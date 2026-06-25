@@ -24,7 +24,7 @@ Search for FREE basketball live streams in Germany from approved official source
 flowchart TD
     A[Step 1: Date Range<br/>today…today+7d, Europe/Berlin] --> B[Step 2: webSearch<br/>approved sources, limit:20]
     B --> C[Step 2.5: validateStreamUrl<br/>openUrl probe + YouTube rules]
-    C -->|@FIBAWorld / non-TheDBBTV /user/ /channel/UC… / HTTP>=400| Z1[SKIP — reject before Step 3<br/>log reason]
+    C -->|"@FIBAWorld / non-TheDBBTV /user/ /channel/UC… / HTTP>=400"| Z1[SKIP — reject before Step 3<br/>log reason]
     C -->|accepted| D[Step 3: 7-check pipeline]
     D --> E1{Check 1<br/>Free Access}
     E1 -->|FAIL| Z2[SKIP — log reasons across remaining checks]
