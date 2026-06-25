@@ -35,8 +35,10 @@
     {
       "id": 3,
       "prompt": "Deprecated /user/FIBA URL must be rejected Input: url=https://www.youtube.com/user/FIBA; title=FIBA Basketball live; league=FIBA; teams=Germany vs Spain; date=2026-06-27T20:00:00+02:00; free_tier=True.",
-      "expected_output": "Decision=SKIP; reason=YouTube /user/ URLs are deprecated. Only /user/TheDBBTV is accepted as approved official channel.; checks: ",
-      "assertions": [],
+      "expected_output": "Decision=SKIP; reason=YouTube /user/ URLs are deprecated. Only /user/TheDBBTV is accepted as approved official channel.; checks: officialSource=FAIL",
+      "assertions": [
+        "officialSource expected FAIL"
+      ],
       "files": [
         "references/validation-workflow.md",
         "references/approved-sources.md"
@@ -83,8 +85,10 @@
     {
       "id": 7,
       "prompt": "/user/TheDBBTV is the only accepted legacy /user/ URL Input: url=https://www.youtube.com/user/TheDBBTV; title=DBB Basketball LIVE; league=FIBA; teams=Germany U20 vs Austria; date=2026-06-28T18:00:00+02:00; free_tier=True.",
-      "expected_output": "Decision=CREATE; reason=; checks: ",
-      "assertions": [],
+      "expected_output": "Decision=CREATE; reason=; checks: officialSource=PASS",
+      "assertions": [
+        "officialSource expected PASS"
+      ],
       "files": [
         "references/validation-workflow.md",
         "references/approved-sources.md"
@@ -93,8 +97,10 @@
     {
       "id": 8,
       "prompt": "youtube.com/channel/ URL must always be rejected Input: url=https://www.youtube.com/channel/UCxyz123; title=Basketball live; league=; teams=; date=2026-06-27T19:00:00+02:00; free_tier=True.",
-      "expected_output": "Decision=SKIP; reason=YouTube /channel/ URLs are not direct live streams; checks: ",
-      "assertions": [],
+      "expected_output": "Decision=SKIP; reason=YouTube /channel/ URLs are not direct live streams; checks: officialSource=FAIL",
+      "assertions": [
+        "officialSource expected FAIL"
+      ],
       "files": [
         "references/validation-workflow.md",
         "references/approved-sources.md"
