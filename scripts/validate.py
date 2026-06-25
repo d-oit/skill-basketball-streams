@@ -5,16 +5,25 @@ Performs three independent checks against the project at --root. Stdlib only
 (no external dependencies); runnable on any Python 3.8+ environment.
 
 Usage:
-    python3 scripts/validate.py [--root PATH] [--check {all,evals|skill|references}]
+    python3 scripts/validate.py [--root PATH] [--check {all,evals|skill|references|smoke-test}]
 
 Checks:
     evals       evals/evals.json conforms to the v1.0.0 standard schema
                 ({skill_name, evals:[{id:int, prompt, expected_output, assertions[]}]}).
     skill       SKILL.md frontmatter carries name+description+version+category,
-                description <= 1024 chars, body <= 250 lines, ## Rationalizations
-                and ## Red Flags sections present.
+                name matches the spec format regex (lowercase / digits / hyphens)
+                and is <= 64 chars, description <= 1024 chars, compatibility <=
+                500 chars (when present), body <= 250 lines, and the
+                ## Rationalizations + ## Red Flags mandatory sections are present.
     references  Every backtick-wrapped `.md` path cited from SKILL.md and
                 README.md resolves to a real file under --root.
+    smoke-test  Self-test: writes a tmp fixture with known schema violations
+                (invalid `name`, over-long `description`, wrong `skill_name`,
+                non-int `id`, non-list `assertions`, dangling .md references),
+                re-invokes this script against the fixture via subprocess, and
+                asserts exit code 1 + diagnostic FAIL lines for every check on
+                stderr. Use to detect regressions if the schema-check branches
+                are later edited.
 
 Exit codes:
     0  PASS  — every requested check succeeded.
@@ -195,6 +204,138 @@ CHECKS = {
 }
 
 
+def smoke_test() -> int:
+    """Self-test: each FAIL branch must be exercised by at least one targeted
+    fixture via a separate subprocess invocation. Three fixtures (one per
+    check) are set up in independent tmp directories; each fixture is
+    designed so only the target check fails while the other two pass.
+
+    Returns 0 if every FAIL branch correctly rejects its targeted fixture;
+    returns 1 if any branch is silently vacuous (subprocess returned 0, or
+    the expected diagnostic prefix was missing from stderr).
+    """
+    import subprocess
+    import tempfile
+
+    VALID_EVALS = json.dumps(
+        {
+            "skill_name": SKILL_NAME,
+            "evals": [
+                {
+                    "id": 1,
+                    "prompt": "x",
+                    "expected_output": "y",
+                    "assertions": ["a"],
+                }
+            ],
+        }
+    )
+    VALID_SKILL_MD = (
+        "---\n"
+        f"name: {SKILL_NAME}\n"
+        "description: Valid SKILL.md fixture for the smoke-test.\n"
+        "version: 1.0.0\n"
+        "category: workflow\n"
+        "---\n\n"
+        "# Title\n\n"
+        "## Purpose\n\nSome content.\n\n"
+        "## Rationalizations\n\n- [ ] none\n\n"
+        "## Red Flags\n\n- [ ] none\n\n"
+        "## References\n\n- `references/x.md`\n"
+    )
+
+    def setup_evals_fail(r: Path) -> None:
+        """check_evals must FAIL; check_skill + check_references must PASS."""
+        (r / "evals").mkdir()
+        (r / "evals" / "evals.json").write_text(
+            json.dumps({"skill_name": "WRONG", "evals": []}),
+            encoding="utf-8",
+        )
+        (r / "references").mkdir()
+        (r / "references" / "x.md").write_text("# OK\n", encoding="utf-8")
+        (r / "SKILL.md").write_text(VALID_SKILL_MD, encoding="utf-8")
+        (r / "README.md").write_text(
+            "See `references/x.md`.\n", encoding="utf-8"
+        )
+
+    def setup_skill_fail(r: Path) -> None:
+        """check_skill must FAIL; check_evals + check_references must PASS."""
+        (r / "evals").mkdir()
+        (r / "evals" / "evals.json").write_text(VALID_EVALS, encoding="utf-8")
+        (r / "references").mkdir()
+        (r / "references" / "x.md").write_text("# OK\n", encoding="utf-8")
+        # Bad SKILL.md: name fails NAME_REGEX (uppercase + underscore).
+        (r / "SKILL.md").write_text(
+            "---\n"
+            "name: Bad_Name\n"
+            "description: x\n"
+            "version: 1.0.0\n"
+            "category: workflow\n"
+            "---\n\n"
+            "# title\n",
+            encoding="utf-8",
+        )
+        (r / "README.md").write_text(
+            "See `references/x.md`.\n", encoding="utf-8"
+        )
+
+    def setup_references_fail(r: Path) -> None:
+        """check_references must FAIL; check_evals + check_skill must PASS."""
+        (r / "evals").mkdir()
+        (r / "evals" / "evals.json").write_text(VALID_EVALS, encoding="utf-8")
+        (r / "references").mkdir()
+        (r / "references" / "x.md").write_text("# OK\n", encoding="utf-8")
+        (r / "SKILL.md").write_text(VALID_SKILL_MD, encoding="utf-8")
+        (r / "README.md").write_text(
+            "See `references/missing.md`.\n", encoding="utf-8"
+        )
+
+    script_path = Path(__file__).resolve()
+    cases = [
+        ("evals", "FAIL: evals:", setup_evals_fail),
+        ("skill", "FAIL: SKILL.md:", setup_skill_fail),
+        ("references", "FAIL: references:", setup_references_fail),
+    ]
+    errs: list[str] = []
+    for check, expected_prefix, setup in cases:
+        with tempfile.TemporaryDirectory() as t:
+            r = Path(t)
+            setup(r)
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    str(script_path),
+                    "--root",
+                    str(r),
+                    "--check",
+                    check,
+                ],
+                capture_output=True,
+                text=True,
+            )
+            if proc.returncode == 0:
+                errs.append(
+                    f"--check {check}: expected exit 1, got 0 "
+                    f"(stdout={proc.stdout!r}, stderr={proc.stderr!r})"
+                )
+            elif expected_prefix not in proc.stderr:
+                errs.append(
+                    f"--check {check}: missing diagnostic {expected_prefix!r} "
+                    f"in stderr:\n{proc.stderr}"
+                )
+
+    if errs:
+        for e in errs:
+            print(f"FAIL: smoke-test: {e}", file=sys.stderr)
+        return 1
+    print(
+        "OK: smoke-test: every FAIL branch correctly rejects its targeted "
+        "fixture (3 separate subprocess invocations across check_evals / "
+        "check_skill / check_references)"
+    )
+    return 0
+
+
 def main() -> None:
     p = argparse.ArgumentParser(
         description="Validate skill-basketball-streams project structure.",
@@ -207,10 +348,14 @@ def main() -> None:
     p.add_argument(
         "--check",
         default="all",
-        choices=("all", "evals", "skill", "references"),
-        help="which check to run (default: all)",
+        choices=("all", "evals", "skill", "references", "smoke-test"),
+        help="which check to run (default: all); 'smoke-test' exercises the "
+             "FAIL branches against a tmp fixture and returns 0 if every "
+             "branch correctly rejects",
     )
     args = p.parse_args()
+    if args.check == "smoke-test":
+        sys.exit(smoke_test())
     root = Path(args.root).resolve()
     if not root.is_dir():
         print(
