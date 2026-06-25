@@ -1,153 +1,104 @@
 {
+  "skill_name": "skill-basketball-streams",
   "evals": [
     {
-      "id": "eval-001",
-      "description": "Valid FIBA live stream URL should pass all checks",
-      "input": {
-        "url": "https://www.youtube.com/@fiba/live",
-        "title": "FIBA U20 Women's EuroBasket 2026 LIVE",
-        "date": "2026-06-27T19:00:00+02:00",
-        "league": "FIBA",
-        "teams": "Germany vs France",
-        "free": true
-      },
-      "expected": {
-        "decision": "CREATE",
-        "checks": {
-          "freeAccess": "PASS",
-          "liveContent": "PASS",
-          "officialSource": "PASS",
-          "basketballSpecific": "PASS",
-          "dateTimeRange": "PASS",
-          "workingLink": "PASS",
-          "directStreamVerification": "PASS"
-        }
-      }
+      "id": 1,
+      "prompt": "Valid FIBA live stream URL should pass all checks Input: url=https://www.youtube.com/@fiba/live; title=FIBA U20 Women's EuroBasket 2026 LIVE; league=FIBA; teams=Germany vs France; date=2026-06-27T19:00:00+02:00; free_tier=True.",
+      "expected_output": "Decision=CREATE; reason=; checks: freeAccess=PASS, liveContent=PASS, officialSource=PASS, basketballSpecific=PASS, dateTimeRange=PASS, workingLink=PASS, directStreamVerification=PASS",
+      "assertions": [
+        "freeAccess expected PASS",
+        "liveContent expected PASS",
+        "officialSource expected PASS",
+        "basketballSpecific expected PASS",
+        "dateTimeRange expected PASS",
+        "workingLink expected PASS",
+        "directStreamVerification expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md"
+      ]
     },
     {
-      "id": "eval-002",
-      "description": "@FIBAWorld is NOT a valid channel and must be rejected",
-      "input": {
-        "url": "https://www.youtube.com/@FIBAWorld/live",
-        "title": "FIBA World Cup live",
-        "date": "2026-06-27T19:00:00+02:00",
-        "league": "FIBA",
-        "teams": "Germany vs USA",
-        "free": true
-      },
-      "expected": {
-        "decision": "SKIP",
-        "reason": "@FIBAWorld is NOT a valid YouTube channel. Only @fiba is the official FIBA channel.",
-        "checks": {
-          "officialSource": "FAIL",
-          "workingLink": "FAIL"
-        }
-      }
+      "id": 2,
+      "prompt": "@FIBAWorld is NOT a valid channel and must be rejected Input: url=https://www.youtube.com/@FIBAWorld/live; title=FIBA World Cup live; league=FIBA; teams=Germany vs USA; date=2026-06-27T19:00:00+02:00; free_tier=True.",
+      "expected_output": "Decision=SKIP; reason=@FIBAWorld is NOT a valid YouTube channel. Only @fiba is the official FIBA channel.; checks: officialSource=FAIL, workingLink=FAIL",
+      "assertions": [
+        "officialSource expected FAIL",
+        "workingLink expected FAIL"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md"
+      ]
     },
     {
-      "id": "eval-003",
-      "description": "Deprecated /user/FIBA URL must be rejected",
-      "input": {
-        "url": "https://www.youtube.com/user/FIBA",
-        "title": "FIBA Basketball live",
-        "date": "2026-06-27T20:00:00+02:00",
-        "league": "FIBA",
-        "teams": "Germany vs Spain",
-        "free": true
-      },
-      "expected": {
-        "decision": "SKIP",
-        "reason": "YouTube /user/ URLs are deprecated. Only /user/TheDBBTV is accepted as approved official channel."
-      }
+      "id": 3,
+      "prompt": "Deprecated /user/FIBA URL must be rejected Input: url=https://www.youtube.com/user/FIBA; title=FIBA Basketball live; league=FIBA; teams=Germany vs Spain; date=2026-06-27T20:00:00+02:00; free_tier=True.",
+      "expected_output": "Decision=SKIP; reason=YouTube /user/ URLs are deprecated. Only /user/TheDBBTV is accepted as approved official channel.; checks: ",
+      "assertions": [],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md"
+      ]
     },
     {
-      "id": "eval-004",
-      "description": "MagentaSport free EuroLeague game should be accepted",
-      "input": {
-        "url": "https://www.magentasport.de/live/basketball/euroleague",
-        "title": "EuroLeague LIVE: Real Madrid vs ALBA Berlin",
-        "date": "2026-06-26T20:30:00+02:00",
-        "league": "EuroLeague",
-        "teams": "Real Madrid vs ALBA Berlin",
-        "free": true
-      },
-      "expected": {
-        "decision": "CREATE",
-        "checks": {
-          "freeAccess": "PASS",
-          "officialSource": "PASS"
-        }
-      }
+      "id": 4,
+      "prompt": "MagentaSport free EuroLeague game should be accepted Input: url=https://www.magentasport.de/live/basketball/euroleague; title=EuroLeague LIVE: Real Madrid vs ALBA Berlin; league=EuroLeague; teams=Real Madrid vs ALBA Berlin; date=2026-06-26T20:30:00+02:00; free_tier=True.",
+      "expected_output": "Decision=CREATE; reason=; checks: freeAccess=PASS, officialSource=PASS",
+      "assertions": [
+        "freeAccess expected PASS",
+        "officialSource expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md"
+      ]
     },
     {
-      "id": "eval-005",
-      "description": "Paid Sky Sport stream must be rejected",
-      "input": {
-        "url": "https://www.sky.de/sport/basketball",
-        "title": "BBL Finals LIVE auf Sky",
-        "date": "2026-06-27T19:00:00+02:00",
-        "league": "BBL",
-        "teams": "ALBA Berlin vs Bayern",
-        "free": false,
-        "keywords": ["Sky", "Abo", "subscription"]
-      },
-      "expected": {
-        "decision": "SKIP",
-        "reason": "Paid content (Sky subscription required)",
-        "checks": {
-          "freeAccess": "FAIL",
-          "officialSource": "FAIL"
-        }
-      }
+      "id": 5,
+      "prompt": "Paid Sky Sport stream must be rejected Input: url=https://www.sky.de/sport/basketball; title=BBL Finals LIVE auf Sky; league=BBL; teams=ALBA Berlin vs Bayern; date=2026-06-27T19:00:00+02:00; free_tier=False.",
+      "expected_output": "Decision=SKIP; reason=Paid content (Sky subscription required); checks: freeAccess=FAIL, officialSource=FAIL",
+      "assertions": [
+        "freeAccess expected FAIL",
+        "officialSource expected FAIL"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md"
+      ]
     },
     {
-      "id": "eval-006",
-      "description": "Highlights/replay must be rejected",
-      "input": {
-        "url": "https://www.sportschau.de/basketball/highlights",
-        "title": "BBL Highlights: Top 10 Plays",
-        "date": "2026-06-24T10:00:00+02:00",
-        "league": "BBL",
-        "free": true,
-        "keywords": ["highlights", "replay"]
-      },
-      "expected": {
-        "decision": "SKIP",
-        "reason": "Not a live stream (highlights/replay)",
-        "checks": {
-          "liveContent": "FAIL"
-        }
-      }
+      "id": 6,
+      "prompt": "Highlights/replay must be rejected Input: url=https://www.sportschau.de/basketball/highlights; title=BBL Highlights: Top 10 Plays; league=BBL; teams=; date=2026-06-24T10:00:00+02:00; free_tier=True.",
+      "expected_output": "Decision=SKIP; reason=Not a live stream (highlights/replay); checks: liveContent=FAIL",
+      "assertions": [
+        "liveContent expected FAIL"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md"
+      ]
     },
     {
-      "id": "eval-007",
-      "description": "/user/TheDBBTV is the only accepted legacy /user/ URL",
-      "input": {
-        "url": "https://www.youtube.com/user/TheDBBTV",
-        "title": "DBB Basketball LIVE",
-        "date": "2026-06-28T18:00:00+02:00",
-        "league": "FIBA",
-        "teams": "Germany U20 vs Austria",
-        "free": true
-      },
-      "expected": {
-        "decision": "CREATE",
-        "note": "Only accepted after page content is read and LIVE text confirmed"
-      }
+      "id": 7,
+      "prompt": "/user/TheDBBTV is the only accepted legacy /user/ URL Input: url=https://www.youtube.com/user/TheDBBTV; title=DBB Basketball LIVE; league=FIBA; teams=Germany U20 vs Austria; date=2026-06-28T18:00:00+02:00; free_tier=True.",
+      "expected_output": "Decision=CREATE; reason=; checks: ",
+      "assertions": [],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md"
+      ]
     },
     {
-      "id": "eval-008",
-      "description": "youtube.com/channel/ URL must always be rejected",
-      "input": {
-        "url": "https://www.youtube.com/channel/UCxyz123",
-        "title": "Basketball live",
-        "date": "2026-06-27T19:00:00+02:00",
-        "free": true
-      },
-      "expected": {
-        "decision": "SKIP",
-        "reason": "YouTube /channel/ URLs are not direct live streams"
-      }
+      "id": 8,
+      "prompt": "youtube.com/channel/ URL must always be rejected Input: url=https://www.youtube.com/channel/UCxyz123; title=Basketball live; league=; teams=; date=2026-06-27T19:00:00+02:00; free_tier=True.",
+      "expected_output": "Decision=SKIP; reason=YouTube /channel/ URLs are not direct live streams; checks: ",
+      "assertions": [],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md"
+      ]
     }
   ]
 }
