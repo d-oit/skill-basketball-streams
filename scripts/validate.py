@@ -91,6 +91,28 @@ def check_evals(root: Path) -> None:
                 f"evals[{i}].assertions: expected list, got "
                 f"{type(case['assertions']).__name__}"
             )
+        # Per-case type coverage (note: deliberately NOT asserting
+        # non-empty for `expected_output`, `assertions`, or per-entry
+        # assertions — a legitimate eval case can express "no output"
+        # via empty `expected_output`, "no PASS/FAIL signal" via empty
+        # `assertions: []`, etc. The static schema check above is
+        # necessary but not sufficient; these type-only checks ensure each
+        # case carries the right TYPE of evidence for a future
+        # skill-evaluator to assert against, without rejecting legitimate
+        # "vacuous-looking" cases).
+        expected_output = case.get("expected_output")
+        if not isinstance(expected_output, str):
+            errs.append(
+                f"evals[{i}].expected_output: expected string, "
+                f"got {type(expected_output).__name__}"
+            )
+        if isinstance(case.get("assertions"), list):
+            for j, assertion in enumerate(case["assertions"]):
+                if not isinstance(assertion, str):
+                    errs.append(
+                        f"evals[{i}].assertions[{j}]: expected string, "
+                        f"got {type(assertion).__name__}"
+                    )
     if errs:
         for e in errs:
             print(f"FAIL: evals: {e}", file=sys.stderr)
