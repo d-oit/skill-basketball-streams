@@ -1,6 +1,6 @@
 # Contributing
 
-Frontmatter-driven [Codebuff CLI skill](SKILL.md) for finding and
+Frontmatter-driven ([Specification](https://agentskills.io/specification)) for finding and
 validating free basketball live streams in Germany. See [`SKILL.md`](SKILL.md)
 for the contract, [`README.md`](README.md) for the dataflow.
 
