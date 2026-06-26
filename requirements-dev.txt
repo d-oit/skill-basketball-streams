@@ -1,0 +1,6 @@
+# Test-only dependencies for skill-basketball-streams.
+# Install with: `pip install -r requirements-dev.txt`
+# The production scripts (validate.py / runtime_eval.py) remain
+# stdlib-only on Python 3.8+.
+
+pytest>=8.0

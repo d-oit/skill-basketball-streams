@@ -37,3 +37,9 @@ jobs:
 
       - name: Run runtime_eval (structural pass)
         run: python3 scripts/runtime_eval.py --root .
+
+      - name: Install test dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Run pytest
+        run: python3 -m pytest tests/ -v --tb=short
