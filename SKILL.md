@@ -111,4 +111,4 @@ Always emit the Step 7 table. On total failure return `"Found [N] potential stre
 - `references/calendar-setup.md` — Google Calendar event schema, color codes, duplicate detection parameters, time-handling rules
 - `references/implementation-notes.md` — query templates, time-handling, team-name variants, exclusion vocabulary, full `validateStreamUrl` implementation and end-to-end workflow TypeScript
 - `references/lessons-learned.md` — incident post-mortem (broken `/user/FIBA` events), root causes, prevention checklist, validation log template and worked examples
-- `evals/evals.json` — 8 eval cases (driving the `skill-evaluator` rubric; see `README.md` → Self-Validation)
+- `evals/evals.json` — 12 eval cases (driving the `skill-evaluator` rubric; see `README.md` → Self-Validation)

@@ -75,10 +75,17 @@ ASCII fallback (for renderers that strip Mermaid):
 ```
 SKILL.md                              Main skill instructions (frontmatter, process, mandates)
 README.md                             This file (overview, dataflow, dev workflow)
+CHANGELOG.md                          Release history (Keep-a-Changelog format)
 evals/
-  └── evals.json                      8 standard-schema eval cases (driving the rubric)
+  └── evals.json                      12 standard-schema eval cases (driving the rubric)
 scripts/
-  └── validate.py                     Self-contained validator (stdlib only): `python3 scripts/validate.py --root .` runs three checks — evals.json schema, SKILL.md frontmatter + body ≤250 lines + mandatory sections, and backtick-wrapped .md path resolution.
+  ├── validate.py                     Self-contained validator (stdlib only): three checks plus smoke-test regression guard.
+  ├── runtime_eval.py                 Scaffold runtime skill-evaluator (structural + runtime passes; canned stub inputs).
+  └── README.md                       Maintenance doc: tool list, exit codes, how to add a check/case, CI integration.
+tests/
+  ├── pytest.ini                      Pytest config (testpaths, default options, warning filter).
+  ├── test_validate.py                ~17 subprocess tests for scripts/validate.py.
+  └── test_runtime_eval.py            ~10 subprocess tests for scripts/runtime_eval.py.
 references/
   ├── approved-sources.md             Approved streaming sources + YouTube URL allow/reject table
   ├── validation-workflow.md          7-check pipeline + special cases + decision logic
@@ -95,7 +102,7 @@ references/
 - Mandatory source reference URL and ISO validation timestamp on every event.
 - Duplicate detection via `googleCalendarListEvents` (±30 min, team + league `fullText`).
 - Mandatory `## Rationalizations` / `## Red Flags` sections to defend against agent drift.
-- Schema-conformant `evals/evals.json` (8 standard-shape cases passable by any external evaluator).
+- Schema-conformant `evals/evals.json` (12 standard-shape cases passable by any external evaluator).
 
 ## Approved Sources (top-level categories)
 
@@ -137,7 +144,7 @@ Run before each release; every item is checkable without external tooling.
 - [ ] Frontmatter contains `name`, `description`, `category`, and `version`
 - [ ] `description` line is ≤ 1024 chars
 - [ ] Includes `## Rationalizations` and `## Red Flags` sections
-- [ ] Contains at least 3 realistic eval cases in `evals/evals.json`
+- [ ] Contains at least 3 realistic eval cases in `evals/evals.json` (currently 12)
 - [ ] JSON-shape validation passes (`id:int`, `prompt`, `expected_output`, `assertions[]`)
 - [ ] All backtick-wrapped `.md` paths in `SKILL.md` and `README.md` resolve to real files
 - [ ] The validator in **Quick Verification** above passes (exit code 0)

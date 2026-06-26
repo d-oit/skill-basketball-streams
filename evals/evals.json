@@ -105,6 +105,61 @@
         "references/validation-workflow.md",
         "references/approved-sources.md"
       ]
+    },
+    {
+      "id": 9,
+      "prompt": "BBL ALBA Berlin home game on official club website should pass all checks. Input: url=https://www.albaberlin.de/live; title=ALBA Berlin vs ratiopharm ulm LIVE; league=BBL; teams=ALBA Berlin vs ratiopharm ulm; date=2026-06-28T19:00:00+02:00; free_tier=True.",
+      "expected_output": "Decision=CREATE; reason=; checks: freeAccess=PASS, liveContent=PASS, officialSource=PASS, basketballSpecific=PASS, dateTimeRange=PASS, workingLink=PASS, directStreamVerification=PASS",
+      "assertions": [
+        "freeAccess expected PASS",
+        "liveContent expected PASS",
+        "officialSource expected PASS",
+        "basketballSpecific expected PASS",
+        "dateTimeRange expected PASS",
+        "workingLink expected PASS",
+        "directStreamVerification expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "Dyn Sport Mix free streaming tier on Pluto TV (no subscription required) should pass. Input: url=https://pluto.tv/de/live/dyn-sport-mix; title=Dyn Sport Mix Basketball LIVE; league=BBL; teams=FC Bayern Muenchen vs ratiopharm ulm; date=2026-06-29T18:00:00+02:00; free_tier=True.",
+      "expected_output": "Decision=CREATE; reason=Dyn Sport Mix free tier (Pluto TV - no subscription required); checks: freeAccess=PASS, liveContent=PASS, officialSource=PASS, basketballSpecific=PASS",
+      "assertions": [
+        "freeAccess expected PASS",
+        "liveContent expected PASS",
+        "officialSource expected PASS",
+        "basketballSpecific expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md"
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "Past event (yesterday) is outside the allowed today...today+7d window and must be rejected. Input: url=https://www.youtube.com/@fiba/live; title=FIBA U20 game replay; league=FIBA; teams=Germany vs France; date=2026-06-25T19:00:00+02:00; free_tier=True.",
+      "expected_output": "Decision=SKIP; reason=Event outside today...today+7d window (past event); checks: dateTimeRange=FAIL",
+      "assertions": [
+        "dateTimeRange expected FAIL"
+      ],
+      "files": [
+        "references/validation-workflow.md"
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "Future event more than 7 days out is outside the allowed window and must be rejected. Input: url=https://www.youtube.com/@fiba/live; title=FIBA upcoming tournament; league=FIBA; teams=Germany vs Serbia; date=2026-07-05T19:00:00+02:00; free_tier=True.",
+      "expected_output": "Decision=SKIP; reason=Event outside today...today+7d window (>7 days in future); checks: dateTimeRange=FAIL",
+      "assertions": [
+        "dateTimeRange expected FAIL"
+      ],
+      "files": [
+        "references/validation-workflow.md"
+      ]
     }
   ]
 }
