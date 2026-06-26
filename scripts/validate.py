@@ -313,13 +313,32 @@ def smoke_test() -> int:
         )
 
     script_path = Path(__file__).resolve()
-    cases = [
-        ("evals", "FAIL: evals:", setup_evals_fail),
-        ("skill", "FAIL: SKILL.md:", setup_skill_fail),
-        ("references", "FAIL: references:", setup_references_fail),
-    ]
+    # Per-check FAIL-fixture builders + their expected stderr prefix.
+    # Required for smoke-test coverage of every registered CHECKS entry.
+    # Adding a new CHECKS entry MUST also register a fixture here;
+    # otherwise the smoke-test reports the missing coverage before it ships
+    # (tests/test_validate.py:test_each_check_fail_branch_via_parametrize
+    # exercises the same registry on the pytest side so the gap is caught
+    # by both the production self-test and the unit-test surface).
+    fail_fixtures = {
+        "evals": (setup_evals_fail, "FAIL: evals:"),
+        "skill": (setup_skill_fail, "FAIL: SKILL.md:"),
+        "references": (
+            setup_references_fail,
+            "FAIL: references:",
+        ),
+    }
     errs: list[str] = []
-    for check, expected_prefix, setup in cases:
+    for check in CHECKS:
+        fixture = fail_fixtures.get(check)
+        if fixture is None:
+            errs.append(
+                f"--check {check}: no FAIL-fixture builder registered "
+                f"(smoke-test can't cover this check); add an entry to "
+                f"fail_fixtures in smoke_test()"
+            )
+            continue
+        setup, expected_prefix = fixture
         with tempfile.TemporaryDirectory() as t:
             r = Path(t)
             setup(r)
@@ -350,10 +369,11 @@ def smoke_test() -> int:
         for e in errs:
             print(f"FAIL: smoke-test: {e}", file=sys.stderr)
         return 1
+    covered = " / ".join(f"check_{k}" for k in CHECKS.keys())
     print(
-        "OK: smoke-test: every FAIL branch correctly rejects its targeted "
-        "fixture (3 separate subprocess invocations across check_evals / "
-        "check_skill / check_references)"
+        f"OK: smoke-test: every FAIL branch correctly rejects its targeted "
+        f"fixture ({len(CHECKS)} separate subprocess invocations across "
+        f"{covered})"
     )
     return 0
 

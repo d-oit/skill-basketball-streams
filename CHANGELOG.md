@@ -7,17 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-06-26
+
 ### Added
 
 - **`CONTRIBUTING.md`** (NEW at repo root) — top-level contributor doc
   with quick-start, eval-case schema (required vs recommended fields),
   release-workflow pointer, broken-link issue format, and a
   Conventional Commits prefix note.
-- **`scripts/README.md` → Releasing** — canonical release workflow
+- **`scripts/README.md` → Releasing`** — canonical release workflow
   section covering pre-v1.1.0 (legacy GH013 + admin-bypass) vs
   post-v1.1.0 (direct push) flows, the `gh pr merge --rebase --admin`
   command, the tag + tag-push step, and the `delete_branch_on_merge`
   note.
+- **`.github/workflows/codeql.yml`** (NEW) — CodeQL analysis on
+  every push + PR + weekly cron (`0 6 * * 1`) on the default branch.
+  Security-extended query suite over Python, SARIF upload via
+  `github/codeql-action/analyze@v3`. Augments the validator matrix
+  with security scanning.
+- **`.gitignore`** — created with `__pycache__/`, `*.pyc`, `*.pyo`,
+  `*.pyd`, and `.pytest_cache/` patterns. pytest bytecode cache is no
+  longer tracked.
 
 ### Changed
 
@@ -29,6 +39,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   preserved.
 - **Repo setting `delete_branch_on_merge: true`** — feat branches
   auto-cleanup after a successful PR merge (was `false`).
+- **`scripts/validate.py:smoke_test`** — driven by `CHECKS.keys()`
+  iteration over a per-check `fail_fixtures` registry. Adding a 4th
+  check now produces a typed error ("no FAIL-fixture builder
+  registered") if its fixture is not also registered.
+- **`tests/test_validate.py`** — added
+  `@pytest.mark.parametrize`-decorated
+  `test_each_check_fail_branch_via_parametrize` for the 3 CHECKS
+  entries, plus module-level `_setup_*_fail` helpers. Adding a 4th
+  check requires one tuple entry.
 
 ### Cleanup
 

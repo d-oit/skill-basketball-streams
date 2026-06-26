@@ -360,3 +360,80 @@ def test_smoke_test_passes_on_current_repo():
     # smoke-test exercises each FAIL branch via subprocess; verify all three
     # got exercised.
     assert "every FAIL branch correctly rejects" in r.stdout
+
+
+# ---------------------------------------------------------------------------
+# Parametrized FAIL-branch coverage — adding a 4th check requires one tuple
+# entry below (and a fixture inside `scripts/validate.py:smoke_test`'s
+# `fail_fixtures` dict). The pytest side and the production self-test stay
+# in lockstep so a new check ships only after its FAIL-branch coverage is
+# registered on both sides.
+# ---------------------------------------------------------------------------
+
+
+def _setup_evals_fail(tmp_path: Path) -> None:
+    """Eval case with WRONG skill_name — must FAIL check_evals."""
+    _write_minimal_repo(tmp_path, {"skill_name": "WRONG", "evals": []})
+
+
+def _setup_skill_regex_fail(tmp_path: Path) -> None:
+    """Skill name failing NAME_REGEX (uppercase + underscore)."""
+    _write_minimal_repo(tmp_path)
+    bad = (
+        "---\n"
+        "name: Bad_Name\n"
+        "description: x\n"
+        "version: 1.0.0\n"
+        "category: workflow\n"
+        "---\n\n"
+        "# Title\n\n"
+    )
+    (tmp_path / "SKILL.md").write_text(bad, encoding="utf-8")
+
+
+def _setup_references_missing_fail(tmp_path: Path) -> None:
+    """README.md cites a `.md` path that doesn't exist on disk."""
+    _write_minimal_repo(tmp_path)
+    (tmp_path / "README.md").write_text(
+        "See `references/missing.md`.\n", encoding="utf-8"
+    )
+
+
+@pytest.mark.parametrize(
+    "check_key, setup_fn, expected_diagnostic",
+    [
+        (
+            "evals",
+            _setup_evals_fail,
+            "FAIL: evals:",
+        ),
+        (
+            "skill",
+            _setup_skill_regex_fail,
+            "FAIL: SKILL.md:",
+        ),
+        (
+            "references",
+            _setup_references_missing_fail,
+            "FAIL: references:",
+        ),
+    ],
+    ids=["check=evals", "check=skill", "check=references"],
+)
+def test_each_check_fail_branch_via_parametrize(
+    tmp_path, check_key, setup_fn, expected_diagnostic,
+):
+    """Each registered CHECKS entry MUST be covered by a per-check FAIL
+    fixture. Adding a 4th check requires (a) adding a CHECKS dict entry to
+    scripts/validate.py + a `fail_fixtures[*]` entry to its smoke_test(),
+    and (b) adding one tuple entry to this parametrize list."""
+    setup_fn(tmp_path)
+    r = _run(["--check", check_key, "--root", str(tmp_path)])
+    assert r.returncode == 1, (
+        f"--check {check_key} did not FAIL on its targeted fixture:\n"
+        f"stdout={r.stdout!r}\nstderr={r.stderr!r}"
+    )
+    assert expected_diagnostic in r.stderr, (
+        f"--check {check_key} expected {expected_diagnostic!r} in stderr, "
+        f"got:\n{r.stderr}"
+    )
