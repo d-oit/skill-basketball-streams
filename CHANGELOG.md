@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-06-26
+
 ### Added
 
 - **Test suite (`tests/`)** — pytest suite covering both `scripts/validate.py`
@@ -16,27 +18,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   detection + malformed JSON + non-coercible int keys). Run with
   `pytest tests/` from the project root. Stdlib-only except for
   `pytest` itself; see `requirements-dev.txt`.
-- **`requirements-dev.txt`** — declares `pytest>=9.0` as the only test
-  dependency. Production scripts remain stdlib-only on Python 3.8+.
+- **`requirements-dev.txt`** — declares `pytest>=8.0` as the only test
+  dependency (lower bound keeps Python 3.8 supported in the CI matrix —
+  pytest 9 dropped 3.8). Production scripts remain stdlib-only on Python 3.8+.
 - **`tests/pytest.ini`** — pytest configuration (testpaths, default options,
   warning filter).
+- **CI step: pytest** — `.github/workflows/validate.yml` now installs
+  `requirements-dev.txt` and runs `pytest tests/` per matrix entry, so
+  the full unit-test suite runs alongside the validator + smoke-test +
+  runtime_eval on every push/PR (5 Python versions × `fail-fast: false`).
 - **CI step: runtime_eval structural pass** — `.github/workflows/validate.yml`
-  now runs `python3 scripts/runtime_eval.py --root .` as a third step, so the
-  per-case structural coverage runs alongside the validator on every
-  push/PR (5 Python versions × `fail-fast: false`).
+  now runs `python3 scripts/runtime_eval.py --root .` as an additional
+  step, so the per-case structural coverage runs alongside the validator
+  on every push/PR.
 - **CI Python matrix** — `.github/workflows/validate.yml` runs the validator
-  + smoke-test + runtime_eval over `python-version: ['3.8', '3.9', '3.10',
-  '3.11', '3.12']` so every documented stdlib compatibility range is
-  covered.
+  + smoke-test + runtime_eval + pytest over
+  `python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']` so every
+  documented stdlib compatibility range is covered.
 - **Eval cases 9–12** — `evals/evals.json` extended from 8 to 12
   standard-schema cases. New coverage: positive (BBL club website on
   `albaberlin.de` passes all 7 checks; Dyn Sport Mix free tier via
   Pluto TV) and negative (past event violates Check 5; future event >+7d
   violates Check 5).
+- **`scripts/runtime_eval.py`** — stdlib-only scaffold runtime-evaluator
+  with two modes — **structural pass** (`--root .` walks every case
+  and asserts `id:int` + `expected_output:str` + `assertions:list`) and
+  **runtime pass** (`--stubs stubs.json` asserts each stub string equals
+  the case's `expected_output` AND every evaluation-assertion needle
+  parses out of the corpus).
 - **`scripts/README.md`** — maintenance doc covering: which scripts exist,
   how to add a new check, how to add a new eval case (JSON-aware heredoc
   edits), how to update `runtime_eval.py`, exit codes + CLI conventions,
   and CI integration.
+- **`CHANGELOG.md`** — Keep-a-Changelog format with `[Unreleased]` and
+  dated release sections.
 
 ### Changed
 
@@ -47,6 +62,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `assertions: []` or "no output" via `expected_output: ""`). Catches
   type-shape regressions like `expected_output: 42` without rejecting
   legitimately-empty cases.
+- **`scripts/validate.py --check evals` exit code** — moved from exit 1
+  on first failure to "print all failures, then exit 1" so a single run
+  surfaces every regression in one go instead of forcing an
+  edit-fail-fix loop.
 - **Eval case assertions populated** — cases id=3, id=7, id=8 (which had
   `assertions: []` after the initial `expected.checks` migration) now
   carry a single `officialSource expected PASS|FAIL` assertion derived
