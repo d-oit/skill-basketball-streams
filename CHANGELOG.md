@@ -30,11 +30,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Repo setting `delete_branch_on_merge: true`** — feat branches
   auto-cleanup after a successful PR merge (was `false`).
 
-### Removed
+### Cleanup
 
-- **`feat/test-suite-and-eval-expansion`** (local + remote) —
-  merged via PR #1 at commit `21e7bcc` (v1.1.0 release). The feat
-  branch superseded by `main`; remote ref + local tracking removed.
+- **`feat/test-suite-and-eval-expansion`** branch REFERENCE —
+  deleted locally + on remote after PR #1 (v1.1.0 release) merged at
+  commit `21e7bcc`. The merged commits themselves remain on `main`
+  (post-rebase at `21e7bcc`); only the branch ref is gone. `git log
+  main` still shows the contribution.
 
 ## [1.1.0] - 2026-06-26
 

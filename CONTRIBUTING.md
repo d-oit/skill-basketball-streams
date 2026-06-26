@@ -5,7 +5,8 @@ validating free basketball live streams in Germany. See [`SKILL.md`](SKILL.md)
 for the contract, [`README.md`](README.md) for the dataflow.
 
 Commit prefix follows [Conventional Commits](https://www.conventionalcommits.org/):
-`feat:` / `fix:` / `chore:` / `docs:` / `test:` / `refactor:`.
+`feat:` / `fix:` / `chore:` / `docs:` / `test:` / `refactor:` / `perf:` /
+`build:` / `ci:` / `style:` / `revert:`.
 
 ## Quick start
 
