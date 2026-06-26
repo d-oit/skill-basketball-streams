@@ -140,6 +140,71 @@ All three commands run on Python `[3.8, 3.9, 3.10, 3.11, 3.12]` via
 If you add a fourth step, append it under the existing three (do NOT
 replace them) and keep the matrix intact.
 
+## Releasing
+
+**Workflow**: feature branch → PR → rebase-merge → annotated tag → tag push.
+
+### Pre-v1.1.0 (legacy)
+
+Ruleset 18142708 had a `code_scanning` rule that required CodeQL
+results. Since CodeQL was not configured, direct `git push origin main`
+was rejected with `GH013: Code Scanning not configured for main`. The
+workaround was to open a PR and merge with admin bypass:
+
+```bash
+gh pr merge <PR-number> --rebase --admin
+```
+
+The `--admin` flag invokes `bypass_actors[pull_request]` for the
+maintainer, overriding the `code_scanning` + `code_quality` rules.
+
+### Post-v1.1.0
+
+The `code_scanning` rule was removed from 18142708 (default-branch
+commit: `21e7bcc`). CodeQL default-setup was `not-configured`; the rule
+was checking against absent results. With that rule gone, direct
+`git push origin main` is the expected path for maintainers — this
+commit is the first direct push since the ruleset change, so its
+success verifies the fix end-to-end.
+
+Caveat: `code_quality` (severity: errors) remains in 18142708 and
+**has not been tested**. If a code-quality tool is added later and trips
+on lint errors, direct push may be rejected; fall back to the PR
+rebase-merge path in that case.
+
+### Concrete release commands
+
+```bash
+# 1. Land feature work on a feat branch
+git checkout -b feat/release-prep
+# (edit, commit, push the branch)
+git push origin feat/release-prep
+
+# 2. Open the PR
+gh pr create --base main --head feat/release-prep \
+  --title "feat: ..." --body "..."
+
+# 3. After CI is green, rebase-merge with admin bypass
+#    `--rebase` preserves commits + satisfies `required_linear_history`
+gh pr merge <PR-number> --rebase --admin
+
+# 4. Tag + push tag (ruleset targets branch refs only, not tag refs)
+git fetch origin
+git checkout main
+git tag -a v<X.Y.Z> -m "Release v<X.Y.Z>: <summary>"
+git push origin v<X.Y.Z>
+
+# 5. (optional) GitHub Release with notes from CHANGELOG.md
+gh release create v<X.Y.Z> --notes-file CHANGELOG.md
+```
+
+`--squash` works too (`gh pr merge <PR-number> --squash --admin`); it
+also satisfies `required_linear_history`. Only the legacy `--merge`
+(merge commit) is blocked by the ruleset.
+
+The `delete_branch_on_merge` repo setting is `true`, so the feat branch
+is auto-cleaned after a successful merge.
+
 ## See also
 
 - [`../SKILL.md`](../SKILL.md) — frontmatter + 7-step pipeline.

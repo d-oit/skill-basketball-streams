@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`CONTRIBUTING.md`** (NEW at repo root) — top-level contributor doc
+  with quick-start, eval-case schema (required vs recommended fields),
+  release-workflow pointer, broken-link issue format, and a
+  Conventional Commits prefix note.
+- **`scripts/README.md` → Releasing** — canonical release workflow
+  section covering pre-v1.1.0 (legacy GH013 + admin-bypass) vs
+  post-v1.1.0 (direct push) flows, the `gh pr merge --rebase --admin`
+  command, the tag + tag-push step, and the `delete_branch_on_merge`
+  note.
+
+### Changed
+
+- **Ruleset 18142708 (`Main`)** — removed the `code_scanning` rule.
+  CodeQL default-setup was `not-configured`; the rule was checking
+  against absent results. Direct `git push origin main` now succeeds
+  for any contributor with admin role. Other rules (`deletion`,
+  `non_fast_forward`, `required_linear_history`, `code_quality`)
+  preserved.
+- **Repo setting `delete_branch_on_merge: true`** — feat branches
+  auto-cleanup after a successful PR merge (was `false`).
+
+### Removed
+
+- **`feat/test-suite-and-eval-expansion`** (local + remote) —
+  merged via PR #1 at commit `21e7bcc` (v1.1.0 release). The feat
+  branch superseded by `main`; remote ref + local tracking removed.
+
 ## [1.1.0] - 2026-06-26
 
 ### Added
