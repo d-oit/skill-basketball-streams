@@ -4,6 +4,8 @@ AI agent skill: search, validate, and add **FREE basketball live streams in Germ
 
 > Frontmatter-driven trigger — load this skill whenever the user asks for free / official / German basketball streams, requests validation of a candidate stream URL, or asks to add / verify basketball calendar entries.
 
+<img width="1672" height="941" alt="image" src="https://github.com/user-attachments/assets/4f701f23-0f03-478f-b88b-d1ef1c328ebd" />
+
 ## Description
 
 Search for FREE basketball live streams in Germany from approved official sources, validate them with a 7-check pipeline (URL, page content, source allow-list, basketball-specific, date range, live proof, source reference), and add confirmed streams to a Google Calendar. **Not** for paid broadcasters (Sky / DAZN / Prime), highlight reels, or non-basketball sports.
