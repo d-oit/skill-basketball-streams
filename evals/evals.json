@@ -160,6 +160,106 @@
       "files": [
         "references/validation-workflow.md"
       ]
+    },
+    {
+      "id": 13,
+      "prompt": "Duplicate detection with fullText correctly populated with team keywords should identify duplicate. Input: url=https://www.sportschau.de/basketball/live; title=BBL: ALBA Berlin vs Bayern Munich LIVE; league=BBL; teams=ALBA Berlin vs Bayern Munich; date=2026-06-27T19:00:00+02:00; free_tier=True; existing_event=true; existing_event_fullText=ALBA Berlin Bayern Munich.",
+      "expected_output": "Decision=SKIP; reason=Event already exists: duplicate detected via fullText team keywords; checks: duplicateCheck=FAIL",
+      "assertions": [
+        "duplicateCheck expected FAIL"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/calendar-setup.md"
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "Duplicate detection with blank fullText should NOT properly identify duplicate (fullText bug). Input: url=https://www.sportschau.de/basketball/live; title=BBL: ALBA Berlin vs Bayern Munich LIVE; league=BBL; teams=ALBA Berlin vs Bayern Munich; date=2026-06-27T19:00:00+02:00; free_tier=True; existing_event=true; existing_event_fullText= .",
+      "expected_output": "Decision=CREATE; reason=; checks: duplicateCheck=PASS, all PASS; WARNING: duplicate NOT detected due to blank fullText parameter (BUG - see SKILL.md Step 5)",
+      "assertions": [
+        "duplicateCheck expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/calendar-setup.md",
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "Two different games within same 30-minute window should NOT be deduped. Input: url=https://www.sportschau.de/basketball/live; title=BBL: ALBA Berlin vs Bayern Munich LIVE; league=BBL; teams=ALBA Berlin vs Bayern Munich; date=2026-06-27T19:00:00+02:00; free_tier=True; existing_event=true; existing_event_teams=FC Bayern Munich vs ratiopharm Ulm; existing_event_time=2026-06-27T19:15:00+02:00.",
+      "expected_output": "Decision=CREATE; reason=Different teams - NOT a duplicate; checks: duplicateCheck=PASS, all PASS",
+      "assertions": [
+        "duplicateCheck expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/calendar-setup.md"
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "Same teams, different time slot (rematch) should NOT be deduped. Input: url=https://www.sportschau.de/basketball/live; title=BBL: ALBA Berlin vs Bayern Munich LIVE; league=BBL; teams=ALBA Berlin vs Bayern Munich; date=2026-06-28T19:00:00+02:00; free_tier=True; existing_event=true; existing_event_teams=ALBA Berlin vs Bayern Munich; existing_event_time=2026-06-27T19:00:00+02:00.",
+      "expected_output": "Decision=CREATE; reason=Same teams but different date - rematch, NOT a duplicate; checks: duplicateCheck=PASS, all PASS",
+      "assertions": [
+        "duplicateCheck expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/calendar-setup.md"
+      ]
+    },
+    {
+      "id": 17,
+      "prompt": "MagentaSport stream WITHOUT matching announcement on magentasport.de must be REJECTED. Input: url=https://www.magenta.tv/tv/live-basketball-euroleague-12345; title=EuroLeague LIVE: Real Madrid vs ALBA Berlin; league=EuroLeague; teams=Real Madrid vs ALBA Berlin; date=2026-06-26T20:30:00+02:00; free_tier=True; magenta_announcement_found=false.",
+      "expected_output": "Decision=SKIP; reason=No matching free-access announcement found on magentasport.de; checks: freeAccess=FAIL",
+      "assertions": [
+        "freeAccess expected FAIL"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md",
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": 18,
+      "prompt": "MagentaSport stream WITH matching announcement on magentasport.de should be ACCEPTED. Input: url=https://www.magenta.tv/tv/live-basketball-euroleague-12345; title=EuroLeague LIVE: Real Madrid vs ALBA Berlin; league=EuroLeague; teams=Real Madrid vs ALBA Berlin; date=2026-06-26T20:30:00+02:00; free_tier=True; magenta_announcement_found=true; magenta_announcement_keywords=kostenlos fuer alle.",
+      "expected_output": "Decision=CREATE; reason=Matching free-access announcement found on magentasport.de; checks: freeAccess=PASS, officialSource=PASS",
+      "assertions": [
+        "freeAccess expected PASS",
+        "officialSource expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md",
+        "SKILL.md"
+      ]
+    },
+    {
+      "id": 19,
+      "prompt": "MagentaSport announcement with 'kostenlos fuer alle' keyword should pass Check 1. Input: url=https://www.magentasport.de/live/basketball/euroleague; title=EuroLeague LIVE: Kostenlos fuer alle; league=EuroLeague; teams=Real Madrid vs ALBA Berlin; date=2026-06-26T20:30:00+02:00; free_tier=True; page_content=kostenlos fuer alle.",
+      "expected_output": "Decision=CREATE; reason=; checks: freeAccess=PASS (kostenlos fuer alle), liveContent=PASS, officialSource=PASS",
+      "assertions": [
+        "freeAccess expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md"
+      ]
+    },
+    {
+      "id": 20,
+      "prompt": "MagentaSport announcement with 'mit MagentaSport Abo' keyword must be REJECTED. Input: url=https://www.magenta.tv/tv/live-basketball-euroleague-12345; title=EuroLeague LIVE; league=EuroLeague; teams=Real Madrid vs ALBA Berlin; date=2026-06-26T20:30:00+02:00; free_tier=False; page_content=mit MagentaSport Abo.",
+      "expected_output": "Decision=SKIP; reason=Paid content (mit MagentaSport Abo); checks: freeAccess=FAIL",
+      "assertions": [
+        "freeAccess expected FAIL"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md"
+      ]
     }
   ]
 }

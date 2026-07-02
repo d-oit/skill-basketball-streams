@@ -78,11 +78,14 @@ ASCII fallback (for renderers that strip Mermaid):
 SKILL.md                              Main skill instructions (frontmatter, process, mandates)
 README.md                             This file (overview, dataflow, dev workflow)
 CHANGELOG.md                          Release history (Keep-a-Changelog format)
+SETUP.md                              Setup guide: create Google Calendar, configure skill, validate
 evals/
   └── evals.json                      12 standard-schema eval cases (driving the rubric)
 scripts/
   ├── validate.py                     Self-contained validator (stdlib only): three checks plus smoke-test regression guard.
   ├── runtime_eval.py                 Scaffold runtime skill-evaluator (structural + runtime passes; canned stub inputs).
+  ├── color_mapping.py                Pure function for mapping league/event-type to Google Calendar colorId.
+  ├── bump_version.py                 Automate version bump sync between SKILL.md and CHANGELOG.md.
   └── README.md                       Maintenance doc: tool list, exit codes, how to add a check/case, CI integration.
 tests/
   ├── pytest.ini                      Pytest config (testpaths, default options, warning filter).
@@ -119,10 +122,14 @@ Full table with domains and YouTube allow/reject patterns → `references/approv
 
 ## Calendar
 
-- **Calendar ID:** `f8a14c4037d9ab411f93f19ee369218f0ed54be7c2d88deaf09d6b76fbe72e7f@group.calendar.google.com`
-- **Timezone:** `Europe/Berlin`
-- **Visibility:** `public`
-- **Color code:** `"6"` Tangerine/Orange (default); `"11"` Tomato for EuroLeague finals; `"2"` Sage for FIBA internationals
+Calendar configuration is centralized in `config/calendar.json` with support for `BASKETBALL_CALENDAR_ID` environment variable override.
+
+- **Calendar ID:** Configured in `config/calendar.json` (override via `BASKETBALL_CALENDAR_ID` env var)
+- **Timezone:** Configured in `config/calendar.json` (default: `Europe/Berlin`)
+- **Visibility:** Configured in `config/calendar.json` (default: `public`)
+- **Color code:** `"6"` Tangerine/Orange (default); `"11"` Tomato for EuroLeague finals; `"2"` Sage for FIBA internationals (via `scripts/color_mapping.py`)
+
+**Setup Guide:** See `SETUP.md` for step-by-step instructions on creating your Google Calendar and configuring the skill.
 
 Event schema and duplicate-check parameters → `references/calendar-setup.md`.
 
