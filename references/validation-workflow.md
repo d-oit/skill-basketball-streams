@@ -106,13 +106,10 @@ Every stream found must pass **all 7 checks** before a calendar event is created
 ## Decision Logic
 
 ```
-Checks 1–7: ALL must PASS
-  → Decision: CREATE calendar event
-
-Any check FAILS:
-  → Decision: SKIP
-  → Log reason for rejection
-  → Continue to next stream
+Checks 1–7: ALL must PASS → Decision: CREATE calendar event
+Any check FAILS:          → Decision: SKIP
+                          → Log reason for rejection
+                          → Continue to next stream
 ```
 
 ## Validation Log Format
@@ -134,11 +131,38 @@ Calendar Event ID: [id or N/A]
 
 ## Special Cases
 
-### MagentaSport Free Game
+### MagentaSport/MagentaTV Special Case
 
-- Only ONE game per matchday is free
-- Must verify the specific game page says "kostenlos" or "free"
-- Other games on MagentaSport require subscription → REJECT
+> **IMPORTANT:** MagentaSport (`magentasport.de`) and MagentaTV (`magenta.tv`) are two separate domains with distinct roles. Handling them correctly is mandatory.
+
+**Domain Separation:**
+- `magentasport.de` = **Content/announcement provider** — where free games are announced, schedules are published, and "kostenlos für alle" confirmations appear.
+- `magenta.tv` = **Streaming platform** — where the actual live streams play. URLs follow the pattern `magenta.tv/tv/live-[game-slug]/[dynamic-id]` and are often **not indexed** by search engines.
+
+**Free Stream Policy:**
+- MagentaSport confirms: *"Jeden Spieltag außerdem eine Partie kostenlos für alle"* (one game per matchday free for everyone).
+- Only ONE game per matchday is free. All other games require a MagentaSport subscription → REJECT.
+
+**Mandatory Two-Step Search Strategy:**
+1. **Announcement Search** — Search `site:magentasport.de`, `site:facebook.com/magentasport`, and `site:twitter.com/MagentaSport` for the free-game announcement using keywords: `kostenlos`, `kostenlos für alle`, `ohne Abo`, `für alle`.
+2. **Stream Search** — Search `site:magenta.tv/tv/live*` for the matching game content. Cross-reference the slug/game title with the announcement found in step 1.
+3. **Cross-reference Rule** — A `magenta.tv` stream URL is **only valid** if a matching official free-access announcement exists on `magentasport.de` or official MagentaSport social media. **No announcement = REJECT.**
+
+**Free Stream Indicators (PASS):**
+- `"kostenlos für alle"`
+- `"ohne Abo"`
+- `"ohne Login"`
+- `"für alle zugänglich"`
+- `"Jeden Spieltag eine Partie kostenlos"`
+
+**Subscription/Paid Indicators (FAIL → REJECT):**
+- `"mit MagentaSport Abo"`
+- `"nur für Abonnenten"`
+- `"Login erforderlich"`
+- `"kostenpflichtig"`
+
+**Validation Note for Check 1 (Free Access):**
+If a `magenta.tv` URL passes HTTP 200 but no official free-access announcement can be found on `magentasport.de`, the stream must be treated as **subscription-gated** and **REJECTED** at Check 1. Document the discrepancy in the validation log.
 
 ### Dyn Sport Mix
 
