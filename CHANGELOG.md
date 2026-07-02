@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-07-02
+
+### Added
+
+- **`SKILL.md` — `> IMPORTANT MAGENTA NOTE` blockquote** under `## Approved Sources` — explains the two-domain split: `magentasport.de` (content/announcement provider) vs `magenta.tv` (streaming platform), dynamic URL problem, and the mandatory both-domain check requirement.
+- **`SKILL.md` — `### Step 2.3 — MagentaSport/MagentaTV Special Handling`** — new sub-step between Step 2 and Step 2.5 with: domain separation, mandatory two-step announcement + stream search strategy, free stream indicators (PASS), paid indicators (FAIL → REJECT), and cross-reference rule (no announcement = REJECT).
+- **`SKILL.md` — Constraint #11** — `Magenta two-domain rule`: a `magenta.tv` stream URL requires a matching official free-access announcement on `magentasport.de` or MagentaSport social media; without it → REJECT.
+- **`SKILL.md` — Rationalizations row** — `"The magenta.tv URL looks valid so no announcement needed"` → why it's wrong.
+- **`SKILL.md` — two new Red Flag checklist items** — (1) used `magenta.tv` stream URL without a matching free-access announcement on `magentasport.de`; (2) searched only one Magenta domain and skipped the other.
+- **`references/validation-workflow.md` — expanded `### MagentaSport/MagentaTV Special Case`** — replaced the thin 3-bullet `### MagentaSport Free Game` section with full coverage: domain separation, free stream policy (one game per matchday), mandatory two-step search strategy, free/paid indicators, and a Validation Note for Check 1 (HTTP 200 alone is insufficient without a matching announcement).
+
+### Changed
+
+- **`SKILL.md` version** bumped `1.1.1` → `1.1.2`.
+- **`SKILL.md` References section** — `references/validation-workflow.md` description updated to mention `MagentaSport two-domain rule + 1-game rule`.
+
+
 ## [1.1.1] - 2026-06-26
 
 ### Added
