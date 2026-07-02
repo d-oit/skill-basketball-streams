@@ -5,7 +5,7 @@ Performs three independent checks against the project at --root. Stdlib only
 (no external dependencies); runnable on any Python 3.8+ environment.
 
 Usage:
-    python3 scripts/validate.py [--root PATH] [--check {all,evals|skill|references|smoke-test}]
+    python3 scripts/validate.py [--root PATH] [--check {all,evals|skill|references|calendar-config|smoke-test}]
 
 Checks:
     evals       evals/evals.json conforms to the v1.0.0 standard schema
@@ -17,6 +17,8 @@ Checks:
                 ## Rationalizations + ## Red Flags mandatory sections are present.
     references  Every backtick-wrapped `.md` path cited from SKILL.md and
                 README.md resolves to a real file under --root.
+    calendar-config  config/calendar.json exists with valid calendarId field
+                (non-empty, not a placeholder, matches Google Calendar ID pattern).
     smoke-test  Self-test: writes a tmp fixture with known schema violations
                 (invalid `name`, over-long `description`, wrong `skill_name`,
                 non-int `id`, non-list `assertions`, dangling .md references),
@@ -52,6 +54,17 @@ MAX_BODY_LINES = 250
 EVALS_REQUIRED_KEYS = {"id", "prompt", "expected_output", "assertions"}
 FRONTMATTER_REQUIRED_KEYS = {"name", "description", "version", "category"}
 MANDATORY_SECTIONS = {"## Rationalizations", "## Red Flags"}
+
+# Calendar ID validation pattern
+# Google Calendar IDs are 64 hex characters followed by @group.calendar.google.com
+CALENDAR_ID_PATTERN = re.compile(
+    r'^[a-f0-9]{64}@group\.calendar\.google\.com$', re.IGNORECASE
+)
+# Placeholder detection patterns
+PLACEHOLDER_PATTERNS = [
+    r'YOUR_', r'HERE', r'TODO', r'FIXME', r'XXX',
+    r'\.\.\.', r'placeholder', r'example', r'sample'
+]
 
 
 def _fail(msg: str):
@@ -91,15 +104,6 @@ def check_evals(root: Path) -> None:
                 f"evals[{i}].assertions: expected list, got "
                 f"{type(case['assertions']).__name__}"
             )
-        # Per-case type coverage (note: deliberately NOT asserting
-        # non-empty for `expected_output`, `assertions`, or per-entry
-        # assertions — a legitimate eval case can express "no output"
-        # via empty `expected_output`, "no PASS/FAIL signal" via empty
-        # `assertions: []`, etc. The static schema check above is
-        # necessary but not sufficient; these type-only checks ensure each
-        # case carries the right TYPE of evidence for a future
-        # skill-evaluator to assert against, without rejecting legitimate
-        # "vacuous-looking" cases).
         expected_output = case.get("expected_output")
         if not isinstance(expected_output, str):
             errs.append(
@@ -205,7 +209,7 @@ def check_references(root: Path) -> None:
                 file=sys.stderr,
             )
             continue
-        for r in re.findall(r"`([\w/.\-]+\.md)`", f.read_text(encoding="utf-8")):
+        for r in re.findall(r"`([\w/.-]+\.md)`", f.read_text(encoding="utf-8")):
             if "/" in r:
                 refs.add(r)
     missing = [r for r in sorted(refs) if not (root / r).is_file()]
@@ -219,18 +223,93 @@ def check_references(root: Path) -> None:
     )
 
 
+def check_calendar_config(root: Path) -> None:
+    """Validate calendar configuration in config/calendar.json.
+    
+    Checks:
+    - config/calendar.json exists
+    - calendarId field is present and non-empty
+    - calendarId is not a placeholder
+    - calendarId matches the Google Calendar ID pattern
+    """
+    config_path = root / "config" / "calendar.json"
+    
+    # Check that config file exists
+    if not config_path.is_file():
+        _fail(
+            f"calendar config: {config_path.relative_to(root)}: file missing. "
+            f"Create config/calendar.json with your Calendar ID. See SETUP.md for instructions."
+        )
+    
+    # Load and parse the config file
+    try:
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        _fail(f"calendar config: {config_path.relative_to(root)}: invalid JSON ({e})")
+    
+    # Check that calendarId field exists
+    if "calendarId" not in config:
+        _fail(
+            f"calendar config: {config_path.relative_to(root)}: missing 'calendarId' field. "
+            f"Add: \"calendarId\": \"YOUR_CALENDAR_ID@group.calendar.google.com\""
+        )
+    
+    calendar_id = config["calendarId"]
+    
+    # Check that calendarId is a non-empty string
+    if not isinstance(calendar_id, str) or not calendar_id.strip():
+        _fail(
+            f"calendar config: {config_path.relative_to(root)}: calendarId is empty or missing. "
+            f"Set it to your Google Calendar ID."
+        )
+    
+    calendar_id = calendar_id.strip()
+    
+    # Check that calendarId is not a placeholder
+    for pattern in PLACEHOLDER_PATTERNS:
+        if re.search(pattern, calendar_id, re.IGNORECASE):
+            _fail(
+                f"calendar config: {config_path.relative_to(root)}: calendarId appears to be a placeholder: {calendar_id!r}. "
+                f"Replace it with your actual Google Calendar ID. See SETUP.md for instructions."
+            )
+    
+    # Check that calendarId matches the Google Calendar ID pattern
+    if not CALENDAR_ID_PATTERN.match(calendar_id):
+        _fail(
+            f"calendar config: {config_path.relative_to(root)}: calendarId has invalid format: {calendar_id!r}. "
+            f"Expected format: [64-hex-chars]@group.calendar.google.com. "
+            f"Get your Calendar ID from Google Calendar Settings. See SETUP.md for instructions."
+        )
+    
+    # Optional: check other fields exist (not required, but recommended)
+    recommended_fields = ["timezone", "defaultColorId", "visibility"]
+    missing_recommended = [f for f in recommended_fields if f not in config]
+    if missing_recommended:
+        print(
+            f"WARN: calendar config: {config_path.relative_to(root)}: "
+            f"missing recommended fields: {', '.join(missing_recommended)}",
+            file=sys.stderr,
+        )
+    
+    print(
+        f"OK: calendar config: {config_path.relative_to(root)}: "
+        f"calendarId={calendar_id[:20]}... (valid format)"
+    )
+
+
 CHECKS = {
     "evals": check_evals,
     "skill": check_skill,
     "references": check_references,
+    "calendar-config": check_calendar_config,
 }
 
 
 def smoke_test() -> int:
     """Self-test: each FAIL branch must be exercised by at least one targeted
-    fixture via a separate subprocess invocation. Three fixtures (one per
+    fixture via a separate subprocess invocation. Four fixtures (one per
     check) are set up in independent tmp directories; each fixture is
-    designed so only the target check fails while the other two pass.
+    designed so only the target check fails while the other three pass.
 
     Returns 0 if every FAIL branch correctly rejects its targeted fixture;
     returns 1 if any branch is silently vacuous (subprocess returned 0, or
@@ -260,14 +339,24 @@ def smoke_test() -> int:
         "category: workflow\n"
         "---\n\n"
         "# Title\n\n"
-        "## Purpose\n\nSome content.\n\n"
-        "## Rationalizations\n\n- [ ] none\n\n"
-        "## Red Flags\n\n- [ ] none\n\n"
-        "## References\n\n- `references/x.md`\n"
+        "## Purpose\n\n"
+        "Some content.\n\n"
+        "## Rationalizations\n\n"
+        "- [ ] none\n\n"
+        "## Red Flags\n\n"
+        "- [ ] none\n\n"
+        "## References\n\n"
+        "- `references/x.md`\n"
     )
+    VALID_CALENDAR_CONFIG = json.dumps({
+        "calendarId": "f8a14c4037d9ab411f93f19ee369218f0ed54be7c2d88deaf09d6b76fbe72e7f@group.calendar.google.com",
+        "timezone": "Europe/Berlin",
+        "defaultColorId": "6",
+        "visibility": "public"
+    })
 
     def setup_evals_fail(r: Path) -> None:
-        """check_evals must FAIL; check_skill + check_references must PASS."""
+        """check_evals must FAIL; check_skill + check_references + check_calendar_config must PASS."""
         (r / "evals").mkdir()
         (r / "evals" / "evals.json").write_text(
             json.dumps({"skill_name": "WRONG", "evals": []}),
@@ -275,17 +364,21 @@ def smoke_test() -> int:
         )
         (r / "references").mkdir()
         (r / "references" / "x.md").write_text("# OK\n", encoding="utf-8")
+        (r / "config").mkdir()
+        (r / "config" / "calendar.json").write_text(VALID_CALENDAR_CONFIG, encoding="utf-8")
         (r / "SKILL.md").write_text(VALID_SKILL_MD, encoding="utf-8")
         (r / "README.md").write_text(
             "See `references/x.md`.\n", encoding="utf-8"
         )
 
     def setup_skill_fail(r: Path) -> None:
-        """check_skill must FAIL; check_evals + check_references must PASS."""
+        """check_skill must FAIL; check_evals + check_references + check_calendar_config must PASS."""
         (r / "evals").mkdir()
         (r / "evals" / "evals.json").write_text(VALID_EVALS, encoding="utf-8")
         (r / "references").mkdir()
         (r / "references" / "x.md").write_text("# OK\n", encoding="utf-8")
+        (r / "config").mkdir()
+        (r / "config" / "calendar.json").write_text(VALID_CALENDAR_CONFIG, encoding="utf-8")
         # Bad SKILL.md: name fails NAME_REGEX (uppercase + underscore).
         (r / "SKILL.md").write_text(
             "---\n"
@@ -302,14 +395,38 @@ def smoke_test() -> int:
         )
 
     def setup_references_fail(r: Path) -> None:
-        """check_references must FAIL; check_evals + check_skill must PASS."""
+        """check_references must FAIL; check_evals + check_skill + check_calendar_config must PASS."""
         (r / "evals").mkdir()
         (r / "evals" / "evals.json").write_text(VALID_EVALS, encoding="utf-8")
         (r / "references").mkdir()
         (r / "references" / "x.md").write_text("# OK\n", encoding="utf-8")
+        (r / "config").mkdir()
+        (r / "config" / "calendar.json").write_text(VALID_CALENDAR_CONFIG, encoding="utf-8")
         (r / "SKILL.md").write_text(VALID_SKILL_MD, encoding="utf-8")
         (r / "README.md").write_text(
             "See `references/missing.md`.\n", encoding="utf-8"
+        )
+
+    def setup_calendar_config_fail(r: Path) -> None:
+        """check_calendar_config must FAIL; check_evals + check_skill + check_references must PASS."""
+        (r / "evals").mkdir()
+        (r / "evals" / "evals.json").write_text(VALID_EVALS, encoding="utf-8")
+        (r / "references").mkdir()
+        (r / "references" / "x.md").write_text("# OK\n", encoding="utf-8")
+        (r / "config").mkdir()
+        # Invalid calendar config: placeholder calendarId
+        (r / "config" / "calendar.json").write_text(
+            json.dumps({
+                "calendarId": "YOUR_CALENDAR_ID_HERE",
+                "timezone": "Europe/Berlin",
+                "defaultColorId": "6",
+                "visibility": "public"
+            }),
+            encoding="utf-8",
+        )
+        (r / "SKILL.md").write_text(VALID_SKILL_MD, encoding="utf-8")
+        (r / "README.md").write_text(
+            "See `references/x.md`.\n", encoding="utf-8"
         )
 
     script_path = Path(__file__).resolve()
@@ -326,6 +443,10 @@ def smoke_test() -> int:
         "references": (
             setup_references_fail,
             "FAIL: references:",
+        ),
+        "calendar-config": (
+            setup_calendar_config_fail,
+            "FAIL: calendar config:",
         ),
     }
     errs: list[str] = []
@@ -390,7 +511,7 @@ def main() -> None:
     p.add_argument(
         "--check",
         default="all",
-        choices=("all", "evals", "skill", "references", "smoke-test"),
+        choices=("all", "evals", "skill", "references", "calendar-config", "smoke-test"),
         help="which check to run (default: all); 'smoke-test' exercises the "
              "FAIL branches against a tmp fixture and returns 0 if every "
              "branch correctly rejects",

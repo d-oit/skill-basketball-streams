@@ -5,7 +5,7 @@ version: "1.1.2"
 category: workflow
 license: MIT
 allowed-tools: webSearch openUrl webFetch googleCalendarListEvents googleCalendarCreateEvent
-compatibility: Requires internet access (webSearch + openUrl HTTP probe) and Google Calendar API access (listEvents + createEvent). Timezone - Europe/Berlin.
+compatibility: Requires internet access (webSearch + openUrl HTTP probe) and Google Calendar API access (listEvents + createEvent). Timezone configurable via `config/calendar.json` (default: Europe/Berlin).
 ---
 
 # Basketball Streams Finder & Calendar Manager
@@ -14,7 +14,7 @@ compatibility: Requires internet access (webSearch + openUrl HTTP probe) and Goo
 
 ## Purpose
 
-Search for FREE basketball live streams in Germany from official sources, validate them, and add confirmed streams to Google Calendar `f8a14c4037d9ab411f93f19ee369218f0ed54be7c2d88deaf09d6b76fbe72e7f@group.calendar.google.com`.
+Search for FREE basketball live streams in Germany from official sources, validate them, and add confirmed streams to Google Calendar (Calendar ID configured in `config/calendar.json`, override via `BASKETBALL_CALENDAR_ID` environment variable).
 
 ## When to Use
 
@@ -34,11 +34,11 @@ Full list and YouTube URL rules: `references/approved-sources.md`. Summary: Dyn 
 
 ### Step 1 — Determine Date Range
 
-Today (00:00 `Europe/Berlin`) through today + 7 days (23:59 `Europe/Berlin`). Convert times to ISO 8601 with `+02:00` (CEST) or `+01:00` (CET).
+Today (00:00, timezone from `config/calendar.json` default `Europe/Berlin`) through today + 7 days (23:59). Convert times to ISO 8601 with `+02:00` (CEST) or `+01:00` (CET).
 
 ### Step 2 — Search for Streams
 
-Run `webSearch` against each approved source with `limit: 20`, focusing on official domains. Canonical query list in `references/implementation-notes.md`.
+Run `webSearch` against each approved source with `limit: 20`, focusing on official domains. **Search in tier order (Tier 1 → Tier 6)** as defined in `references/approved-sources.md`. If a stream is confirmed from a higher tier, skip lower tiers for that same event to reduce redundant searches. Canonical query list in `references/implementation-notes.md`.
 
 ### Step 2.3 — MagentaSport/MagentaTV Special Handling
 
@@ -72,11 +72,11 @@ For each surviving stream: league, teams, ISO 8601 date/time in CET, direct link
 
 ### Step 5 — Check Google Calendar for Duplicates
 
-Call `googleCalendarListEvents` on `f8a14c...@group.calendar.google.com` with `startTime = eventStart - 30 min`, `endTime = eventStart + 30 min`, `fullText = " "`. Duplicate if any of: same ±30-min slot, identical team pair, or title contains same BBL/EuroLeague/team substring.
+Call `googleCalendarListEvents` on calendarId from `config/calendar.json` (or `BASKETBALL_CALENDAR_ID` env var) with `startTime = eventStart - 30 min`, `endTime = eventStart + 30 min`, `fullText = "{{team1}} {{team2}}"`. Duplicate if any of: same ±30-min slot, identical team pair, or title contains same BBL/EuroLeague/team substring.
 
 ### Step 6 — Create Event (Only If No Duplicate AND All 7 Checks Passed)
 
-`googleCalendarCreateEvent` with required fields (`summary`, `startTime`, `endTime`, `calendarId`, `timeZone="Europe/Berlin"`), a `description` containing League / Teams / Date/Time / FREE STREAM LINKS / Access / SOURCE REFERENCE-with-ISO-timestamp / Validation Notes, `colorId: "6"` (Tangerine/Orange; `"11"` Red for EuroLeague finals, `"2"` Green for FIBA internationals), `visibility: "public"`. Default duration 2.5h regular season / 3h playoff. See `references/calendar-setup.md`.
+`googleCalendarCreateEvent` with required fields (`summary`, `startTime`, `endTime`, `calendarId`, `timeZone="Europe/Berlin"`), a `description` containing League / Teams / Date/Time / FREE STREAM LINKS / Access / SOURCE REFERENCE-with-ISO-timestamp / Validation Notes, `colorId` from `get_color_id(league, event_type)` function (see `scripts/color_mapping.py`: `"6"` Tangerine/Orange default, `"11"` Red for EuroLeague/BCL finals, `"2"` Green for FIBA internationals), `visibility: "public"`. Default duration 2.5h regular season / 3h playoff. See `references/calendar-setup.md`.
 
 ### Step 7 — Output Results
 
