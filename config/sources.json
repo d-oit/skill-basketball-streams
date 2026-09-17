@@ -24,10 +24,10 @@
       "tier": 1,
       "name": "Basketball Bundesliga",
       "type": "league",
-      "domains": ["basketball-bundesliga.de"],
-      "social": ["x.com/BBLofficial", "facebook.com/BBLofficial"],
+      "domains": ["easycredit-bbl.de"],
+      "social": ["x.com/easyCreditBBL", "facebook.com/BBLofficial"],
       "free_access": "selected",
-      "notes": "Official BBL site"
+      "notes": "Official easyCredit BBL site. The league renamed: `basketball-bundesliga.de` no longer serves this site (TLS SNI failure on both the bare and www host, while DNS still resolves) and `x.com/BBLofficial` is a 404 while the other four approved X accounts answer 200 — the current locators are `easycredit-bbl.de`, `x.com/easyCreditBBL` and `youtube.com/@basketballbundesliga`. Verified 2026-09-17 by `scripts/link_inventory.py` + `scripts/link_check.py`. The Facebook page is UNVERIFIED either way and deliberately left as it was: facebook.com answers HTTP 400 to every user agent this repo sends, for every handle including a known-good one, so a probe there cannot tell a dead page from a blocked one."
     },
     {
       "tier": 1,
@@ -110,7 +110,7 @@
       "domains": ["youtube.com"],
       "handles": [
         "youtube.com/@fiba",
-        "youtube.com/@bbl_basketball",
+        "youtube.com/@basketballbundesliga",
         "youtube.com/@EuroLeague",
         "youtube.com/@BasketballCL",
         "youtube.com/user/TheDBBTV"

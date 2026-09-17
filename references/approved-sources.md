@@ -13,7 +13,7 @@ These are the primary, most reliable sources for official basketball content.
 |--------|------|---------|-------|
 | FIBA | Federation | `fiba.basketball`, `fiba.com` | Official international basketball federation |
 | EuroLeague | League | `euroleaguebasketball.net` | Official EuroLeague site |
-| Basketball Bundesliga (BBL) | League | `basketball-bundesliga.de` | Official BBL site |
+| Basketball Bundesliga (BBL) | League | `easycredit-bbl.de` | Official easyCredit BBL site. **Renamed** — `basketball-bundesliga.de` no longer serves it (TLS SNI failure, DNS still resolving) and `x.com/BBLofficial` is a 404. Re-verified 2026-09-17 via `scripts/link_inventory.py` + `scripts/link_check.py` |
 | Basketball Champions League (BCL) | League | `championsleague.basketball` | Official BCL site. **Free for selected games only** — some games are free, others are not. Always check the site *and* the official social accounts (see BCL note below). |
 | DBB (Deutscher Basketball Bund) | Federation | `basketball-bund.de` | German Basketball Federation |
 
@@ -73,7 +73,7 @@ Official YouTube channels for leagues, federations, and clubs.
 |---------|--------------|-------|
 | FIBA (official) | `youtube.com/@fiba` | ✅ ONLY valid FIBA handle |
 | DBB - Deutscher Basketball Bund | `youtube.com/user/TheDBBTV` | ✅ Only accepted `/user/` URL |
-| Basketball Bundesliga | `youtube.com/@bbl_basketball` | Verify |
+| Basketball Bundesliga | `youtube.com/@basketballbundesliga` | ✅ Verified 2026-09-17 — channel "easyCredit Basketball Bundesliga". The old `@bbl_basketball` returns 404 |
 | EuroLeague | `youtube.com/@EuroLeague` | Verify |
 | ALBA Berlin | Via `albaberlin.de` social links | Verify |
 | FC Bayern Basketball | Via `fcbayern.com` social links | Verify |
@@ -113,7 +113,8 @@ is free; it can never be the `directLink`.
 | `@MagentaSport` | `x.com/MagentaSport` | MagentaSport free-game announcements |
 | MagentaSport | `facebook.com/MagentaSport` | MagentaSport free-game announcements |
 | `@EuroLeague` | `x.com/EuroLeague` | EuroLeague broadcaster/timing confirmations |
-| `@BBLofficial` | `x.com/BBLofficial` | BBL schedule/broadcast confirmations |
+| `@easyCreditBBL` | `x.com/easyCreditBBL` | BBL schedule/broadcast confirmations. Verified 2026-09-17 and linked from the league's own homepage; `x.com/BBLofficial` is a 404 |
+| Basketball Bundesliga | `facebook.com/BBLofficial` | **Unverifiable by probe**: facebook.com answers HTTP 400 to any non-browser user agent, so check by hand |
 
 The machine-readable mirror of this table lives in `config/sources.json`.
 

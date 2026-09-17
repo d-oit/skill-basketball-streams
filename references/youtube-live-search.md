@@ -76,7 +76,7 @@ promotable; `REJECT` is not.
 Only channels in `references/approved-sources.md` Tier 6 / `config/sources.json`:
 
 ```
-youtube.com/@fiba           youtube.com/@bbl_basketball
+youtube.com/@fiba           youtube.com/@basketballbundesliga
 youtube.com/@EuroLeague     youtube.com/@BasketballCL
 youtube.com/user/TheDBBTV
 ```
