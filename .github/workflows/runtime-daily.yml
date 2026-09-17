@@ -1,0 +1,913 @@
+name: runtime-daily
+
+# Phase 0/1 of live-stream-runtime-spec.md.
+#
+# SAFETY MODEL — read this before enabling anything:
+#   * The `telemetry` job is always safe: it makes NO calendar calls at all.
+#   * The `runtime` job is gated behind the repo variable ENABLE_CALENDAR_WRITES.
+#     While it is not "true", the job runs in dry-run mode and writes nothing.
+#     With it "true", a scheduled run writes; a `workflow_dispatch` follows its
+#     own `dry_run` input, which can only add dry-run and never remove it. The
+#     decision is made once, in `scripts/write_mode.py`, and printed in the job
+#     summary — see the note there for why it is not an inline `${{ }}`.
+#   * The audit job (Phase 3) is gated behind ENABLE_AUDIT.
+# Nothing here can surprise a calendar subscriber by being merged.
+#
+# Cron note: 08:30 UTC, NOT earlier — Gemini free-tier RPD resets at midnight
+# Pacific (07:00-08:00 UTC), so an earlier run would spend the previous day's
+# quota. See live-stream-runtime-spec.md §15.3.
+
+on:
+  schedule:
+    - cron: '30 8 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Force dry-run (no calendar writes)'
+        type: boolean
+        default: true
+  repository_dispatch:
+    types: [streams-refresh]
+
+concurrency:
+  group: runtime-daily
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Rung health — spec §10 `rungs.json` and §18.4 (Phase 0/1 runtime).
+  #
+  # Why this job exists at all: `RungHealth` parks a rung after three
+  # consecutive failures, but it is in memory, so the parking died with the
+  # process and "a rung parked for N consecutive days raises an issue" could
+  # never be observed. `scripts/rung_health.py` is the missing writer; this is
+  # its only producer. It makes NO calendar call and holds NO calendar
+  # credential.
+  #
+  # Deliberately NOT `needs: telemetry`. The search preflight below reds when no
+  # search backend is configured, and a dead *render* backend is a different
+  # fault that must still be recorded on a day the search half is misconfigured.
+  # ---------------------------------------------------------------------------
+  rung-health:
+    name: Rung health — probe the render ladder
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    # One branch, one writer at a time. Three jobs in this workflow push
+    # `telemetry`; a job-level group serialises them so two writers cannot race
+    # to a non-fast-forward rejection, and a future writer that forgets this
+    # group is caught by a test rather than by a mysterious red push.
+    #
+    # `queue: max` is NOT decoration. The default is `queue: single`, documented
+    # as "at most one job or workflow run can be pending ... when a new job ...
+    # is queued, any existing pending job ... is canceled and replaced". So a
+    # third writer that is eligible at the same time does not wait — it *cancels
+    # a pending job*, silently, and a cancelled ledger job looks exactly like a
+    # quiet day. `cancel-in-progress: false` only protects the RUNNING one.
+    # (`queue: max` may not be combined with `cancel-in-progress: true`.)
+    concurrency:
+      group: telemetry-branch
+      cancel-in-progress: false
+      queue: max
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Configure git identity for telemetry commits
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Check out the telemetry branch as a worktree
+        run: |
+          git fetch origin telemetry || echo "telemetry branch does not exist yet"
+          if git show-ref --verify --quiet refs/remotes/origin/telemetry; then
+            git worktree add .tmp/telemetry -B telemetry origin/telemetry
+          else
+            git worktree add --orphan -b telemetry .tmp/telemetry
+          fi
+          mkdir -p .tmp/telemetry
+
+      # One invocation, three hosts, ONE strike tracker. `render_ladder --probe`
+      # builds a fresh tracker per invocation, so probing the hosts separately
+      # would give a dead backend one strike each and never park it.
+      #
+      # Exits 0 in every content case — a host refusing us, a key missing, or a
+      # rung with nothing to say are all *recorded* outcomes, not step failures.
+      # It exits non-zero only when the ledger could not be written, which is a
+      # real fault and must red.
+      - name: Probe the render ladder
+        env:
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+          TINYFISH_API_KEY: ${{ secrets.TINYFISH_API_KEY }}
+        run: |
+          python3 scripts/rung_health.py probe \
+            --dest .tmp/telemetry \
+            --run-id "$(date -u +%Y-%m-%dT%H:%MZ)" \
+            --url https://www.magentasport.de/ \
+            --url https://www.championsleague.basketball/ \
+            --url https://www.magenta.tv/
+
+      - name: Write the rung snapshot
+        run: python3 scripts/rung_health.py snapshot --dest .tmp/telemetry
+
+      - name: Commit telemetry (one commit per run, never per row)
+        run: |
+          cd .tmp/telemetry
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No new rung rows."
+            exit 0
+          fi
+          git commit -m "telemetry: rung health $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push origin telemetry
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## Rung health"
+            echo ""
+            if [ -d .tmp/telemetry ]; then
+              # Reuse the renderer rather than reformatting the ledger here: two
+              # formatters for one artifact drift, and the misleading one wins.
+              python3 scripts/rung_health.py parked --dest .tmp/telemetry --days 3 --markdown
+            else
+              echo "No telemetry worktree — nothing was recorded this run."
+            fi
+            echo ""
+            echo "Only *fileable* failures reach the issue: a hosted rung failing"
+            echo "(a provider rejecting the key is the retired-backend case) or a"
+            echo "local rung that cannot connect at all. A local rung that was"
+            echo "*refused* is a statement about the target's WAF, so it is kept in"
+            echo "\`rungs.json\` and never filed."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  telemetry:
+    name: Phase 0 — candidate ledger
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # One branch, one writer at a time — see the note on `rung-health`,
+    # including why `queue: max` is required rather than optional.
+    concurrency:
+      group: telemetry-branch
+      cancel-in-progress: false
+      queue: max
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Phase 0 is the ONLY producer of the recall denominator. With no search
+      # backend configured it writes nothing at all — and the job would still be
+      # green, with absence looking exactly like a quiet day. Offline and
+      # presence-based, so it cannot red for a network reason; validity is a
+      # different failure and the ladder run below reports it.
+      - name: Preflight — at least one search backend is configured
+        run: python3 scripts/run_daily.py --check-backends
+
+      - name: Configure git identity for telemetry commits
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Check out the telemetry branch as a worktree
+        run: |
+          git fetch origin telemetry || echo "telemetry branch does not exist yet"
+          if git show-ref --verify --quiet refs/remotes/origin/telemetry; then
+            git worktree add .tmp/telemetry -B telemetry origin/telemetry
+          else
+            git worktree add --orphan -b telemetry .tmp/telemetry
+          fi
+          mkdir -p .tmp/telemetry
+
+      # Tolerant of a *content* outcome, not a configuration one: the preflight
+      # above has already redded on a missing key, so a failure here means the
+      # backend was reachable and returned nothing, or hit a transient HTTP
+      # error. A 429 must not take the whole telemetry job — and its commit —
+      # down with it. Do not pipe this through `tee`: the pipe would mask the
+      # exit status and the tolerance would become accidental.
+      - name: Run the Phase 0 search ladder
+        env:
+          EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+          TINYFISH_API_KEY: ${{ secrets.TINYFISH_API_KEY }}
+        run: |
+          python3 scripts/run_daily.py \
+            --dest .tmp/telemetry \
+            --run-id "$(date -u +%Y-%m-%dT%H:%MZ)" \
+            --json \
+            || echo "::warning::the search ladder surfaced no candidates (backend reachable but empty, or a transient error) — recall is unchanged for this run"
+
+      # Official fixtures are the only external ground truth for whether a game
+      # existed at all. Without them fixture_recall (games no backend even saw)
+      # is unmeasurable, and a systematically invisible source stays invisible
+      # while the self-reported recall figure stays healthy.
+      #
+      # Tolerated, not required: the league sites change markup, and a fetch
+      # failure must degrade fixture_recall to n/a rather than red the run. The
+      # write is idempotent, so re-observing the same window adds nothing.
+      - name: Fetch official league fixtures
+        run: |
+          python3 scripts/fixtures.py \
+            --source bbl --source bcl --source euroleague \
+            --out .tmp/telemetry/fixtures.jsonl \
+            || echo "::warning::fixture fetch produced nothing — fixture_recall will be n/a this run"
+
+      - name: Recall report
+        run: python3 scripts/candidates.py --ledger .tmp/telemetry/candidates.jsonl recall || true
+
+      # Derived snapshot: regenerable from the JSONL streams, so it is rewritten
+      # every run. Written AFTER the fixtures so fixture_recall reflects the
+      # current window.
+      - name: Write the metrics snapshot
+        run: |
+          python3 scripts/metrics.py \
+            --dest .tmp/telemetry \
+            --run-id "$(date -u +%Y-%m-%dT%H:%MZ)" \
+            || echo "::warning::metrics snapshot failed"
+          if [ -f .tmp/telemetry/metrics.json ]; then
+            python3 -c "import json;d=json.load(open('.tmp/telemetry/metrics.json'));r=d['recall'];f=d['fixture_recall'];a=d['audit'];print('recall', r['recall'], 'fixture_recall', (f or {}).get('fixture_recall'), 'precision', a['precision'])"
+          fi
+
+      - name: Commit telemetry (one commit per run, never per row)
+        run: |
+          cd .tmp/telemetry
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No new telemetry rows."
+            exit 0
+          fi
+          git commit -m "telemetry: run $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push origin telemetry
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## Runtime telemetry (Phase 0)"
+            echo ""
+            echo "| Metric | Value |"
+            echo "|---|---|"
+            if [ -f .tmp/telemetry/candidates.jsonl ]; then
+              echo "| Ledger rows | $(wc -l < .tmp/telemetry/candidates.jsonl) |"
+            else
+              echo "| Ledger rows | 0 |"
+            fi
+            if [ -f .tmp/telemetry/fixtures.jsonl ]; then
+              echo "| Fixture rows | $(wc -l < .tmp/telemetry/fixtures.jsonl) |"
+            else
+              echo "| Fixture rows | 0 (fixture_recall is n/a) |"
+            fi
+            echo "| Calendar calls | 0 (Phase 0 never writes) |"
+            echo ""
+            echo "Recall denominator grows here first; without it no later change can be judged."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # Reuse the renderer rather than reformatting the snapshot here: two
+          # formatters for one artifact drift, and the misleading one wins.
+          if [ -f .tmp/telemetry/metrics.json ]; then
+            {
+              echo ""
+              echo "### Derived metrics"
+              echo ""
+              echo '```'
+              python3 scripts/metrics.py --dest .tmp/telemetry --dry-run
+              echo '```'
+              echo ""
+              echo "### Trend (per run)"
+              echo ""
+              echo '```'
+              # The per-run view is the one that answers "is this getting
+              # better?" — cumulative recall barely moves once history is long.
+              python3 scripts/metrics.py --dest .tmp/telemetry --trend --dry-run
+              echo '```'
+              echo ""
+              echo "\`n/a\` means never measured, never \`0\` — a zero would read as a"
+              echo "measured failure on no evidence. Precision excludes INCONCLUSIVE"
+              echo "from its denominator, so a quiet day cannot look accurate."
+              echo "The trend sparkline is on an absolute 0..1 scale, so a small"
+              echo "real move does not look like a dramatic climb."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  runtime:
+    name: Phase 1/2 — skill run
+    needs: telemetry
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # Gated: absent or "false" keeps this job in dry-run and makes no writes.
+    # The variable also decides *within* the job, in the "Resolve the write mode"
+    # step: with it true, a scheduled run writes and a dispatch follows its own
+    # `dry_run` input (which can only add dry-run, never remove it).
+    if: vars.ENABLE_CALENDAR_WRITES == 'true' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+      # No `id-token: write`: nothing in this job performs OIDC. It was here for
+      # `google-github-actions/auth@v2`, which is gone, and a permission kept
+      # "just in case" is a capability that a future step inherits without
+      # anyone deciding it should.
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # ONE decision, made in tested Python, used by every step below.
+      #
+      # This replaced `DRY_RUN: ${{ inputs.dry_run || 'true' }}`, which on a
+      # `schedule` event is *always* 'true' (there is no inputs object on a
+      # cron), so a repository with ENABLE_CALENDAR_WRITES=true ran green every
+      # morning, planned every event, and never passed --live. The switch was
+      # dead on the only path that runs unattended, and an Actions expression
+      # cannot be tested, so nothing could catch it. See scripts/write_mode.py.
+      #
+      # Deliberately NOT gated on ENABLE_CALENDAR_WRITES: the agent step below is
+      # un-gated, so the mode must exist for it. With writes off this prints
+      # dry-run — the same posture as before, now with a reason attached.
+      #
+      # Passed through `env` rather than interpolated into the script: that is
+      # GitHub's own script-injection guidance, and it is also what makes this
+      # step replayable — a `${{ }}` inside a `run:` block reaches the shell
+      # unexpanded, where `${{ x }}` is a bash "bad substitution" and the step
+      # dies for a reason that has nothing to do with the workflow.
+      - name: Resolve the write mode
+        id: mode
+        env:
+          EVENT: ${{ github.event_name }}
+          DISPATCH_INPUT: ${{ inputs.dry_run }}
+          WRITE_ENABLED: ${{ vars.ENABLE_CALENDAR_WRITES }}
+        run: |
+          python3 scripts/write_mode.py \
+            --event "$EVENT" \
+            --input "$DISPATCH_INPUT" \
+            --enabled "$WRITE_ENABLED" >> "$GITHUB_OUTPUT"
+
+      # There is deliberately NO Google auth step here any more, and no
+      # `GCP_WORKLOAD_IDENTITY_PROVIDER` / `GCP_SERVICE_ACCOUNT` variable to read.
+      # The calendar credential lives with Composio, which holds the Google OAuth
+      # grant for the connected account; `calendar_io.py` presents only
+      # `COMPOSIO_API_KEY`. A `google-github-actions/auth@v2` step would now be
+      # dead configuration — nothing downstream reads a Google access token — and
+      # a step that cannot affect anything is a step that hides a real one being
+      # missing.
+
+      - name: Install opencode CLI
+        run: npm install -g opencode-ai@latest || npm install -g opencode
+
+      # A configuration fault, not a quiet day. With no LLM rung configured the
+      # run cannot apply the 7 checks at all, and the summary would look exactly
+      # like "no free streams found today" — the one failure that is invisible
+      # from the outside. Offline and deterministic, so it fails in seconds.
+      #
+      # Placed AFTER the CLI install on purpose: a runner whose only credential
+      # is the CLI's own auth store is configured, and checking before the
+      # install would red it.
+      - name: Preflight — at least one LLM rung is configured
+        run: |
+          python3 scripts/capture_transcripts.py --check-rungs
+          python3 scripts/capture_transcripts.py --list-models
+
+      - name: Start the opencode backend (one MCP boot for the job)
+        run: |
+          opencode serve --port 4096 --hostname 127.0.0.1 &
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:4096/ >/dev/null 2>&1 && break
+            sleep 1
+          done
+
+      # ONE decision, in tested Python, of which model the run below uses.
+      #
+      # This replaced `LLM_MODEL: ${{ vars.LLM_MODEL || 'opencode/big-pickle' }}`,
+      # which named a Zen model unconditionally: a repository holding a Gemini or
+      # an OpenRouter key and no Zen key is correctly configured (`--check-rungs`
+      # passes for it), yet the run asked the CLI for a model it had no
+      # credential for and produced no transcript — indistinguishable from a
+      # quiet day. Which rung serves is a fact about the credentials that are
+      # set, so it cannot be a workflow literal; and a decision written as a
+      # `${{ }}` expression cannot be tested. See scripts/llm_model.py.
+      #
+      # The credential list here is deliberately the same one `--check-rungs`
+      # considers, including the CLI's own providers: if the resolver saw a
+      # narrower set than the gate, the two would disagree about what
+      # "configured" means.
+      - name: Resolve the model
+        id: llm
+        env:
+          LLM_MODEL: ${{ vars.LLM_MODEL }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python3 scripts/llm_model.py >> "$GITHUB_OUTPUT"
+
+      # Security control: the calendar-writing agent must NOT be able to edit
+      # SKILL.md, references/ or the gate scripts mid-run. `edit` and `bash` are
+      # omitted, and anything omitted is denied.
+      - name: Create the permission-restricted runtime agent
+        run: |
+          opencode agent create \
+            --path .opencode/agent \
+            --description "Basketball streams runtime: read-only research, calendar writer" \
+            --mode primary \
+            --permissions read,glob,grep,webfetch,websearch,skill
+
+      - name: Run the skill
+        env:
+          # Read from the resolver above, so the credential the model was chosen
+          # for is actually present here. `GOOGLE_API_KEY` is the Gemini alias
+          # `RUNG_CREDENTIALS` accepts; a rung selected on the strength of a
+          # variable that this step does not receive would fail here for a reason
+          # that looks like a dead provider.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+          TINYFISH_API_KEY: ${{ secrets.TINYFISH_API_KEY }}
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+          LLM_MODEL: ${{ steps.llm.outputs.model }}
+          DRY_RUN: ${{ steps.mode.outputs.dry_run }}
+        run: |
+          # `pipefail`, because the transcript is persisted by `tee` and a pipe
+          # reports *tee's* status: without it a failed run reads as a pass, and
+          # every step below then works from a transcript that was never written.
+          # (The Phase 0 ladder avoids the pipe instead of arming it — there the
+          # payload is already on stdout and `tee` is not the writer.)
+          set -o pipefail
+          # This is the earliest step in this job to write into `.tmp`, and nothing
+          # before it creates the directory. `tee .tmp/transcript.json` therefore
+          # could not open its own output file, and the artifact's
+          # `if-no-files-found: ignore` hid that: the run was failing to record a
+          # transcript while looking like a quiet day.
+          mkdir -p .tmp
+          opencode run --attach http://127.0.0.1:4096 \
+            --model "$LLM_MODEL" --format json \
+            --file SKILL.md --file references/ \
+            "Execute Steps 1-7 for today (Europe/Berlin). DRY_RUN=$DRY_RUN. Emit the Step 7 table." \
+            | tee .tmp/transcript.json
+
+      # ── The write path. Ordered, and each step is inspectable on its own. ──
+      # 1. Read the calendar FIRST (dedupe-before-write is a safety property,
+      #    not a detail: without the read, the planner cannot know what exists).
+      # 2. Plan in memory — no API calls, so the decision is reviewable.
+      # 3. Apply only on --live, and only for create/update rows.
+      - name: List existing events for the window
+        id: existing
+        if: vars.ENABLE_CALENDAR_WRITES == 'true'
+        env:
+          BASKETBALL_CALENDAR_ID: ${{ vars.BASKETBALL_CALENDAR_ID }}
+          # The API key is the whole credential; the user id says *whose* grant
+          # to use and survives a reconnect, which a pinned connected-account id
+          # does not. Both as secrets: the user id is an account handle, and this
+          # repository is public. `calendar_io.py` exits 2 naming whichever one is
+          # missing rather than reading an unscoped call as a configured one.
+          COMPOSIO_API_KEY: ${{ secrets.COMPOSIO_API_KEY }}
+          COMPOSIO_USER_ID: ${{ secrets.COMPOSIO_USER_ID }}
+        run: |
+          mkdir -p .tmp
+          python3 scripts/calendar_io.py list --days 7 --out .tmp/existing.json
+
+      - name: Extract the candidates the agent found
+        id: candidates
+        if: vars.ENABLE_CALENDAR_WRITES == 'true'
+        run: |
+          # The runtime agent is deliberately denied `edit` and `bash`, so it
+          # cannot write this file itself — the transcript is the channel, and
+          # the extraction contract is enforced below rather than assumed.
+          python3 scripts/capture_transcripts.py --runner replay \
+            --from .tmp/transcript.json --check >/dev/null 2>&1 || true
+          python3 scripts/extract_candidates.py \
+            --transcript .tmp/transcript.json --out .tmp/candidates.json
+
+      # ── The audit's verdicts, read back so they can be honoured. ──────────
+      # §17's hard requirement is that a `WRONG` event is never shown as
+      # `VERIFIED`. The planner reads a stored `WRONG` off the calendar, and the
+      # calendar recovers it from a `[WRONG] ` title prefix — which
+      # `audit_events` computes and puts in `audit.jsonl`, and which nothing
+      # applies. So on the real path that rule was unreachable and the next run's
+      # fresh guess was free to promote a condemned event. This step gives the
+      # planner the record itself.
+      #
+      # Read-only, deliberately: this job holds no `contents: write`, and a
+      # read-only `git show` of a branch (the same one `self-improve.yml` uses)
+      # needs none. An absent ledger is a repository whose audit has not run yet,
+      # not a fault — but it IS the state in which a wrong event can be promoted,
+      # so the job summary says so rather than passing silently.
+      - name: Read the audit verdict ledger
+        id: verdicts
+        if: vars.ENABLE_CALENDAR_WRITES == 'true'
+        run: |
+          mkdir -p .tmp
+          if git fetch --depth=1 origin telemetry 2>/dev/null; then
+            git show origin/telemetry:audit.jsonl > .tmp/audit.jsonl 2>/dev/null || true
+          fi
+          if [ -s .tmp/audit.jsonl ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "Audit rows on the telemetry branch: $(wc -l < .tmp/audit.jsonl)"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No audit ledger on the telemetry branch yet, so no event is held by a WRONG verdict this run."
+          fi
+
+      - name: Plan the calendar writes (no API calls)
+        id: plan
+        if: >-
+          vars.ENABLE_CALENDAR_WRITES == 'true' &&
+          steps.candidates.outcome == 'success'
+        env:
+          # Via `env`, not interpolated into the shell — GitHub's script-injection
+          # guidance, and what keeps this step replayable.
+          VERDICTS_READY: ${{ steps.verdicts.outputs.ready }}
+        run: |
+          # `set --` rather than building a command string: the flag is added or
+          # not, with no word-splitting to get wrong.
+          set -- --existing .tmp/existing.json \
+                 --candidates .tmp/candidates.json --json
+          if [ "$VERDICTS_READY" = "true" ]; then
+            set -- "$@" --verdicts .tmp/audit.jsonl
+          fi
+          python3 scripts/upsert_events.py "$@" > .tmp/plan.json
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          plan = json.load(open(".tmp/plan.json"))
+          summary = plan["summary"]
+          print("## Calendar plan (no API calls yet)")
+          print()
+          print("| Action | Count |")
+          print("|---|---|")
+          for action, count in summary.items():
+              print(f"| {action} | {count} |")
+          print()
+          print("`skip` rows send nothing: a verified event is never modified, and")
+          print("an audit `WRONG` verdict is never overwritten by a fresh guess.")
+          held = [row for row in plan["plan"] if "audit verdict WRONG" in row.get("reason", "")]
+          print()
+          if held:
+              print(f"{len(held)} event(s) held by an audit `WRONG` verdict:")
+              print()
+              for row in held:
+                  print(f"* `{row['event_id']}` — {row['reason']}")
+          else:
+              print("No event was held by an audit verdict this run.")
+          PY
+
+      - name: Apply the plan
+        id: apply
+        if: >-
+          vars.ENABLE_CALENDAR_WRITES == 'true' &&
+          steps.plan.outcome == 'success'
+        env:
+          MODE: ${{ steps.mode.outputs.dry_run }}
+          BASKETBALL_CALENDAR_ID: ${{ vars.BASKETBALL_CALENDAR_ID }}
+          COMPOSIO_API_KEY: ${{ secrets.COMPOSIO_API_KEY }}
+          COMPOSIO_USER_ID: ${{ secrets.COMPOSIO_USER_ID }}
+        run: |
+          # --live is required before a single byte is written. The dry run runs
+          # first so the log always contains the intended change, even if the
+          # write then fails.
+          #
+          # The mode is READ, never recomputed: a second inline expression here
+          # is exactly how the two halves of this step drifted apart before.
+          #
+          # Written as `= false` rather than `!= true` so that every value other
+          # than the one the resolver emits — empty, unset, or a `${{ }}` that
+          # arrived unexpanded in a local replay — stays on the dry-run side.
+          # `--out` writes the applied result, which is the record of what the
+          # calendar now holds and under which event id. Phase 3 keys its
+          # verdicts to those ids, so this file is the audit's evidence — and it
+          # is what `calendar_io.py` writes BEFORE its own exit-1 path, so a
+          # partially failed apply is still recordable rather than lost.
+          if [ "$MODE" = "false" ]; then
+            python3 scripts/calendar_io.py apply --plan .tmp/plan.json \
+              --out .tmp/applied.json
+            python3 scripts/calendar_io.py apply --plan .tmp/plan.json --live \
+              --out .tmp/applied.json
+          else
+            echo "::notice::dry-run — planning only, no calendar writes."
+            python3 scripts/calendar_io.py apply --plan .tmp/plan.json \
+              --out .tmp/applied.json
+          fi
+
+      # ── Phase 2's record, and Phase 3's only input. ──────────────────────
+      # `telemetry/events.jsonl` and `evidence.json` are what the audit reads;
+      # before this step existed, nothing wrote them, so the audit job found its
+      # inputs absent, printed a notice, and did nothing — every run. Precision
+      # stayed `n/a` and the self-improvement loop had no ledger to learn from.
+      #
+      # Runs on `always()` so a partially failed apply is still recorded: the
+      # events that DID land are exactly the ones a subscriber can see.
+      # The shell guard keeps a missing result (the run never reached the write
+      # path) a notice rather than a red step, while a genuine refusal — a
+      # written event the calendar will not name — still exits non-zero.
+      - name: Record what was written (Phase 3 input)
+        if: always()
+        run: |
+          if [ ! -f .tmp/applied.json ]; then
+            echo "::notice::No apply result this run, so there is nothing to record."
+            exit 0
+          fi
+          python3 scripts/event_ledger.py record \
+            --plan .tmp/plan.json \
+            --applied .tmp/applied.json \
+            --dest .tmp \
+            --run-id "$(date -u +%Y-%m-%dT%H:%MZ)"
+
+      - name: Ledger summary
+        if: always()
+        run: |
+          {
+            echo "## Event ledger (Phase 2 -> 3)"
+            echo ""
+            if [ -f .tmp/applied.json ] && [ -f .tmp/plan.json ]; then
+              python3 scripts/event_ledger.py record \
+                --plan .tmp/plan.json --applied .tmp/applied.json \
+                --dest .tmp --markdown
+            else
+              echo "No apply result this run, so nothing was recorded."
+            fi
+            echo ""
+            echo "The audit can only judge events the ledger names: a missing"
+            echo "event id would be a verdict nothing could ever act on, so it is"
+            echo "refused rather than written with an empty key."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # The per-case grader needs ONE transcript per eval case. This job makes a
+      # single run for today's window, so it cannot produce them: 1 run is not 36
+      # cases. What it CAN do is grade the moment a captured set exists, and
+      # fail hard when it does — a grade that is swallowed with `|| true` is not
+      # a gate. (The step this replaced fed the raw run stream to --transcripts
+      # and tolerated the mismatch, so it could only ever print a warning.)
+      - name: Grade the eval set against a captured transcript
+        if: always()
+        run: |
+          if [ -f tests/fixtures/runtime_transcripts.json ]; then
+            python3 scripts/runtime_eval.py --root . \
+              --transcripts tests/fixtures/runtime_transcripts.json
+          else
+            echo "::notice::No captured transcript, so the per-case grader did not run. Capture one (needs a free AI Studio key):"
+            echo "python3 scripts/capture_transcripts.py --runner ladder --out tests/fixtures/runtime_transcripts.json"
+          fi
+
+      # Which LLM rungs this run actually had. Free tiers are withdrawn without
+      # notice, and "the run found nothing" is indistinguishable from "every
+      # rung was dead" unless the rung state is printed next to it.
+      - name: Report which LLM rungs are configured
+        if: always()
+        run: |
+          python3 scripts/capture_transcripts.py --list-models \
+            || echo "::notice::The Gemini rung is unavailable — see the FAIL line above. The ladder uses the rungs that are configured."
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: runtime-transcript
+          path: .tmp/transcript.json
+          if-no-files-found: ignore
+          retention-days: 30
+
+      # The runtime job is the only job that knows what it wrote, and it holds
+      # no `contents: write` — deliberately, because it also holds the calendar
+      # credential and the two authorities are kept apart. The artifact is the
+      # handoff: the audit job publishes these files to the telemetry branch,
+      # the same producer/filer split `rung-health` and `rung-issues` use.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: run-ledger
+          path: |
+            .tmp/events.jsonl
+            .tmp/evidence.json
+          if-no-files-found: ignore
+          retention-days: 30
+
+      # The write mode is the one fact a reader needs to interpret everything
+      # above: "no events were created" means something quite different in
+      # dry-run than it does with writes permitted. It used to appear only as a
+      # `::notice::` inside the apply step, which is why a permanently-dry-run
+      # cron could run green for as long as nobody looked at the log.
+      - name: Job summary
+        if: always()
+        env:
+          MODE: ${{ steps.mode.outputs.dry_run }}
+          REASON: ${{ steps.mode.outputs.reason }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          {
+            echo "## Skill run (Phase 1/2)"
+            echo ""
+            echo "| Fact | Value |"
+            echo "|---|---|"
+            if [ "$MODE" = "true" ]; then
+              echo "| Write mode | dry-run (no calendar writes) |"
+            else
+              echo "| Write mode | live writes permitted |"
+            fi
+            echo "| Decided by | $REASON |"
+            echo "| Event | $EVENT |"
+            echo ""
+            echo "\`ENABLE_CALENDAR_WRITES\` is the master switch; on a dispatch the"
+            echo "\`dry_run\` input can only force dry-run, never grant a write."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # ---------------------------------------------------------------------------
+  # Phase 3 — post-hoc audit and promotion sweep.
+  #
+  # It requires two artefacts that Phase 2 must produce:
+  #   telemetry/events.jsonl   events written, keyed by event_id
+  #   telemetry/evidence.json  {event_id: {live_confirmed, free_confirmed, paid}}
+  # `runtime` now produces them and hands them over as the `run-ledger` artifact,
+  # because it holds no `contents: write` (and must not: it holds the calendar
+  # credential). This job has the write permission, so it is the one that
+  # publishes them to the telemetry branch. Without that handoff the job found
+  # its inputs absent, printed a notice, and did nothing on every single run.
+  #
+  # `needs: runtime` is an ORDERING dependency, not a success one: it exists so
+  # the artifact is available when this job starts. The audit must still run on a
+  # day the skill run failed — that is exactly when a false positive is most
+  # likely to have been created — which is why the condition is `always()`. If
+  # `runtime` was skipped, the branch copies are still audited.
+  #
+  # It never invents a verdict for an event it cannot see.
+  # ---------------------------------------------------------------------------
+  audit:
+    name: Phase 3 — post-hoc audit
+    needs: [telemetry, runtime]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: always() && vars.ENABLE_AUDIT == 'true'
+    permissions:
+      contents: write
+    # One branch, one writer at a time — see the note on `rung-health`,
+    # including why `queue: max` is required rather than optional.
+    concurrency:
+      group: telemetry-branch
+      cancel-in-progress: false
+      queue: max
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Configure git identity for telemetry commits
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Check out the telemetry branch as a worktree
+        run: |
+          git fetch origin telemetry || echo "telemetry branch does not exist yet"
+          if git show-ref --verify --quiet refs/remotes/origin/telemetry; then
+            git worktree add .tmp/telemetry -B telemetry origin/telemetry
+          else
+            git worktree add --orphan -b telemetry .tmp/telemetry
+          fi
+          mkdir -p .tmp/telemetry
+
+      # The run's own ledger, produced by the `runtime` job. Tolerated when
+      # absent (a skipped or failed run produces no artifact), because the
+      # branch may still carry events worth auditing. Downloaded into the
+      # worktree so the commit below publishes it — that is what puts
+      # `events.jsonl` on the telemetry branch, where §10.1 says it lives.
+      - name: Fetch this run's ledger
+        id: run-ledger
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: run-ledger
+          path: .tmp/telemetry
+
+      - name: Check for audit inputs
+        id: inputs
+        run: |
+          if [ -f .tmp/telemetry/events.jsonl ] && [ -f .tmp/telemetry/evidence.json ]; then
+            echo "ready=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Phase 3 audit skipped — .tmp/telemetry/events.jsonl and/or evidence.json are absent (Phase 2 has not written any events yet)."
+          fi
+
+      - name: Audit finished events and sweep promotions
+        if: steps.inputs.outputs.ready == 'true'
+        run: |
+          # Exit 1 means every event was INCONCLUSIVE — a real signal, not an
+          # error, so it must not red the workflow.
+          python3 scripts/audit_events.py \
+            --events .tmp/telemetry/events.jsonl \
+            --evidence .tmp/telemetry/evidence.json \
+            --out .tmp/telemetry/audit.jsonl \
+            --run-id "$(date -u +%Y-%m-%dT%H:%MZ)" || true
+
+      - name: Commit telemetry (one commit per run, never per row)
+        if: steps.inputs.outputs.ready == 'true'
+        run: |
+          cd .tmp/telemetry
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No new audit rows."
+            exit 0
+          fi
+          git commit -m "telemetry: audit $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push origin telemetry
+
+      - name: Job summary
+        if: always()
+        env:
+          # Via `env` for the same two reasons as the runtime summary above:
+          # GitHub's script-injection guidance, and a `${{ }}` left in the `run:`
+          # block reaches the shell unexpanded, where it is a bash "bad
+          # substitution". This step failed in `replay_ci.py` for exactly that.
+          INPUTS_READY: ${{ steps.inputs.outputs.ready }}
+        run: |
+          {
+            echo "## Post-hoc audit (Phase 3)"
+            echo ""
+            echo "| Metric | Value |"
+            echo "|---|---|"
+            if [ -f .tmp/telemetry/audit.jsonl ]; then
+              echo "| Audit rows (cumulative) | $(wc -l < .tmp/telemetry/audit.jsonl) |"
+            else
+              echo "| Audit rows | 0 |"
+            fi
+            echo "| Inputs present | ${INPUTS_READY:-no} |"
+            echo ""
+            echo "A \`WRONG\` verdict relabels an event; it never deletes one. Fix the gate on the self-improvement branch, never the event."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # ---------------------------------------------------------------------------
+  # §18.4's other half: a rung parked for N consecutive days raises an issue.
+  #
+  # Producing and filing are split across jobs on purpose, the same way
+  # `self-improve.yml` holds no calendar credential. The job that probes and
+  # commits holds no issue permission and cannot touch the issue tracker; this
+  # one holds `issues: write`, holds NO search or render key, and never writes
+  # to the branch. Neither of them can reach the calendar.
+  #
+  # `gh` is only ever invoked when a rung is actually parked (a test pins the
+  # negative with a stub `gh`), so a normal day files nothing.
+  # ---------------------------------------------------------------------------
+  rung-issues:
+    name: Rung health — file a parked rung
+    needs: rung-health
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check out the telemetry branch (read-only)
+        id: ledger
+        run: |
+          git fetch origin telemetry || echo "telemetry branch does not exist yet"
+          if git show-ref --verify --quiet refs/remotes/origin/telemetry; then
+            git worktree add .tmp/telemetry origin/telemetry
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No telemetry branch yet, so there is no rung ledger to read."
+          fi
+
+      - name: File a parked rung
+        if: steps.ledger.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 scripts/rung_health.py parked \
+            --dest .tmp/telemetry --days 3 --file
+
+      - name: Job summary
+        if: always()
+        env:
+          LEDGER_READY: ${{ steps.ledger.outputs.ready }}
+        run: |
+          {
+            echo "## Parked rungs"
+            echo ""
+            if [ "$LEDGER_READY" = "true" ]; then
+              python3 scripts/rung_health.py parked \
+                --dest .tmp/telemetry --days 3 --markdown
+            else
+              echo "No rung ledger this run."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
