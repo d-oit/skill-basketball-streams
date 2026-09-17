@@ -90,6 +90,10 @@ class Backend:
     def available(self) -> bool:
         return bool(os.environ.get(self.env_var)) if self.env_var else True
 
+    def status_detail(self, configured: bool) -> str:
+        """The preflight line for this rung — `backend_status` prints it verbatim."""
+        return f"{self.env_var} is set" if configured else f"{self.env_var} is not set"
+
     def search(self, query: str, limit: int) -> list[dict]:
         raise NotImplementedError
 
@@ -141,6 +145,143 @@ class ExaBackend(Backend):
         )
 
 
+class ExaMcpKeylessBackend(Backend):
+    """The hosted Exa MCP server in its free keyless mode.
+
+    https://exa.ai/docs/get-started/exa-mcp: `https://mcp.exa.ai/mcp` serves
+    rate-limited search with NO API key (their "Keyless" auth mode). This rung
+    exists so Phase 0 can populate the recall ledger with zero secrets — the
+    alternative was a preflight that red every day until a human bought a key.
+
+    Position in the ladder: AFTER the paid `exa-mcp` rung and BEFORE `tinyfish`.
+    Same provider as rung 1, so the rung steps aside entirely when EXA_API_KEY
+    is set — a second rung re-searching every query would only duplicate rows
+    (dedup hides it) and double the rate-limit spend. TinyFish stays last: it
+    is the independent index, i.e. the rung that catches Exa-wide outages.
+
+    Transport notes, from the live probe this class was written against: the
+    endpoint speaks Streamable HTTP — POST JSON-RPC, `Accept: application/json,
+    text/event-stream`, take `mcp-session-id` from the initialize response and
+    send it back on every later call. The tool answer comes as an SSE `data:`
+    line whose JSON `result.content[0].text` holds records separated by `---`
+    with `Title:` / `URL:` line prefixes. A free-tier rate limit surfaces as
+    HTTP 429, which `_fail` records and the ladder answers by moving on.
+    """
+
+    name = "exa-mcp-keyless"
+    env_var = ""  # free: nothing to configure
+    endpoint = "https://mcp.exa.ai/mcp"
+    tool = "web_search_exa"
+
+    def available(self) -> bool:
+        # Step aside when the paid rung is configured (see class docstring).
+        return not os.environ.get("EXA_API_KEY")
+
+    def status_detail(self, configured: bool) -> str:
+        if configured:
+            return "free keyless tier of https://mcp.exa.ai/mcp (no key needed)"
+        return "stepping aside: EXA_API_KEY is set, the paid rung serves"
+
+    def _rpc(self, session: str | None, payload: dict) -> tuple[str | None, str]:
+        """One JSON-RPC POST. Returns `(session_id_to_keep, raw_body)`."""
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json, text/event-stream",
+            "User-Agent": USER_AGENT,
+        }
+        if session:
+            headers["mcp-session-id"] = session
+        request = urllib.request.Request(
+            self.endpoint,
+            data=json.dumps(payload).encode("utf-8"),
+            headers=headers,
+            method="POST",
+        )
+        with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as resp:
+            kept = resp.headers.get("mcp-session-id") or session
+            return kept, resp.read().decode("utf-8", "replace")
+
+    def _result_text(self, body: str) -> str:
+        """The tool's text payload from an SSE `data:` line (or a bare JSON body)."""
+        candidates = [line[5:].strip() for line in body.splitlines() if line.startswith("data:")]
+        candidates.append(body)
+        for raw in candidates:
+            try:
+                message = json.loads(raw)
+            except ValueError:
+                continue
+            if isinstance(message, dict) and isinstance(message.get("result"), dict):
+                content = message["result"].get("content") or []
+                chunks = [
+                    part.get("text", "")
+                    for part in content
+                    if isinstance(part, dict) and part.get("type") == "text"
+                ]
+                text = "\n".join(chunks)
+                if text.strip():
+                    return text
+        return ""
+
+    @staticmethod
+    def _records(text: str) -> list[dict]:
+        """`Title:`/`URL:` blocks separated by `---` into candidate dicts."""
+        records: list[dict] = []
+        for block in text.split("\n---"):
+            url = title = ""
+            for line in block.splitlines():
+                if line.startswith("URL:") and not url:
+                    url = line[len("URL:"):].strip()
+                elif line.startswith("Title:") and not title:
+                    title = line[len("Title:"):].strip()
+            if url:
+                records.append({"url": url, "title": title})
+        return records
+
+    def search(self, query: str, limit: int) -> list[dict]:
+        session: str | None = None
+        try:
+            session, _ = self._rpc(
+                None,
+                {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "initialize",
+                    "params": {
+                        "protocolVersion": "2025-03-26",
+                        "capabilities": {},
+                        "clientInfo": {"name": "basketball-streams-runtime", "version": "1.0"},
+                    },
+                },
+            )
+            try:
+                self._rpc(session, {"jsonrpc": "2.0", "method": "notifications/initialized"})
+            except (urllib.error.HTTPError, urllib.error.URLError, OSError):
+                pass  # a rejected notification does not gate the search itself
+            _, body = self._rpc(
+                session,
+                {
+                    "jsonrpc": "2.0",
+                    "id": 2,
+                    "method": "tools/call",
+                    "params": {
+                        "name": self.tool,
+                        "arguments": {"query": query, "numResults": max(1, limit)},
+                    },
+                },
+            )
+        except urllib.error.HTTPError as exc:
+            self._fail(f"HTTP {exc.code}")
+            return []
+        except (urllib.error.URLError, OSError, ValueError) as exc:
+            self._fail(f"{type(exc).__name__}: {exc}")
+            return []
+        text = self._result_text(body)
+        if not text:
+            self._fail("MCP response carried no result content")
+            return []
+        return self._result(query, self._records(text)[:limit])
+
+
 class TinyFishSearchBackend(Backend):
     name = "tinyfish"
     env_var = "TINYFISH_API_KEY"
@@ -174,9 +315,10 @@ class TinyFishSearchBackend(Backend):
 
 
 ALL_BACKENDS: dict[str, Backend] = {
-    backend.name: backend for backend in (ExaBackend(), TinyFishSearchBackend())
+    backend.name: backend
+    for backend in (ExaBackend(), ExaMcpKeylessBackend(), TinyFishSearchBackend())
 }
-LADDER = ("exa-mcp", "tinyfish")
+LADDER = ("exa-mcp", "exa-mcp-keyless", "tinyfish")
 
 # Hosts that must never be recorded as candidate stream sources.
 NEVER_SOURCE_HOSTS = (
@@ -204,10 +346,8 @@ def backend_status(names: list[str] | None = None) -> list[tuple[str, bool, str]
     status: list[tuple[str, bool, str]] = []
     for name in names if names is not None else LADDER:
         backend = ALL_BACKENDS[name]
-        if backend.available():
-            status.append((name, True, f"{backend.env_var} is set"))
-        else:
-            status.append((name, False, f"{backend.env_var} is not set"))
+        configured = backend.available()
+        status.append((name, configured, backend.status_detail(configured)))
     return status
 
 
@@ -329,7 +469,8 @@ def main() -> None:
         if not any(configured for _, configured, _ in status):
             print(
                 "FAIL: run_daily: no search backend is configured — set "
-                "EXA_API_KEY or TINYFISH_API_KEY. Phase 0 writes nothing "
+                "EXA_API_KEY or TINYFISH_API_KEY, or drop --backend so the "
+                "keyless rung (exa-mcp-keyless) serves. Phase 0 writes nothing "
                 "without one, so the run would be green and the ledger empty",
                 file=sys.stderr,
             )
@@ -378,9 +519,10 @@ def main() -> None:
 
     available = [b.name for b in backends if b.available()]
     if not available:
+        missing = sorted({b.env_var for b in backends if b.env_var})
         print(
             "FAIL: run_daily: every backend is unavailable "
-            f"(missing {', '.join(sorted(b.env_var for b in backends))}) — "
+            f"(missing {', '.join(missing) or 'the selected rungs'}) — "
             "Phase 0 writes nothing so the ledger stays honest",
             file=sys.stderr,
         )

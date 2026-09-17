@@ -332,7 +332,10 @@ class TestTheRegistryStaysComplete:
         checks = self._by_name()
         for backend in ALL_BACKENDS.values():
             assert f"search:{backend.name}" in checks, backend.name
-            assert checks[f"search:{backend.name}"].env == (backend.env_var,)
+            # A keyless rung carries no credential, so its surface must have an
+            # empty env tuple — `assess` reads that as "probe directly".
+            expected_env = (backend.env_var,) if backend.env_var else ()
+            assert checks[f"search:{backend.name}"].env == expected_env, backend.name
 
     def test_every_credential_the_runtime_reads_has_a_surface(self):
         """The invariant that matters, over the union rather than per-component.
@@ -351,7 +354,10 @@ class TestTheRegistryStaysComplete:
         for names in RUNG_CREDENTIALS.values():
             required.update(names)
         for backend in ALL_BACKENDS.values():
-            required.add(backend.env_var)
+            # A keyless rung reads no credential (env_var is ""); adding the
+            # empty string here would demand an env var nobody can set.
+            if backend.env_var:
+                required.add(backend.env_var)
         for rung in ALL_RUNGS.values():
             # Only the hosted rungs carry a key; the local ones have no `env_var`
             # attribute at all, which is what makes the ladder never empty.
@@ -405,7 +411,17 @@ class TestOfflineIsStructural:
         offline = structural(checks)
         assert [check.name for check in offline] == ["github-issues:grant"]
         assert all(not check.env for check in offline)
+        assert all(check.structural for check in offline)
         assert len(offline) < len(checks), "a mode that probes everything is not offline"
+
+    def test_env_free_does_not_imply_structural(self):
+        """No credential does not mean no network: the keyless rung proves it."""
+        by_name = {check.name: check for check in build_checks()}
+        keyless = by_name["search:exa-mcp-keyless"]
+        assert keyless.env == () and keyless.structural is False
+        # The repository check stays structural, and its probe reads workflows,
+        # not sockets — that is what earns it a place in `--offline`.
+        assert by_name["github-issues:grant"].structural is True
 
     def test_every_offline_surface_has_a_probe(self):
         """An env-less check with no probe could never be anything but noise."""
@@ -550,6 +566,9 @@ class TestCli:
         # this run never asked about) nor a name in any row.
         assert "NO   " not in result.stderr
         assert "llm:" not in result.stderr
+        # Not structural either: the keyless rung has no credential but still
+        # talks to a service, and offline promises not to touch the network.
+        assert "search:" not in result.stderr
 
     def test_offline_spends_nothing_even_when_credentials_are_set(self):
         """The property a CI gate depends on: configured-but-offline is inert.
@@ -562,6 +581,23 @@ class TestCli:
         )
         assert result.returncode == 0
         assert "llm:gemini" not in result.stderr
+        assert "1 valid" in result.stderr
+
+    def test_offline_never_probes_a_service_backed_by_no_credential(self):
+        """structural is declared, not derived from an empty env.
+
+        The keyless Exa rung needs no key yet still speaks to mcp.exa.ai; an
+        env-derived offline set would probe it, and --offline would spend the
+        network it promises a CI gate it never touches. The env-less checks that
+        DO read the repository (exactly one) are the only ones probed.
+        """
+        from run_daily import ALL_BACKENDS
+
+        assert ALL_BACKENDS["exa-mcp-keyless"].env_var == ""  # the trap exists
+        result = self._run("--offline")
+        assert result.returncode == 0
+        assert "search:" not in result.stderr
+        assert "(of 1 surface(s))" in result.stderr
         assert "1 valid" in result.stderr
 
     def test_markdown_is_payload_only_and_reads_as_a_table(self):

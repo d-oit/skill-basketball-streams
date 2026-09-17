@@ -27,7 +27,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   check cannot be silently disarmed by a rename.
 
 
+## [1.3.0] - 2026-09-17
+
+### Added
+
+- **Free keyless Exa MCP search rung** (`exa-mcp-keyless`) in `run_daily.py`'s
+  Phase 0 ladder, now `exa-mcp` → `exa-mcp-keyless` → `tinyfish`. The hosted
+  MCP server at `https://mcp.exa.ai/mcp` serves rate-limited search with no API
+  key (Exa's "Keyless" mode — verified live: initialize → session →
+  `tools/call web_search_exa` returned real BBL results). Consequence: the
+  Phase 0 preflight passes with **zero secrets**, so the daily runtime runs on
+  a fresh fork on day one. The rung steps aside when `EXA_API_KEY` is set (same
+  provider; serving twice would duplicate rows), and TinyFish stays last as the
+  independent index. Transport parser unit-tested against the recorded live
+  response (`tests/fixtures/exa_mcp_keyless_search.sse`); 429 rate limits are
+  recorded in the run's failure detail, never silent.
+
 ## [Unreleased]
+
 
 
 ### Notes

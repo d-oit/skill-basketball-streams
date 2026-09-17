@@ -18,7 +18,7 @@ come from the backends below.
 | **TinyFish** | Search + Fetch **free at any balance**; 5,000 req/month allowance, 30 req/min (Search), 150 URLs/min (Fetch) | Fetch yes; Browser tool for hard pages | — | Primary search: `after_date` / `before_date` / `recency_minutes` filters map directly onto the "datetime > now" gate |
 | **Firecrawl** | 1,000 credits/month, no card; keyless mode (no API key) for search + scrape | **Yes** (`waitFor`, `onlyMainContent`) | `firecrawl-mcp` | Rendering `magenta.tv` and other SPAs; the paid-plan escape hatch for anti-bot pages |
 | **Tavily** | 1,000 credits/month, no card | via `extract` | `tavily-mcp` | `/search`, `/extract`, `/crawl` for announcement pages |
-| **Exa** | $20 credits on sign-up (~2,800 searches) + $10/month | `search_and_contents` returns page text | `exa-mcp-server` | Semantic discovery of unindexed dynamic slugs |
+| **Exa** | MCP server is **free, keyless, rate-limited** (`https://mcp.exa.ai/mcp`); sign-up adds $20 credits (~2,800 searches) | `search_and_contents` returns page text | `exa-mcp-server`; hosted `mcp.exa.ai/mcp` | Semantic discovery of unindexed dynamic slugs; the keyless rung is Phase 0's zero-secret default |
 | **YouTube Data API v3** | 10,000 units/day; `search.list` = 100 units (~100 live searches/day) | n/a | — | `eventType=live` live-only search (see `references/youtube-live-search.md`) |
 | **Composio (Google Calendar toolkit)** | Free Hobby tier, 100K tool calls/month | n/a | Composio's own MCP server | Reading and writing the events — no Google Cloud project, no service account |
 
@@ -26,6 +26,30 @@ Recommended default ladder: **TinyFish** (search) → **Firecrawl** (render) →
 **Exa** (semantic fallback) → **Tavily** (extract fallback). If the agent runtime
 already exposes `webSearch` + `openUrl`, use those first and treat the backends
 above as the fallback rungs for dynamic/blocked pages.
+
+### The keyless Exa MCP rung (Phase 0's zero-secret default)
+
+`run_daily.py`'s search ladder is `exa-mcp` (paid, needs `EXA_API_KEY`) →
+**`exa-mcp-keyless`** (free, no key) → `tinyfish` (needs `TINYFISH_API_KEY`). The
+keyless rung speaks to the hosted MCP server at `https://mcp.exa.ai/mcp` — Exa
+serves it rate-limited with no API key at all (their "Keyless" auth mode,
+https://exa.ai/docs/get-started/exa-mcp). Consequences:
+
+* The Phase 0 preflight (`run_daily.py --check-backends`) passes with **zero
+  secrets**: a fresh fork runs Phase 0 on day one.
+* A free-tier rate limit surfaces as HTTP 429 in the run's failure detail; the
+  ladder moves on, and a paid `EXA_API_KEY` remains the upgrade path.
+* The keyless rung steps aside entirely when `EXA_API_KEY` is set — same
+  provider, so serving twice would only duplicate rows and burn limits.
+* Transport: JSON-RPC over Streamable HTTP — `initialize`, echo the returned
+  `mcp-session-id`, then `tools/call` for `web_search_exa`; the answer is SSE
+  with `result.content[0].text` holding `Title:`/`URL:` records split by `---`.
+  The parser is unit-tested against a recorded live response
+  (`tests/fixtures/exa_mcp_keyless_search.sse`).
+
+Ordering rationale: paid Exa outranks keyless Exa (same index, better limits),
+and TinyFish stays last as the *independent* index — the rung that still works
+when Exa-wide is having a bad day.
 
 **Excluded by project policy: Brave Search API.** Do not use it as a search rung,
 a fallback, or an MCP, and do not add a `--backend` entry for it. `run_daily.py`
