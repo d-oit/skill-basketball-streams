@@ -1,0 +1,80 @@
+{
+  "derived": true,
+  "ledger_rows": 13,
+  "max_strikes": 3,
+  "parked": [],
+  "run_id": "2026-09-17T11:08Z",
+  "rungs": {
+    "curl_cffi": {
+      "attempts": 3,
+      "consecutive_failures": 0,
+      "failures": 0,
+      "last_error": "curl_cffi not installed",
+      "last_host": "magenta.tv",
+      "last_seen": "2026-09-17T11:08:43+00:00",
+      "last_state": "skipped",
+      "max_strikes": 3,
+      "ok_no_evidence": 0,
+      "parked": false,
+      "skipped": 3,
+      "successes": 0
+    },
+    "firecrawl": {
+      "attempts": 3,
+      "consecutive_failures": 0,
+      "failures": 0,
+      "last_error": "FIRECRAWL_API_KEY not set",
+      "last_host": "magenta.tv",
+      "last_seen": "2026-09-17T11:08:43+00:00",
+      "last_state": "skipped",
+      "max_strikes": 3,
+      "ok_no_evidence": 0,
+      "parked": false,
+      "skipped": 3,
+      "successes": 0
+    },
+    "patchright": {
+      "attempts": 1,
+      "consecutive_failures": 0,
+      "failures": 0,
+      "last_error": "patchright not installed",
+      "last_host": "magenta.tv",
+      "last_seen": "2026-09-17T11:08:43+00:00",
+      "last_state": "skipped",
+      "max_strikes": 3,
+      "ok_no_evidence": 0,
+      "parked": false,
+      "skipped": 1,
+      "successes": 0
+    },
+    "tinyfish": {
+      "attempts": 3,
+      "consecutive_failures": 0,
+      "failures": 0,
+      "last_error": "TINYFISH_API_KEY not set",
+      "last_host": "magenta.tv",
+      "last_seen": "2026-09-17T11:08:43+00:00",
+      "last_state": "skipped",
+      "max_strikes": 3,
+      "ok_no_evidence": 0,
+      "parked": false,
+      "skipped": 3,
+      "successes": 0
+    },
+    "urllib": {
+      "attempts": 3,
+      "consecutive_failures": 0,
+      "failures": 0,
+      "last_error": "",
+      "last_host": "magenta.tv",
+      "last_seen": "2026-09-17T11:08:43+00:00",
+      "last_state": "ok-no-evidence",
+      "max_strikes": 3,
+      "ok_no_evidence": 3,
+      "parked": false,
+      "skipped": 0,
+      "successes": 0
+    }
+  },
+  "ts": "2026-09-17T11:08:45+00:00"
+}
