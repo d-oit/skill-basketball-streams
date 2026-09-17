@@ -5,7 +5,30 @@ All notable changes to `skill-basketball-streams` will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-09-17
+
+### Fixed
+
+- **`runtime-daily.yml` failed GitHub's workflow parser — every trigger was
+  dead.** Five comments carried a literal empty `` `${{ }}` `` token (prose
+  about expressions, in comments warning about expressions). GitHub scans
+  `run:` block values for workflow expressions even inside comments, and an
+  empty one is a parse error ("An expression was expected", HTTP 422 on
+  dispatch) — so the daily cron never started and dispatch refused with 422.
+  The offline gate could not see it: PyYAML parses the file fine and
+  `workflow-refs` checks paths, not expressions. The prose now says "a
+  workflow expression" instead of the token.
+
+### Added
+
+- **`tests/test_workflow_expressions.py`** — tripwire: no workflow may contain
+  an empty `${{ }}`. It is the only offline check that encodes what dispatch
+  actually requires, and it asserts the workflow list is non-empty so the
+  check cannot be silently disarmed by a rename.
+
+
 ## [Unreleased]
+
 
 ### Notes
 

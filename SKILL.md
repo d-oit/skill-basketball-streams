@@ -1,7 +1,7 @@
 ---
 name: skill-basketball-streams
 description: Search for FREE basketball live streams in Germany from approved official sources (BBL, EuroLeague, FIBA, Basketball Champions League, MagentaSport/MagentaTV, public broadcasters, clubs, YouTube channels), validate them with a 7-check pipeline (URL, page content, source allow-list, basketball-specific, date range, live proof, source reference), then add confirmed streams to Google Calendar. Renders the JS-rendered, bot-blocked magenta.tv via a fetch ladder, searches YouTube live-only under a strict start-datetime-greater-than-now gate, and revalidates stored links while discovering new sources through an append-only run log. Use when the user wants free basketball streams in Germany on a calendar, needs a stream URL validated, or reports broken links in past events. Triggers - "find basketball streams", "free BBL stream", "any free EuroLeague game today?", "validate this basketball URL", "add stream to basketball calendar". Not for paid broadcasters (Sky/DAZN/Prime), highlight reels, or non-basketball sports.
-version: "1.2.0"
+version: "1.2.1"
 category: workflow
 license: MIT
 allowed-tools: webSearch openUrl webFetch firecrawlScrape tinyfishFetch youtubeLiveSearch linkCheck GOOGLECALENDAR_EVENTS_LIST GOOGLECALENDAR_CREATE_EVENT GOOGLECALENDAR_PATCH_EVENT
