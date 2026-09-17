@@ -105,6 +105,8 @@ scripts/
   ├── runtime_eval.py                 Runtime skill-evaluator: structural + canned-stub passes, plus --transcripts for real captured runs.
   ├── youtube_live.py                 Live-only, future-only YouTube gate (classify_stream / filter_candidates).
   ├── link_check.py                   Link revalidation: OK / BROKEN / BLOCKED / ERROR / UNREACHABLE / INVALID.
+  ├── link_inventory.py               The links.json producer link_check.py --input never had: stored event links + every approved domain.
+  ├── stream_links.py                 The event description's link block, writer and reader in one place (directLink / sourceReference).
   ├── source_learning.py              Run log (--dest), per-source hit rates, quarantined new-source discovery.
   ├── candidates.py                   Candidate ledger + recall denominator (append / recall / retry).
   ├── render_ladder.py                Render ladder: blocked-climbs-vs-error-stops, AGPL licence guard, strike halting.
@@ -139,6 +141,8 @@ tests/
   ├── test_runtime_eval.py            ~12 subprocess tests for scripts/runtime_eval.py.
   ├── test_youtube_live.py            Live-only/future-only gate: units + CLI contract.
   ├── test_link_check.py              Link classification (BROKEN vs BLOCKED vs ERROR) + CLI contract.
+  ├── test_link_inventory.py          The producer: registry coverage, the candidate-to-inventory round trip, CLI contract.
+  ├── test_stream_links.py            The link vocabulary: normalisation, rendering, parsing (including the bare-bullet colon trap).
   ├── test_source_learning.py         Scoring, candidate discovery, --dest, quarantine writes + CLI contract.
   ├── test_candidates.py              Recall arithmetic, retry selection, ledger IO + CLI contract.
   ├── test_render_ladder.py           Licence guards, host ordering, blocked/error semantics, strike halting (offline).
@@ -188,7 +192,7 @@ references/
 - **Fetch ladder for dynamic/blocked pages** (`references/magenta-tv.md`): `magenta.tv` is a JS-rendered SPA whose shell returns 200 with no readable body, so Checks 6/7 require a browser-rendering backend (Firecrawl / TinyFish Fetch / Exa / Tavily / headless browser). 401/403/429/451 classify as *blocked*, never *broken*.
 - **BCL per-game free rule**: `championsleague.basketball` free access is decided per game via the site plus `@BasketballCL` and the BCL Facebook page — silence is not consent.
 - **Social media is validation evidence, never a source link.**
-- **Link revalidation + self-learning** (`scripts/link_check.py`, `scripts/source_learning.py`): append-only run log, per-source hit rates, quarantined new-source discovery, and link quarantine (never event deletion) on failure.
+- **Link revalidation + self-learning** (`scripts/link_inventory.py`, `scripts/link_check.py`, `scripts/source_learning.py`): append-only run log, per-source hit rates, quarantined new-source discovery, and link quarantine (never event deletion) on failure. The inventory builds the `links.json` that revalidation reads — from the stored event descriptions **and** `config/sources.json`, so all 22 approved domains are covered and not just the 4 the page corpus reaches. It makes no network request; only `link_check.py` probes, and deliberately gates nothing.
 - Free backend map, including $0 LLM options (OpenCode Zen free model IDs) and MCP wiring → `references/search-backends.md`.
 - **Runtime guardrails in code, not prose**: `scripts/render_ladder.py` treats `blocked` as distinct from a real error (403 climbs the ladder instead of discarding a game), and `assert_shippable()` makes it impossible for an AGPL rung to become a default when this repo is MIT.
 - **Recall is measured, not assumed**: `scripts/candidates.py` keeps a ledger of every candidate any backend surfaced, because without a denominator there is no way to tell whether a change made the pipeline better or merely quieter.
@@ -214,9 +218,9 @@ references/
 - Sportschau / ARD, ZDF
 - Regional: MDR, BR24, RBB24
 - Official BBL club websites (ALBA Berlin, FC Bayern München, ratiopharm ulm, …)
-- Official YouTube channels (`@fiba`, `@EuroLeague`, `@bbl_basketball`, `@BasketballCL`, `user/TheDBBTV` accepted; `@FIBAWorld`, generic `/channel/UC…`, and most `/user/…` URLs rejected)
+- Official YouTube channels (`@fiba`, `@EuroLeague`, `@basketballbundesliga`, `@BasketballCL`, `user/TheDBBTV` accepted; `@FIBAWorld`, generic `/channel/UC…`, and most `/user/…` URLs rejected)
 
-Social accounts (`@BasketballCL`, `@MagentaSport`, `@EuroLeague`, `@BBLofficial`) are **validation evidence for free access only** — never a stored stream link.
+Social accounts (`@BasketballCL`, `@MagentaSport`, `@EuroLeague`, `@easyCreditBBL`) are **validation evidence for free access only** — never a stored stream link.
 
 Full table with domains, the BCL triple-check and YouTube allow/reject patterns → `references/approved-sources.md`. Machine-readable mirror → `config/sources.json`.
 

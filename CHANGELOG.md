@@ -31,6 +31,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`scripts/link_inventory.py` — the producer `link_check.py --input` never had — and
+  `scripts/stream_links.py`, the vocabulary its writer and its reader share.**
+  `references/self-learning.md` lists link revalidation as one of five learning loops, and its
+  input is `links.json`: a file named in that table, in `SKILL.md`, in `docs/do-harness.md` and
+  in `link_check.py`'s own docstring, and **produced by nothing**. The loop could not run even
+  in principle — the same shape as `telemetry/events.jsonl` and `evidence.json` before
+  `event_ledger.py`, and it had a second cause one layer up (see *Fixed*). The inventory is
+  built from two places because the links live in two: the stored event descriptions, read back
+  out of the `FREE STREAM LINKS:` block, and `config/sources.json` — which is the half no check
+  covered, since of its **22 approved domains only 4** are reachable from the recorded page
+  corpus, so `fiba.basketball`, `euroleaguebasketball.net`, `sportschau.de`, `zdf.de`,
+  `joyn.de`, `pluto.tv`, `zattoo.com` and 11 others had never been tested at all. Each entry
+  carries a `kind` (`calendar-event` / `approved-domain` / `approved-channel` /
+  `validation-account`), because the right reaction differs: a dead event link is quarantined, a
+  dead domain means the tier table is stale, and a `validation-account` answering 401/403 is the
+  **expected** result rather than a finding. It makes no network request, so it is deterministic
+  and can gate a change, while `link_check.py` remains the probing half and deliberately gates
+  nothing — a league behind a rate limit must not red a build. `events_without_links` is
+  reported rather than dropped, because "the calendar has no dead links" and "no event had a
+  link to check" must not read the same.
+
 - **The rehearsal can now be filled in from one gitignored file, run with no credential at
   all, and pasted into the release PR.** `.env.example` lists every variable `build_checks()`
   names with where to get it, and `--env-file PATH` loads it — **explicitly, never
@@ -241,6 +262,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `PATH` proving a run with nothing parked never reaches GitHub at all.
 
 ### Changed
+
+- **The approved-source registry's BBL row pointed at three locators that no longer answer, in
+  three different files.** Found by actually running the inventory: the league renamed to
+  easyCredit BBL, and every part of the Tier-1 entry had gone stale independently —
+  `basketball-bundesliga.de` no longer serves the site (TLS SNI failure on both the bare and
+  `www` host, while DNS still resolves), `x.com/BBLofficial` is a **404** while the other four
+  approved X accounts answer 200, and `youtube.com/@bbl_basketball` is a **404** while
+  `@fiba`, `@EuroLeague` and `@BasketballCL` all answer 200 — so the probes were discriminating
+  rather than reporting a provider outage. The current locators are `easycredit-bbl.de`
+  ("easyCredit BBL — Die offizielle Seite"), `x.com/easyCreditBBL` (also linked from the
+  league's own homepage) and `youtube.com/@basketballbundesliga` (channel: "easyCredit
+  Basketball Bundesliga"). Updated in lockstep in `config/sources.json`,
+  `references/approved-sources.md`, `references/youtube-live-search.md`, `README.md`, `SKILL.md`
+  and `scripts/youtube_live.py`'s `DEFAULT_ALLOWED_HANDLES` — the last of which matters most,
+  because that tuple is what the live gate actually enforces and `tests/test_youtube_live.py`
+  asserts it matches the registry. **The Facebook page is deliberately left alone, and marked
+  unverified rather than "verified good":** `facebook.com` answers HTTP 400 to every user agent
+  this repo sends, for every handle including a known-good control, so a probe there cannot
+  distinguish a dead page from a blocked one. Two related findings are reported and **not**
+  fixed, because both need a decision rather than an edit: `scripts/fixtures.py`'s BBL source
+  URL (`basketball-bundesliga.de/spielplan/`) cannot simply be repointed to the new domain,
+  which serves **no JSON-LD and no microdata** on either of its schedule pages, so Phase 5's
+  BBL fixture fetch needs a different extraction strategy; and 18 of the 22 approved domains had
+  never been checked at all before this.
 
 - **BREAKING (config) — `defaultColorId` is removed, not wired up.** The field was reported as
   read-but-never-written and deliberately left open, on the reasoning that fixing it meant
@@ -658,6 +703,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   one worth pinning in CI.
 
 ### Fixed
+
+- **`link_check.py --json --out` produced unparseable output.** The `--out` confirmation was
+  printed to stdout in both modes, so asking for the machine-readable report *and* writing it to
+  a file emitted a JSON document with a human line in front of it — a parse error for every
+  reader, including the tests that assert the payload. The confirmation now goes to stderr when
+  `--json` is set, which is the rule this repo has written down and then re-learned four times
+  (`upsert_events`, `calendar_io`, `synthesise_eval_case`, `run_daily`); it is now pinned by a
+  test that parses stdout with `--json --out` together.
+
+- **A candidate's `directLink` was dropped at the planner boundary, so no event the runtime
+  wrote recorded its link anywhere — which is why `links.json` had no producer.** The link was
+  lost at *every* boundary, measured rather than inferred: `upsert_events._event_fields`
+  projected `start`/`end`/`league`/`teams`/`league_color_id` (+ `evidence`) and named no link
+  field at all, `calendar_io.description_for` wrote only the `League:`/`Teams:` lines out of
+  the six parts `references/calendar-setup.md` specifies, and `event_ledger.ledger_row` records
+  no link either. `grep` for `directLink`, `sourceReference`, `Validated:` or
+  `Validation Notes:` across `scripts/` returned **zero writers** — while four readers depended
+  on them: `SKILL.md` Constraint 9 ("every event description must contain `sourceReference` and
+  validation timestamp"), the validation pseudocode in `references/lessons-learned.md`
+  (`if (!stream.directLink) REJECT`), `references/self-learning.md`'s revalidation loop, which
+  quarantines a link *by removing it from the description*, and `link_check.py`'s own docstring
+  ("every calendar event carries a `sourceReference` and one or more direct stream links").
+  This is the third instance of the class the repo keeps finding — a rule that reads a field
+  nothing writes — and its tell was the same: a *unit test with a hand-built input*, where the
+  fixture supplied the link the real pipeline never carried. The writer now exists in one place,
+  `scripts/stream_links.py`: `_event_fields` carries the fields from the candidate,
+  `description_for` renders the block, and `parse_event` reads it back, so a link written and
+  read back still decides the same way. Only the parts a row actually has are rendered, so a row
+  with no link information produces byte-identical output to before.
+
+- **`calendar_io.parse_event` crashed on its own output, and was not idempotent.** It read
+  `raw["start"]["dateTime"]`, but `calendar_io list` writes this function's *flattened* result —
+  so re-reading a `list` export died with `AttributeError: 'str' object has no attribute 'get'`,
+  and that export is the documented input of `link_inventory.py`. Feeding a parsed event back in
+  also lost `id` (read only as `id`, never `event_id`) and `colorId` (never `league_color_id`),
+  so the second pass was not equal to the first. Closed at the parser rather than special-cased
+  at the caller: a normaliser that cannot read what it writes is how the round trip above stays
+  broken in a way no unit test notices.
 
 - **`scripts/rehearse.py` could not be imported on Python 3.9 — one of the two versions the CI
   matrix runs.** `Probe = Callable[[], tuple[bool | None, str]]` is an *assignment*, not an
