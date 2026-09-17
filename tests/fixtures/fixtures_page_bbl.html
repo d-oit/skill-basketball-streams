@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="de">
+<!--
+  SYNTHETIC INPUT FIXTURE — not a capture of the live site.
+
+  It is an *input*, and `tests/fixtures/README.md` allows inputs to be
+  hand-written while outputs must be captured. It reproduces the two shapes the
+  parser supports, in the order it prefers them:
+
+    1. `application/ld+json` with `SportsEvent` nodes  (primary)
+    2. `itemtype="...SportsEvent"` microdata           (fallback)
+
+  Event 4 is deliberately unusable (no `startDate`), and the "Basketball"
+  node is deliberately not a SportsEvent, so the "no match means no fixture"
+  rule has something to reject. If a real site is added, capture its page as a
+  new fixture rather than editing this one.
+-->
+<head>
+  <title>Spielplan | Basketball Bundesliga</title>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SportsEvent",
+        "name": "ALBA Berlin vs FC Bayern Muenchen",
+        "startDate": "2026-09-16T19:00:00+02:00",
+        "url": "https://www.basketball-bundesliga.de/spiel/1"
+      },
+      {
+        "@type": "SportsEvent",
+        "name": "Basketball Bundesliga Spieltag",
+        "startDate": "2026-09-17T20:30:00+02:00",
+        "competitor": [
+          {"@type": "SportsTeam", "name": "Telekom Baskets Bonn"},
+          {"@type": "SportsTeam", "name": "Ratiopharm Ulm"}
+        ],
+        "url": "https://www.basketball-bundesliga.de/spiel/2"
+      },
+      {
+        "@type": "SportsEvent",
+        "name": "Hamburg Towers gegen EWE Baskets Oldenburg",
+        "startDate": "2026-09-18T19:00:00+02:00"
+      },
+      {
+        "@type": "SportsEvent",
+        "name": "FC Bayern Muenchen vs Wuerzburg Baskets"
+      },
+      {
+        "@type": "Basketball",
+        "name": "Not an event",
+        "startDate": "2026-09-19T19:00:00+02:00"
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+<!-- Microdata-only events, used when a page carries no JSON-LD at all. -->
+<div itemscope itemtype="https://schema.org/SportsEvent">
+  <span itemprop="name">MHP Riesen Ludwigsburg - Wuerzburg Baskets</span>
+  <time itemprop="startDate" datetime="2026-09-20T15:00:00+02:00">20.09.2026 15:00</time>
+</div>
+</body>
+</html>
