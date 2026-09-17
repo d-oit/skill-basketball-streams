@@ -1,0 +1,140 @@
+[
+  {
+    "invariant": "No calendar event is created unless all 7 validation checks pass",
+    "rationale": "A previous incident shipped calendar events with broken YouTube links to subscribers. The 7-check pipeline is the documented contract that prevents it, and it is only real if it is enforced.",
+    "sensor": "pytest",
+    "category": "correctness"
+  },
+  {
+    "invariant": "A magenta.tv stream URL is only accepted with a matching free-access announcement on magentasport.de or official MagentaSport social media",
+    "rationale": "magenta.tv is the streaming platform and magentasport.de is the announcement provider. Only one game per matchday is free, so a working magenta.tv URL proves nothing about entitlement.",
+    "sensor": "skill-contract",
+    "category": "correctness"
+  },
+  {
+    "invariant": "An HTTP 200 on the magenta.tv app shell never satisfies the Working Link or Direct Stream checks",
+    "rationale": "magenta.tv is a JavaScript-rendered SPA: a plain GET returns 200 with no readable body. Treating that as a pass would ship unverified streams as verified.",
+    "sensor": "pytest",
+    "category": "correctness"
+  },
+  {
+    "invariant": "A YouTube candidate is promotable only when it is a real live broadcast whose scheduled_start is strictly greater than now, or is live now with no actualEndTime",
+    "rationale": "/live URLs and isLiveContent survive after a broadcast ends, so without the ended-broadcast check the pipeline ships links to finished games. VODs and highlight reels are excluded by the same gate.",
+    "sensor": "live-gate",
+    "category": "correctness"
+  },
+  {
+    "invariant": "Basketball Champions League free access is decided per game via the official site plus @BasketballCL and the BCL Facebook page",
+    "rationale": "championsleague.basketball is an approved source, but some games are free and others are not. Silence from all three channels is not consent to treat a game as free.",
+    "sensor": "skill-contract",
+    "category": "correctness"
+  },
+  {
+    "invariant": "Social media accounts may validate free access but are never stored as the directLink",
+    "rationale": "A social post can confirm that a game is free; it can never be the stream. Storing one would produce an event whose link never plays the game.",
+    "sensor": "skill-contract",
+    "category": "integrity"
+  },
+  {
+    "invariant": "Paid broadcasters are rejected even when the domain is otherwise well known",
+    "rationale": "Sky, DAZN, Prime and Sport1+ are excluded from the approved-source list. Rejecting paid content is the skill's contract, not a preference to be delegated upstream.",
+    "sensor": "pytest",
+    "category": "correctness"
+  },
+  {
+    "invariant": "A newly discovered source domain stays quarantined until a human promotes it in a PR that also adds an accept and a reject eval case",
+    "rationale": "The runtime is allowed to learn, but it may not widen its own trust boundary. Quarantine keeps recall improvements from becoming an unreviewed allow-list change.",
+    "sensor": "source-registry",
+    "category": "security"
+  },
+  {
+    "invariant": "The default render ladder contains zero AGPL-3.0 rungs",
+    "rationale": "This repository is MIT. nodriver is the strongest anti-bot tool but is AGPL-3.0, so it may exist only as an opt-in, user-installed rung that shipped code never imports.",
+    "sensor": "pytest",
+    "category": "compliance"
+  },
+  {
+    "invariant": "Duplicate calendar events are never created and verified events are never modified",
+    "rationale": "The runtime checks existing events before writing and replaces only unverified entries. Overwriting a verified event would silently discard human-confirmed data.",
+    "sensor": "pytest",
+    "category": "integrity"
+  },
+  {
+    "invariant": "Calendar events are never deleted because a link failed revalidation",
+    "rationale": "Links expire by design (YouTube /live URLs 404 after a broadcast ends). Quarantining the link and recording the reason preserves the audit trail; deleting the event destroys it.",
+    "sensor": "pytest",
+    "category": "integrity"
+  },
+  {
+    "invariant": "Telemetry ledgers are append-only and every run leaves an auditable record",
+    "rationale": "Precision and recall are only chartable if the candidate ledger and run log are never rewritten. Derived snapshots (metrics.json) are regenerable; the JSONL streams are evidence.",
+    "sensor": "runtime-eval",
+    "category": "integrity"
+  },
+  {
+    "invariant": "Every eval assertion needle resolves inside its case's expected_output",
+    "rationale": "The runtime grader parses '<name>=PASS|FAIL' needles out of expected_output. An assertion without a matching needle silently grades nothing, which is how a green run can mean nothing at all.",
+    "sensor": "runtime-eval",
+    "category": "correctness"
+  },
+  {
+    "invariant": "A non-VERIFIED verification state overrides the league colour in the calendar",
+    "rationale": "An unconfirmed stream must look unconfirmed. Letting a final keep Tomato red because colour 11 was 'reserved' would hide exactly the uncertainty the state machine exists to expose.",
+    "sensor": "pytest",
+    "category": "correctness"
+  },
+  {
+    "invariant": "The calendar write path performs no HTTP write without an explicit live flag",
+    "rationale": "Whether a run wrote to a public calendar must be answerable by reading the command line, not by trusting a code path. A bare `calendar_io.py apply` makes no request at all, and a test replaces the transport with one that raises.",
+    "sensor": "pytest",
+    "category": "security"
+  },
+  {
+    "invariant": "The unattended runtime writes to the calendar only when ENABLE_CALENDAR_WRITES is exactly true, and a workflow_dispatch input can never widen that",
+    "rationale": "The daily cron decided dry-run with `${{ inputs.dry_run || 'true' }}`, which is always true on a schedule event because there is no inputs object, so ENABLE_CALENDAR_WRITES=true planned every event and wrote nothing while running green. One tested decision now lives in scripts/write_mode.py, and the manual dispatch input can only add dry-run, so a person poking the button cannot widen what the repository switch allows.",
+    "sensor": "pytest",
+    "category": "safety"
+  },
+  {
+    "invariant": "A synthesised eval case is never re-baselined to clear a red gate",
+    "rationale": "A case synthesised from an audit misjudgement encodes the bug and must fail until the gate is tightened. Blessing it green would mean the loop learned by weakening the check that caught it.",
+    "sensor": "eval-synthesis",
+    "category": "integrity"
+  },
+  {
+    "invariant": "Fixture-derived recall drops a fixture that fails to parse rather than counting it as a missed game",
+    "rationale": "A half-parsed fixture would be reported as a missed game that does not exist, sending someone hunting a phantom and quietly deflating the metric that is supposed to catch real misses.",
+    "sensor": "pytest",
+    "category": "correctness"
+  },
+  {
+    "invariant": "The component allowed to edit SKILL.md and references/ holds no calendar credential",
+    "rationale": "Writing the calendar and rewriting the instructions are different privileges. self-improve.yml has contents:write but no id-token:write, and runtime-daily.yml's agent is denied edit and bash, so neither half can do both.",
+    "sensor": "pytest",
+    "category": "security"
+  },
+  {
+    "invariant": "Render-rung health is derived from an append-only ledger, and a rung that is merely unavailable is never recorded as a failure",
+    "rationale": "RungHealth parks a rung after three consecutive failures, but it lived only in memory, so spec §18.4's 'a rung parked for N consecutive days raises an issue' could never be observed: a retired backend (GitHub Models, 2026-07-30) left one `failed` line as the only trace. scripts/rung_health.py writes rung-attempts.jsonl and rungs.json derives from it, with three load-bearing rules — a rung with no key or no package is `skipped` and breaks a strike streak rather than extending it (or a keyless repository would park the hosted rungs and a later key would start from a fake history), a calendar day with no rows breaks a streak rather than extending it (a gap is not evidence), and a streak ends at the rung's latest observed day so a rung fixed today stops re-reporting last week's. Only fileable failures reach an issue: a local rung refused by a target is the 403 the ladder is built to climb past, so it is recorded and never filed.",
+    "sensor": "pytest",
+    "category": "correctness"
+  },
+  {
+    "invariant": "Stream evidence may only become a calendar link for the game the page actually names",
+    "rationale": "has_stream_evidence() proves a page is playing a live stream, not that it is playing this game; a page streaming something else passed it. render_ladder.anchor_game() matches the expected clubs against the document's own title, and reports a keyword-stuffed multi-game title as ambiguous instead of picking one, because attributing an arbitrary live stream is the false positive this whole pipeline exists to prevent.",
+    "sensor": "page-corpus",
+    "category": "correctness"
+  },
+  {
+    "invariant": "The audit judges only events Phase 2 actually wrote, and only ones it can name",
+    "rationale": "audit_events resolves a verdict back to an event by event_id, so a ledger row without one could never be applied to anything, and a dry run writes nothing, so a row for it would be a verdict about a game that is not on the calendar. event_ledger.py refuses such a row rather than recording one. Its inputs, telemetry/events.jsonl and evidence.json, were documented and read by the audit but never written by anything, so Phase 3 found them absent on every run and did nothing: precision stayed n/a for the life of the project and the self-improvement loop had no ledger to learn from.",
+    "sensor": "event-ledger",
+    "category": "integrity"
+  },
+  {
+    "invariant": "A game the audit proved was paid, or was never live, is never promoted back to VERIFIED by a later run",
+    "rationale": "live-stream-runtime-spec.md §17 calls this a 100% hard requirement, and upsert_events' policy table enforced it by reading a stored WRONG off the calendar — and the calendar recovers that state from a '[WRONG] ' title prefix. audit_events computes that relabelled title and puts it in audit.jsonl, and no component applied it, so the rule was unreachable on the real path: a condemned event stayed on the subscriber's calendar looking like a game awaiting confirmation, and the next run's fresh guess could promote it to VERIFIED. The planner now honours the newest WRONG verdict from the audit ledger itself, joined by event_id, using audit_events.latest_per_event so the two cannot disagree about which row is current.",
+    "sensor": "upsert-verdicts",
+    "category": "correctness"
+  }
+]

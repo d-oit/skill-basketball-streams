@@ -1,0 +1,214 @@
+name: verify
+
+# Step 8 of docs/do-harness.md — adopted with one correction.
+#
+# ── WHY THIS IS A SEPARATE WORKFLOW ────────────────────────────────────────
+# `validate.yml` and `codeql.yml` are deliberately untouched. do-harness is a
+# binary installed from GitHub Releases, so a release outage or a harness
+# regression must not be able to red the existing Python 3.9/3.12 matrix. This
+# workflow can go red on its own without blocking anyone else's merge.
+#
+# ── WHY THE PRODUCT GRADERS ARE STILL HERE ─────────────────────────────────
+# The plan's Step 6 intended to hand grading authority to `do-harness eval` and
+# demote `scripts/validate.py --check evals`. That step is WITHDRAWN: `do-harness
+# eval` resolves skills only under `.agents/skills` (hardcoded — it reports
+# "skill '...' not found under .agents/skills" and offers no config key to widen
+# it). It grades the two development-tooling skills, `harness` and
+# `skill-creator`, and never the root `SKILL.md`. Swapping the graders out would
+# therefore leave `evals/evals.json` ungraded while still looking green.
+#
+# So `do-harness eval` runs *in addition to* the product graders, never instead
+# of them. `tests/test_harness_boundary.py` pins that, so a later edit cannot
+# quietly perform the swap.
+#
+# Two graders can disagree and the easier one tends to be trusted, so treat a
+# disagreement as a real finding rather than picking the green one.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.py'
+      - '**.sh'
+      - '**.yml'
+      - '**.yaml'
+      - '**.json'
+      - '**.md'
+      - '**.toml'
+      - 'requirements-dev.txt'
+      - '.github/workflows/verify.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '**.py'
+      - '**.sh'
+      - '**.yml'
+      - '**.yaml'
+      - '**.json'
+      - '**.md'
+      - '**.toml'
+      - 'requirements-dev.txt'
+      - '.github/workflows/verify.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Keep this identical to the pin in AGENTS.md and docs/do-harness.md. Never
+  # `latest`: a floating pin lets a harness release change the gate silently.
+  DO_HARNESS_VERSION: v0.1.0
+
+jobs:
+  # ── The harness gate: sensors + invariants + skill eval ───────────────────
+  harness:
+    name: do-harness verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: 'requirements-dev.txt'
+
+      - name: Install test dependencies
+        # The `pytest` sensor is part of the verification set, so the suite must
+        # be importable before `verify` runs.
+        run: pip install -r requirements-dev.txt
+
+      - name: Install the pinned do-harness binary
+        run: |
+          curl -fsSL \
+            https://raw.githubusercontent.com/d-o-hub/do-harness/main/scripts/install.sh \
+            | sh -s -- --version "$DO_HARNESS_VERSION"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Doctor
+        run: do-harness doctor
+
+      # ── ORDER IS LOAD-BEARING. Read before moving a step. ─────────────────
+      # `do-harness eval` SIGSEGVs (exit 139) on the SECOND invocation once a
+      # state database exists, on a fresh checkout. Minimal reproduction:
+      #
+      #     rm -rf .do-harness
+      #     do-harness eval   # 0, and it creates .do-harness/agent_state.db
+      #     do-harness eval   # 139, no output
+      #
+      # It does not reproduce in a long-lived working copy, so it is invisible
+      # until CI runs it. Anything that creates the database first — `seed`, or
+      # a `verify --record` — triggers it too.
+      #
+      # Two mitigations, both deliberate: `eval` runs FIRST (before anything
+      # creates the database) and is `continue-on-error`, because per the Step 6
+      # finding it grades only `.agents/skills` and is explicitly supplemental.
+      # Do not let an upstream harness crash red the build, and do not gate on
+      # it. `Verify` below is the gate.
+      - name: do-harness eval (tooling skills — supplemental)
+        continue-on-error: true
+        run: do-harness eval --format json
+
+      - name: Verify (verification signal set, evidence written) — THE GATE
+        # --strict plus --evidence is the only green worth trusting: without
+        # sensors `verify` exits 0 having run nothing, which is a vacuous pass.
+        # Failure tails go to stderr so stdout stays parseable. This step is
+        # intentionally NOT `continue-on-error`: its exit code is the answer.
+        run: |
+          do-harness verify \
+            --set verification \
+            --format json \
+            --strict \
+            --evidence .do-harness/evidence.json
+
+      # Reporting, not gating. A fresh ephemeral checkout has no recorded beats,
+      # so `status` exits 1 with `missing` — expected, and meaningless to fail
+      # the build over. It is printed for the log's benefit.
+      - name: Status (reporting only; a fresh checkout has no history)
+        if: always()
+        run: |
+          do-harness status --set verification || \
+            echo "::notice::no recorded evidence in this ephemeral checkout — expected on CI, not a failure"
+
+      # Sensor run counts and strike counts. Worth printing on every run because
+      # a *halted* sensor (3 consecutive failures) is reported as failed without
+      # being executed, so a long red streak can otherwise look like a permanent,
+      # unexplained failure. `errors list` / `errors clear` is the escape hatch.
+      - name: Harness trends (sensor stats, strikes, eval history)
+        if: always()
+        run: |
+          mkdir -p .do-harness
+          do-harness metrics | tee .do-harness/metrics.txt
+          {
+            echo ""
+            echo "### Harness trends"
+            echo ""
+            echo '```'
+            cat .do-harness/metrics.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # `seed` is deliberately NOT run here. On CI the database is ephemeral, so
+      # seeding it proves nothing the `invariants-shape` sensor and
+      # `tests/test_harness_boundary.py` do not already prove — and it creates
+      # the state database, which is what segfaults `eval` above. Seeding belongs
+      # in local setup (see AGENTS.md), not in a throwaway runner.
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: do-harness-evidence
+          path: .do-harness/evidence.json
+          if-no-files-found: warn
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## do-harness verification"
+            echo ""
+            echo "Pinned binary: \`$DO_HARNESS_VERSION\`"
+            echo ""
+            echo "\`do-harness eval\` grades \`.agents/skills/{harness,skill-creator}\`"
+            echo "only. It **does not grade the root \`SKILL.md\`** (the path is"
+            echo "hardcoded), which is why the product graders below still run."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # ── The product gate: the root skill's four graders ───────────────────────
+  product-graders:
+    name: Product graders (root skill)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: 'requirements-dev.txt'
+
+      - name: Install test dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: validate.py (all checks)
+        run: python3 scripts/validate.py --root . --check all
+
+      - name: runtime_eval.py (structural + needle resolution)
+        run: python3 scripts/runtime_eval.py --root .
+
+      - name: synthesise_eval_case.py (every assertion has a needle)
+        run: python3 scripts/synthesise_eval_case.py --verify
+
+      - name: pytest
+        run: python3 -m pytest tests/ -q

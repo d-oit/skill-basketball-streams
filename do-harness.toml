@@ -1,0 +1,215 @@
+# do-harness.toml — sensor pack for this workspace.
+#
+# Every sensor is offline and deterministic: no network, no credentials. The two
+# network-adjacent commands (`link_check`, `youtube_live`) run in `--dry-run` /
+# fixture mode, so CI never depends on a live broadcast existing.
+#
+# With zero sensors `do-harness verify` exits 0 without running anything — a
+# vacuous pass, not evidence. `--strict` plus `--evidence` is the only green
+# worth trusting.
+language = "generic"
+
+[hooks]
+# Keep pre-commit sub-second: docs-only changes must not pay for pytest.
+pre-commit = ["skill-contract", "validate-smoke"]
+# Empty = the full suite.
+pre-push = []
+
+[[sensors]]
+name = "skill-contract"
+argv = ["python3", "scripts/validate.py", "--root", ".", "--check", "all"]
+when-changed = ["SKILL.md", "README.md", "evals/**", "references/**", "config/**"]
+
+[[sensors]]
+name = "validate-smoke"
+argv = ["python3", "scripts/validate.py", "--check", "smoke-test"]
+when-changed = ["scripts/validate.py", "tests/**"]
+
+[[sensors]]
+name = "runtime-eval"
+argv = ["python3", "scripts/runtime_eval.py", "--root", "."]
+when-changed = ["scripts/runtime_eval.py", "evals/**"]
+
+[[sensors]]
+name = "pytest"
+argv = ["python3", "-m", "pytest", "tests/", "-q"]
+when-changed = ["tests/**", "scripts/**"]
+
+[[sensors]]
+name = "live-gate"
+argv = [
+  "python3",
+  "scripts/youtube_live.py",
+  "--input",
+  "tests/fixtures/youtube_live_candidates.json",
+  "--now",
+  "2026-09-14T09:00:00Z",
+]
+when-changed = ["scripts/youtube_live.py", "tests/fixtures/**"]
+
+[[sensors]]
+name = "source-registry"
+argv = ["python3", "scripts/source_learning.py", "candidates", "--root", ".", "--dry-run"]
+when-changed = ["config/sources.json", "scripts/source_learning.py"]
+
+[[sensors]]
+name = "link-gate"
+argv = ["python3", "scripts/link_check.py", "--url", "https://www.youtube.com/@fiba/live", "--dry-run"]
+when-changed = ["scripts/link_check.py"]
+
+[[sensors]]
+name = "version-sync"
+argv = ["python3", "scripts/bump_version.py", "--check"]
+when-changed = ["SKILL.md", "CHANGELOG.md"]
+
+[[sensors]]
+name = "upsert-plan"
+argv = [
+  "python3",
+  "scripts/upsert_events.py",
+  "--existing",
+  "tests/fixtures/upsert_existing.json",
+  "--candidates",
+  "tests/fixtures/upsert_candidates.json",
+]
+when-changed = ["scripts/upsert_events.py", "scripts/verification.py", "tests/fixtures/**"]
+
+[[sensors]]
+name = "upsert-verdicts"
+# The audit's verdicts, honoured by the planner. Two events would both be
+# promoted without the ledger; with it, only the one the audit condemned is
+# held. The `[WRONG]` prefix the policy table reads is written by nothing, so
+# without this input the §17 hard requirement is unenforceable on the real path.
+argv = [
+  "python3",
+  "scripts/upsert_events.py",
+  "--existing",
+  "tests/fixtures/upsert_verdict_existing.json",
+  "--candidates",
+  "tests/fixtures/upsert_verdict_candidates.json",
+  "--verdicts",
+  "tests/fixtures/upsert_verdicts.jsonl",
+]
+when-changed = ["scripts/upsert_events.py", "scripts/audit_events.py", "tests/fixtures/upsert_verdict*", "tests/fixtures/audit*", "tests/fixtures/synthesise*", "tests/fixtures/**"]
+
+[[sensors]]
+name = "candidates-recall"
+argv = ["python3", "scripts/candidates.py", "recall", "--ledger", "tests/fixtures/candidates_ledger.jsonl"]
+when-changed = ["scripts/candidates.py", "tests/fixtures/**"]
+
+[[sensors]]
+name = "audit-verdict"
+argv = [
+  "python3",
+  "scripts/audit_events.py",
+  "--events",
+  "tests/fixtures/audit_events.json",
+  "--evidence",
+  "tests/fixtures/audit_evidence.json",
+  "--now",
+  "2026-09-15T08:30:00Z",
+]
+when-changed = ["scripts/audit_events.py", "scripts/verification.py", "tests/fixtures/**"]
+
+[[sensors]]
+name = "event-ledger"
+# The Phase 2 -> 3 seam, as one command. `events.jsonl` and `evidence.json` are
+# the audit's documented inputs and nothing wrote them, so Phase 3 found its
+# inputs absent on every run and did nothing. This is the round trip: the writer
+# produces both files and `audit_events` returns a verdict from them.
+argv = ["python3", "-m", "pytest", "tests/test_event_ledger.py", "-q"]
+when-changed = [
+  "scripts/event_ledger.py",
+  "scripts/evidence.py",
+  "scripts/audit_events.py",
+  "scripts/calendar_io.py",
+]
+
+[[sensors]]
+name = "eval-synthesis"
+argv = [
+  "python3",
+  "scripts/synthesise_eval_case.py",
+  "--verdicts",
+  "tests/fixtures/synthesise_verdicts.jsonl",
+  "--dry-run",
+]
+when-changed = ["scripts/synthesise_eval_case.py", "tests/fixtures/**"]
+
+[[sensors]]
+name = "metrics"
+# Fixture inputs, so this is offline and deterministic: the metric contract is
+# checked without needing a telemetry branch to exist.
+argv = [
+  "python3",
+  "scripts/metrics.py",
+  "--candidates",
+  "tests/fixtures/candidates_ledger.jsonl",
+  "--fixtures",
+  "tests/fixtures/league_fixtures.jsonl",
+  "--audit",
+  "tests/fixtures/synthesise_verdicts.jsonl",
+  "--dry-run",
+]
+when-changed = ["scripts/metrics.py", "scripts/candidates.py", "tests/fixtures/**"]
+
+[[sensors]]
+name = "workflow-refs"
+# Catches the class, not the instance: a workflow that names a missing file is a
+# step that can never do its job, however it chooses to hide the exit code.
+argv = ["python3", "scripts/check_workflow_refs.py", "--root", "."]
+when-changed = [".github/workflows/**", "scripts/check_workflow_refs.py"]
+
+[[sensors]]
+name = "page-corpus"
+# The stream-evidence gate is what stands between a rendered page and a calendar
+# write. It is judged against real recorded pages, not invented strings, because
+# the rule it replaced matched the word "live" inside a YouTube JS bundle.
+argv = ["python3", "scripts/record_pages.py", "--check"]
+when-changed = ["scripts/record_pages.py", "scripts/render_ladder.py", "tests/fixtures/pages/**"]
+
+[[sensors]]
+name = "invariants-shape"
+argv = ["python3", "-c", "import json; d=json.load(open('plans/invariants.json')); assert isinstance(d,list), 'invariants.json must be a bare array'"]
+when-changed = ["plans/invariants.json"]
+
+[signal-sets]
+feedback = ["skill-contract", "validate-smoke"]
+verification = [
+  "skill-contract",
+  "validate-smoke",
+  "runtime-eval",
+  "pytest",
+  "live-gate",
+  "source-registry",
+  "invariants-shape",
+  "workflow-refs",
+  "page-corpus",
+  "upsert-plan",
+  "upsert-verdicts",
+  "candidates-recall",
+  "metrics",
+  "audit-verdict",
+  "event-ledger",
+  "eval-synthesis",
+]
+release = [
+  "skill-contract",
+  "validate-smoke",
+  "runtime-eval",
+  "pytest",
+  "live-gate",
+  "source-registry",
+  "invariants-shape",
+  "workflow-refs",
+  "page-corpus",
+  "upsert-plan",
+  "upsert-verdicts",
+  "candidates-recall",
+  "metrics",
+  "audit-verdict",
+  "event-ledger",
+  "eval-synthesis",
+  "link-gate",
+  "version-sync",
+]
