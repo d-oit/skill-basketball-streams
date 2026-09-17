@@ -82,6 +82,7 @@ python3 -m pytest tests/test_transcripts.py
 | `audit_runs.jsonl` | hand-written (safe) | Audit rows for two runs, one of which has **no** candidate rows — pins that a run present only in the audit stream still appears in the trend |
 | `fixtures_page_bbl.html` | hand-written (safe) | A league page carrying JSON-LD `SportsEvent` nodes, a microdata block the JSON-LD path must ignore, one event with no `startDate`, and one node that is not an event |
 | `fixtures_page_microdata.html` | hand-written (safe) | The same idea with **no** JSON-LD, so the microdata fallback is exercised |
+| `link_inventory_events.json` | hand-written (safe) | A three-event `calendar_io list` export (the shape that CLI writes, `{"events": […]}`): one event carrying the full documented description block — two links, a source reference, a validation timestamp — one legacy event carrying **no** block, and one whose stored link is a rejected `/channel/` YouTube shape. Pins the producer's round trip and its registry coverage, and that "the calendar has no dead links" cannot be confused with "no event had a link to check" |
 | `agent_transcript_sample.json` | hand-written (safe) | An **envelope sample** for `extract_candidates.py` — not a captured run. It is an input to the extractor, not a grading fixture, and must never be used to grade the skill |
 
 Unlike transcripts, a *candidate input* fixture is a legitimate hand-written
