@@ -86,6 +86,12 @@ class Check:
     what: str
     probe: Probe | None = None
     optional: bool = False
+    # True only for checks that read the REPOSITORY and never the network —
+    # the set `--offline` runs. Derived from `env` in the past, but env-less no
+    # longer implies repo-bound: the keyless search rung has no credential and
+    # still speaks to a service, and probing it offline would spend nothing
+    # less than the network the mode promises not to touch.
+    structural: bool = False
 
 
 @dataclass(frozen=True)
@@ -159,15 +165,20 @@ def assess(
 
 
 def structural(checks: list[Check]) -> list[Check]:
-    """The checks that need no credential, i.e. that read the REPOSITORY.
+    """The checks that need no credential AND no network — they read the repo.
 
     `--offline` runs only these, which is what makes the half of the rehearsal
     that is deterministic and network-free usable as a CI gate: `github-issues`
     can only ever prove *identity* (a read-only `GITHUB_TOKEN` authenticates
     perfectly), while whether a workflow may file is a fact about its
     `permissions:` block and needs no key at all.
+
+    Selected by the explicit `structural` flag, not by an empty `env`: a
+    credential-free check may still be a live service (the keyless Exa MCP
+    rung), and "does this check read the repository?" is a fact about intent
+    that only the author can declare.
     """
-    return [check for check in checks if not check.env]
+    return [check for check in checks if check.structural]
 
 
 def env_file_values(text: str, source: str) -> dict[str, str]:
@@ -499,6 +510,7 @@ def build_checks(*, timeout: int = 60) -> list[Check]:
             env=(),
             what="the workflows that file issues are allowed to",
             probe=probe_issue_grant,
+            structural=True,
         ),
         Check(
             name="llm:gemini",
@@ -528,6 +540,17 @@ def build_checks(*, timeout: int = 60) -> list[Check]:
             env=("EXA_API_KEY",),
             what="Phase 0's first search backend",
             probe=_probe_search("exa-mcp"),
+        ),
+        Check(
+            name="search:exa-mcp-keyless",
+            # Free keyless tier of the hosted Exa MCP server: no credential to
+            # be missing, so `env` stays empty and `assess` probes it directly.
+            # The probe is real even when EXA_API_KEY is set — availability (a
+            # ladder-routing fact) and usability (this question) are apart.
+            # NOT structural: it talks to a service, so `--offline` must skip it.
+            env=(),
+            what="Phase 0's zero-secret search rung (hosted mcp.exa.ai, free keyless tier)",
+            probe=_probe_search("exa-mcp-keyless"),
         ),
         Check(
             name="search:tinyfish",

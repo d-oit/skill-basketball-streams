@@ -389,6 +389,7 @@ when nothing is configured-but-rejected and nothing required is missing.
 | `llm:opencode` | `OPENCODE_ZEN_API_KEY` (`ANTHROPIC_API_KEY` / `ANTHROPIC_AUTH_TOKEN` / `OPENAI_API_KEY`) | `opencode auth login`, or the key page for whichever provider the pin names. The probe runs `opencode --version` as well: a key is not enough if the binary cannot start |
 | `llm:openrouter` | `OPENROUTER_API_KEY` | [openrouter.ai/keys](https://openrouter.ai/keys) |
 | `search:exa-mcp` | `EXA_API_KEY` | [dashboard.exa.ai](https://dashboard.exa.ai) |
+| `search:exa-mcp-keyless` | *(none — free keyless tier)* | Nothing to set up: Phase 0's middle rung talks to the hosted MCP server at `mcp.exa.ai` without a key. Rate-limited by Exa; the paid rung above remains the upgrade path and takes precedence when its key is set |
 | `search:tinyfish` | `TINYFISH_API_KEY` | [agent.tinyfish.ai/api-keys](https://agent.tinyfish.ai/api-keys) |
 | `render:firecrawl` *(optional)* | `FIRECRAWL_API_KEY` | [firecrawl.dev](https://www.firecrawl.dev/) — the hosted escape hatch for SPA pages like `magenta.tv`; keyless mode exists without it |
 | `youtube-data-api` *(optional)* | `YOUTUBE_API_KEY` | [Google Cloud console](https://console.cloud.google.com/) with YouTube Data API v3 enabled — only the Data API path needs it, the HTML live filter does not |

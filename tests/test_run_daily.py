@@ -24,6 +24,7 @@ from scripts.run_daily import (
     ALL_BACKENDS,
     LADDER,
     Backend,
+    ExaMcpKeylessBackend,
     backend_status,
     collect_candidates,
     host_of,
@@ -206,7 +207,11 @@ class TestBackendStatus:
         monkeypatch.delenv("EXA_API_KEY", raising=False)
         monkeypatch.setenv("TINYFISH_API_KEY", "dummy")
         status = dict((name, ok) for name, ok, _ in backend_status())
-        assert status == {"exa-mcp": False, "tinyfish": True}
+        assert status == {
+            "exa-mcp": False,
+            "exa-mcp-keyless": True,  # the free rung: nothing to configure
+            "tinyfish": True,
+        }
 
     def test_detail_names_the_env_var(self, monkeypatch):
         monkeypatch.delenv("EXA_API_KEY", raising=False)
@@ -325,15 +330,28 @@ class TestTheFailureNamesItsCause:
 
 class TestCliContracts:
     def test_check_backends_fails_with_no_credentials(self, tmp_path):
-        result = _run(["--check-backends"], env={})
+        # The free keyless rung is always configured, so the ladder can only be
+        # emptied by *excluding* it — the configuration fault this reports.
+        result = _run(
+            ["--check-backends", "--backend", "exa-mcp", "--backend", "tinyfish"],
+            env={},
+        )
         assert result.returncode == 1
         assert "no search backend is configured" in result.stderr
         assert "EXA_API_KEY" in result.stderr
+
+    def test_check_backends_passes_with_zero_credentials(self):
+        # THE reason the keyless rung exists: Phase 0 runs with no secrets at
+        # all, so the daily preflight cannot red on a fresh fork.
+        result = _run(["--check-backends"], env={})
+        assert result.returncode == 0
+        assert "OK   backend exa-mcp-keyless" in result.stdout
 
     def test_check_backends_passes_with_one_credential(self):
         result = _run(["--check-backends"], env={"EXA_API_KEY": "dummy"})
         assert result.returncode == 0
         assert "OK   backend exa-mcp" in result.stdout
+        assert "NO   backend exa-mcp-keyless" in result.stdout  # steps aside
         assert "NO   backend tinyfish" in result.stdout
 
     def test_check_backends_does_not_red_on_a_bad_argument_set(self):
@@ -343,7 +361,10 @@ class TestCliContracts:
         assert result.returncode == 0
 
     def test_run_fails_loudly_when_no_backend_is_available(self, tmp_path):
-        result = _run(["--dest", str(tmp_path)], env={})
+        result = _run(
+            ["--dest", str(tmp_path), "--backend", "exa-mcp", "--backend", "tinyfish"],
+            env={},
+        )
         assert result.returncode == 1
         assert "every backend is unavailable" in result.stderr
         # And it must not create the ledger on the way out: an empty ledger is
@@ -527,3 +548,114 @@ class TestRuntimeDailyWiring:
         assert "|| echo" in code, (
             "a transient HTTP error must not take the telemetry commit down with it"
         )
+
+
+class TestExaMcpKeylessBackend:
+    """The free hosted Exa MCP rung (`https://mcp.exa.ai/mcp`, no API key).
+
+    Contract proven live on 2026-09-17: initialize hands back an
+    `mcp-session-id`, a `tools/call` for `web_search_exa` answers as SSE whose
+    JSON `result.content[0].text` carries `Title:`/`URL:` records separated by
+    `---`. The fixture is that real response, recorded verbatim — so these
+    tests parse what the service actually sends, not what we assume it sends.
+    """
+
+    FIXTURE = REPO_ROOT / "tests" / "fixtures" / "exa_mcp_keyless_search.sse"
+
+    class _FakeResponse:
+        def __init__(self, body: bytes, session: str | None = None):
+            self.body = body
+            self.headers = {"mcp-session-id": session} if session else {}
+
+        def read(self) -> bytes:
+            return self.body
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+    def _backend_with(self, monkeypatch, responses):
+        import urllib.request
+
+        calls: list[dict] = []
+
+        def fake_urlopen(request, timeout=None):
+            payload = json.loads(request.data.decode("utf-8"))
+            calls.append(payload)
+            assert timeout == 20  # TIMEOUT_SECONDS — a hung MCP must not hang a run
+            return responses[min(len(responses) - 1, len(calls) - 1)]
+
+        monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+        return calls
+
+    def test_parses_the_recorded_live_response(self):
+        backend = ExaMcpKeylessBackend()
+        text = backend._result_text(self.FIXTURE.read_text(encoding="utf-8"))
+        records = backend._records(text)
+        assert [r["url"] for r in records] == [
+            "https://sportbild.bild.de/sportmix/basketball/"
+            "auftakt-der-bbl-so-sehen-sie-alba-berlin-niners-chemnitz-live-im-tv-"
+            "stream-6aa94503176f7c20b935dc43",
+            "https://www.dyn.sport/",
+            "https://www.easycredit-bbl.de/live-tv",
+        ]
+        assert "Sportbild.de" in records[0]["title"]
+
+    def test_records_without_a_url_are_dropped(self):
+        text = "Title: no url here\nPublished: N/A\n---\nTitle: kept\nURL: https://x.example/a"
+        assert ExaMcpKeylessBackend._records(text) == [
+            {"url": "https://x.example/a", "title": "kept"}
+        ]
+
+    def test_steps_aside_when_the_paid_rung_is_configured(self, monkeypatch):
+        monkeypatch.setenv("EXA_API_KEY", "dummy")
+        backend = ExaMcpKeylessBackend()
+        assert backend.available() is False
+        assert "EXA_API_KEY" in backend.status_detail(False)
+
+    def test_serves_when_no_key_is_set(self, monkeypatch):
+        monkeypatch.delenv("EXA_API_KEY", raising=False)
+        assert ExaMcpKeylessBackend().available() is True
+
+    def test_search_happy_path_sends_session_and_tool_call(self, monkeypatch):
+        monkeypatch.delenv("EXA_API_KEY", raising=False)
+        body = self.FIXTURE.read_bytes()
+        responses = [
+            self._FakeResponse(b'event: message\ndata: {"result":{},"jsonrpc":"2.0","id":1}\n', session="sess-1"),
+            self._FakeResponse(b"", session="sess-1"),  # notifications/initialized
+            self._FakeResponse(body, session="sess-1"),
+        ]
+        backend = ExaMcpKeylessBackend()
+        calls = self._backend_with(monkeypatch, responses)
+        rows = backend.search("BBL live", 5)
+        assert [r["url"] for r in rows][0].startswith("https://sportbild")
+        assert [c["method"] for c in calls] == ["initialize", "notifications/initialized", "tools/call"]
+        assert calls[2]["params"]["name"] == "web_search_exa"
+        assert calls[2]["params"]["arguments"]["numResults"] == 5
+
+    def test_rate_limit_is_recorded_as_the_last_error(self, monkeypatch):
+        import urllib.error
+
+        monkeypatch.delenv("EXA_API_KEY", raising=False)
+
+        def raise_429(request, timeout=None):
+            raise urllib.error.HTTPError(request.full_url, 429, "slow down", {}, None)
+
+        import urllib.request
+
+        monkeypatch.setattr(urllib.request, "urlopen", raise_429)
+        backend = ExaMcpKeylessBackend()
+        assert backend.search("q", 5) == []
+        assert backend.last_error == "HTTP 429"
+
+    def test_a_contentless_result_is_a_transport_failure(self, monkeypatch):
+        monkeypatch.delenv("EXA_API_KEY", raising=False)
+        responses = [
+            self._FakeResponse(b'{"jsonrpc":"2.0","id":1,"error":{"code":-32000,"message":"over limit"}}'),
+        ]
+        backend = ExaMcpKeylessBackend()
+        self._backend_with(monkeypatch, responses)
+        assert backend.search("q", 5) == []
+        assert "no result content" in backend.last_error
