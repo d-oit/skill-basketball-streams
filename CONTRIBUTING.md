@@ -24,15 +24,28 @@ Commit prefix follows [Conventional Commits](https://www.conventionalcommits.org
      lessons-learned, implementation notes).
    - [`evals/evals.json`](evals/evals.json) — eval cases.
    - [`scripts/`](scripts/) — validators + maintenance doc.
+   - [`tests/`](tests/) — pytest suite; fixtures and their rules live in
+     [`tests/fixtures/README.md`](tests/fixtures/README.md).
+   - [`docs/runtime.md`](docs/runtime.md) — the runtime operator guide.
    - [`.github/workflows/validate.yml`](.github/workflows/validate.yml) — CI.
 4. Validate locally (every check must stay green):
    ```bash
    python3 scripts/validate.py --root . --check all
    python3 scripts/validate.py --root . --check smoke-test
    python3 scripts/runtime_eval.py --root .
-   # Optional full pytest suite (~1s once installed):
-   pip install -r requirements-dev.txt && pytest tests/
+   pip install -r requirements-dev.txt     # one-time
+   pytest tests/                           # ~15s
    ```
+
+   Or run all of it through the harness (`do-harness` on `PATH` or
+   `DO_HARNESS_BIN` set — see [`AGENTS.md`](AGENTS.md)):
+   ```bash
+   do-harness verify --set verification --strict
+   ```
+
+   `do-harness eval` is **not** part of the product gate: it resolves skills
+   only under `.agents/skills` and never sees the root `SKILL.md`. See
+   [`docs/do-harness.md`](docs/do-harness.md) → Step 6 (withdrawn).
 5. Commit + push:
    ```bash
    git add -A
@@ -40,7 +53,8 @@ Commit prefix follows [Conventional Commits](https://www.conventionalcommits.org
    git push origin feat/<topic>
    ```
 6. Open a PR via `gh pr create --base main`. The CI matrix runs the
-   validators on Python 3.8–3.12; wait for green. The maintainer then
+   validators on Python 3.9 and 3.12 (`validate.yml`), and the harness gate
+   runs on 3.12 (`verify.yml`); wait for green. The maintainer then
    rebase-merges via `gh pr merge --rebase --admin` (admin-bypass;
    see [scripts/README.md → Releasing](scripts/README.md#releasing)).
    `delete_branch_on_merge: true` auto-cleans the feat branch.
@@ -77,9 +91,27 @@ canonical workflow:
 
 ```
 feature branch → PR → rebase-merge (`gh pr merge --rebase --admin`)
+                → rehearsal (`python3 scripts/rehearse.py --env-file .env --require-all`)
                 → annotated tag (`git tag -a v<X.Y.Z>`)
                 → push tag (`git push origin v<X.Y.Z>`)
 ```
+
+The rehearsal is the one step the harness cannot take. `do-harness verify` proves
+the change; it says nothing about whether the credentials the runtime will use are
+configured *and accepted* — sensors are offline and deterministic by design, and a
+free provider having a bad day must not red the build. Release only once it reports
+no `invalid` (a rejected credential) and no `missing` required one.
+
+If your credentials are not already exported, put them in one gitignored file:
+`cp .env.example .env` and fill it in. `--env-file` is explicit, never discovered,
+and an already-set environment variable wins over the file. Then paste
+`python3 scripts/rehearse.py --env-file .env --markdown` into the PR — a rehearsal
+whose evidence is in the PR is reviewable, and one that is merely *reported* to have
+run is not.
+
+The rehearsal's offline half (`--list` + `--offline`) also runs in `validate.yml`,
+on both 3.9 and 3.12, because it needs no credential; the live half deliberately
+does not run anywhere unattended.
 
 ## Reporting broken calendar links
 

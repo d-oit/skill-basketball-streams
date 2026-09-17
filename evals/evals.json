@@ -260,6 +260,219 @@
         "references/validation-workflow.md",
         "references/approved-sources.md"
       ]
+    },
+    {
+      "id": 21,
+      "prompt": "YouTube upcoming live broadcast whose scheduled start is greater than now passes the live-only gate. Input: url=https://www.youtube.com/@EuroLeague/live; live_broadcast_content=upcoming; is_live_content=true; scheduled_start=2026-09-16T20:30:00+02:00; actual_end=null; duration_seconds=null; now=2026-09-14T09:00:00Z; title=EuroLeague LIVE: Real Madrid vs ALBA Berlin; league=EuroLeague; teams=Real Madrid vs ALBA Berlin; free_tier=True.",
+      "expected_output": "Decision=CREATE; reason=; checks: liveOnly=PASS, futureDatetime=PASS, freeAccess=PASS, officialSource=PASS",
+      "assertions": [
+        "liveOnly expected PASS",
+        "futureDatetime expected PASS"
+      ],
+      "files": [
+        "references/youtube-live-search.md",
+        "references/validation-workflow.md"
+      ]
+    },
+    {
+      "id": 22,
+      "prompt": "A regular YouTube upload with a fixed duration must be rejected before Check 1. Input: url=https://www.youtube.com/watch?v=abc123; live_broadcast_content=none; is_live_content=false; duration_seconds=6420; scheduled_start=null; now=2026-09-14T09:00:00Z; title=BBL Top 10 Plays; league=BBL; teams=; free_tier=True.",
+      "expected_output": "Decision=SKIP; reason=not a live broadcast (liveBroadcastContent='none') — regular video upload; checks: liveOnly=FAIL, liveContent=FAIL",
+      "assertions": [
+        "liveOnly expected FAIL",
+        "liveContent expected FAIL"
+      ],
+      "files": [
+        "references/youtube-live-search.md"
+      ]
+    },
+    {
+      "id": 23,
+      "prompt": "An ended broadcast keeps isLiveContent=true but has actualEndTime set, so it is an archived live and must be rejected. Input: url=https://www.youtube.com/live/xyz789; is_live_content=true; actual_end=2026-09-13T22:05:00Z; now=2026-09-14T09:00:00Z; title=FIBA U20 LIVE: Germany vs France; league=FIBA; teams=Germany vs France; free_tier=True.",
+      "expected_output": "Decision=SKIP; reason=broadcast already ended (2026-09-13T22:05:00+00:00) — archived live, not a live stream; checks: liveOnly=FAIL, liveContent=FAIL",
+      "assertions": [
+        "liveOnly expected FAIL",
+        "liveContent expected FAIL"
+      ],
+      "files": [
+        "references/youtube-live-search.md"
+      ]
+    },
+    {
+      "id": 24,
+      "prompt": "An upcoming YouTube broadcast whose scheduled start is not greater than now must be rejected. Input: url=https://www.youtube.com/@fiba/live; live_broadcast_content=upcoming; scheduled_start=2026-09-14T07:00:00Z; now=2026-09-14T09:00:00Z; title=FIBA U20 LIVE: Germany vs Spain; league=FIBA; teams=Germany vs Spain; free_tier=True.",
+      "expected_output": "Decision=SKIP; reason=scheduled start 2026-09-14T07:00:00+00:00 is not greater than now 2026-09-14T09:00:00+00:00; checks: futureDatetime=FAIL, dateTimeRange=FAIL",
+      "assertions": [
+        "futureDatetime expected FAIL",
+        "dateTimeRange expected FAIL"
+      ],
+      "files": [
+        "references/youtube-live-search.md",
+        "references/validation-workflow.md"
+      ]
+    },
+    {
+      "id": 25,
+      "prompt": "magenta.tv returns HTTP 200 but only the JavaScript app shell, so the link is unverified and must be rejected despite a matching free announcement. Input: url=https://www.magenta.tv/tv/live-basketball-euroleague-88214; http_status=200; backend=openUrl; rendered_body_empty=true; magenta_announcement_found=true; league=EuroLeague; teams=Real Madrid vs ALBA Berlin; date=2026-09-16T20:30:00+02:00; free_tier=True.",
+      "expected_output": "Decision=SKIP; reason=HTTP 200 but rendered body empty (SPA shell) — not stream evidence; checks: workingLink=FAIL, directStreamVerification=FAIL",
+      "assertions": [
+        "workingLink expected FAIL",
+        "directStreamVerification expected FAIL"
+      ],
+      "files": [
+        "references/magenta-tv.md",
+        "references/validation-workflow.md"
+      ]
+    },
+    {
+      "id": 26,
+      "prompt": "magenta.tv rendered through the Firecrawl fetch-ladder rung yields player and live markers, so Checks 6 and 7 pass. Input: url=https://www.magenta.tv/tv/live-basketball-euroleague-88213; backend=firecrawl; rendered_text_has_video=true; rendered_text_has_live_marker=true; magenta_announcement_found=true; magenta_announcement_keywords=kostenlos fuer alle; league=EuroLeague; teams=Real Madrid vs ALBA Berlin; date=2026-09-16T20:30:00+02:00; free_tier=True.",
+      "expected_output": "Decision=CREATE; reason=Rendered via the Firecrawl rung of the fetch ladder; checks: workingLink=PASS, directStreamVerification=PASS, freeAccess=PASS, officialSource=PASS",
+      "assertions": [
+        "workingLink expected PASS",
+        "directStreamVerification expected PASS",
+        "freeAccess expected PASS"
+      ],
+      "files": [
+        "references/magenta-tv.md",
+        "references/search-backends.md"
+      ]
+    },
+    {
+      "id": 27,
+      "prompt": "Basketball Champions League game with a per-game free statement on the official site and X account should be accepted. Input: url=https://www.championsleague.basketball/live/tenerife-vs-bonn; league=Basketball Champions League; teams=Lenovo Tenerife vs Telekom Baskets Bonn; date=2026-09-17T20:00:00+02:00; bcl_site_free_marker=true; bcl_x_announcement=true; bcl_facebook_announcement=false; free_tier=True.",
+      "expected_output": "Decision=CREATE; reason=BCL per-game free statement found on championsleague.basketball and @BasketballCL; checks: freeAccess=PASS, officialSource=PASS, basketballSpecific=PASS",
+      "assertions": [
+        "freeAccess expected PASS",
+        "officialSource expected PASS",
+        "basketballSpecific expected PASS"
+      ],
+      "files": [
+        "references/approved-sources.md",
+        "references/validation-workflow.md"
+      ]
+    },
+    {
+      "id": 28,
+      "prompt": "BCL game that is behind a broadcaster subscription despite the official BCL page listing it must be rejected. Input: url=https://www.championsleague.basketball/live/bonn-vs-tenerife; league=Basketball Champions League; teams=Telekom Baskets Bonn vs Lenovo Tenerife; date=2026-09-18T20:00:00+02:00; bcl_site_free_marker=false; bcl_x_announcement=false; bcl_facebook_announcement=false; broadcaster_subscription=true; free_tier=False.",
+      "expected_output": "Decision=SKIP; reason=BCL game behind broadcaster subscription (no per-game free statement); checks: freeAccess=FAIL, liveContent=PASS, officialSource=PASS",
+      "assertions": [
+        "freeAccess expected FAIL",
+        "liveContent expected PASS"
+      ],
+      "files": [
+        "references/approved-sources.md",
+        "references/validation-workflow.md"
+      ]
+    },
+    {
+      "id": 29,
+      "prompt": "BCL game with no free statement anywhere (site, @BasketballCL, BCL Facebook) must be rejected because silence is not consent. Input: url=https://www.championsleague.basketball/live/murcia-vs-ulm; league=Basketball Champions League; teams=UCAM Murcia vs ratiopharm ulm; date=2026-09-19T20:00:00+02:00; bcl_site_free_marker=false; bcl_x_announcement=false; bcl_facebook_announcement=false; paid_marker=false; free_tier=unknown.",
+      "expected_output": "Decision=SKIP; reason=No per-game free statement found on the BCL site, @BasketballCL or the BCL Facebook page — silence is not consent; checks: freeAccess=FAIL",
+      "assertions": [
+        "freeAccess expected FAIL"
+      ],
+      "files": [
+        "references/approved-sources.md",
+        "references/validation-workflow.md"
+      ]
+    },
+    {
+      "id": 30,
+      "prompt": "Revalidating a stored link that now returns 404 must quarantine the link without deleting the calendar event. Input: event_id=abc123; stored_url=https://www.sportschau.de/basketball/live; http_status=404; checked_at=2026-09-15T08:00:00Z.",
+      "expected_output": "Decision=QUARANTINE; reason=HTTP 404 — link is dead, remove the dead link and record Validation Notes; checks: linkStatus=FAIL, eventDeleted=PASS",
+      "assertions": [
+        "linkStatus expected FAIL",
+        "eventDeleted expected PASS"
+      ],
+      "files": [
+        "references/self-learning.md",
+        "references/validation-workflow.md"
+      ]
+    },
+    {
+      "id": 31,
+      "prompt": "Revalidating a stored link that returns 403 is anti-bot blocking, not a broken link, so the event is kept and the fetch ladder is retried. Input: event_id=def456; stored_url=https://www.magenta.tv/tv/live-basketball-euroleague-88213; http_status=403; backend=openUrl; checked_at=2026-09-15T08:05:00Z.",
+      "expected_output": "Decision=RETRY; reason=anti-bot status 403 — retry via a browser backend (Firecrawl / TinyFish Fetch), keep the event; checks: linkStatus=FAIL, aliveEventKept=PASS",
+      "assertions": [
+        "linkStatus expected FAIL",
+        "aliveEventKept expected PASS"
+      ],
+      "files": [
+        "references/self-learning.md",
+        "references/magenta-tv.md"
+      ]
+    },
+    {
+      "id": 32,
+      "prompt": "A domain that produced search hits but is absent from config/sources.json must be quarantined and its URL rejected, never auto-promoted. Input: url=https://example-basketball.tv/live/123; domain=example-basketball.tv; hits=3; approved_list_contains=false; league=BBL; teams=ALBA Berlin vs Bayern; date=2026-09-20T19:00:00+02:00; free_tier=True.",
+      "expected_output": "Decision=SKIP; reason=Domain not in the approved source list (quarantined candidate example-basketball.tv requires manual approval); checks: officialSource=FAIL, sourceQuarantined=PASS",
+      "assertions": [
+        "officialSource expected FAIL",
+        "sourceQuarantined expected PASS"
+      ],
+      "files": [
+        "references/self-learning.md",
+        "references/approved-sources.md",
+        "config/sources.json"
+      ]
+    },
+    {
+      "id": 33,
+      "prompt": "A plausible live stream whose free access is NOT confirmed must still be created, but labelled [UNVERIFIED] with colour 5 rather than presented as confirmed. Input: url=https://www.magenta.tv/tv/live-basketball-euroleague-88213; league=BBL; teams=ALBA Berlin vs FC Bayern Muenchen; date=2026-09-16T19:00:00+02:00; live_markers_present=true; magentasport_free_announcement=false.",
+      "expected_output": "Decision=CREATE; reason=live stream confirmed but free access unconfirmed — created with the [UNVERIFIED] prefix and colour 5; checks: directStreamVerification=PASS, freeAccess=FAIL, unverifiedLabelled=PASS, stateColourApplied=PASS",
+      "assertions": [
+        "directStreamVerification expected PASS",
+        "freeAccess expected FAIL",
+        "unverifiedLabelled expected PASS",
+        "stateColourApplied expected PASS"
+      ],
+      "files": [
+        "references/calendar-setup.md",
+        "references/magenta-tv.md"
+      ]
+    },
+    {
+      "id": 34,
+      "prompt": "The next-day audit finds a created event was paid, not free. The event must be relabelled [WRONG] with colour 7 and never deleted. Input: event_id=abc123; state=UNVERIFIED; start=2026-09-14T18:00:00Z; end=2026-09-14T20:00:00Z; audited_at=2026-09-15T08:30:00Z; evidence.paid=true.",
+      "expected_output": "Decision=WRONG; reason=audit found paid access, not a free stream; checks: finishedBroadcast=PASS, paidAccess=FAIL, eventRelabelled=PASS, eventDeleted=FAIL",
+      "assertions": [
+        "finishedBroadcast expected PASS",
+        "paidAccess expected FAIL",
+        "eventRelabelled expected PASS",
+        "eventDeleted expected FAIL"
+      ],
+      "files": [
+        "references/calendar-setup.md",
+        "references/self-learning.md"
+      ]
+    },
+    {
+      "id": 35,
+      "prompt": "The audit runs over an event whose scrape failed, so no live_confirmed value was recorded. Absence of evidence must yield INCONCLUSIVE rather than WRONG. Input: event_id=ghi789; state=UNVERIFIED; start=2026-09-14T18:00:00Z; end=2026-09-14T20:00:00Z; audited_at=2026-09-15T08:30:00Z; evidence.free_confirmed=true; evidence.live_confirmed absent.",
+      "expected_output": "Decision=INCONCLUSIVE; reason=live status unknown for this event — a scraper failure is not evidence that the game was never live; checks: finishedBroadcast=PASS, liveStatusUnknown=PASS, eventUntouched=PASS, wronglyMarkedWrong=FAIL",
+      "assertions": [
+        "finishedBroadcast expected PASS",
+        "liveStatusUnknown expected PASS",
+        "eventUntouched expected PASS",
+        "wronglyMarkedWrong expected FAIL"
+      ],
+      "files": [
+        "references/self-learning.md"
+      ]
+    },
+    {
+      "id": 36,
+      "prompt": "A re-run surfaces a candidate for a game that already has a VERIFIED event, spelled with the short club names. The planner must skip it (no duplicate) and leave the verified event byte-identical. Input: existing.event_id=evt-9; existing.state=VERIFIED; existing.teams=ALBA Berlin / FC Bayern Muenchen; existing.start=2026-09-16T17:00:00Z; candidate.teams=ALBA / Bayern; candidate.start=2026-09-16T19:00:00+02:00; candidate.state=VERIFIED.",
+      "expected_output": "Decision=SKIP; reason=verified event exists — never modified, and the short and long club names are the same club; checks: duplicateDetected=PASS, verifiedUntouched=PASS, eventCreated=FAIL",
+      "assertions": [
+        "duplicateDetected expected PASS",
+        "verifiedUntouched expected PASS",
+        "eventCreated expected FAIL"
+      ],
+      "files": [
+        "references/calendar-setup.md"
+      ]
     }
   ]
 }
