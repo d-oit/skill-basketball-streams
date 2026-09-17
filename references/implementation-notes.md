@@ -108,6 +108,9 @@ const sources = [
 
 // 2.5. Filter via validateStreamUrl before Step 3
 const validated = [];
+// Steps 5–6 are shown as they are implemented, not as they are sketched: the
+// calendar tools are Composio's `GOOGLECALENDAR_*` slugs and their arguments are
+// snake_case, which is not the same shape the Calendar API's own bodies use.
 for (const result of searchResults) {
   const v = await validateStreamUrl(result.url);
   if (!v.valid) { console.log(`Rejected ${result.url}: ${v.reason}`); continue; }
@@ -117,28 +120,42 @@ for (const result of searchResults) {
 // 3–4. Run the 7-check pipeline; extract game details for survivors.
 //       See references/validation-workflow.md for Check definitions.
 
-// 5. Duplicate check
+// 5. Duplicate check. The WHOLE window in one call — a per-game ±30 min probe is
+//    8+ calls and, more importantly, cannot see the event created two games ago.
+const existing = await GOOGLECALENDAR_EVENTS_LIST({
+  calendarId: CALENDAR_ID,
+  timeMin: WINDOW_START,
+  timeMax: WINDOW_END,
+  singleEvents: true,
+  orderBy: 'startTime',
+  showDeleted: false,
+});
 for (const game of validatedGames) {
-  const dup = await googleCalendarListEvents({
-    calendarId: CALENDAR_ID,
-    startTime: subtract(game.startTime, 30, 'minutes'),
-    endTime:   add(game.startTime, 30, 'minutes'),
-    fullText: `${game.team1} ${game.team2}`,
-  });
-  if (dup?.length) { logSkipped(game, dup[0].id); continue; }
+  const dup = matchInMemory(game, existing.items);  // ±30 min AND team pair AND league
+  if (dup) { logSkipped(game, dup.id); continue; }
 
-  // 6. Create event
-  const event = await googleCalendarCreateEvent({
-    calendarId: CALENDAR_ID,
-    summary: `${game.league} ${game.team1} vs ${game.team2} - FREE Live Stream`,
-    startTime: game.startTime,
-    endTime:   game.endTime,
-    timeZone:  'Europe/Berlin',
+  // 6. Create event. Two arguments are not optional here: without them the tool
+  //    adds a Google Meet link and the connected user as an attendee. `colorId`
+  //    is deliberately absent — CREATE_EVENT ignores it (step 6b applies it).
+  const created = await GOOGLECALENDAR_CREATE_EVENT({
+    calendar_id: CALENDAR_ID,
+    summary: `${statePrefix}${game.league} ${game.team1} vs ${game.team2} - FREE Live Stream`,
+    start_datetime: game.startTime,
+    end_datetime:   game.endTime,
+    timezone:  'Europe/Berlin',
     description: buildDescription(game),
-    colorId: game.colorId || '6',
-    visibility: 'public',
+    create_meeting_room: false,
+    exclude_organizer: true,
+    send_updates: 'none',
   });
-  logCreated(game, event.id, event.htmlLink);
+  // 6b. The colour is a second call: CREATE_EVENT ignores `color_id`.
+  await GOOGLECALENDAR_PATCH_EVENT({
+    calendar_id: CALENDAR_ID,
+    event_id: created.id,
+    color_id: game.colorId || '6',
+    send_updates: 'none',
+  });
+  logCreated(game, created.id);
 }
 
 // 7. Emit the results table (see SKILL.md Step 7)

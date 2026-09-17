@@ -26,13 +26,17 @@ Every stream found must pass **all 7 checks** before a calendar event is created
 
 **Pass criteria**:
 - Contains: "live", "Live", "LIVE", "live stream", "live übertragung"
-- For YouTube: Page must contain "Live" or "LIVE" badge text
+- For YouTube: `liveBroadcastContent` is `live`/`upcoming`, an active "LIVE"
+  badge, or an upcoming live broadcast listed on the page
 - Scheduled future event with live stream planned
 
 **Fail criteria**:
 - Contains: "highlights", "replay", "zusammenfassung", "on demand", "wiederholung"
 - Past event without live component
 - YouTube channel page with no active/scheduled live stream
+- YouTube `liveBroadcastContent` is `none`, `actualEndTime` is set, or the item
+  has a fixed `duration_seconds` while not live now → VOD, not a live stream
+  (see `references/youtube-live-search.md`)
 
 ## Check 3: Official Source
 
@@ -78,14 +82,22 @@ Every stream found must pass **all 7 checks** before a calendar event is created
 **Purpose**: Verify the URL is accessible.
 
 **Pass criteria**:
-- `openUrl` returns HTTP 200
+- HTTP 200 **with readable page content**
 - Page loads without errors
 - Not redirected to a 404, 500, or paywall page
 
 **Fail criteria**:
 - HTTP 404, 500, or other error
 - URL redirects to a subscription/paywall page
-- For YouTube: `/user/` URLs (except `TheDBBTV`), `/channel/` URLs — always rejected
+- HTTP 200 but an empty/JS app shell (no readable body) → **UNVERIFIED**, not a pass
+- For YouTube: `/user/` URLs (except `TheDBBTV`), `/channel/`, `/playlist`, `/results`, `/shorts` — always rejected
+
+**Anti-bot statuses**: `401/403/429/451` mean *blocked*, not *broken*. Do not
+reject the game — climb the fetch ladder in `references/magenta-tv.md` and retry
+with a browser-rendering backend. Classify stored links with
+`scripts/link_check.py` (`OK` / `BROKEN` / `BLOCKED` / `ERROR` / `UNREACHABLE` /
+`INVALID`) and see `references/self-learning.md` → Link revalidation for the
+quarantine cadence.
 
 ## Check 7: Direct Stream Verification (CRITICAL)
 
@@ -131,6 +143,28 @@ Calendar Event ID: [id or N/A]
 
 ## Special Cases
 
+### Basketball Champions League (BCL) — Selected Games Only
+
+`championsleague.basketball` is approved (Tier 1), but **free access is decided
+per game**, not per source. Some BCL games are free, others are not.
+
+**Mandatory triple check (all three, per game):**
+
+1. `championsleague.basketball` — the game page itself
+2. `x.com/BasketballCL` (official handle `@BasketballCL`)
+3. `facebook.com/BasketballCL` (page: *Basketball Champions League*)
+
+**Accept** only when at least one of the three carries the free marker for that
+specific game (matching teams + date). **Reject** when:
+
+- none of the three states free access (silence ≠ free),
+- the BCL page only links out to a broadcaster without a free statement, or
+- the free claim is for a *different* game that matchday.
+
+Log which of the three sources carried the announcement in
+`Validation Notes`. Social accounts are validation evidence only — never the
+`directLink`.
+
 ### MagentaSport/MagentaTV Special Case
 
 > **IMPORTANT:** MagentaSport (`magentasport.de`) and MagentaTV (`magenta.tv`) are two separate domains with distinct roles. Handling them correctly is mandatory.
@@ -145,7 +179,7 @@ Calendar Event ID: [id or N/A]
 
 **Mandatory Two-Step Search Strategy:**
 1. **Announcement Search** — Search `site:magentasport.de`, `site:facebook.com/magentasport`, and `site:twitter.com/MagentaSport` for the free-game announcement using keywords: `kostenlos`, `kostenlos für alle`, `ohne Abo`, `für alle`.
-2. **Stream Search** — Search `site:magenta.tv/tv/live*` for the matching game content. Cross-reference the slug/game title with the announcement found in step 1.
+2. **Stream Search** — Search `site:magenta.tv/tv/live*` for the matching game content. Cross-reference the slug/game title with the announcement found in step 1. **`magenta.tv` is a JS-rendered, bot-blocked SPA**: a plain GET returns an app shell with no readable text, so Checks 6 and 7 require a browser-rendering backend (Firecrawl / TinyFish Fetch / Playwright). Full fetch ladder, acceptance markers and worked logs: `references/magenta-tv.md`.
 3. **Cross-reference Rule** — A `magenta.tv` stream URL is **only valid** if a matching official free-access announcement exists on `magentasport.de` or official MagentaSport social media. **No announcement = REJECT.**
 
 **Free Stream Indicators (PASS):**
