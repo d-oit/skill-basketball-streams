@@ -19,7 +19,7 @@ substitution is silent:
   checks below are not prose hygiene: every `GOOGLECALENDAR_*` slug the product
   names must be a `TOOL_*` constant `calendar_io.py` actually calls.
 
-Parsed with regex rather than PyYAML: CI installs pytest and nothing else.
+Parsed with regex rather than PyYAML: the production scripts stay stdlib-only.
 """
 from __future__ import annotations
 

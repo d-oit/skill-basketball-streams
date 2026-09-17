@@ -18,7 +18,7 @@ break silently:
 * if the artifact name drifts between the upload and the download, the handoff
   breaks and the audit goes back to doing nothing, silently.
 
-Parsed with regex rather than PyYAML: CI installs pytest and nothing else.
+Parsed with regex rather than PyYAML: the production scripts stay stdlib-only.
 """
 from __future__ import annotations
 

@@ -180,7 +180,7 @@ class TestGithubOutputContract:
 class TestRuntimeDailyWiring:
     """The workflow must read one resolved mode, never re-derive it inline.
 
-    Parsed with regex rather than PyYAML: CI installs pytest and nothing else.
+    Parsed with regex rather than PyYAML: the production scripts stay stdlib-only.
     """
 
     STEP_START = re.compile(r"^      - (?:name|uses|id):", re.M)

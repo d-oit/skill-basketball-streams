@@ -4,3 +4,8 @@
 # stdlib-only on Python 3.8+.
 
 pytest>=8.0
+
+# Required by scripts/replay_ci.py to parse workflow YAML. The test suite
+# exercises that script (tests/test_replay_ci.py), so CI must install it too —
+# a dependency only a fresh checkout can prove missing.
+pyyaml>=6.0
