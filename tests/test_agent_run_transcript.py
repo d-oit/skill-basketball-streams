@@ -17,7 +17,7 @@ The ladder avoids the pipe; here `tee` IS the writer, so the pipe is armed with
 could not open its own output file, and the artifact upload's
 `if-no-files-found: ignore` hid both the failure and the missing transcript.
 
-Parsed with regex rather than PyYAML: CI installs pytest and nothing else.
+Parsed with regex rather than PyYAML: the production scripts stay stdlib-only.
 """
 from __future__ import annotations
 

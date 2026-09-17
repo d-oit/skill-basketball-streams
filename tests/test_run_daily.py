@@ -460,8 +460,8 @@ class TestJsonStdoutIsParseable:
 class TestRuntimeDailyWiring:
     """The telemetry job must gate configuration and tolerate only content.
 
-    Parsed with a regex rather than PyYAML: CI installs pytest and nothing else,
-    so a YAML dependency here would fail in the one environment that runs it.
+    Parsed with a regex rather than PyYAML: the production scripts stay
+    stdlib-only, so no test needs a YAML dependency to read a workflow.
     """
 
     STEP_START = re.compile(r"^      - (?:name|uses|id):", re.M)

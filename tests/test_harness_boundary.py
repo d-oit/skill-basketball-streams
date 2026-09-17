@@ -328,9 +328,9 @@ def test_documented_pin_matches_the_workflow() -> None:
 def _steps(workflow: str) -> list[str]:
     """Split a workflow's job steps into blocks.
 
-    Regex rather than `yaml.safe_load`: CI installs only `pytest`
-    (`requirements-dev.txt`), and PyYAML is not among its dependencies. Depending
-    on it here would make these tests error on the runner while passing locally.
+    Regex rather than `yaml.safe_load`: the production scripts stay stdlib-only
+    (`requirements-dev.txt` promises that), and keeping these tests YAML-free
+    means the suite still parses workflows if PyYAML ever goes missing again.
     """
     body = workflow.split("steps:", 1)[1] if "steps:" in workflow else workflow
     parts = re.split(r"\n      - ", body)
