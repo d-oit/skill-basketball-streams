@@ -59,5 +59,156 @@ jobs:
       - name: Run runtime_eval (structural pass)
         run: python3 scripts/runtime_eval.py --root .
 
+      # Runtime-path contract checks. Every one of these is deterministic and
+      # needs no secrets — that is the point: a runtime regression must be
+      # catchable in CI, not only on a scheduled run with credentials.
+      - name: Run verification (state model)
+        run: python3 scripts/verification.py
+
+      - name: Run upsert_events (fixture plan)
+        run: |
+          python3 scripts/upsert_events.py \
+            --existing tests/fixtures/upsert_existing.json \
+            --candidates tests/fixtures/upsert_candidates.json --json
+
+      - name: Run audit_events (fixture audit)
+        run: |
+          python3 scripts/audit_events.py \
+            --events tests/fixtures/audit_events.json \
+            --evidence tests/fixtures/audit_evidence.json \
+            --now 2026-09-15T08:30:00Z
+
+      - name: Run candidates (fixture ledger)
+        run: |
+          python3 scripts/candidates.py recall --ledger tests/fixtures/candidates_ledger.jsonl
+          python3 scripts/candidates.py retry  --ledger tests/fixtures/candidates_ledger.jsonl
+
+      - name: Run render_ladder (rung registry + licence guard)
+        run: python3 scripts/render_ladder.py --list
+
+      - name: Run link_check (offline dry-run)
+        run: python3 scripts/link_check.py --url https://www.youtube.com/@fiba/live --dry-run
+
+      - name: Run youtube_live (URL builders)
+        run: python3 scripts/youtube_live.py --print-urls "EuroLeague live"
+
+      - name: Run source_learning (dry-run discovery)
+        run: python3 scripts/source_learning.py candidates --root . --dry-run
+
+      - name: Run synthesise_eval_case (needle invariant)
+        run: python3 scripts/synthesise_eval_case.py --verify
+
+      - name: Run fixtures (JSON-LD and microdata pages)
+        run: |
+          python3 scripts/fixtures.py \
+            --input tests/fixtures/fixtures_page_bbl.html --source bbl \
+            --now 2026-09-14T08:30:00Z
+          python3 scripts/fixtures.py \
+            --input tests/fixtures/fixtures_page_microdata.html --source bbl \
+            --now 2026-09-14T08:30:00Z
+
+      - name: Run candidates unseen (fixture join)
+        run: |
+          python3 scripts/candidates.py unseen \
+            --ledger tests/fixtures/candidates_ledger.jsonl \
+            --fixtures tests/fixtures/league_fixtures.jsonl
+
+      - name: Run metrics (derived snapshot, fixture inputs)
+        run: |
+          python3 scripts/metrics.py \
+            --candidates tests/fixtures/candidates_ledger.jsonl \
+            --fixtures tests/fixtures/league_fixtures.jsonl \
+            --audit tests/fixtures/synthesise_verdicts.jsonl \
+            --run-id ci --dry-run
+          # The trend is a second code path (run_id grouping + sparkline), so it
+          # gets its own invocation rather than riding on the summary above.
+          python3 scripts/metrics.py \
+            --candidates tests/fixtures/candidates_ledger_runs.jsonl \
+            --audit tests/fixtures/audit_runs.jsonl \
+            --trend --dry-run
+
+      # The decision that gates the write path below, asserted in both
+      # directions. The bug this replaces: on a `schedule` event there is no
+      # `inputs` object, so `${{ inputs.dry_run || 'true' }}` was always 'true'
+      # and ENABLE_CALENDAR_WRITES=true planned every event while writing none —
+      # green every morning, and readable only from the log. The `--enabled true`
+      # case is the one no fixture previously covered.
+      - name: Run write_mode (the cron honours ENABLE_CALENDAR_WRITES)
+        run: |
+          mkdir -p .tmp
+          python3 scripts/write_mode.py \
+            --event schedule --enabled true > .tmp/write-mode-scheduled.out
+          grep -qx 'dry_run=false' .tmp/write-mode-scheduled.out
+          python3 scripts/write_mode.py \
+            --event schedule --enabled '' > .tmp/write-mode-off.out
+          grep -qx 'dry_run=true' .tmp/write-mode-off.out
+          # A manual dispatch may only ever ADD dry-run: the input cannot grant a
+          # write the repository variable did not already allow.
+          python3 scripts/write_mode.py \
+            --event workflow_dispatch --input false --enabled '' \
+            > .tmp/write-mode-dispatch.out
+          grep -qx 'dry_run=true' .tmp/write-mode-dispatch.out
+
+      # The Phase 1 write path end to end, with no credentials and no network:
+      # transcript -> candidates -> plan -> dry-run apply. This is the chain that
+      # runs for real behind ENABLE_CALENDAR_WRITES, so a break in it is caught
+      # here rather than on a scheduled run.
+      - name: Run extract_candidates (envelope sample)
+        run: |
+          mkdir -p .tmp
+          python3 scripts/extract_candidates.py \
+            --transcript tests/fixtures/agent_transcript_sample.json \
+            --out .tmp/candidates.json
+
+      - name: Run the write path (plan + dry-run apply, no credentials)
+        run: |
+          python3 scripts/upsert_events.py \
+            --existing tests/fixtures/upsert_existing.json \
+            --candidates .tmp/candidates.json --json > .tmp/plan.json
+          python3 scripts/calendar_io.py apply \
+            --plan .tmp/plan.json --calendar-id ci@example.com \
+            --out .tmp/applied.json
+
+      # Phase 3's inputs, produced for real rather than trusted to exist. The
+      # audit reads events.jsonl and evidence.json; nothing wrote them, so the
+      # audit job found them absent on every run and did nothing. The dry-run
+      # apply above writes no ids, so this leg records nothing and says so —
+      # which is the correct answer and the one worth pinning here.
+      - name: Run event_ledger (the write path's record)
+        run: |
+          python3 scripts/event_ledger.py record \
+            --plan .tmp/plan.json --applied .tmp/applied.json \
+            --dest .tmp --run-id ci
+
+      # A workflow may not name a file that does not exist. The step this was
+      # written for read `tests/fixtures/runtime_transcripts.json`, which is
+      # deliberately absent, and hid the exit code behind `|| true` — so it
+      # no-op'd on every run and still read as a pass in the summary.
+      - name: Run check_workflow_refs
+        run: python3 scripts/check_workflow_refs.py --root .
+
+      # The pre-release rehearsal's offline half, on BOTH matrix versions.
+      # `--list` is here for a reason pytest cannot cover: the rehearsal is a
+      # script as well as a module, so a PEP 604 union in an *evaluated*
+      # position — this file had one, `Probe = Callable[[], tuple[bool | None,
+      # str]]`, where the union is 3.10+ — is a `TypeError` at import on 3.9 and
+      # nothing else in the suite would notice until the push. `--offline` is
+      # the one structural gate the command can run with no credential at all:
+      # every workflow that files an issue must declare `issues: write`, or the
+      # run reads fine and the issue never appears. The live half deliberately
+      # does not run here — see scripts/rehearse.py's docstring.
+      - name: Run rehearse (offline half: registry + issue grant)
+        run: |
+          python3 scripts/rehearse.py --list
+          python3 scripts/rehearse.py --offline
+
+      # The stream-evidence gate decides whether a rendered page counts as a
+      # live stream, and it is what may put a link in a public calendar. It is
+      # checked against real recorded pages: the rule it replaced accepted a
+      # recorded YouTube video and two league home pages. Offline — the corpus
+      # is on disk, so this cannot red for a network reason.
+      - name: Run record_pages (corpus gate)
+        run: python3 scripts/record_pages.py --check
+
       - name: Run pytest
         run: python3 -m pytest tests/ -v --tb=short

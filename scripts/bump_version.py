@@ -5,8 +5,21 @@ This script reads the current version from SKILL.md frontmatter, bumps it
 (major/minor/patch flag), writes the new version back to SKILL.md, and appends
 a templated entry to CHANGELOG.md automatically.
 
+Two modes:
+
+* `--bump {major,minor,patch}` **mutates** SKILL.md and CHANGELOG.md.
+* `--check` **never writes anything**: it asserts that the SKILL.md frontmatter
+  version matches the newest dated CHANGELOG.md heading, so a release cannot be
+  half-applied. This is the `version-sync` sensor in `do-harness.toml`, which is
+  why it must be safe to run on every commit.
+
+`## [Unreleased]` is skipped by `--check`: it is not a released version, so
+requiring it to match would make the sensor red for the whole development cycle
+and train everyone to ignore it.
+
 Usage:
     python3 scripts/bump_version.py [--bump {major,minor,patch}] [--dry-run] [--root PATH]
+    python3 scripts/bump_version.py --check [--root PATH]
 
 Examples:
     # Bump patch version (1.1.2 -> 1.1.3)
@@ -21,9 +34,12 @@ Examples:
     # Dry run (show what would change without modifying files)
     python3 scripts/bump_version.py --bump patch --dry-run
 
+    # Non-mutating consistency check (the version-sync sensor)
+    python3 scripts/bump_version.py --check
+
 Exit codes:
-    0  SUCCESS — version bumped successfully
-    1  FAIL    — error occurred (file not found, invalid version, etc.)
+    0  SUCCESS — version bumped successfully, or --check found them in sync
+    1  FAIL    — error occurred (file not found, invalid version, out of sync)
     2  USAGE   — bad arguments
 """
 from __future__ import annotations
@@ -33,6 +49,12 @@ import re
 import sys
 from datetime import date
 from pathlib import Path
+
+
+CHANGELOG_HEADING_RE = re.compile(
+    r"^##\s+\[(\d+\.\d+\.\d+)\]\s*-\s*(\d{4}-\d{2}-\d{2})\s*$",
+    re.MULTILINE,
+)
 
 
 def parse_version(version_str: str) -> tuple[int, int, int]:
@@ -81,6 +103,61 @@ def bump_version(version: tuple[int, int, int], bump_type: str) -> tuple[int, in
         return (major, minor, patch + 1)
     else:
         raise ValueError(f"Invalid bump type: {bump_type!r}. Must be 'major', 'minor', or 'patch'")
+
+
+def read_changelog_versions(root: Path) -> list[tuple[str, str]]:
+    """Every dated `## [X.Y.Z] - YYYY-MM-DD` heading, as (version, date).
+
+    `[Unreleased]` never matches, which is the point: an unreleased section has
+    no version to be in sync with.
+    """
+    changelog_file = root / "CHANGELOG.md"
+    if not changelog_file.is_file():
+        raise FileNotFoundError(f"CHANGELOG.md not found at {changelog_file}")
+    text = changelog_file.read_text(encoding="utf-8")
+    return [
+        (match.group(1), match.group(2))
+        for match in CHANGELOG_HEADING_RE.finditer(text)
+    ]
+
+
+def check_version_sync(root: Path) -> int:
+    """Compare SKILL.md's version with the newest dated CHANGELOG heading.
+
+    Returns 0 when they agree, 1 otherwise (printing the reason). Picks the
+    *highest* version rather than the first heading in the file, so a heading
+    inserted in the wrong place is reported as a mismatch instead of silently
+    being treated as the newest release.
+    """
+    skill_version, _, _ = read_skill_version(root)
+    released = read_changelog_versions(root)
+    if not released:
+        print(
+            "FAIL: version-sync: CHANGELOG.md has no dated release heading "
+            "(`## [X.Y.Z] - YYYY-MM-DD`), so there is nothing to compare against",
+            file=sys.stderr,
+        )
+        return 1
+
+    newest, released_on = max(released, key=lambda pair: parse_version(pair[0]))
+    if parse_version(skill_version) != parse_version(newest):
+        print(
+            f"FAIL: version-sync: SKILL.md says {skill_version} but the newest "
+            f"CHANGELOG release is {newest} ({released_on})",
+            file=sys.stderr,
+        )
+        print(
+            "      Run `python3 scripts/bump_version.py --bump {major,minor,patch}` "
+            "to sync them, or fix the CHANGELOG heading.",
+            file=sys.stderr,
+        )
+        return 1
+
+    print(
+        f"OK: version-sync: SKILL.md {skill_version} matches CHANGELOG {newest} "
+        f"({released_on}); {len(released)} dated release(s)"
+    )
+    return 0
 
 
 def read_skill_version(root: Path) -> tuple[str, list[str]]:
@@ -194,8 +271,14 @@ def main() -> None:
     p.add_argument(
         "--bump",
         choices=("major", "minor", "patch"),
-        required=True,
+        required=False,
         help="Version component to bump (major, minor, or patch)",
+    )
+    p.add_argument(
+        "--check",
+        action="store_true",
+        default=False,
+        help="verify SKILL.md and CHANGELOG.md agree, without writing anything",
     )
     p.add_argument(
         "--dry-run",
@@ -214,7 +297,25 @@ def main() -> None:
     if not root.is_dir():
         print(f"FAIL: --root {root}: not a directory", file=sys.stderr)
         sys.exit(2)
-    
+
+    if args.check:
+        if args.bump:
+            print(
+                "FAIL: --check and --bump are mutually exclusive", file=sys.stderr
+            )
+            sys.exit(2)
+        try:
+            sys.exit(check_version_sync(root))
+        except (FileNotFoundError, ValueError) as e:
+            print(f"FAIL: version-sync: {e}", file=sys.stderr)
+            sys.exit(1)
+
+    if not args.bump:
+        print(
+            "FAIL: one of --bump or --check is required", file=sys.stderr
+        )
+        sys.exit(2)
+
     try:
         # Read current version
         old_version_str, frontmatter_lines, version_line_idx = read_skill_version(root)

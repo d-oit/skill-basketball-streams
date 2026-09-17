@@ -18,7 +18,10 @@ Checks:
     references  Every backtick-wrapped `.md` path cited from SKILL.md and
                 README.md resolves to a real file under --root.
     calendar-config  config/calendar.json exists with valid calendarId field
-                (non-empty, not a placeholder, matches Google Calendar ID pattern).
+                (non-empty, not a placeholder, matches Google Calendar ID pattern),
+                and `visibility` — when present — is one the calendar tools accept.
+                The runtime sends that value on every create and update, so a typo
+                here is a rejected write mid-run rather than a quiet default.
     smoke-test  Self-test: writes a tmp fixture with known schema violations
                 (invalid `name`, over-long `description`, wrong `skill_name`,
                 non-int `id`, non-list `assertions`, dangling .md references),
@@ -65,6 +68,12 @@ PLACEHOLDER_PATTERNS = [
     r'YOUR_', r'HERE', r'TODO', r'FIXME', r'XXX',
     r'\.\.\.', r'placeholder', r'example', r'sample'
 ]
+# The values the Calendar tools accept for `visibility`. Restated rather than
+# imported from `calendar_config.py`: this module is deliberately self-contained
+# (its smoke-test fixtures are bare directories with no `scripts/` in them), so a
+# sibling import would break them. `tests/test_validate.py` asserts the two lists
+# are equal, which is what stops the restatement from becoming a second truth.
+VISIBILITY_VALUES = ("default", "public", "private", "confidential")
 
 
 def _fail(msg: str):
@@ -231,6 +240,7 @@ def check_calendar_config(root: Path) -> None:
     - calendarId field is present and non-empty
     - calendarId is not a placeholder
     - calendarId matches the Google Calendar ID pattern
+    - `visibility`, when present, is one the calendar tools accept
     """
     config_path = root / "config" / "calendar.json"
     
@@ -281,8 +291,20 @@ def check_calendar_config(root: Path) -> None:
             f"Get your Calendar ID from Google Calendar Settings. See SETUP.md for instructions."
         )
     
+    # `visibility` is optional, so an absent value is not an error — but a
+    # *present* one is sent to the API by `calendar_io.py` (`--visibility`
+    # defaults to it), and an unaccepted value is rejected at write time with a
+    # message about the API's parameter. Caught here, before a run needs it.
+    visibility = config.get("visibility")
+    if visibility is not None and visibility not in VISIBILITY_VALUES:
+        _fail(
+            f"calendar config: {config_path.relative_to(root)}: visibility "
+            f"{visibility!r} is not one of {', '.join(VISIBILITY_VALUES)}. "
+            f"The runtime sends this value on every create and update."
+        )
+
     # Optional: check other fields exist (not required, but recommended)
-    recommended_fields = ["timezone", "defaultColorId", "visibility"]
+    recommended_fields = ["timezone", "visibility"]
     missing_recommended = [f for f in recommended_fields if f not in config]
     if missing_recommended:
         print(
@@ -351,7 +373,6 @@ def smoke_test() -> int:
     VALID_CALENDAR_CONFIG = json.dumps({
         "calendarId": "f8a14c4037d9ab411f93f19ee369218f0ed54be7c2d88deaf09d6b76fbe72e7f@group.calendar.google.com",
         "timezone": "Europe/Berlin",
-        "defaultColorId": "6",
         "visibility": "public"
     })
 
@@ -419,8 +440,32 @@ def smoke_test() -> int:
             json.dumps({
                 "calendarId": "YOUR_CALENDAR_ID_HERE",
                 "timezone": "Europe/Berlin",
-                "defaultColorId": "6",
                 "visibility": "public"
+            }),
+            encoding="utf-8",
+        )
+        (r / "SKILL.md").write_text(VALID_SKILL_MD, encoding="utf-8")
+        (r / "README.md").write_text(
+            "See `references/x.md`.\n", encoding="utf-8"
+        )
+
+    def setup_calendar_config_visibility_fail(r: Path) -> None:
+        """check_calendar_config must FAIL on an unaccepted `visibility`;
+        the other three checks must PASS."""
+        (r / "evals").mkdir()
+        (r / "evals" / "evals.json").write_text(VALID_EVALS, encoding="utf-8")
+        (r / "references").mkdir()
+        (r / "references" / "x.md").write_text("# OK\n", encoding="utf-8")
+        (r / "config").mkdir()
+        # Valid calendarId, so only the visibility branch can fire. `private` is
+        # the trap this catches: a plausible word that is not the API's value
+        # (the API says `default`, `public`, `private` or `confidential`, so a
+        # near-miss is a mis-set field, not a typo a linter would notice).
+        (r / "config" / "calendar.json").write_text(
+            json.dumps({
+                "calendarId": "f8a14c4037d9ab411f93f19ee369218f0ed54be7c2d88deaf09d6b76fbe72e7f@group.calendar.google.com",
+                "timezone": "Europe/Berlin",
+                "visibility": "unlisted",
             }),
             encoding="utf-8",
         )
@@ -437,54 +482,61 @@ def smoke_test() -> int:
     # (tests/test_validate.py:test_each_check_fail_branch_via_parametrize
     # exercises the same registry on the pytest side so the gap is caught
     # by both the production self-test and the unit-test surface).
+    #
+    # A check may register **more than one** fixture. That matters because
+    # `_fail` exits on the first failure, so one fixture can only ever exercise
+    # the first branch it trips: `calendar-config` has two FAIL branches now, and
+    # a single entry would leave the newer one permanently unexercised while the
+    # output still read `OK: smoke-test`.
     fail_fixtures = {
-        "evals": (setup_evals_fail, "FAIL: evals:"),
-        "skill": (setup_skill_fail, "FAIL: SKILL.md:"),
-        "references": (
-            setup_references_fail,
-            "FAIL: references:",
-        ),
-        "calendar-config": (
-            setup_calendar_config_fail,
-            "FAIL: calendar config:",
-        ),
+        "evals": [(setup_evals_fail, "FAIL: evals:")],
+        "skill": [(setup_skill_fail, "FAIL: SKILL.md:")],
+        "references": [
+            (setup_references_fail, "FAIL: references:"),
+        ],
+        "calendar-config": [
+            (setup_calendar_config_fail, "FAIL: calendar config:"),
+            (setup_calendar_config_visibility_fail, "FAIL: calendar config:"),
+        ],
     }
     errs: list[str] = []
+    invocations = 0
     for check in CHECKS:
-        fixture = fail_fixtures.get(check)
-        if fixture is None:
+        fixtures = fail_fixtures.get(check)
+        if not fixtures:
             errs.append(
                 f"--check {check}: no FAIL-fixture builder registered "
                 f"(smoke-test can't cover this check); add an entry to "
                 f"fail_fixtures in smoke_test()"
             )
             continue
-        setup, expected_prefix = fixture
-        with tempfile.TemporaryDirectory() as t:
-            r = Path(t)
-            setup(r)
-            proc = subprocess.run(
-                [
-                    sys.executable,
-                    str(script_path),
-                    "--root",
-                    str(r),
-                    "--check",
-                    check,
-                ],
-                capture_output=True,
-                text=True,
-            )
-            if proc.returncode == 0:
-                errs.append(
-                    f"--check {check}: expected exit 1, got 0 "
-                    f"(stdout={proc.stdout!r}, stderr={proc.stderr!r})"
+        for setup, expected_prefix in fixtures:
+            invocations += 1
+            with tempfile.TemporaryDirectory() as t:
+                r = Path(t)
+                setup(r)
+                proc = subprocess.run(
+                    [
+                        sys.executable,
+                        str(script_path),
+                        "--root",
+                        str(r),
+                        "--check",
+                        check,
+                    ],
+                    capture_output=True,
+                    text=True,
                 )
-            elif expected_prefix not in proc.stderr:
-                errs.append(
-                    f"--check {check}: missing diagnostic {expected_prefix!r} "
-                    f"in stderr:\n{proc.stderr}"
-                )
+                if proc.returncode == 0:
+                    errs.append(
+                        f"--check {check}: expected exit 1, got 0 "
+                        f"(stdout={proc.stdout!r}, stderr={proc.stderr!r})"
+                    )
+                elif expected_prefix not in proc.stderr:
+                    errs.append(
+                        f"--check {check}: missing diagnostic {expected_prefix!r} "
+                        f"in stderr:\n{proc.stderr}"
+                    )
 
     if errs:
         for e in errs:
@@ -493,7 +545,7 @@ def smoke_test() -> int:
     covered = " / ".join(f"check_{k}" for k in CHECKS.keys())
     print(
         f"OK: smoke-test: every FAIL branch correctly rejects its targeted "
-        f"fixture ({len(CHECKS)} separate subprocess invocations across "
+        f"fixture ({invocations} separate subprocess invocations across "
         f"{covered})"
     )
     return 0
