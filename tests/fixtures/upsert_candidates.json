@@ -1,0 +1,20 @@
+{
+  "candidates": [
+    {
+      "league": "BBL",
+      "teams": ["ALBA", "Bayern"],
+      "start": "2026-09-16T19:00:00+02:00",
+      "state": "VERIFIED",
+      "summary": "BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "league_color_id": "6"
+    },
+    {
+      "league": "Basketball Champions League",
+      "teams": ["Lenovo Tenerife", "Telekom Baskets Bonn"],
+      "start": "2026-09-17T20:00:00+02:00",
+      "state": "UNVERIFIED",
+      "summary": "BCL: Lenovo Tenerife vs Telekom Baskets Bonn",
+      "league_color_id": "6"
+    }
+  ]
+}

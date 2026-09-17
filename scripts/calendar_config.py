@@ -29,15 +29,29 @@ from pathlib import Path
 from typing import Any
 
 # Default values for validation (should match config/calendar.json when present)
+#
+# `defaultColorId` used to live here and was removed on 2026-09-16: it was read by
+# nothing, and every colour this skill writes is decided by the colour contract
+# (`verification.py` + `color_mapping.py`), not by a setting. See
+# `references/calendar-setup.md` for why a settable colour was the defect, not the
+# missing wiring.
 DEFAULT_CONFIG = {
     "calendarId": "",  # Empty string = must be configured
     "timezone": "Europe/Berlin",
-    "defaultColorId": "6",
     "visibility": "public",
 }
 
 # Environment variable name for calendar ID override
 CALENDAR_ID_ENV_VAR = "BASKETBALL_CALENDAR_ID"
+
+# The values the Calendar tools accept for `visibility`, taken from the live tool
+# schema (recorded in `tests/fixtures/composio/`). Defined here, next to the field
+# it constrains, so the writer (`calendar_io.py --visibility`) and the grader
+# (`validate.py --check calendar-config`) cannot disagree about what is legal.
+# `validate.py` restates this list rather than importing it — it is deliberately
+# self-contained, because its smoke-test fixtures are bare directories with no
+# `scripts/` in them — and `tests/test_validate.py` asserts the two agree.
+VISIBILITY_VALUES = ("default", "public", "private", "confidential")
 
 
 def get_config_path(root: Path | None = None) -> Path:
@@ -92,8 +106,7 @@ def get_calendar_config(root: Path | None = None) -> dict[str, Any]:
     
     Note:
         Only calendarId is overridden by environment variable. Other
-        settings (timezone, defaultColorId, visibility) always come
-        from the config file.
+        settings (timezone, visibility) always come from the config file.
     """
     try:
         config = load_config(root)
@@ -137,19 +150,6 @@ def get_timezone(root: Path | None = None) -> str:
     return config.get("timezone", DEFAULT_CONFIG["timezone"])
 
 
-def get_default_color_id(root: Path | None = None) -> str:
-    """Get the default color ID from config.
-    
-    Args:
-        root: Optional project root path.
-    
-    Returns:
-        The default colorId string (e.g., "6").
-    """
-    config = get_calendar_config(root)
-    return config.get("defaultColorId", DEFAULT_CONFIG["defaultColorId"])
-
-
 def get_visibility(root: Path | None = None) -> str:
     """Get the default visibility from config.
     
@@ -173,7 +173,6 @@ if __name__ == "__main__":
         print("Calendar Configuration:")
         print(f"  calendarId: {config.get('calendarId', 'NOT SET')}")
         print(f"  timezone: {config.get('timezone', 'NOT SET')}")
-        print(f"  defaultColorId: {config.get('defaultColorId', 'NOT SET')}")
         print(f"  visibility: {config.get('visibility', 'NOT SET')}")
         
         env_override = os.environ.get(CALENDAR_ID_ENV_VAR)

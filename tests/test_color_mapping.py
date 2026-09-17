@@ -1,7 +1,18 @@
 """Unit tests for scripts/color_mapping.py."""
+import json
+import re
+from pathlib import Path
+
 import pytest
 
-from scripts.color_mapping import get_color_id, COLOR_MAPPING_TABLE
+from scripts.color_mapping import (
+    DEFAULT_LEAGUE_COLOR_ID,
+    get_color_id,
+    COLOR_MAPPING_TABLE,
+)
+from scripts.verification import FORBIDDEN_LEAGUE_COLOR_IDS
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 class TestGetColorId:
@@ -127,3 +138,79 @@ class TestColorMappingTable:
         """Verify that the mapping table matches function behavior."""
         assert COLOR_MAPPING_TABLE.get((league, event_type)) == expected
         assert get_color_id(league, event_type) == expected
+
+
+class TestLeagueDefaultColourContract:
+    """The league default is a constant, not a setting.
+
+    Pinned because the defect it replaces was invisible from either end: the
+    config offered a `defaultColorId` that no code path read, while four modules
+    each carried their own `"6"`. Both halves are asserted — one definition, and
+    no way to configure it into a colour the state machine has reserved.
+    """
+
+    def test_default_is_not_a_reserved_colour(self):
+        """A league default in the UNVERIFIED or WRONG colour would make the
+        calendar assert something false about a game nobody disproved."""
+        from scripts.verification import DEFAULT_LEAGUE_COLOR_ID as canonical
+
+        assert DEFAULT_LEAGUE_COLOR_ID == canonical
+        assert DEFAULT_LEAGUE_COLOR_ID not in FORBIDDEN_LEAGUE_COLOR_IDS
+        # Pinned exactly: a guard written against an empty (or shrunken) set is
+        # the vacuous pass this repository keeps re-learning to avoid.
+        assert FORBIDDEN_LEAGUE_COLOR_IDS == frozenset({"2", "5", "7", "11"})
+
+    def test_reserved_colours_still_derive_from_the_state_machine(self):
+        """The forbidden set is derived, not restated — a second list would be
+        free to drift away from the colours the states actually use."""
+        from scripts.verification import (
+            LEAGUE_OVERRIDE_COLOR_IDS,
+            STATE_COLOR_IDS,
+            STATE_UNVERIFIED,
+            STATE_WRONG,
+        )
+
+        assert FORBIDDEN_LEAGUE_COLOR_IDS == (
+            {
+                STATE_COLOR_IDS[STATE_UNVERIFIED],
+                STATE_COLOR_IDS[STATE_WRONG],
+            }
+            | LEAGUE_OVERRIDE_COLOR_IDS
+        )
+
+    def test_the_default_has_one_definition(self):
+        """A second literal is how the four copies drifted apart in the first
+        place — each was local, so nothing compared them."""
+        redeclared = sorted(
+            path.name
+            for path in (REPO_ROOT / "scripts").glob("*.py")
+            if re.search(
+                r"^\s*DEFAULT_LEAGUE_COLOR\s*=",
+                path.read_text(encoding="utf-8"),
+                re.MULTILINE,
+            )
+        )
+        assert redeclared == []
+
+    def test_the_four_callers_import_it_rather_than_restate_it(self):
+        """The mapping fallback and the three plan/audit/ledger fallbacks are the
+        same value, reached by import."""
+        from scripts import audit_events, event_ledger, upsert_events
+        from scripts.verification import DEFAULT_LEAGUE_COLOR_ID as canonical
+
+        assert get_color_id("Some Unknown League") == canonical
+        for module in (upsert_events, audit_events, event_ledger):
+            assert module.DEFAULT_LEAGUE_COLOR_ID == canonical
+
+    def test_default_color_id_is_gone_from_the_config_surface(self):
+        """Pins the removal so the field cannot come back unnoticed. It was
+        removed rather than wired up, because a colour a user can set to `"7"`
+        (Peacock = WRONG) is a colour contract that can be made to lie."""
+        from scripts import calendar_config
+
+        assert not hasattr(calendar_config, "get_default_color_id")
+        assert "defaultColorId" not in calendar_config.DEFAULT_CONFIG
+        written = json.loads(
+            (REPO_ROOT / "config" / "calendar.json").read_text(encoding="utf-8")
+        )
+        assert "defaultColorId" not in written

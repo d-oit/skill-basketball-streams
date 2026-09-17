@@ -1,0 +1,23 @@
+{
+  "_comment": "Both candidates claim free access AND a live stream, so each is a promotion of the matching event in upsert_verdict_existing.json. The only thing that can stop the first one is the audit ledger.",
+  "candidates": [
+    {
+      "league": "Basketball Champions League",
+      "teams": ["Lenovo Tenerife", "Telekom Baskets Bonn"],
+      "start": "2026-09-17T20:00:00+02:00",
+      "state": "VERIFIED",
+      "summary": "BCL: Lenovo Tenerife vs Telekom Baskets Bonn",
+      "evidence": {"live_confirmed": true, "free_confirmed": true},
+      "league_color_id": "6"
+    },
+    {
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-09-16T19:00:00+02:00",
+      "state": "VERIFIED",
+      "summary": "BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "evidence": {"live_confirmed": true, "free_confirmed": true},
+      "league_color_id": "6"
+    }
+  ]
+}
