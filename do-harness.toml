@@ -58,6 +58,27 @@ argv = ["python3", "scripts/link_check.py", "--url", "https://www.youtube.com/@f
 when-changed = ["scripts/link_check.py"]
 
 [[sensors]]
+name = "link-inventory"
+# The self-learning link-revalidation seam, as one command. `links.json` is named
+# in `references/self-learning.md`'s loop table, in `SKILL.md` and in
+# `link_check.py`'s own docstring, and nothing produced it — because the runtime
+# recorded a link *nowhere*: `_event_fields` dropped it at the planner boundary
+# and `description_for` wrote only `League:`/`Teams:`. The loop could not run even
+# in principle. This pins the round trip that makes it runnable: a candidate's
+# link, through the planner and the description writer, back out of the reader and
+# into the inventory — plus coverage of all 22 approved domains, of which the page
+# corpus reaches 4.
+argv = ["python3", "-m", "pytest", "tests/test_link_inventory.py", "-q"]
+when-changed = [
+  "scripts/link_inventory.py",
+  "scripts/stream_links.py",
+  "scripts/calendar_io.py",
+  "scripts/upsert_events.py",
+  "config/sources.json",
+  "tests/fixtures/link_inventory_events.json",
+]
+
+[[sensors]]
 name = "version-sync"
 argv = ["python3", "scripts/bump_version.py", "--check"]
 when-changed = ["SKILL.md", "CHANGELOG.md"]
@@ -191,6 +212,7 @@ verification = [
   "metrics",
   "audit-verdict",
   "event-ledger",
+  "link-inventory",
   "eval-synthesis",
 ]
 release = [
@@ -209,6 +231,7 @@ release = [
   "metrics",
   "audit-verdict",
   "event-ledger",
+  "link-inventory",
   "eval-synthesis",
   "link-gate",
   "version-sync",
