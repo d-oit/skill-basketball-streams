@@ -1,9 +1,9 @@
 """Pytest suite for the Gemini (free AI Studio) rung of capture_transcripts.py.
 
 Why this file exists: the spec's LLM ladder (``live-stream-runtime-spec.md`` §4)
-is "Gemini free → OpenCode Zen free → OpenRouter free, automatic failover", but
-only the last rung had an implementation. The rung that is *documented as
-primary* was missing, so the capture path could never run on a bare runner.
+was "Gemini free → OpenCode Zen free → OpenRouter free, automatic failover"
+(reordered 2026-09-17 by operator decision to put the free OpenRouter router
+first), and the capture path needs its rungs implemented and tested offline.
 
 Every test here is offline: ``_request`` is monkeypatched, which is the single
 function the module uses to touch the network. A test that opened a socket would
@@ -542,7 +542,7 @@ class TestCli:
         """A report, so it exits 0 even when the report is "all rungs down"."""
         result = _run(["--list-models"], env=self._no_keys_env())
         assert result.returncode == 0
-        assert "ladder: gemini -> opencode -> openrouter" in result.stdout
+        assert "ladder: openrouter -> gemini -> opencode" in result.stdout
         assert "NO   rung gemini:" in result.stdout
         assert "NO   gemini models: GEMINI_API_KEY is not set" in result.stdout
 

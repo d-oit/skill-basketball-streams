@@ -515,7 +515,7 @@ def build_checks(*, timeout: int = 60) -> list[Check]:
         Check(
             name="llm:gemini",
             env=("GEMINI_API_KEY", "GOOGLE_API_KEY"),
-            what="rung 1 of the model ladder",
+            what="LLM ladder rung: AI Studio (free tier)",
             probe=_probe_gemini(timeout),
         ),
         Check(
@@ -526,13 +526,13 @@ def build_checks(*, timeout: int = 60) -> list[Check]:
                 "ANTHROPIC_AUTH_TOKEN",
                 "OPENAI_API_KEY",
             ),
-            what="rung 2 of the model ladder (the CLI, not just the key)",
+            what="LLM ladder rung: the Zen CLI (not just the key)",
             probe=_probe_opencode(timeout),
         ),
         Check(
             name="llm:openrouter",
             env=("OPENROUTER_API_KEY",),
-            what="rung 3 of the model ladder",
+            what="LLM ladder rung: the free OpenRouter router",
             probe=_probe_openrouter(timeout),
         ),
         Check(

@@ -81,7 +81,7 @@ that gate the next change to `main`.
 | Failure cost | **Prefer recall early, precision later** | 1 |
 | Self-improvement scope | **All five**: auto-grow evals, auto-tune tier order, auto-tune gates/thresholds, distill skills from traces, rewrite own instructions | 1 |
 | Unverified marking | **Title prefix + colour** (not description-only, not a separate calendar) | 2 |
-| LLM path | **Gemini free (AI Studio) primary → OpenCode Zen free → OpenRouter free**, automatic failover | 3 |
+| LLM path | **OpenRouter free (router) primary → Gemini free (AI Studio) → OpenCode Zen**, automatic failover *(reordered 2026-09-17 by operator decision; the free OpenRouter router works from any runner)* | 3 |
 | Guardrail before live | **Self-improvement branch**; `main` advances only when the eval run is green | 3 |
 | Cadence | **Once daily** | 3 |
 | History | **Append-only, forever** | 3 |
@@ -158,7 +158,7 @@ backends, and honest labelling when that fails.
 |---|---|---|
 | **Google AI Studio (Gemini)** | Free tier key, large context | **No GCP billing required** — separate product from the paid Gemini API |
 | **OpenCode Zen** | Free model IDs: `big-pickle`, `mimo-v2.5-free`, `ling-3.0-flash-fin-free`, `nemotron-3-ultra-free`, `nemotron-3.5-lightning-free`, `muse-spark-1.3-contributor-free` | OpenAI-compatible `POST /zen/v1/chat/completions`; config id format `opencode/<model-id>`; other Zen models are pay-as-you-go |
-| **OpenRouter** | 20 req/min, 50 req/day (1,000/day after a one-time $10 deposit); `openrouter/free` router | Last-resort rung |
+| **OpenRouter** | 20 req/min, 50 req/day (1,000/day after a one-time $10 deposit); `openrouter/free` router | **First rung** (reordered 2026-09-17 by operator decision) |
 | ~~GitHub Models~~ | **Retired 2026-07-30** | Not an option |
 
 ### 4.5 Free search/render inventory
@@ -272,7 +272,7 @@ This is why the spec keeps **all gates in Python**, never in prompts.
 ### 5.3 Provider ladder (failover order)
 
 ```
-LLM:    Gemini free (AI Studio)  →  OpenCode Zen free  →  OpenRouter free
+LLM:    OpenRouter free (router)  →  Gemini free (AI Studio)  →  OpenCode Zen
 Search: Exa MCP (free)           →  TinyFish           →  Firecrawl
 Render: Firecrawl (waitFor)      →  TinyFish Fetch     →  [flagged] self-hosted stealth rung
 ```

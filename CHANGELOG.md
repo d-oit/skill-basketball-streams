@@ -43,7 +43,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   response (`tests/fixtures/exa_mcp_keyless_search.sse`); 429 rate limits are
   recorded in the run's failure detail, never silent.
 
+## [1.4.0] - 2026-09-17
+
+### Changed
+
+- **The LLM ladder is reordered: the free OpenRouter router now serves first**
+  (`openrouter` → `gemini` → `opencode`; was Gemini → Zen → OpenRouter, as spec
+  §4 pinned it). Operator decision 2026-09-17: OpenRouter's free router works
+  from any runner — the Zen free tier refused GitHub Actions with "free tier can
+  only be used from within OpenCode" — and its 50 req/day free allowance fits a
+  once-daily runtime. Spec §4, `capture_transcripts.LADDER`, `llm_model.py`,
+  the rehearsal registry wording, `docs/runtime.md`, and the tests pinning the
+  old order all moved together. Failover semantics unchanged: first *configured*
+  rung serves; `LLM_MODEL` still overrides everything; `--check-rungs` remains
+  the gate.
+
+
 ## [Unreleased]
+
 
 
 

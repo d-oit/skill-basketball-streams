@@ -6,7 +6,7 @@ Why this exists. Two workflow steps pinned the model with
     LLM_MODEL: ${{ vars.LLM_MODEL || 'opencode/big-pickle' }}
 
 `opencode/big-pickle` is an **OpenCode Zen** model id: `opencode/` is the provider
-prefix and `big-pickle` is rung 2 of the LLM ladder. But the ladder is
+prefix and `big-pickle` is a Zen id of the LLM ladder. But the ladder is
 credential-driven, and `capture_transcripts.RUNG_CREDENTIALS` already says so — a
 repository holding only `GEMINI_API_KEY`, or only `OPENROUTER_API_KEY`, is a
 *correctly configured* repository, and `capture_transcripts.py --check-rungs`
@@ -27,10 +27,12 @@ Two consequences follow, and both are why this is not a `${{ }}` expression:
 Precedence:
 
 1. `LLM_MODEL` — the documented pin (`docs/runtime.md`), used verbatim.
-2. `GEMINI_API_KEY` / `GOOGLE_API_KEY` — rung 1, as `google/<id>`.
-3. `OPENCODE_ZEN_API_KEY` — rung 2, as `opencode/big-pickle`.
-4. `OPENROUTER_API_KEY` — rung 3, as `openrouter/openrouter/free`.
-5. Nothing at all — rung 3's model, with the reason saying so.
+2. `OPENROUTER_API_KEY` — rung 1, as `openrouter/openrouter/free` (reordered
+   2026-09-17 by operator decision: the free OpenRouter router serves first;
+   it is rate-limited but works from any runner).
+3. `GEMINI_API_KEY` / `GOOGLE_API_KEY` — rung 2, as `google/<id>`.
+4. `OPENCODE_ZEN_API_KEY` — rung 3, as `opencode/big-pickle`.
+5. Nothing at all — rung 1's model, with the reason saying so.
 
 That is `capture_transcripts.LADDER`'s order, applied to model *selection* rather
 than to failover. The ladder is not restated here: `RUNG_CREDENTIALS`,
@@ -133,12 +135,20 @@ def resolve_model(pin: str, environ: Mapping[str, str]) -> Resolution:
         # escape hatch for the undetectable cases in the module docstring.
         return Resolution(pin.strip(), "pinned", f"{PIN} is set, and the pin wins")
 
+    openrouter = _first_set(RUNG_CREDENTIALS["openrouter"], environ)
+    if openrouter:
+        return Resolution(
+            f"{RUNG_PROVIDERS['openrouter']}/{OPENROUTER_DEFAULT_MODEL}",
+            "openrouter",
+            f"{openrouter} is set, so the free OpenRouter rung serves the run",
+        )
+
     gemini = _first_set(RUNG_CREDENTIALS["gemini"], environ)
     if gemini:
         return Resolution(
             f"{RUNG_PROVIDERS['gemini']}/{GEMINI_DEFAULT_MODEL}",
             "gemini",
-            f"{gemini} is set, so rung 1 serves the run",
+            f"{gemini} is set and no OpenRouter credential is, so its rung serves the run",
         )
 
     zen = _first_set(("OPENCODE_ZEN_API_KEY",), environ)
@@ -146,22 +156,13 @@ def resolve_model(pin: str, environ: Mapping[str, str]) -> Resolution:
         return Resolution(
             f"{RUNG_PROVIDERS['opencode']}/{ZEN_DEFAULT_MODEL}",
             "opencode",
-            f"{zen} is set, so rung 2 serves the run",
-        )
-
-    openrouter = _first_set(RUNG_CREDENTIALS["openrouter"], environ)
-    if openrouter:
-        return Resolution(
-            f"{RUNG_PROVIDERS['openrouter']}/{OPENROUTER_DEFAULT_MODEL}",
-            "openrouter",
-            f"{openrouter} is set and neither earlier rung has a credential, "
-            "so rung 3 serves the run",
+            f"{zen} is set and no earlier rung has a credential, so its rung serves the run",
         )
 
     return Resolution(
         f"{RUNG_PROVIDERS['openrouter']}/{OPENROUTER_DEFAULT_MODEL}",
         "openrouter",
-        "no ladder credential was found, so the last rung's model is used; "
+        "no ladder credential was found, so the first rung's model is used; "
         "`capture_transcripts.py --check-rungs` is the gate on that, not this step",
     )
 

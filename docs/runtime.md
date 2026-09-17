@@ -292,9 +292,9 @@ Also triggerable via `workflow_dispatch` (with a `dry_run` input) and
 | Secret | `EXA_API_KEY` | search rung 1 |
 | Secret | `TINYFISH_API_KEY` | search rung 2, render rung 2 |
 | Secret | `FIRECRAWL_API_KEY` | render rung 1 (magenta.tv) |
-| Secret | `GEMINI_API_KEY` | LLM rung 1 (AI Studio free tier) |
-| Secret | `OPENCODE_ZEN_API_KEY` | LLM rung 2 |
-| Secret | `OPENROUTER_API_KEY` | LLM rung 3 |
+| Secret | `OPENROUTER_API_KEY` | LLM rung: the free OpenRouter router (first) |
+| Secret | `GEMINI_API_KEY` | LLM rung: AI Studio free tier (second) |
+| Secret | `OPENCODE_ZEN_API_KEY` | LLM rung: the Zen CLI (third) |
 | Secret | `COMPOSIO_API_KEY` | the calendar credential (Composio tool execution) |
 | Secret | `COMPOSIO_USER_ID` | whose connected account the call acts as |
 | Variable | `LLM_MODEL` | pins the agent's model id (e.g. `opencode/big-pickle`); unset, `scripts/llm_model.py` picks it from the rung that has a credential |
@@ -633,7 +633,7 @@ daily run must be designed for the worst credible case (~20 requests/day). There
 
 ### The ladder, and how to check it
 
-The runtime ladder is **Gemini free (AI Studio) → OpenCode Zen free → OpenRouter free**, with
+The runtime ladder is **OpenRouter free (router, first) → Gemini free (AI Studio) → OpenCode Zen**, with
 failover. All three rungs are **$0**: the AI Studio free tier is a separate product from the
 paid Gemini API and needs no GCP billing.
 
@@ -708,9 +708,9 @@ resolves it in ordinary Python, following the ladder's own order, and both workf
 | Situation | Model |
 |---|---|
 | `vars.LLM_MODEL` set | used verbatim — the pin wins over everything below |
-| `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) | `google/<gemini id>` — rung 1 |
-| `OPENCODE_ZEN_API_KEY` | `opencode/big-pickle` — rung 2 |
-| `OPENROUTER_API_KEY` | `openrouter/openrouter/free` — rung 3, the router that selects free models |
+| `OPENROUTER_API_KEY` | `openrouter/openrouter/free` — the free router, first in the ladder (reordered 2026-09-17 by operator decision) |
+| `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) | `google/<gemini id>` — second rung |
+| `OPENCODE_ZEN_API_KEY` | `opencode/big-pickle` — third rung |
 
 ```bash
 # What would this repository actually run? Reports rung, model and reason.
