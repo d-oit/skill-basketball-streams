@@ -64,6 +64,7 @@ try:  # direct CLI execution
     # two must agree about which ledger row is current or this guarantee inverts.
     from audit_events import latest_per_event
     from evidence import coerce_evidence
+    from stream_links import normalise_links
     from team_tokens import team_matches, team_tokens, text_names_all
     from verification import (
         DEFAULT_LEAGUE_COLOR_ID,
@@ -77,6 +78,7 @@ try:  # direct CLI execution
 except ImportError:  # imported as a package module
     from scripts.audit_events import latest_per_event  # type: ignore
     from scripts.evidence import coerce_evidence  # type: ignore
+    from scripts.stream_links import normalise_links  # type: ignore
     from scripts.team_tokens import team_matches, team_tokens, text_names_all  # type: ignore
     from scripts.verification import (  # type: ignore
         DEFAULT_LEAGUE_COLOR_ID,
@@ -448,6 +450,14 @@ def _event_fields(candidate: dict, league: str) -> dict:
     evidence = coerce_evidence(candidate)
     if evidence:
         fields["evidence"] = evidence
+    # The link the event was built from, carried rather than dropped. `directLink`
+    # and `sourceReference` are required by SKILL.md Constraint 9 and read back by
+    # `calendar_io.description_for`/`link_inventory`, but this projection used to
+    # discard them: they were the one part of a candidate the planner did not name,
+    # so a link reached the calendar only if an agent wrote the description by
+    # hand, and `link_check.py --input links.json` had nothing to read on the
+    # runtime path.
+    fields.update(normalise_links(candidate))
     return fields
 
 

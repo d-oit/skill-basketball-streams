@@ -81,11 +81,25 @@ from pathlib import Path
 
 try:  # direct CLI execution: `python3 scripts/calendar_io.py`
     from calendar_config import VISIBILITY_VALUES, get_visibility
+    from stream_links import (
+        links_from_description,
+        render_block,
+        source_reference_from_description,
+        validated_at_from_description,
+        validation_notes_from_description,
+    )
     from verification import STATE_PREFIXES, STATE_VERIFIED, state_from_title
 except ImportError:  # imported as a package module, e.g. scripts.calendar_io
     from scripts.calendar_config import (  # type: ignore[no-redef]
         VISIBILITY_VALUES,
         get_visibility,
+    )
+    from scripts.stream_links import (  # type: ignore[no-redef]
+        links_from_description,
+        render_block,
+        source_reference_from_description,
+        validated_at_from_description,
+        validation_notes_from_description,
     )
     from scripts.verification import (  # type: ignore[no-redef]
         STATE_PREFIXES,
@@ -295,36 +309,84 @@ def description_for(row: dict) -> str:
     Derived from the plan row rather than required from the caller: the row
     already carries `league` and `teams` (they exist for exactly this), and a
     caller that has to remember to build a description is one that will not.
+
+    The link half (`Date/Time:`, `FREE STREAM LINKS:`, `Access:`, `SOURCE
+    REFERENCE:`) comes from `stream_links.render_block`, which renders only the
+    parts the row actually has — so a row with no link information produces
+    exactly the two lines it always did. That is what keeps the whole
+    specification in one place instead of in this function and a parser
+    somewhere else.
     """
     league = str(row.get("league") or "").strip()
     teams = [str(part).strip() for part in (row.get("teams") or []) if str(part).strip()]
+    start = str(row.get("start") or row.get("startTime") or "").strip()
     lines = []
     if league:
         lines.append(f"League: {league}")
     if len(teams) == 2:
         lines.append(f"Teams: {' vs '.join(teams)}")
+    # Only once the entry can already identify the game. A timestamp on its own
+    # names no event, so a row with no league and no teams still gets no
+    # description at all — which is the property `created` events were relying on
+    # before this line existed.
+    if lines and start:
+        lines.append(f"Date/Time: {start}")
+    extra = render_block(row)
+    if not lines and extra and extra[0] == "":
+        # No identity block to separate the sections from, so the leading blank
+        # line would be the first character of the description.
+        extra = extra[1:]
+    lines += extra
     return "\n".join(lines) + ("\n" if lines else "")
 
 
+def _day_of(value: object) -> str:
+    """The date-time of a Google `start`/`end` object, or of an already-named one.
+
+    Both shapes arrive in practice: an API event carries
+    `{"dateTime": "…", "timeZone": "…"}`, and this function's own output carries
+    the flattened string. Reading only the object shape made `parse_event`
+    **crash on its own output** (`str` has no `.get`), which is the shape
+    `calendar_io list > events.json` writes — and that file is the documented
+    input of `link_inventory.py`, so the round trip had to be closed here rather
+    than special-cased at the caller.
+    """
+    if isinstance(value, dict):
+        return str(value.get("dateTime") or value.get("date") or "")
+    return str(value or "")
+
+
 def parse_event(raw: dict) -> dict:
-    """Normalise an API event into the shape `upsert_events` matches on."""
+    """Normalise an API event into the shape `upsert_events` matches on.
+
+    Idempotent: feeding it the dict it returned yields the same dict, so an export
+    written by `calendar_io list` can be read back by anything that expects an API
+    event.
+    """
     if not isinstance(raw, dict):
         raise ValueError("event must be an object")
-    start = raw.get("start") or {}
-    end = raw.get("end") or {}
     summary = str(raw.get("summary") or "")
     description = str(raw.get("description") or "")
     return {
-        "event_id": str(raw.get("id") or ""),
+        "event_id": str(raw.get("id") or raw.get("event_id") or ""),
         "summary": summary,
         "description": description,
-        "start": str((start.get("dateTime") or start.get("date") or "")),
-        "end": str((end.get("dateTime") or end.get("date") or "")),
+        "start": _day_of(raw.get("start")),
+        "end": _day_of(raw.get("end")),
         "teams": teams_from_description(description),
         "league": league_from_description(description),
         "state": state_from_title(summary),
-        "league_color_id": str(raw.get("colorId") or ""),
+        "league_color_id": str(raw.get("colorId") or raw.get("league_color_id") or ""),
         "status": str(raw.get("status") or "confirmed"),
+        # Read back out of the description — the round trip that makes the link
+        # revalidation loop possible. `scripts/link_inventory.py` turns these into
+        # the `links.json` that `link_check.py --input` has always been documented
+        # to take, and until `description_for` wrote them there was nothing to
+        # read: the stored link existed only as prose in a reference document.
+        "links": links_from_description(description),
+        "source_reference": source_reference_from_description(description),
+        "validated_at": validated_at_from_description(description),
+        "validation_notes": validation_notes_from_description(description),
     }
 
 
