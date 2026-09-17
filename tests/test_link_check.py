@@ -216,3 +216,20 @@ class TestCli:
         assert result.returncode == 0
         payload = json.loads(result.stdout)
         assert payload["results"][0]["status"] == OK
+
+    def test_json_with_out_keeps_stdout_parseable(self, tmp_path):
+        # The `--out` confirmation went to stdout in both modes, so `--json --out`
+        # emitted the payload with a human line in front of it: every reader of
+        # that stdout, including this one, got a parse error rather than a report.
+        out = tmp_path / "report.json"
+        result = _run(
+            [
+                "--url", "https://www.youtube.com/@fiba/live",
+                "--dry-run", "--out", str(out), "--json",
+            ]
+        )
+        assert result.returncode == 0
+        payload = json.loads(result.stdout)  # a stray line here is a parse error
+        assert payload["results"][0]["status"] == OK
+        assert json.loads(out.read_text(encoding="utf-8")) == payload
+        assert f"wrote report to {out}" in result.stderr
