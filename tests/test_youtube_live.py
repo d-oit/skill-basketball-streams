@@ -76,7 +76,7 @@ class TestApprovedHandles:
         [
             "https://www.youtube.com/@fiba/live",
             "https://www.youtube.com/@EuroLeague/live",
-            "https://www.youtube.com/@bbl_basketball/live",
+            "https://www.youtube.com/@basketballbundesliga/live",
             "https://www.youtube.com/@BasketballCL/live",
             "https://www.youtube.com/live/abc123",
             "https://www.youtube.com/watch?v=abc123",

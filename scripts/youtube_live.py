@@ -91,7 +91,7 @@ HANDLE_RE = re.compile(
 # rule while no code enforced it.
 DEFAULT_ALLOWED_HANDLES = (
     "fiba",
-    "bbl_basketball",
+    "basketballbundesliga",
     "euroleague",
     "basketballcl",
 )
