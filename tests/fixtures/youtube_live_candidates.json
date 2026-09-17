@@ -1,0 +1,53 @@
+{
+  "_note": "HAND-WRITTEN INPUT FIXTURE for the `live-gate` sensor in do-harness.toml, pinned to --now 2026-09-14T09:00:00Z. It is a candidate INPUT, which tests/fixtures/README.md allows, and never a record of what a run produced. The first entry must be promotable so the sensor asserts a real promotion rather than an arbitrary exit code; the rest exist so the gate's rejections stay covered.",
+  "candidates": [
+    {
+      "url": "https://www.youtube.com/@EuroLeague/live",
+      "video_id": "LIVE0001",
+      "title": "EuroLeague LIVE: Real Madrid vs ALBA Berlin",
+      "channel": "@EuroLeague",
+      "live_broadcast_content": "upcoming",
+      "scheduled_start": "2026-09-16T20:00:00+02:00",
+      "is_live_now": false,
+      "is_live_content": true,
+      "actual_end": null,
+      "duration_seconds": null
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=VOD00002",
+      "video_id": "VOD00002",
+      "title": "EuroLeague highlights: Real Madrid vs ALBA Berlin",
+      "channel": "@EuroLeague",
+      "live_broadcast_content": "none",
+      "scheduled_start": null,
+      "is_live_now": false,
+      "is_live_content": false,
+      "actual_end": null,
+      "duration_seconds": 612
+    },
+    {
+      "url": "https://www.youtube.com/live/ENDED003",
+      "video_id": "ENDED003",
+      "title": "EuroLeague LIVE: Barcelona vs Bayern",
+      "channel": "@EuroLeague",
+      "live_broadcast_content": "none",
+      "scheduled_start": "2026-09-13T20:00:00+02:00",
+      "is_live_now": false,
+      "is_live_content": true,
+      "actual_end": "2026-09-13T22:14:00+02:00",
+      "duration_seconds": 8040
+    },
+    {
+      "url": "https://www.youtube.com/@FIBAWorld/live",
+      "video_id": "BADCHAN04",
+      "title": "FIBA Basketball World Cup LIVE",
+      "channel": "@FIBAWorld",
+      "live_broadcast_content": "upcoming",
+      "scheduled_start": "2026-09-17T18:00:00+02:00",
+      "is_live_now": false,
+      "is_live_content": true,
+      "actual_end": null,
+      "duration_seconds": null
+    }
+  ]
+}

@@ -14,6 +14,7 @@ These are the primary, most reliable sources for official basketball content.
 | FIBA | Federation | `fiba.basketball`, `fiba.com` | Official international basketball federation |
 | EuroLeague | League | `euroleaguebasketball.net` | Official EuroLeague site |
 | Basketball Bundesliga (BBL) | League | `basketball-bundesliga.de` | Official BBL site |
+| Basketball Champions League (BCL) | League | `championsleague.basketball` | Official BCL site. **Free for selected games only** — some games are free, others are not. Always check the site *and* the official social accounts (see BCL note below). |
 | DBB (Deutscher Basketball Bund) | Federation | `basketball-bund.de` | German Basketball Federation |
 
 ### Tier 2: National Broadcasters (High Confidence)
@@ -39,7 +40,7 @@ Platforms that carry official free basketball streams.
 | Platform | Domains | Notes |
 |----------|---------|-------|
 | Dyn Sport Mix | `amazon.de`, `primevideo.com`, `joyn.de`, `pluto.tv`, `zattoo.com` | Free tier only; NOT behind Prime paywall |
-| MagentaSport | `magentasport.de`, `magenta.tv` | One free EuroLeague game per matchday; requires two-domain verification |
+| MagentaSport / MagentaTV | `magentasport.de`, `magenta.tv` | One free EuroLeague game per matchday; requires two-domain verification. `magenta.tv` is a JS-rendered, bot-blocked SPA — see `references/magenta-tv.md` |
 
 ### Tier 5: Official Club Websites (Medium Confidence)
 Official websites of BBL clubs that may host live streams.
@@ -77,17 +78,65 @@ Official YouTube channels for leagues, federations, and clubs.
 | ALBA Berlin | Via `albaberlin.de` social links | Verify |
 | FC Bayern Basketball | Via `fcbayern.com` social links | Verify |
 
+### Basketball Champions League (BCL) — Selected Games Only
+
+`championsleague.basketball` is an approved Tier 1 source, but **free access is
+per-game, not per-source**. Some BCL games are free, others require a
+broadcaster subscription. Never treat "it is on the official BCL site" as free
+access.
+
+Mandatory triple check for every BCL game:
+
+1. **Site** — `championsleague.basketball` game page for a free marker
+   (`free`, `kostenlos`, `watch free`, `Live auf … kostenlos`).
+2. **X/Twitter** — `x.com/BasketballCL` (official handle `@BasketballCL`) for the
+   per-game free announcement.
+3. **Facebook** — `facebook.com/BasketballCL` (page: *Basketball Champions
+   League*) for the same announcement.
+
+A BCL game is **only** accepted when at least one of the three shows the free
+marker **for that specific game** (matching teams, matching date). A BCL page
+that only links to official broadcast partners is a **link-out, not a stream** →
+REJECT at Check 1 unless the partner stream itself independently passes all 7
+checks.
+
+## Social Media as Validation Sources (always check)
+
+Official social accounts are **validation evidence for Check 1 (free access)**,
+never standalone stream sources. A social post can confirm that a specific game
+is free; it can never be the `directLink`.
+
+| Account | Domain | Used to validate |
+|---------|--------|------------------|
+| `@BasketballCL` | `x.com/BasketballCL` | BCL free-game announcements (mandatory per game) |
+| Basketball Champions League | `facebook.com/BasketballCL` | BCL free-game announcements (mandatory per game) |
+| `@MagentaSport` | `x.com/MagentaSport` | MagentaSport free-game announcements |
+| MagentaSport | `facebook.com/MagentaSport` | MagentaSport free-game announcements |
+| `@EuroLeague` | `x.com/EuroLeague` | EuroLeague broadcaster/timing confirmations |
+| `@BBLofficial` | `x.com/BBLofficial` | BBL schedule/broadcast confirmations |
+
+The machine-readable mirror of this table lives in `config/sources.json`.
+
 ## YouTube URL Rules (STRICT)
 
 | Pattern | Status | Reason |
 |---------|--------|--------|
-| `youtube.com/@handle` | ✅ ACCEPTED | Modern handle format |
 | `youtube.com/@handle/live` | ✅ PREFERRED | Direct live URL |
+| `youtube.com/live/<id>` | ✅ ACCEPTED | Live broadcast permalink |
+| `youtube.com/watch?v=<id>` | ✅ ACCEPTED | Only when `liveBroadcastContent` is `live`/`upcoming` |
+| `youtube.com/@handle` | ✅ ACCEPTED | Channel handle — needs a listed live/upcoming broadcast (Check 7) |
 | `youtube.com/user/TheDBBTV` | ✅ ACCEPTED | Only approved legacy URL |
 | `youtube.com/@FIBAWorld` | ❌ REJECTED | NOT a valid YouTube channel |
-| `youtube.com/user/FIBA` | ❌ REJECTED | Deprecated/broken |
 | `youtube.com/user/[other]` | ❌ REJECTED | Only TheDBBTV is approved |
 | `youtube.com/channel/UC...` | ❌ REJECTED | Not direct live streams |
+| `youtube.com/playlist?…`, `/results?…`, `/shorts/…` | ❌ REJECTED | Not direct live streams |
+
+**Live-only + future-only:** a YouTube hit must be a real live broadcast whose
+start datetime is greater than now (or be live at this moment), never a VOD,
+replay, highlights reel, or ended broadcast. Search with the live filter
+(`sp=EgJAAQ%3D%3D`) or the Data API's `eventType=live`, and gate every result
+with `scripts/youtube_live.py`. Full contract:
+`references/youtube-live-search.md`.
 
 ## Search Order Rationale
 
@@ -112,3 +161,4 @@ The tier system prioritizes sources based on:
 | Amazon Prime (general) | Paid (Dyn Sport Mix free tier only) |
 | Pirate/aggregator sites | Unofficial |
 | Third-party stream sites | Unofficial |
+| Social media accounts as stream sources | Validation only — never a `directLink` |

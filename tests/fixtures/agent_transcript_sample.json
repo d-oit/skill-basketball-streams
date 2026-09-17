@@ -1,0 +1,9 @@
+{
+  "_note": "HAND-WRITTEN INPUT FIXTURE for scripts/extract_candidates.py. It is an envelope SAMPLE, not a captured run: it exists so the extractor's contract (fenced ```json block -> candidate objects) has a deterministic test. It is NOT a grading fixture and must never be used to grade the skill — grading requires a transcript captured by scripts/capture_transcripts.py, for the reason in tests/fixtures/README.md. The one deliberately broken entry at the bottom exercises the rejection path.",
+  "transcripts": [
+    {
+      "id": 1,
+      "output": "I checked the approved sources for the next 7 days.\n\n```json\n[\n  {\n    \"league\": \"BBL\",\n    \"teams\": [\"ALBA Berlin\", \"FC Bayern Muenchen\"],\n    \"start\": \"2026-09-16T19:00:00+02:00\",\n    \"state\": \"UNVERIFIED\",\n    \"summary\": \"BBL: ALBA Berlin vs FC Bayern Muenchen\",\n    \"url\": \"https://www.magenta.tv/tv/live-basketball-euroleague-88213\",\n    \"backend\": \"firecrawl\"\n  },\n  {\n    \"league\": \"Basketball Champions League\",\n    \"teams\": \"Lenovo Tenerife vs Telekom Baskets Bonn\",\n    \"start\": \"2026-09-17T20:00:00+02:00\",\n    \"state\": \"VERIFIED\",\n    \"league_color_id\": \"6\"\n  },\n  {\n    \"league\": \"BBL\",\n    \"teams\": [\"Hamburg Towers\"],\n    \"start\": \"not-a-date\"\n  }\n]\n```\n"
+    }
+  ]
+}

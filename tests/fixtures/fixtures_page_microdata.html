@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="de">
+<!--
+  SYNTHETIC INPUT FIXTURE — the fallback path only.
+
+  Carries **no** JSON-LD, so `parse_page` must fall through to the microdata
+  extractor. The second block is unusable (no `startDate`) so the "no match
+  means no fixture" rule is exercised here too.
+-->
+<head><title>Spielplan</title></head>
+<body>
+  <div itemscope itemtype="https://schema.org/SportsEvent">
+    <span itemprop="name">MHP Riesen Ludwigsburg - Wuerzburg Baskets</span>
+    <time itemprop="startDate" datetime="2026-09-20T15:00:00+02:00">20.09.2026 15:00</time>
+  </div>
+  <div itemscope itemtype="https://schema.org/SportsEvent">
+    <span itemprop="name">SYNTHETIC-DATA-ONLY - No Start Date</span>
+  </div>
+</body>
+</html>

@@ -1,0 +1,129 @@
+{
+  "$comment": "Machine-readable mirror of references/approved-sources.md. Consumed by scripts/source_learning.py (approved_domains) so newly discovered domains can be quarantined instead of auto-trusted. Keep in sync with the reference doc.",
+  "version": "1.2.0",
+  "sources": [
+    {
+      "tier": 1,
+      "name": "FIBA",
+      "type": "federation",
+      "domains": ["fiba.basketball", "fiba.com"],
+      "social": ["x.com/FIBA", "facebook.com/FIBA"],
+      "free_access": "selected",
+      "notes": "Official international basketball federation"
+    },
+    {
+      "tier": 1,
+      "name": "EuroLeague",
+      "type": "league",
+      "domains": ["euroleaguebasketball.net"],
+      "social": ["x.com/EuroLeague", "facebook.com/EuroLeague"],
+      "free_access": "selected",
+      "notes": "Official EuroLeague site"
+    },
+    {
+      "tier": 1,
+      "name": "Basketball Bundesliga",
+      "type": "league",
+      "domains": ["basketball-bundesliga.de"],
+      "social": ["x.com/BBLofficial", "facebook.com/BBLofficial"],
+      "free_access": "selected",
+      "notes": "Official BBL site"
+    },
+    {
+      "tier": 1,
+      "name": "Basketball Champions League",
+      "type": "league",
+      "domain": "championsleague.basketball",
+      "domains": ["championsleague.basketball"],
+      "social": ["x.com/BasketballCL", "facebook.com/BasketballCL"],
+      "free_access": "selected",
+      "notes": "Official BCL site. Free for selected games only — a BCL page, the @BasketballCL X/Twitter account and the Basketball Champions League Facebook page must ALWAYS be checked for the free-game marker. Some games are free, others are behind a broadcaster subscription; a page that does not state free access is REJECTED."
+    },
+    {
+      "tier": 1,
+      "name": "DBB (Deutscher Basketball Bund)",
+      "type": "federation",
+      "domains": ["basketball-bund.de"],
+      "social": ["youtube.com/user/TheDBBTV"],
+      "free_access": "free",
+      "notes": "German Basketball Federation"
+    },
+    {
+      "tier": 2,
+      "name": "Sportschau (ARD)",
+      "type": "broadcaster",
+      "domains": ["sportschau.de", "ard.de", "ardmediathek.de"],
+      "free_access": "free",
+      "notes": "Free public broadcaster"
+    },
+    {
+      "tier": 2,
+      "name": "ZDF",
+      "type": "broadcaster",
+      "domains": ["zdf.de", "zdfmediathek.de"],
+      "free_access": "free",
+      "notes": "Free public broadcaster"
+    },
+    {
+      "tier": 3,
+      "name": "MDR",
+      "type": "broadcaster",
+      "domains": ["mdr.de"],
+      "free_access": "free"
+    },
+    {
+      "tier": 3,
+      "name": "BR24",
+      "type": "broadcaster",
+      "domains": ["br.de", "br24.de"],
+      "free_access": "free"
+    },
+    {
+      "tier": 3,
+      "name": "RBB24",
+      "type": "broadcaster",
+      "domains": ["rbb-online.de", "rbb24.de"],
+      "free_access": "free"
+    },
+    {
+      "tier": 4,
+      "name": "Dyn Sport Mix",
+      "type": "streaming_platform",
+      "domains": ["joyn.de", "pluto.tv", "zattoo.com"],
+      "social": [],
+      "free_access": "free_tier",
+      "notes": "Free tier only. amazon.de / primevideo.com require a Prime subscription -> reject."
+    },
+    {
+      "tier": 4,
+      "name": "MagentaSport / MagentaTV",
+      "type": "streaming_platform",
+      "domains": ["magentasport.de", "magenta.tv"],
+      "social": ["x.com/MagentaSport", "facebook.com/MagentaSport"],
+      "free_access": "selected",
+      "notes": "One free EuroLeague game per matchday. magenta.tv is the JS-rendered streaming platform (bot-blocked) and requires a matching free-access announcement on magentasport.de. See references/magenta-tv.md."
+    },
+    {
+      "tier": 6,
+      "name": "Official YouTube channels",
+      "type": "youtube",
+      "domains": ["youtube.com"],
+      "handles": [
+        "youtube.com/@fiba",
+        "youtube.com/@bbl_basketball",
+        "youtube.com/@EuroLeague",
+        "youtube.com/@BasketballCL",
+        "youtube.com/user/TheDBBTV"
+      ],
+      "free_access": "free",
+      "notes": "Live-only, future-only. See references/youtube-live-search.md."
+    }
+  ],
+  "excluded": [
+    {"name": "Sky Sport", "reason": "paid subscription"},
+    {"name": "DAZN", "reason": "paid subscription"},
+    {"name": "Sport1+", "reason": "paid"},
+    {"name": "Amazon Prime (general)", "reason": "paid; Dyn Sport Mix free tier only"},
+    {"name": "Pirate/aggregator sites", "reason": "unofficial"}
+  ]
+}
