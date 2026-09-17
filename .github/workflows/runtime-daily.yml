@@ -9,7 +9,8 @@ name: runtime-daily
 #     With it "true", a scheduled run writes; a `workflow_dispatch` follows its
 #     own `dry_run` input, which can only add dry-run and never remove it. The
 #     decision is made once, in `scripts/write_mode.py`, and printed in the job
-#     summary — see the note there for why it is not an inline `${{ }}`.
+#     summary — see the note there for why it is not an inline workflow
+#     expression.
 #   * The audit job (Phase 3) is gated behind ENABLE_AUDIT.
 # Nothing here can surprise a calendar subscriber by being merged.
 #
@@ -337,7 +338,8 @@ jobs:
       #
       # Passed through `env` rather than interpolated into the script: that is
       # GitHub's own script-injection guidance, and it is also what makes this
-      # step replayable — a `${{ }}` inside a `run:` block reaches the shell
+      # step replayable — an unexpanded expression inside a `run:` block reaches
+      # the shell
       # unexpanded, where `${{ x }}` is a bash "bad substitution" and the step
       # dies for a reason that has nothing to do with the workflow.
       - name: Resolve the write mode
@@ -393,8 +395,8 @@ jobs:
       # passes for it), yet the run asked the CLI for a model it had no
       # credential for and produced no transcript — indistinguishable from a
       # quiet day. Which rung serves is a fact about the credentials that are
-      # set, so it cannot be a workflow literal; and a decision written as a
-      # `${{ }}` expression cannot be tested. See scripts/llm_model.py.
+      # set, so it cannot be a workflow literal; and a decision written as an
+      # unexpanded workflow expression cannot be tested. See scripts/llm_model.py.
       #
       # The credential list here is deliberately the same one `--check-rungs`
       # considers, including the CLI's own providers: if the resolver saw a
@@ -584,8 +586,9 @@ jobs:
           # is exactly how the two halves of this step drifted apart before.
           #
           # Written as `= false` rather than `!= true` so that every value other
-          # than the one the resolver emits — empty, unset, or a `${{ }}` that
-          # arrived unexpanded in a local replay — stays on the dry-run side.
+          # than the one the resolver emits — empty, unset, or an unexpanded
+          # expression token that arrived here in a local replay — stays on the
+          # dry-run side.
           # `--out` writes the applied result, which is the record of what the
           # calendar now holds and under which event id. Phase 3 keys its
           # verdicts to those ids, so this file is the audit's evidence — and it
@@ -829,9 +832,9 @@ jobs:
         if: always()
         env:
           # Via `env` for the same two reasons as the runtime summary above:
-          # GitHub's script-injection guidance, and a `${{ }}` left in the `run:`
-          # block reaches the shell unexpanded, where it is a bash "bad
-          # substitution". This step failed in `replay_ci.py` for exactly that.
+          # GitHub's script-injection guidance, and an unexpanded expression left
+          # in the `run:` block reaches the shell unexpanded, where it is a bash
+          # "bad substitution". This step failed in `replay_ci.py` for exactly that.
           INPUTS_READY: ${{ steps.inputs.outputs.ready }}
         run: |
           {
