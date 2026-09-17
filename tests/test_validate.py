@@ -16,6 +16,10 @@ from pathlib import Path
 
 import pytest
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from scripts import validate  # noqa: E402
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCRIPT = REPO_ROOT / "scripts" / "validate.py"
 
@@ -397,6 +401,91 @@ def _setup_references_missing_fail(tmp_path: Path) -> None:
     (tmp_path / "README.md").write_text(
         "See `references/missing.md`.\n", encoding="utf-8"
     )
+
+
+# ---------------------------------------------------------------------------
+# --check calendar-config
+# ---------------------------------------------------------------------------
+
+_VALID_CALENDAR_ID = (
+    "f8a14c4037d9ab411f93f19ee369218f0ed54be7c2d88deaf09d6b76fbe72e7f"
+    "@group.calendar.google.com"
+)
+
+
+def _write_calendar_config(tmp_path: Path, **fields) -> Path:
+    """A valid repo *with* a calendar config — `_write_minimal_repo` omits one.
+
+    Idempotent, because one caller rewrites the config per enum value in a loop.
+    """
+    if not (tmp_path / "evals").exists():
+        _write_minimal_repo(tmp_path)
+    (tmp_path / "config").mkdir(exist_ok=True)
+    config = {
+        "calendarId": _VALID_CALENDAR_ID,
+        "timezone": "Europe/Berlin",
+        "visibility": "public",
+    }
+    config.update(fields)
+    path = tmp_path / "config" / "calendar.json"
+    path.write_text(json.dumps(config), encoding="utf-8")
+    return path
+
+
+def test_check_calendar_config_passes_on_its_own_config(tmp_path):
+    """The baseline for the three tests below: without it, a FAIL there is
+    indistinguishable from the fixture being wrong."""
+    _write_calendar_config(tmp_path)
+    assert _run(["--check", "calendar-config", "--root", str(tmp_path)]).returncode == 0
+
+
+def test_check_calendar_config_fails_on_an_unaccepted_visibility(tmp_path):
+    """The field is sent on every write, so a bad value is caught before a run.
+
+    `calendar_io.py --visibility` defaults to this config value and sends it on
+    both creates and updates; an unaccepted one is rejected by the API at write
+    time, naming *its* parameter rather than the file that supplied the typo. A
+    plausible-but-wrong word is exactly what a human writes and nothing else
+    would catch.
+    """
+    _write_calendar_config(tmp_path, visibility="unlisted")
+    result = _run(["--check", "calendar-config", "--root", str(tmp_path)])
+    assert result.returncode == 1
+    assert "FAIL: calendar config:" in result.stderr
+    assert "visibility" in result.stderr
+    assert "confidential" in result.stderr
+
+
+def test_check_calendar_config_accepts_every_value_the_tools_accept(tmp_path):
+    for value in validate.VISIBILITY_VALUES:
+        _write_calendar_config(tmp_path, visibility=value)
+        result = _run(["--check", "calendar-config", "--root", str(tmp_path)])
+        assert result.returncode == 0, (value, result.stderr)
+
+
+def test_check_calendar_config_accepts_a_missing_visibility(tmp_path):
+    """The field is recommended, not required — absence is not a failure."""
+    _write_calendar_config(tmp_path)
+    path = tmp_path / "config" / "calendar.json"
+    config = json.loads(path.read_text())
+    config.pop("visibility")
+    path.write_text(json.dumps(config))
+    result = _run(["--check", "calendar-config", "--root", str(tmp_path)])
+    assert result.returncode == 0, result.stderr
+    assert "missing recommended fields: visibility" in result.stderr
+
+
+def test_the_visibility_enum_has_one_meaning_across_both_modules():
+    """`validate.py` cannot import the runtime, so the two must be tied by a test.
+
+    It is deliberately self-contained — its smoke-test fixtures are bare
+    directories with no `scripts/` in them, so importing `calendar_config` would
+    break them. That leaves two tuples, and two tuples drift; this is the
+    assertion that makes them one fact.
+    """
+    from scripts.calendar_config import VISIBILITY_VALUES
+
+    assert validate.VISIBILITY_VALUES == VISIBILITY_VALUES
 
 
 @pytest.mark.parametrize(
