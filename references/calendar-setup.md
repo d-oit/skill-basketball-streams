@@ -46,6 +46,25 @@ SOURCE REFERENCE:
 - Validation Notes: [Any important notes]
 ```
 
+**This block is written by `scripts/calendar_io.py`, not by hand.**
+`description_for(row)` renders it from the plan row, and
+`scripts/stream_links.py` owns the format in both directions, so the writer and
+the reader cannot drift apart.
+
+The link half reaches the row because `upsert_events._event_fields` carries it
+from the candidate: `directLink` (or `directLinks`, a list of `{source, url}`),
+`sourceReference`, `access`, `validationTimestamp` and `validationNotes`. Both the
+camelCase spellings above and snake_case are accepted. Only the parts a row
+actually has are rendered, so a row that carries no link block produces exactly
+the `League:`/`Teams:` lines it always did.
+
+Three things read it back, which is why it has to be written rather than
+described: `parse_event` exposes `links`/`source_reference`/`validated_at` on
+every stored event, `scripts/link_inventory.py` turns those into the `links.json`
+that `scripts/link_check.py --input` consumes, and `references/self-learning.md`'s
+revalidation loop needs the stored link in order to quarantine it. All of that was
+specified here for months while nothing wrote a single one of the four link lines.
+
 ### Color Coding
 
 Two **orthogonal** dimensions decide the colour: the league/event type, and the

@@ -9,7 +9,7 @@ loops, all backed by append-only files:
 | Post-hoc audit | `scripts/audit_events.py --events … --evidence …` | `logs/audit.jsonl` | yes — relabels events (§6) |
 | Source scoring | `scripts/source_learning.py score --root .` | stdout / `--json` | no — informs tier order |
 | New-source discovery | `scripts/source_learning.py candidates --root .` | `logs/source-candidates.json` (`"status": "quarantined"`) | **no** — human approval |
-| Link revalidation | `scripts/link_check.py --input links.json` | report JSON | no — quarantine only |
+| Link revalidation | `scripts/link_inventory.py` → `scripts/link_check.py --input links.json` | `links.json` + report JSON | no — quarantine only |
 
 `logs/` is gitignored: learning data is per-installation, not repository state.
 
@@ -85,9 +85,46 @@ Calendar links rot. Revalidate on this cadence:
 | ~2 h before start | `BROKEN` → same quarantine; `BLOCKED`/`UNREACHABLE` → retry via the fetch ladder, keep the event |
 | After the event ends | YouTube `/live` URLs always 404 afterwards — expected, do **not** rewrite the event |
 
+Two steps, because they answer different questions. The first makes the list of
+links to check and touches no network; the second asks whether each one still
+answers.
+
 ```bash
-python3 scripts/link_check.py --input links.json --out logs/link-report.json
+# 1. Build the input. Reads the calendar export and the approved registry.
+python3 scripts/calendar_io.py list --time-min "$TODAY" --time-max "$PLUS7D" \
+  --out .tmp/events.json
+python3 scripts/link_inventory.py --events .tmp/events.json --root . \
+  --out logs/links.json
+
+# 2. Ask. This is the only network in the loop.
+python3 scripts/link_check.py --input logs/links.json --out logs/link-report.json
 ```
+
+`links.json` is built from **two** places, and the two are acted on differently:
+
+| `kind` | Where it comes from | What a failure means |
+|---|---|---|
+| `calendar-event` | the stored event's `FREE STREAM LINKS:` block, read back out of the description | quarantine that link on that event |
+| `approved-domain` | `config/sources.json` | the tier table points at a site that moved — fix the registry, not the event |
+| `approved-channel` | the registry's YouTube handles | a channel handle rotted; the live-only rule has lost a source |
+| `validation-account` | the registry's `social` handles | Check 1 lost the announcement channel a rule depends on |
+
+Before this existed, the loop was unfeedable: `links.json` was named here, in
+`SKILL.md` and in `link_check.py`'s own docstring, and **nothing produced it** —
+because the runtime recorded a link nowhere at all. `upsert_events` dropped it at
+the planner boundary and `description_for` wrote only the `League:`/`Teams:`
+lines, so a candidate's `directLink` never reached the calendar. The producer
+arrived with the writer.
+
+The inventory run is offline and deterministic, so it can gate a change. The
+probe is neither: a league behind a rate limit or a free provider having a bad day
+would red a build for a reason that says nothing about this repository. That is
+the same split as `tests/fixtures/pages/` — the gate is re-checked offline on
+every PR, and reaching the live web is a separate weekly job.
+
+`INVALID` on a `calendar-event` entry is worth its own look: it means a rejected
+URL shape (a `/channel/` or `/c/` YouTube link) was stored on a calendar event,
+which Constraint 2 forbids.
 
 Statuses and their meaning: `OK`, `BROKEN` (404/410 → quarantine the link),
 `BLOCKED` (401/403/429/451 → anti-bot, climb the fetch ladder),
@@ -166,6 +203,7 @@ python3 scripts/validate.py --root . --check all
 python3 scripts/validate.py --check smoke-test
 python3 scripts/runtime_eval.py --root .
 python3 scripts/source_learning.py score --root .
+python3 scripts/link_inventory.py --root . --dry-run
 python3 scripts/link_check.py --url https://www.youtube.com/@fiba/live --dry-run
 python3 scripts/audit_events.py --help >/dev/null
 python3 -m pytest tests/
