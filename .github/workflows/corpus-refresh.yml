@@ -1,0 +1,128 @@
+name: corpus-refresh
+
+# The page corpus (`tests/fixtures/pages/`) is the real-web evidence behind
+# `FetchResult.has_stream_evidence()` — the last check before a rendered page may
+# become a link in the Google Calendar. The committed copies are re-checked on
+# every PR by `record_pages.py --check`, which is offline and cannot notice that
+# the *live* page changed shape. This workflow does only that, and nothing else:
+#
+#   * weekly (Mondays 06:00 UTC) it re-fetches every recorded page,
+#   * compares the gate's verdict with the recorded one, and
+#   * files (or comments on) ONE issue if — and only if — a verdict flipped.
+#
+# ── NOISE ────────────────────────────────────────────────────────────────────
+# Only a VERDICT change files anything. A byte change is expected and silent: the
+# YouTube fixtures are extracts of a 1.3 MB document whose hash moves whenever a
+# sidebar suggestion is edited, so treating a hash diff as a finding would file
+# an issue every week and bury the real signal. A persistent flip comments on the
+# existing open issue instead of opening a new one.
+#
+# ── AUTHORITY ────────────────────────────────────────────────────────────────
+# No credential, no calendar access: `contents: read` plus `issues: write`, and
+# it never commits. The refreshed corpus is a build artifact, so whatever is
+# committed still has to come through a PR where `validate.yml` re-runs the
+# offline gate. Whether a flip means the source changed or the gate broke is a
+# human's call — see the issue body.
+#
+# A page that cannot be reduced stops the WRITE rather than partially updating
+# the corpus: `record_pages.py` buffers every file and writes only once all of
+# them have been reduced, so an aborted refresh leaves the corpus byte-identical.
+# The previous version wrote each stored file as it went and the manifest last,
+# so an abort rewrote the pages that SUCCEEDED and kept the old manifest —
+# leaving the corpus failing its own `--check` with a hash mismatch that could
+# not be re-recorded away while the provider was rate-limiting.
+#
+# "Cannot be reduced" includes an **HTTP error status**. `_fetch` returns an
+# error's status and body like any other response, so a 429 body was classified
+# as content — the one way this job could file a false `lost-evidence` issue, or
+# write an error page over a recorded fixture, off a rate limit alone. A dead
+# URL, an error status and a 200 that carries no extract all now name the page in
+# a `FAIL:` line, which is the line the warning below points at.
+#
+# The comparison that WAS possible is still reported — for the pages reached, and
+# marked partial in the summary — because a week with no comparison and a week
+# with no flips must not read the same. Nothing is filed off a partial run: that
+# is what the exit code decides.
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: corpus-refresh
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  refresh:
+    name: Re-record the corpus and report verdict flips
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Offline and first: if the committed corpus is already red then a flip
+      # report would be describing a gate that is broken for a reason this run
+      # cannot see, and the wrong finding is worse than none.
+      - name: Preflight — the committed corpus still classifies
+        run: python3 scripts/record_pages.py --check
+
+      # Network. `--baseline` points at the committed corpus because the scratch
+      # output is empty: the comparison is "the web today versus what we
+      # recorded", not "what we recorded twice".
+      - name: Re-record every page into a scratch corpus
+        id: refresh
+        run: |
+          mkdir -p .tmp
+          if python3 scripts/record_pages.py --refresh \
+               --out .tmp/corpus \
+               --baseline tests/fixtures/pages \
+               --json > .tmp/refresh.json; then
+            echo "refreshed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "refreshed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Could not reduce every page, so nothing was written and no issue is filed. The FAIL lines above name each page, and one that cannot be fetched, that answers with an HTTP error, or that no longer carries an extract is a corpus problem, not a flip — the partial comparison is in the job summary."
+          fi
+
+      # The only step that can open an issue, and the only reason this job has
+      # `issues: write`. It exits 0 without touching GitHub when nothing flipped
+      # — which is the expected outcome on almost every run.
+      - name: File an issue if (and only if) a verdict flipped
+        if: steps.refresh.outputs.refreshed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/corpus_flip_issue.py --report .tmp/refresh.json --file
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## Corpus refresh (weekly)"
+            echo ""
+            if [ -f .tmp/refresh.json ]; then
+              python3 scripts/corpus_flip_issue.py \
+                --report .tmp/refresh.json --markdown
+            else
+              echo "The refresh did not complete, so no verdict comparison was made."
+              echo "This is not a flip report: see the warning in the refresh step,"
+              echo "which names the page that could not be fetched."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: refreshed-corpus
+          path: |
+            .tmp/refresh.json
+            .tmp/corpus/
+          if-no-files-found: ignore
+          retention-days: 30

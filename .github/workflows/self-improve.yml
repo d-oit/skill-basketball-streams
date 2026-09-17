@@ -1,0 +1,350 @@
+name: self-improve
+
+# Phase 4 of live-stream-runtime-spec.md (§9.2-9.3).
+#
+# The loop: an audit misjudgement becomes a regression eval case on a branch.
+# The branch is pushed first (so a red result is preserved as evidence), then
+# gated; only a green gate opens a PR. `main` is never touched by this workflow.
+#
+# ── SECURITY MODEL — the important part ─────────────────────────────────────
+# This workflow is allowed to EDIT the repository, which is what makes "rewrite
+# its own instructions" possible at all. It therefore holds **no calendar
+# credential**: not one step here is given `COMPOSIO_API_KEY` or
+# `COMPOSIO_USER_ID`, which is the whole of what it takes to read or write the
+# calendar (`scripts/calendar_io.py`). Even if the agent talked itself into
+# rewriting SKILL.md badly, it cannot reach a subscriber's calendar from here.
+# The authority to write the calendar (`runtime-daily.yml`) and the authority to
+# edit the instructions (this file) are deliberately held by different workflows.
+#
+# The exclusion used to be phrased as "no `id-token: write` and no Google auth
+# step", and that phrasing stopped being the guarantee the moment the calendar
+# credential became an API key passed through `env` — a permission is not a
+# secret, and the thing to withhold is now the secret. `tests/test_calendar_
+# credential_wiring.py` pins the claim that is actually load-bearing.
+#
+# ── GRADING AUTHORITY ──────────────────────────────────────────────────────
+# The gate below is the repo's own graders: validate.py, runtime_eval.py and
+# pytest. `docs/do-harness.md` once planned to hand authority to
+# `do-harness eval`; that step is WITHDRAWN because `eval` resolves skills only
+# under `.agents/skills` and never sees the root SKILL.md, so it cannot grade
+# `evals/evals.json`. These graders are the authority for the product skill, and
+# this workflow deliberately does not depend on the binary.
+#
+# Disabled by default: set the repo variable ENABLE_SELF_IMPROVE to 'true'.
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Max eval cases to synthesise in one run'
+        type: string
+        default: '3'
+      apply_agent_edits:
+        description: 'Also let the opencode agent propose instruction edits'
+        type: boolean
+        default: false
+  repository_dispatch:
+    types: [audit-verdicts]
+  workflow_run:
+    workflows: [runtime-daily]
+    types: [completed]
+
+concurrency:
+  group: self-improve
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  synthesise:
+    name: Synthesise a regression case, gate it, open a PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: >-
+      vars.ENABLE_SELF_IMPROVE == 'true' &&
+      (github.event_name != 'workflow_run' ||
+       github.event.workflow_run.conclusion == 'success')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install test dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Configure git identity
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Pull the audit ledger from the telemetry branch
+        id: ledger
+        run: |
+          mkdir -p .tmp
+          if git fetch --depth=1 origin telemetry 2>/dev/null; then
+            git show origin/telemetry:audit.jsonl      > .tmp/audit.jsonl      2>/dev/null || true
+            git show origin/telemetry:candidates.jsonl > .tmp/candidates.jsonl 2>/dev/null || true
+          fi
+          if [ -s .tmp/audit.jsonl ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "Audit rows: $(wc -l < .tmp/audit.jsonl)"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No audit ledger on the telemetry branch yet — nothing to learn from. This is the expected state until the runtime job runs with ENABLE_AUDIT=true."
+          fi
+
+      # Runs before anything is written, so a clean audit costs nothing.
+      - name: Can this ledger teach us anything?
+        id: probe
+        if: steps.ledger.outputs.ready == 'true'
+        run: |
+          limit="${{ inputs.limit || '3' }}"
+          if python3 scripts/synthesise_eval_case.py \
+               --verdicts .tmp/audit.jsonl \
+               --ledger .tmp/candidates.jsonl \
+               --limit "$limit" --dry-run; then
+            echo "actionable=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "actionable=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No actionable misjudgements in this ledger."
+          fi
+
+      # The branch is created and pushed BEFORE the gate runs. A red result is
+      # therefore preserved as evidence on the branch rather than thrown away.
+      - name: Create the self-improvement branch
+        id: branch
+        if: steps.probe.outputs.actionable == 'true'
+        run: |
+          branch="self-improve/$(date -u +%Y-%m-%d)"
+          git checkout -b "$branch"
+          echo "name=$branch" >> "$GITHUB_OUTPUT"
+
+      - name: Synthesise the eval case(s)
+        id: synthesise
+        if: steps.probe.outputs.actionable == 'true'
+        run: |
+          # `--json` puts the payload ALONE on stdout, so the created ids are
+          # machine-readable. The capture step needs exactly those ids: a
+          # synthesised case is numbered after every committed case, and that
+          # range is the only way to know which transcripts to take.
+          python3 scripts/synthesise_eval_case.py \
+            --verdicts .tmp/audit.jsonl \
+            --ledger .tmp/candidates.jsonl \
+            --limit "${{ inputs.limit || '3' }}" \
+            --json > .tmp/new-cases.json
+          python3 -c "import json; d=json.load(open('.tmp/new-cases.json')); print('Synthesised case ids:', [c['id'] for c in d['cases']])"
+
+      # ── Closing the loop: grade the NEW cases against real model output ─────
+      # The committed capture covers ids 1..N, and a synthesised case is N+1, so
+      # grading `tests/fixtures/runtime_transcripts.json` here would fail with
+      # "no transcript supplied" for every new case — a legitimate PR blocked by
+      # a reason that has nothing to do with it. The new ids are therefore
+      # captured on their own and graded separately.
+      - name: Capture transcripts for the new case(s)
+        id: capture
+        if: steps.probe.outputs.actionable == 'true'
+        continue-on-error: true
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          ids=$(python3 -c "import json; print(' '.join('--only %d' % c['id'] for c in json.load(open('.tmp/new-cases.json'))['cases']))")
+          if [ -z "$ids" ]; then
+            echo "::notice::No new case ids to capture."
+            exit 0
+          fi
+          # A partial capture writes no file at all, so the file *existing* is
+          # the signal that every new case was captured.
+          if python3 scripts/capture_transcripts.py --runner ladder $ids \
+               --out .tmp/new-transcripts.json; then
+            echo "captured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "captured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::The new case(s) were NOT graded against real output. Set GEMINI_API_KEY (a free AI Studio key needs no billing) to close this gap — until then the pre-fix-red property is asserted, not demonstrated. See tests/fixtures/README.md."
+          fi
+
+      # The same credential-driven choice as `runtime-daily.yml`, from the same
+      # script — a second copy of "which model" is how the two workflows came to
+      # disagree with the ladder in the first place. See scripts/llm_model.py.
+      - name: Resolve the model
+        id: llm
+        if: >-
+          steps.probe.outputs.actionable == 'true' &&
+          inputs.apply_agent_edits
+        env:
+          LLM_MODEL: ${{ vars.LLM_MODEL }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python3 scripts/llm_model.py >> "$GITHUB_OUTPUT"
+
+      # Optional: let the agent propose the instruction fix too. It has `edit`
+      # but, like the rest of this workflow, no calendar credential. Failures
+      # here are tolerated on purpose — the synthesised eval case is the
+      # durable artefact, and a model that cannot run must not block it.
+      - name: Propose instruction edits (optional)
+        if: >-
+          steps.probe.outputs.actionable == 'true' &&
+          inputs.apply_agent_edits
+        continue-on-error: true
+        env:
+          # The resolver can select any of the three rungs, so this step has to
+          # carry the credential for whichever it picked.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          LLM_MODEL: ${{ steps.llm.outputs.model }}
+        run: |
+          # `pipefail`, so the pipe reports the CLI's status rather than `tee`s.
+          # `.tmp` is created earlier in this job, so only the status is at stake
+          # here — and this step is `continue-on-error`, which records the
+          # outcome it is named for only if there is an outcome to record.
+          set -o pipefail
+          npm install -g opencode-ai@latest || npm install -g opencode
+          opencode run --model "$LLM_MODEL" --format json \
+            --file SKILL.md --file references/ --file .tmp/audit.jsonl \
+            "The appended audit verdicts describe real misjudgements. Propose the SMALLEST instruction edit to SKILL.md or references/ that would have prevented each one. Do not weaken any check; do not re-baseline any eval." \
+            | tee .tmp/agent-edit.json
+
+      - name: Push the branch
+        if: steps.probe.outputs.actionable == 'true'
+        run: |
+          branch="${{ steps.branch.outputs.name }}"
+          git add -A
+          git commit -m "test(evals): synthesise regression case from audit verdicts"
+          # Idempotent for same-day re-runs without clobbering work the runner
+          # has not seen: --force-with-lease only succeeds once the existing
+          # branch has been fetched.
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            git fetch origin "refs/heads/$branch:refs/remotes/origin/$branch"
+            git push \
+              --force-with-lease="refs/heads/$branch:refs/remotes/origin/$branch" \
+              origin "HEAD:refs/heads/$branch"
+          else
+            git push origin "HEAD:refs/heads/$branch"
+          fi
+
+      # ── The gate. Green here is the ONLY thing that may open a PR. ──────────
+      # `continue-on-error` is load-bearing, not leniency: the job must be able
+      # to see the failure, keep the branch, and open the red-gate issue.
+      - name: Gate — the repo's own graders
+        id: gate
+        if: steps.probe.outputs.actionable == 'true'
+        continue-on-error: true
+        run: |
+          set -e
+          python3 scripts/validate.py --root . --check all
+          python3 scripts/validate.py --check smoke-test
+          python3 scripts/runtime_eval.py --root .
+          # A synthesised case whose assertion has no needle grades nothing and
+          # would pass vacuously. This is the check that forbids that.
+          python3 scripts/synthesise_eval_case.py --verify
+          # The new cases against real output. Inside this step on purpose: the
+          # PR opens only on `steps.gate.outcome == 'success'`, so a grading
+          # failure has to red the gate rather than sit next to it.
+          # --allow-partial is required and deliberate: this file covers the
+          # newly synthesised ids only, so the strict default (every case must
+          # have a transcript) would fail the gate for a PR that is fine. The
+          # flag makes the narrowed scope visible at the call site, and the
+          # grader reports how many cases it left out.
+          if [ -f .tmp/new-transcripts.json ]; then
+            python3 scripts/runtime_eval.py --root . \
+              --transcripts .tmp/new-transcripts.json --allow-partial
+          else
+            echo "::warning::No transcript for the new case(s), so their pre-fix-red property is NOT verified. See tests/fixtures/README.md."
+          fi
+          python3 -m pytest tests/ -q
+
+      - name: Open the pull request
+        if: steps.probe.outputs.actionable == 'true' && steps.gate.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base main \
+            --head "${{ steps.branch.outputs.name }}" \
+            --title "test(evals): regression cases from $(date -u +%Y-%m-%d) audit" \
+            --body "$(cat <<'EOF'
+          Synthesised by `.github/workflows/self-improve.yml` from the audit ledger
+          on the `telemetry` branch.
+
+          Each case encodes a **confirmed misjudgement**, so it should fail against
+          `main` until the responsible gate is tightened — not pass immediately.
+
+          Reviewing checklist:
+
+          - [ ] Each new case blames the right check (Check 1 for paid, Check 7 for
+                never-live, the `[VERIFIED]` claim for over-claiming).
+          - [ ] No existing check was weakened to make the gate green.
+          - [ ] The fix is an instruction/gate change, not a re-baseline.
+          - [ ] `evals/evals.json` ids remain monotonic.
+
+          The gate that produced this PR runs `validate.py`, `runtime_eval.py`,
+          `synthesise_eval_case.py --verify` and `pytest`. It holds **no calendar
+          credential** by design.
+          EOF
+          )"
+
+      - name: Report a red gate
+        if: steps.probe.outputs.actionable == 'true' && steps.gate.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          body="$(cat <<EOF
+          The self-improvement gate went **red** on \`main\`'s own graders, so no PR
+          was opened. The branch is preserved as evidence:
+
+          \`${{ steps.branch.outputs.name }}\`
+
+          A red gate here is the system refusing to accept its own fix. Do **not**
+          re-baseline the eval set to clear it — that is precisely the failure mode
+          the gate exists to prevent.
+
+          Run locally to reproduce:
+
+          \`\`\`bash
+          git fetch origin ${{ steps.branch.outputs.name }}
+          git checkout ${{ steps.branch.outputs.name }}
+          python3 scripts/validate.py --root . --check all
+          python3 scripts/runtime_eval.py --root .
+          python3 scripts/synthesise_eval_case.py --verify
+          python3 -m pytest tests/ -q
+          \`\`\`
+
+          Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EOF
+          )"
+          gh issue create \
+            --title "[runtime] self-improvement gate red" \
+            --body "$body" || true
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## Self-improvement (Phase 4)"
+            echo ""
+            echo "| Step | Result |"
+            echo "|---|---|"
+            echo "| Audit ledger present | ${{ steps.ledger.outputs.ready }} |"
+            echo "| Actionable misjudgements | ${{ steps.probe.outputs.actionable }} |"
+            echo "| Branch | ${{ steps.branch.outputs.name || '—' }} |"
+            echo "| Gate | ${{ steps.gate.outcome || 'not run' }} |"
+            echo ""
+            echo "This workflow holds **no calendar credential** on purpose: the"
+            echo "authority to edit the instructions and the authority to write the"
+            echo "calendar are held by different workflows."
+          } >> "$GITHUB_STEP_SUMMARY"
