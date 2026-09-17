@@ -1,0 +1,14 @@
+{
+  "events": [
+    {
+      "event_id": "evt-verified-alba",
+      "game_key": "BBL|ALBA Berlin|FC Bayern Muenchen|2026-09-16T17:00Z",
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-09-16T17:00:00Z",
+      "state": "VERIFIED",
+      "summary": "BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "league_color_id": "6"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "evidence": {
+    "evt-paid-bayern": {
+      "paid": true
+    },
+    "evt-live-tenerife": {
+      "live_confirmed": true,
+      "free_confirmed": true
+    },
+    "evt-unknown-bonn": {
+      "free_confirmed": true
+    }
+  }
+}

@@ -11,11 +11,42 @@ Usage:
     # Returns: "6"
 
 The mapping follows the color scheme defined in references/calendar-setup.md.
+
+Two dimensions are **orthogonal** and must not be conflated:
+
+1. **League/event-type** — this module's original job: FIBA stays Sage, EuroLeague
+   finals stay Tomato, everything else Tangerine.
+2. **Verification state** — `VERIFIED` / `UNVERIFIED` / `WRONG`, defined in
+   `scripts/verification.py` and applied by the runtime.
+
+Precedence rule (spec §6): a non-`VERIFIED` state wins over the league colour,
+because an unconfirmed stream must *look* unconfirmed. A confirmed final still
+keeps Tomato.
 """
 from __future__ import annotations
 
+try:  # direct CLI execution: `python3 scripts/color_mapping.py`
+    from verification import DEFAULT_LEAGUE_COLOR_ID, color_for, normalise_state
+except ImportError:  # imported as a package module, e.g. scripts.color_mapping
+    from scripts.verification import (  # type: ignore
+        DEFAULT_LEAGUE_COLOR_ID,
+        color_for,
+        normalise_state,
+    )
 
-def get_color_id(league: str, event_type: str = "regular") -> str:
+# Re-exported so callers have one import site for the state model.
+__all__ = [
+    "get_color_id",
+    "COLOR_MAPPING_TABLE",
+    "DEFAULT_LEAGUE_COLOR_ID",
+    "normalise_state",
+    "color_for",
+]
+
+
+def get_color_id(
+    league: str, event_type: str = "regular", state: str | None = None
+) -> str:
     """Deterministically map league and event-type to a Google Calendar colorId.
     
     Args:
@@ -23,18 +54,31 @@ def get_color_id(league: str, event_type: str = "regular") -> str:
                  Examples: "BBL", "EuroLeague", "FIBA", "Basketball Champions League"
         event_type: The type of event (case-insensitive). Default: "regular"
                     Options: "regular", "final", "playoff", "semifinal", "championship"
+        state: Optional verification state ("VERIFIED"/"UNVERIFIED"/"WRONG").
+               When omitted, behaviour is unchanged from earlier versions. A
+               non-VERIFIED state overrides the league colour so uncertainty is
+               always visible in the calendar.
     
     Returns:
         A string representing the Google Calendar colorId.
         - "6" = Tangerine/Orange (default for all basketball events)
         - "11" = Tomato/Red (EuroLeague finals or special events)
         - "2" = Sage/Green (FIBA international games)
+        - "5" = Banana (UNVERIFIED), "7" = Peacock (WRONG)
     
     Raises:
-        ValueError: If league is empty or None.
+        ValueError: If league is empty or None, or the state is unknown.
     """
     if not league:
         raise ValueError("league must be a non-empty string")
+    league_color = _league_color_id(league, event_type)
+    if state is None:
+        return league_color
+    return color_for(normalise_state(state), league_color)
+
+
+def _league_color_id(league: str, event_type: str = "regular") -> str:
+    """League/event-type colour only, ignoring verification state."""
     
     # Normalize inputs to lowercase for case-insensitive matching
     league_lower = league.lower().strip()
@@ -55,9 +99,12 @@ def get_color_id(league: str, event_type: str = "regular") -> str:
         if event_type_lower in ("final", "finals", "championship", "semifinal", "semifinals"):
             return "11"
     
-    # Rule 4: All other basketball events -> Tangerine/Orange ("6") as default
-    # This includes: BBL (all types), EuroLeague regular season, etc.
-    return "6"
+    # Rule 4: All other basketball events -> the league default.
+    # This includes: BBL (all types), EuroLeague regular season, etc. The value is
+    # imported rather than written out, because it is also the colour the three
+    # planner/audit/ledger modules fall back to — four copies of one "6" is four
+    # places for the colour contract to drift apart.
+    return DEFAULT_LEAGUE_COLOR_ID
 
 
 # Mapping table for documentation and testing purposes

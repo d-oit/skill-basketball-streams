@@ -1,0 +1,23 @@
+{
+  "_comment": "Two events as `calendar_io list` returns them. Both are UNVERIFIED, so both would be promoted by the candidates beside this file. One of them has a WRONG verdict in the audit ledger, which must stop the promotion even though the title carries no [WRONG] prefix — nothing writes that prefix on the real path, which is why the planner's WRONG row was unreachable.",
+  "events": [
+    {
+      "event_id": "evt-paid-bonn",
+      "league": "Basketball Champions League",
+      "teams": ["Lenovo Tenerife", "Telekom Baskets Bonn"],
+      "start": "2026-09-17T18:00:00+00:00",
+      "state": "UNVERIFIED",
+      "summary": "BCL: Lenovo Tenerife vs Telekom Baskets Bonn",
+      "league_color_id": "6"
+    },
+    {
+      "event_id": "evt-legacy-berlin",
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-09-16T17:00:00+00:00",
+      "state": "UNVERIFIED",
+      "summary": "BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "league_color_id": "6"
+    }
+  ]
+}
