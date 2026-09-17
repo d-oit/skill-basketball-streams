@@ -66,9 +66,13 @@ OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
 # hardcoded id is exactly how a rung rots unnoticed.
 GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta"
 GEMINI_DEFAULT_MODEL = "gemini-2.5-flash-lite"
-# Ladder order is fixed by spec §4 ("Gemini free -> OpenCode Zen free ->
-# OpenRouter free, automatic failover").
-LADDER = ("gemini", "opencode", "openrouter")
+# Ladder order. Was spec §4's "Gemini free -> OpenCode Zen free -> OpenRouter
+# free"; reordered 2026-09-17 by operator decision: the FREE OpenRouter router
+# serves first, the AI Studio key second, the Zen CLI last. OpenRouter's free
+# tier is rate-limited (20 req/min, 50 req/day; 1,000/day after a one-time $10
+# deposit), which a once-daily runtime fits comfortably — and its key works
+# from any runner, unlike the Zen free tier (in-CLI only).
+LADDER = ("openrouter", "gemini", "opencode")
 GEMINI_VERSION = re.compile(r"^gemini-(\d+(?:\.\d+)?)")
 OPENROUTER_KEY_ENDPOINT = "https://openrouter.ai/api/v1/key"
 # What makes each rung usable. The list is the union of the documented ladder

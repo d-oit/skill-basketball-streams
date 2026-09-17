@@ -99,7 +99,7 @@ class TestTheLadderDecides:
         assert resolution.model == "anthropic/claude-sonnet-4.5"
         assert resolution.rung == "pinned"
 
-    def test_a_gemini_key_selects_rung_one(self):
+    def test_a_gemini_key_selects_the_gemini_rung(self):
         resolution = resolve_model("", _env("GEMINI_API_KEY"))
         assert resolution.model == f"{RUNG_PROVIDERS['gemini']}/{ct.GEMINI_DEFAULT_MODEL}"
         assert resolution.rung == "gemini"
@@ -110,7 +110,7 @@ class TestTheLadderDecides:
         resolution = resolve_model("", _env("GOOGLE_API_KEY"))
         assert resolution.rung == "gemini"
 
-    def test_a_zen_key_selects_rung_two(self):
+    def test_a_zen_key_selects_the_zen_rung(self):
         resolution = resolve_model("", _env("OPENCODE_ZEN_API_KEY"))
         assert resolution.model == "opencode/big-pickle"
         assert resolution.rung == "opencode"
@@ -126,12 +126,13 @@ class TestTheLadderDecides:
         assert resolution.rung == "openrouter"
 
     def test_an_earlier_rung_beats_a_later_one(self):
-        # Order is the ladder's, not dict order: a repo with both keys must not
-        # pick rung 3 just because it was checked first.
+        # Order is the ladder's (openrouter -> gemini -> opencode, reordered
+        # 2026-09-17 by operator decision), not dict order: a repo with several
+        # keys must not pick a later rung just because it was checked first.
         resolution = resolve_model("", _env("OPENROUTER_API_KEY", "GEMINI_API_KEY"))
+        assert resolution.rung == "openrouter"
+        resolution = resolve_model("", _env("GEMINI_API_KEY", "OPENCODE_ZEN_API_KEY"))
         assert resolution.rung == "gemini"
-        resolution = resolve_model("", _env("OPENROUTER_API_KEY", "OPENCODE_ZEN_API_KEY"))
-        assert resolution.rung == "opencode"
 
     def test_nothing_configured_still_resolves_and_says_why(self):
         # A selector, not a gate: refusing to run here would break a replay,
