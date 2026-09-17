@@ -214,7 +214,15 @@ def main() -> None:
         Path(args.out).write_text(
             json.dumps(report, indent=2) + "\n", encoding="utf-8"
         )
-        print(f"OK: link_check: wrote report to {args.out}")
+        # `--json` promises stdout is the payload alone, so under that flag this
+        # confirmation goes to stderr. It used to go to stdout in both modes, which
+        # made `--json --out` emit a JSON document with a human line in front of
+        # it — unparseable to every reader, and the same trap `upsert_events`,
+        # `calendar_io`, `synthesise_eval_case` and `run_daily` each had to learn.
+        print(
+            f"OK: link_check: wrote report to {args.out}",
+            file=sys.stderr if args.json else sys.stdout,
+        )
 
     if args.json:
         print(json.dumps(report, indent=2))
