@@ -145,6 +145,43 @@ class TestDescriptionFor:
         assert league_from_description("League: EuroLeague\n") == "EuroLeague"
         assert league_from_description("no league line") == ""
 
+    def test_a_row_with_no_link_information_is_written_exactly_as_before(self):
+        # The property that keeps the four tests above true: the link block is
+        # appended only for the parts the row has, so a row that carries no link
+        # renders byte-identically to the two-line block it always did.
+        assert description_for(
+            {"league": "BBL", "teams": ["A", "B"], "start": "2026-09-16T19:00:00+02:00"}
+        ) == (
+            "League: BBL\nTeams: A vs B\nDate/Time: 2026-09-16T19:00:00+02:00\n"
+        )
+
+    def test_the_documented_link_block_is_written(self):
+        text = description_for(
+            {
+                "league": "BCL",
+                "teams": ["Tenerife", "Bonn"],
+                "directLink": "https://www.championsleague.basketball/live/tenerife-vs-bonn",
+                "sourceReference": "https://www.championsleague.basketball/",
+                "access": "free",
+                "validationTimestamp": "2026-09-17T08:00:00Z",
+                "validationNotes": "free-game marker",
+            }
+        )
+        assert text == (
+            "League: BCL\n"
+            "Teams: Tenerife vs Bonn\n"
+            "\n"
+            "FREE STREAM LINKS:\n"
+            "- https://www.championsleague.basketball/live/tenerife-vs-bonn\n"
+            "\n"
+            "Access: free\n"
+            "\n"
+            "SOURCE REFERENCE:\n"
+            "- Found at: https://www.championsleague.basketball/\n"
+            "- Validated: 2026-09-17T08:00:00Z\n"
+            "- Validation Notes: free-game marker\n"
+        )
+
 
 class TestParseEvent:
     def test_full_event(self):
@@ -182,6 +219,38 @@ class TestParseEvent:
     def test_non_dict_is_rejected(self):
         with pytest.raises(ValueError):
             parse_event("junk")  # type: ignore[arg-type]
+
+    def test_it_reads_the_link_block_back_out(self):
+        stored = parse_event(
+            _api_event(
+                description=(
+                    "League: BCL\nTeams: A vs B\n\nFREE STREAM LINKS:\n"
+                    "- magenta.tv: https://www.magenta.tv/tv/live-1\n"
+                    "\nSOURCE REFERENCE:\n"
+                    "- Found at: https://m.example/\n"
+                    "- Validated: 2026-09-17T08:00:00Z\n"
+                    "- Validation Notes: audited\n"
+                )
+            )
+        )
+        assert stored["links"] == [
+            {"source": "magenta.tv", "url": "https://www.magenta.tv/tv/live-1"}
+        ]
+        assert stored["source_reference"] == "https://m.example/"
+        assert stored["validated_at"] == "2026-09-17T08:00:00Z"
+        assert stored["validation_notes"] == "audited"
+
+    def test_a_legacy_event_carries_no_links(self):
+        stored = parse_event(_api_event(description=""))
+        assert stored["links"] == []
+        assert stored["source_reference"] == ""
+
+    def test_it_is_idempotent(self):
+        # `calendar_io list > events.json` writes this function's own output, and
+        # that file is the documented input of `link_inventory.py`. Reading only the
+        # nested API shape made the round trip crash on a `str` having no `.get`.
+        once = parse_event(_api_event())
+        assert parse_event(once) == once
 
 
 class TestBuildEventBody:
