@@ -18,14 +18,23 @@ Design rules, all of them about not inventing data:
 2. **A microdata fallback, clearly marked as a fallback.** Hand-rolled HTML
    scraping breaks whenever a site is redesigned. It is here because it costs
    little, and it returns `[]` rather than guessing.
-3. **No match means no fixture, never a guess.** A partially parsed event is
+3. **An embedded-payload rung, for a site that publishes neither.**
+   `championsleague.basketball` carries no `application/ld+json` and no
+   microdata anywhere — not at its game list and not on a game page, whose only
+   JSON-LD node is a `BreadcrumbList` — so before this rung existed the site was
+   unparseable by construction and its `fixture_recall` was `n/a` for ever. The
+   game list is served by Next.js as a flight payload
+   (`self.__next_f.push([1, "…"])`); joining those string literals and reading
+   the `"games": [...]` arrays out of them is *decoding*, not scraping: once the
+   chunks are joined the game objects are JSON.
+4. **No match means no fixture, never a guess.** A partially parsed event is
    dropped, because a phantom fixture would show up as a "missed" game that does
    not exist and would quietly make recall look worse than it is.
-4. **This module is stdlib-only.** Adding a real DOM parser would mean a new
+5. **This module is stdlib-only.** Adding a real DOM parser would mean a new
    dependency in a repo that has none outside the test suite, so the honest
    trade is fewer supported sites and a captured fixture per site — see
    `tests/fixtures/README.md` for the input/output rule.
-5. **Nothing here touches the network in tests.** `--input` parses a saved page,
+6. **Nothing here touches the network in tests.** `--input` parses a saved page,
    which is the only path CI exercises.
 
 Usage:
@@ -81,10 +90,18 @@ DEFAULT_SOURCES: dict[str, dict] = {
     },
     "bcl": {
         "league": "Basketball Champions League",
-        "url": "https://www.championsleague.basketball/",
+        # The game list, not the site root: the root redirects to `/en`, which is
+        # a landing page carrying no fixtures at all — not in JSON-LD, not in
+        # microdata, and not in the payload.
+        "url": "https://www.championsleague.basketball/en/games",
     },
 }
 EVENT_TYPES = {"sportsevent", "event"}
+# The Next.js flight payload. `"games": [` is not unique on the BCL page — it is
+# sent twice, once empty — so every array is collected rather than the first
+# being trusted.
+FLIGHT_CALL = "self.__next_f.push("
+GAMES_ARRAY = re.compile(r'"games"\s*:\s*\[')
 
 
 def parse_dt(value: object) -> datetime | None:
@@ -268,10 +285,110 @@ def parse_microdata(html: str, *, league: str, source: str, source_url: str = ""
     return fixtures
 
 
+def extract_embedded_payload(html: str) -> str:
+    """The joined Next.js flight payload, or `""` when the page carries none.
+
+    Next streams server-rendered data as `self.__next_f.push([1, "<chunk>"])`
+    calls whose second argument is a JS string literal. Decoding the literals
+    and **concatenating** them rebuilds the stream — a value split across two
+    chunks is only readable once they are joined, which is why the whole flow is
+    returned rather than the chunks one at a time.
+    """
+    decoder = json.JSONDecoder()
+    chunks: list[str] = []
+    position = 0
+    while True:
+        call = html.find(FLIGHT_CALL, position)
+        if call < 0:
+            return "".join(chunks)
+        cursor = call + len(FLIGHT_CALL)
+        try:
+            argument, end = decoder.raw_decode(html, cursor)
+        except ValueError:
+            # A call whose argument is not JSON — a variable, a function call —
+            # is stepped over rather than guessed at.
+            position = cursor
+            continue
+        if (
+            isinstance(argument, list)
+            and len(argument) > 1
+            and isinstance(argument[1], str)
+        ):
+            chunks.append(argument[1])
+        position = end
+
+
+def extract_embedded_games(html: str) -> list[dict]:
+    """Every game object inside a `"games": [ … ]` array of the payload."""
+    flow = extract_embedded_payload(html)
+    if not flow:
+        return []
+    decoder = json.JSONDecoder()
+    games: list[dict] = []
+    for match in GAMES_ARRAY.finditer(flow):
+        try:
+            array, _ = decoder.raw_decode(flow, match.end() - 1)
+        except ValueError:
+            continue
+        if isinstance(array, list):
+            games.extend(item for item in array if isinstance(item, dict))
+    return games
+
+
+def _competitor_name(team: object) -> str:
+    """One side's display name, from the payload's three namings of it.
+
+    `shortName` first, because it is what the site itself shows in the list; the
+    join against the candidate ledger is an exact `game_key` string, so the name
+    chosen here decides whether a game counts as surfaced.
+    """
+    if not isinstance(team, dict):
+        return ""
+    for key in ("shortName", "officialName", "code"):
+        value = team.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return ""
+
+
+def game_to_fixture(
+    game: dict, *, league: str, source: str, source_url: str = ""
+) -> dict | None:
+    """Normalise one embedded game object. None when it is not usable.
+
+    Two refusals, both because a phantom fixture is worse than a missing one —
+    it is reported as a game **no backend surfaced**:
+
+    * **No tip-off.** The list carries the whole season and 46 of its 136 rows
+      are placeholders — `hasTimeGameDateTime` is `false`, the date is a
+      midnight stub and one side is still `null`. No stream can ever match one.
+    * **No pair of teams.** The pair is what `game_key` sorts and what the
+      ledger join compares; half a pairing is not an identity.
+    """
+    teams = [_competitor_name(game.get("teamA")), _competitor_name(game.get("teamB"))]
+    if not all(teams):
+        return None
+    if game.get("hasTimeGameDateTime") is False:
+        return None
+    # `gameDateTimeUTC` is a real instant and is preferred; `gameDateTime` is the
+    # venue-local one, which `parse_dt` would otherwise read as UTC.
+    start = parse_dt(game.get("gameDateTimeUTC") or game.get("gameDateTime"))
+    if start is None:
+        return None
+    return {
+        "league": league,
+        "teams": teams,
+        "start": start.isoformat(),
+        "game_key": build_game_key(league, teams, start.isoformat()),
+        "source": source,
+        "source_url": source_url,
+    }
+
+
 def parse_page(
     html: str, *, league: str, source: str, source_url: str = ""
 ) -> list[dict]:
-    """JSON-LD first, microdata only as a fallback for the same page."""
+    """JSON-LD first, then microdata, then the embedded payload."""
     fixtures: list[dict] = []
     for node in extract_json_ld(html):
         fixture = event_to_fixture(
@@ -281,7 +398,17 @@ def parse_page(
             fixtures.append(fixture)
     if fixtures:
         return fixtures
-    return parse_microdata(html, league=league, source=source, source_url=source_url)
+    fixtures = parse_microdata(html, league=league, source=source, source_url=source_url)
+    if fixtures:
+        return fixtures
+    embedded: list[dict] = []
+    for game in extract_embedded_games(html):
+        fixture = game_to_fixture(
+            game, league=league, source=source, source_url=source_url
+        )
+        if fixture is not None:
+            embedded.append(fixture)
+    return embedded
 
 
 def fetch(url: str) -> str:
@@ -416,17 +543,32 @@ def main() -> None:
             empty.append(name)
         fixtures.extend(found)
 
+    parsed = len(fixtures)
     fixtures = dedupe(
         [fixture for fixture in fixtures if in_window(fixture, now=now, days=args.days)]
     )
 
     if not fixtures:
-        print(
-            f"FAIL: fixtures: no parsable fixtures from {sources} "
-            f"(empty or unparsable: {empty or 'none'}) — the sites may have "
-            "changed their markup; capture a page and add a parser fixture",
-            file=sys.stderr,
-        )
+        # Two different failures, told apart rather than merged: "the page said
+        # nothing" is a parser problem, "the page said nothing *in this window*"
+        # is not — a league whose season has not started has no fixtures to
+        # measure against, and reporting that as a markup change sends the
+        # reader to split a page that was parsed correctly.
+        if parsed:
+            print(
+                f"FAIL: fixtures: {parsed} fixture(s) parsed from {sources} but "
+                f"none inside the {args.days}-day window from "
+                f"{now.isoformat()} — the pages parsed; this is the window, not "
+                "the markup",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                f"FAIL: fixtures: no parsable fixtures from {sources} "
+                f"(empty or unparsable: {empty or 'none'}) — the sites may have "
+                "changed their markup; capture a page and add a parser fixture",
+                file=sys.stderr,
+            )
         sys.exit(1)
 
     if args.out and not args.dry_run:

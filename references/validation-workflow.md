@@ -6,7 +6,13 @@ Detailed step-by-step validation process for every potential stream.
 
 Every stream found must pass **all 7 checks** before a calendar event is created. Failing any single check results in immediate rejection.
 
-## Check 1: Free Access
+Each check has an **id** in its heading below (`freeAccess`, `liveContent`, …).
+That id is the token the runtime's graders match a transcript on, so when a
+validation result is reported as `checks: <id>=PASS|FAIL`, the id names the
+check — the prose titles and the log format's `Check N - Name` lines refer to
+the same checks.
+
+## Check 1: Free Access (check id: `freeAccess`)
 
 **Purpose**: Ensure no payment is required.
 
@@ -20,7 +26,7 @@ Every stream found must pass **all 7 checks** before a calendar event is created
 - Requires registration/payment before viewing
 - Contains pricing information
 
-## Check 2: Live Content
+## Check 2: Live Content (check id: `liveContent`)
 
 **Purpose**: Ensure it is a live stream, not a replay or highlight reel.
 
@@ -38,7 +44,7 @@ Every stream found must pass **all 7 checks** before a calendar event is created
   has a fixed `duration_seconds` while not live now → VOD, not a live stream
   (see `references/youtube-live-search.md`)
 
-## Check 3: Official Source
+## Check 3: Official Source (check id: `officialSource`)
 
 **Purpose**: Ensure the stream is from an approved official source.
 
@@ -52,7 +58,7 @@ Every stream found must pass **all 7 checks** before a calendar event is created
 - Third-party aggregator or pirate site
 - Unofficial fan channel
 
-## Check 4: Basketball-Specific
+## Check 4: Basketball-Specific (check id: `basketballSpecific`)
 
 **Purpose**: Prevent non-basketball content from being added.
 
@@ -64,7 +70,7 @@ Every stream found must pass **all 7 checks** before a calendar event is created
 - Other sports: Fußball, Handball, Eishockey, Tennis, Volleyball
 - Ambiguous content that could be another sport
 
-## Check 5: Date/Time Within Range
+## Check 5: Date/Time Within Range (check id: `dateTimeRange`)
 
 **Purpose**: Only add streams within the next 7 days.
 
@@ -77,7 +83,7 @@ Every stream found must pass **all 7 checks** before a calendar event is created
 - Event is more than 7 days in the future
 - Date/time cannot be determined
 
-## Check 6: Working Link
+## Check 6: Working Link (check id: `workingLink`)
 
 **Purpose**: Verify the URL is accessible.
 
@@ -99,7 +105,7 @@ with a browser-rendering backend. Classify stored links with
 `INVALID`) and see `references/self-learning.md` → Link revalidation for the
 quarantine cadence.
 
-## Check 7: Direct Stream Verification (CRITICAL)
+## Check 7: Direct Stream Verification (check id: `directStreamVerification`, CRITICAL)
 
 **Purpose**: Confirm a live stream actually exists on the page.
 

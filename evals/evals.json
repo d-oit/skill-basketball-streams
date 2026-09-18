@@ -283,7 +283,8 @@
         "liveContent expected FAIL"
       ],
       "files": [
-        "references/youtube-live-search.md"
+        "references/youtube-live-search.md",
+        "references/validation-workflow.md"
       ]
     },
     {
@@ -295,7 +296,8 @@
         "liveContent expected FAIL"
       ],
       "files": [
-        "references/youtube-live-search.md"
+        "references/youtube-live-search.md",
+        "references/validation-workflow.md"
       ]
     },
     {
@@ -335,7 +337,8 @@
       ],
       "files": [
         "references/magenta-tv.md",
-        "references/search-backends.md"
+        "references/search-backends.md",
+        "references/validation-workflow.md"
       ]
     },
     {
@@ -414,7 +417,8 @@
       "files": [
         "references/self-learning.md",
         "references/approved-sources.md",
-        "config/sources.json"
+        "config/sources.json",
+        "references/validation-workflow.md"
       ]
     },
     {
@@ -429,7 +433,8 @@
       ],
       "files": [
         "references/calendar-setup.md",
-        "references/magenta-tv.md"
+        "references/magenta-tv.md",
+        "references/validation-workflow.md"
       ]
     },
     {

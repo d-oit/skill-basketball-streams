@@ -6,9 +6,11 @@ that makes that measurement trustworthy: **no match means no fixture**. A
 half-parsed event would be reported as a missed game that does not exist, which
 would make recall look worse than reality and send someone hunting a phantom.
 
-The two page fixtures are synthetic *inputs* (allowed — see
-`tests/fixtures/README.md`): one JSON-LD, one microdata-only. No test touches
-the network.
+The two BBL page fixtures are synthetic *inputs* (allowed — see
+`tests/fixtures/README.md`): one JSON-LD, one microdata-only. The BCL one is a
+**recorded** response reduced to three games, because the shape it pins — a
+Next.js flight payload — is a provider's output, and a hand-written version of
+it would prove the test rather than the page. No test touches the network.
 """
 from __future__ import annotations
 
@@ -24,7 +26,9 @@ from scripts.fixtures import (
     DEFAULT_SOURCES,
     dedupe,
     event_to_fixture,
+    extract_embedded_games,
     extract_json_ld,
+    game_to_fixture,
     in_window,
     parse_dt,
     parse_microdata,
@@ -37,9 +41,30 @@ SCRIPT = REPO_ROOT / "scripts" / "fixtures.py"
 FIXTURES = REPO_ROOT / "tests" / "fixtures"
 JSONLD_PAGE = FIXTURES / "fixtures_page_bbl.html"
 MICRODATA_PAGE = FIXTURES / "fixtures_page_microdata.html"
+BCL_PAGE = FIXTURES / "fixtures_page_bcl_payload.html"
 NOW = datetime(2026, 9, 14, 8, 30, tzinfo=timezone.utc)
+# The first day of the BCL season inside the recorded page's own list.
+BCL_GAME_DAY = "2026-10-06T08:30:00Z"
 
 BBL = DEFAULT_SOURCES["bbl"]
+BCL = DEFAULT_SOURCES["bcl"]
+
+
+def _payload_page(payload: object, *, splits: int = 1) -> str:
+    """A page carrying `payload` as a Next flight stream, in `splits` chunks.
+
+    Next streams its data, so a real value is routinely cut in half between two
+    calls; joining the literals is the only way the tail of one chunk and the
+    head of the next become readable JSON again.
+    """
+    text = json.dumps(payload, ensure_ascii=False)
+    size = max(1, (len(text) + splits - 1) // splits)
+    chunks = [text[index:index + size] for index in range(0, len(text), size)]
+    calls = "\n".join(
+        f"<script>self.__next_f.push([1,{json.dumps(chunk)}])</script>"
+        for chunk in chunks
+    )
+    return f"<html><body>{calls}</body></html>"
 
 
 def _page(path: Path) -> str:
@@ -254,6 +279,136 @@ class TestParsePage:
         assert parse_page("<html><body>hi</body></html>", league="BBL", source="bbl") == []
 
 
+class TestEmbeddedPayload:
+    """The third rung: a site that publishes neither JSON-LD nor microdata.
+
+    `championsleague.basketball` is that site. Its game list is a Next.js flight
+    payload (`self.__next_f.push`), so before this rung its fixtures could not be
+    measured at all and its `fixture_recall` was `n/a` for ever.
+    """
+
+    def test_the_payload_is_joined_across_push_calls(self):
+        payload = {"data": {"games": [{"gameId": 1}]}}
+        assert extract_embedded_games(_payload_page(payload, splits=4)) == [
+            {"gameId": 1}
+        ]
+
+    def test_a_value_split_between_two_chunks_is_still_read(self):
+        # The realistic version of the test above: the boundary falls inside a
+        # game object, which is what a streamed payload does on its own.
+        payload = {"data": {"games": [{"gameId": 136223, "teamA": {"code": "VILN"}}]}}
+        assert extract_embedded_games(_payload_page(payload, splits=7)) == [
+            {"gameId": 136223, "teamA": {"code": "VILN"}}
+        ]
+
+    def test_a_round_start_date_is_not_a_game(self):
+        """The payload is full of `startDate`/`endDate` pairs belonging to
+        rounds. Reading one as a fixture would invent a game with no teams."""
+        page = _payload_page(
+            {
+                "data": {
+                    "round": {
+                        "roundCode": "RS",
+                        "startDate": "2026-10-06T00:00:00",
+                        "endDate": "2026-12-23T23:59:59.9999999",
+                    }
+                }
+            }
+        )
+        assert parse_page(page, league=BCL["league"], source="bcl") == []
+
+    def test_a_non_event_json_ld_node_falls_through_to_the_payload(self):
+        """A game page's only `ld+json` node is a `BreadcrumbList`. Presenting
+        JSON-LD is not the same as presenting a fixture, so the rung above must
+        yield nothing and let the payload be read."""
+        breadcrumb = (
+            '<script type="application/ld+json">'
+            '{"@context":"https://schema.org","@type":"BreadcrumbList",'
+            '"itemListElement":[{"@type":"ListItem","position":1}]}</script>'
+        )
+        page = _payload_page(
+            {
+                "data": {
+                    "games": [
+                        {
+                            "gameId": 2,
+                            "teamA": {"shortName": "Rytas Vilnius"},
+                            "teamB": {"shortName": "Sabah BC"},
+                            "gameDateTimeUTC": "2026-10-06T16:30:00",
+                            "hasTimeGameDateTime": True,
+                        }
+                    ]
+                }
+            }
+        )
+        found = parse_page(breadcrumb + page, league=BCL["league"], source="bcl")
+        assert [tuple(f["teams"]) for f in found] == [("Rytas Vilnius", "Sabah BC")]
+
+    def test_the_real_page_yields_its_scheduled_games(self):
+        found = parse_page(
+            _page(BCL_PAGE), league=BCL["league"], source="bcl", source_url=BCL["url"]
+        )
+        assert len(found) == 2
+        assert {tuple(f["teams"]) for f in found} == {
+            ("Rytas Vilnius", "Sabah BC"),
+            ("Trabzonspor", "Nanterre 92"),
+        }
+        keys = {f["game_key"] for f in found}
+        assert keys == {
+            "Basketball Champions League|Rytas Vilnius|Sabah BC|2026-10-06T16:30Z",
+            "Basketball Champions League|Nanterre 92|Trabzonspor|2026-10-07T16:00Z",
+        }
+        # The name that becomes the key is the site's own display name, which is
+        # what the exact-string join against the candidate ledger compares.
+        assert all(f["source"] == "bcl" and f["source_url"] == BCL["url"] for f in found)
+
+    def test_the_placeholder_game_is_not_a_fixture(self):
+        """46 of the page's 136 rows are season placeholders: no tip-off
+        (`hasTimeGameDateTime: false`) and one side still `null`. Counted, each
+        would be a game no stream could ever match — a phantom miss."""
+        games = extract_embedded_games(_page(BCL_PAGE))
+        placeholder = [g for g in games if g.get("hasTimeGameDateTime") is False]
+        assert len(placeholder) == 1
+        assert placeholder[0]["teamA"] is None
+        assert game_to_fixture(
+            placeholder[0], league=BCL["league"], source="bcl"
+        ) is None
+        found = parse_page(_page(BCL_PAGE), league=BCL["league"], source="bcl")
+        assert not any("Windrose Giants Antwerp" in f["teams"] for f in found)
+        assert not any(f["start"].startswith("2026-11-03") for f in found)
+
+    def test_a_game_with_no_pair_of_teams_is_not_a_fixture(self):
+        game = {
+            "gameId": 9,
+            "teamA": None,
+            "teamB": {"shortName": "Sabah BC"},
+            "gameDateTimeUTC": "2026-10-06T16:30:00",
+            "hasTimeGameDateTime": True,
+        }
+        assert game_to_fixture(game, league=BCL["league"], source="bcl") is None
+
+    def test_a_game_with_no_tip_off_is_not_a_fixture(self):
+        game = {
+            "gameId": 9,
+            "teamA": {"shortName": "Rytas Vilnius"},
+            "teamB": {"shortName": "Sabah BC"},
+            "gameDateTimeUTC": "2026-10-06T00:00:00",
+            "hasTimeGameDateTime": False,
+        }
+        assert game_to_fixture(game, league=BCL["league"], source="bcl") is None
+
+    def test_the_name_falls_back_through_short_official_and_code(self):
+        game = {
+            "gameId": 9,
+            "teamA": {"code": "VILN"},
+            "teamB": {"officialName": "Sabah BC"},
+            "gameDateTimeUTC": "2026-10-06T16:30:00",
+        }
+        fixture = game_to_fixture(game, league=BCL["league"], source="bcl")
+        assert fixture is not None
+        assert sorted(fixture["teams"]) == ["Sabah BC", "VILN"]
+
+
 class TestWindow:
     def test_inside_the_window(self):
         fixture = {"start": "2026-09-16T19:00:00+02:00"}
@@ -385,12 +540,34 @@ class TestCli:
         result = _run(["--input", str(JSONLD_PAGE), "--source", "bbl", "--now", "soon"])
         assert result.returncode == 2
 
+    def test_embedded_payload_input(self):
+        result = _run(
+            ["--input", str(BCL_PAGE), "--source", "bcl",
+             "--now", BCL_GAME_DAY, "--json"]
+        )
+        assert result.returncode == 0, result.stderr
+        payload = json.loads(result.stdout)
+        assert len(payload["fixtures"]) == 2
+        assert payload["empty_sources"] == []
+
     def test_unparsable_page_exits_one(self, tmp_path):
         page = tmp_path / "empty.html"
         page.write_text("<html><body>nothing here</body></html>", encoding="utf-8")
         result = _run(["--input", str(page), "--source", "bbl"])
         assert result.returncode == 1
         assert "capture a page and add a parser fixture" in result.stderr
+
+    def test_parsed_but_out_of_window_is_its_own_failure(self):
+        """A league whose season has not started parses perfectly and still has
+        nothing in the window. Reporting that as a markup change sends the
+        reader to split a page that was parsed correctly."""
+        result = _run(
+            ["--input", str(BCL_PAGE), "--source", "bcl", "--now", "2026-09-18T08:30:00Z"]
+        )
+        assert result.returncode == 1
+        assert "2 fixture(s) parsed" in result.stderr
+        assert "none inside the 7-day window" in result.stderr
+        assert "capture a page and add a parser fixture" not in result.stderr
 
     def test_diff_mode_reports_the_unseen_game(self):
         result = _run(

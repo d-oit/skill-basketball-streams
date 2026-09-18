@@ -49,12 +49,20 @@ def _committed_ids() -> list[int]:
 
 
 def _repo_with_evals(tmp_path: Path) -> Path:
-    """A throwaway root holding a copy of the real eval set."""
+    """A throwaway root holding a copy of the real eval set — and its references.
+
+    The references are not decoration: every case declares the `references/*.md`
+    it is decided from in `files`, and `capture_transcripts.py` now **refuses**
+    to capture a case whose declared reference is missing rather than grading a
+    model on material it never received. A root holding the eval set but not the
+    files it names is exactly the root that refusal exists to reject.
+    """
     root = tmp_path / "repo"
     (root / "evals").mkdir(parents=True)
     shutil.copy(
         REPO_ROOT / "evals" / "evals.json", root / "evals" / "evals.json"
     )
+    shutil.copytree(REPO_ROOT / "references", root / "references")
     return root
 
 

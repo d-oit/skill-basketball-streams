@@ -78,12 +78,16 @@ Check 3.
 
 Calendar links rot. Revalidate on this cadence:
 
-| When | Action on failure |
-|---|---|
-| At creation (pre-flight) | never create the event |
-| Daily, for events inside today…today+7d | `BROKEN`/`INVALID` → remove the dead link from the event description, append `Validation Notes: link quarantined <ISO ts>` |
-| ~2 h before start | `BROKEN` → same quarantine; `BLOCKED`/`UNREACHABLE` → retry via the fetch ladder, keep the event |
-| After the event ends | YouTube `/live` URLs always 404 afterwards — expected, do **not** rewrite the event |
+| When | Action on failure | id |
+|---|---|---|
+| At creation (pre-flight) | never create the event | — |
+| Daily, for events inside today…today+7d | `BROKEN`/`INVALID` → remove the dead link from the event description, append `Validation Notes: link quarantined <ISO ts>` | `linkStatus=FAIL`, `sourceQuarantined=PASS`, `eventDeleted=FAIL` |
+| ~2 h before start | `BROKEN` → same quarantine; `BLOCKED`/`UNREACHABLE` → retry via the fetch ladder, keep the event | `linkStatus=FAIL`, `aliveEventKept=PASS` |
+| After the event ends | YouTube `/live` URLs always 404 afterwards — expected, do **not** rewrite the event | — |
+
+The `id` column is the token the runtime's graders match a validation result on
+(`checks: <id>=PASS|FAIL`), so a result reported for one of these outcomes names
+the outcome by its id.
 
 Two steps, because they answer different questions. The first makes the list of
 links to check and touches no network; the second asks whether each one still
@@ -150,11 +154,11 @@ python3 scripts/audit_events.py \
 `--events` accepts both JSON and JSONL. `evidence.json` is a mapping keyed by
 `event_id`: `{"live_confirmed": bool, "free_confirmed": bool, "paid": bool}`.
 
-| Verdict | When | Effect on the event |
-|---|---|---|
-| `VERIFIED` | `live_confirmed` **and** `free_confirmed` are `true` | colour `5` → `6`, `[UNVERIFIED]` prefix dropped |
-| `WRONG` | `paid: true`, or `live_confirmed: false` on a finished broadcast | `[WRONG]` prefix, colour `7` |
-| `INCONCLUSIVE` | not finished yet, already `WRONG`, or evidence missing | **untouched** |
+| Verdict | When | Effect on the event | ids |
+|---|---|---|---|
+| `VERIFIED` | `live_confirmed` **and** `free_confirmed` are `true` | colour `5` → `6`, `[UNVERIFIED]` prefix dropped | `eventRelabelled=PASS` |
+| `WRONG` | `paid: true` (`finishedBroadcast=PASS`, `paidAccess=FAIL`), or `live_confirmed: false` on a finished broadcast (`finishedBroadcast=PASS`) | `[WRONG]` prefix, colour `7` | `eventRelabelled=PASS`, `eventDeleted=FAIL` |
+| `INCONCLUSIVE` | not finished yet, already `WRONG`, or evidence missing (`liveStatusUnknown=PASS`, `eventUntouched=PASS`, `wronglyMarkedWrong=FAIL`) | **untouched** | — |
 
 Three rules make this safe:
 

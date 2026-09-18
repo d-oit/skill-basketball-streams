@@ -20,6 +20,7 @@ FIXTURES = REPO_ROOT / "tests" / "fixtures"
 UPSERT = REPO_ROOT / "scripts" / "upsert_events.py"
 AUDIT = REPO_ROOT / "scripts" / "audit_events.py"
 CANDIDATES = REPO_ROOT / "scripts" / "candidates.py"
+FIXTURE_PARSER = REPO_ROOT / "scripts" / "fixtures.py"
 
 
 def _run(script: Path, args: list[str]) -> subprocess.CompletedProcess:
@@ -207,6 +208,34 @@ class TestAuditFixture:
         assert len(text.strip().splitlines()) == 3
         for line in text.strip().splitlines():
             assert json.loads(line)["event_id"]
+
+
+class TestFixturePageContract:
+    """The league page `validate.yml` parses, whose *output* is a verdict.
+
+    Not the same job as `tests/test_fixtures.py`, which covers the parser's
+    semantics. This pins what the CI step is worth: the recorded BCL page must
+    yield exactly these two games. A page that drifts, or a rung that stops
+    being reached, otherwise turns the step into a no-op that still reads as a
+    pass — and this page is the only evidence that the site's fixtures can be
+    measured at all, since it publishes neither JSON-LD nor microdata.
+    """
+
+    def test_the_bcl_page_yields_its_two_scheduled_games(self):
+        result = _run(
+            FIXTURE_PARSER,
+            [
+                "--input", str(FIXTURES / "fixtures_page_bcl_payload.html"),
+                "--source", "bcl",
+                "--now", "2026-10-06T08:30:00Z",
+                "--json",
+            ],
+        )
+        assert result.returncode == 0, result.stderr
+        assert [row["game_key"] for row in json.loads(result.stdout)["fixtures"]] == [
+            "Basketball Champions League|Nanterre 92|Trabzonspor|2026-10-07T16:00Z",
+            "Basketball Champions League|Rytas Vilnius|Sabah BC|2026-10-06T16:30Z",
+        ]
 
 
 class TestCandidatesFixture:

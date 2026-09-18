@@ -145,6 +145,197 @@ class TestBuildPrompt:
         # The check *vocabulary* is fair to point at; the verdict is not.
         assert "references/validation-workflow.md" in prompt
 
+    def test_the_case_references_are_inlined(self):
+        """`evals[].files` is the reference a case is decided from, and it used
+        to be **write-only** — `synthesise_eval_case.py` emitted it, its test
+        asserted it, and nothing ever opened one. The prompt asks for the check
+        names "exactly as `references/validation-workflow.md` names them", which
+        the two HTTP rungs have no filesystem to read: the material has to travel
+        inside the prompt every rung shares.
+        """
+        prompt = build_prompt(
+            {
+                "id": 3,
+                "prompt": "some input",
+                "files": ["references/validation-workflow.md"],
+            },
+            root=REPO_ROOT,
+        )
+        assert "--- references/validation-workflow.md ---" in prompt
+        # The reference's own body, not just its name.
+        assert "Check 3: Official Source" in prompt
+        assert prompt.index("Check 3: Official Source") < prompt.index("Case 3:")
+
+    def test_inlining_a_reference_does_not_inline_the_verdict(self):
+        """The references are the skill's own content; the verdict is the
+        grader's. Both halves are asserted against a real eval case, so the two
+        cannot drift into each other."""
+        case = load_cases(REPO_ROOT, [3])[0]
+        prompt = build_prompt(case, root=REPO_ROOT)
+        assert case["expected_output"] not in prompt
+        assert "officialSource=FAIL" not in prompt
+        assert "Decision=SKIP" not in prompt
+        assert "Check 3: Official Source" in prompt
+
+    def test_a_declared_reference_that_is_missing_is_refused(self, tmp_path):
+        """A case whose reference is absent cannot be captured honestly: the
+        prompt would carry a model guessing at material nobody gave it, and the
+        capture would look like every other capture."""
+        root = tmp_path / "skill"
+        (root / "evals").mkdir(parents=True)
+        (root / "evals" / "evals.json").write_text(
+            json.dumps(
+                {
+                    "evals": [
+                        {
+                            "id": 1,
+                            "prompt": "some input",
+                            "expected_output": "Decision=CREATE",
+                            "assertions": ["a expected PASS"],
+                            "files": ["references/gone.md"],
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        source = tmp_path / "src.json"
+        source.write_text(json.dumps({"1": "Decision=CREATE"}), encoding="utf-8")
+        result = _run(
+            CAPTURE,
+            ["--root", str(root), "--runner", "replay", "--from", str(source)],
+        )
+        assert result.returncode == 2
+        assert "references/gone.md" in result.stderr
+
+    def test_the_payload_records_what_each_case_was_decided_from(self, tmp_path):
+        root = tmp_path / "skill"
+        (root / "evals").mkdir(parents=True)
+        (root / "references").mkdir()
+        (root / "references" / "validation-workflow.md").write_text(
+            "# Checks\n", encoding="utf-8"
+        )
+        (root / "evals" / "evals.json").write_text(
+            json.dumps(
+                {
+                    "evals": [
+                        {
+                            "id": 1,
+                            "prompt": "some input",
+                            "assertions": ["a expected PASS"],
+                            "files": ["references/validation-workflow.md"],
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        source = tmp_path / "src.json"
+        source.write_text(json.dumps({"1": "Decision=CREATE"}), encoding="utf-8")
+        out = tmp_path / "out.json"
+        result = _run(
+            CAPTURE,
+            ["--root", str(root), "--runner", "replay", "--from", str(source),
+             "--out", str(out)],
+        )
+        assert result.returncode == 0, result.stderr
+        payload = json.loads(out.read_text(encoding="utf-8"))
+        assert payload["prompt_files"] == {"1": ["references/validation-workflow.md"]}
+
+
+class TestTheCheckVocabularyIsDelivered:
+    """The grader's needles and the references' ids must be one vocabulary.
+
+    The grader matches `<check-id>=PASS|FAIL` by substring; the model can only
+    emit a token something it read contains. Naming the ids in the references
+    makes the reference the writer and the inlined prompt the reader — and this
+class is the pair: if an id is asserted by any case but is named in no
+    reference that case declares, the capture could never produce a transcript
+    that passes it. That state existed for the life of the eval set (the ids
+    were grader-only), and the live captures failed every assertion because of
+    it.
+    """
+
+    CHECK_IDS = (
+        "freeAccess",
+        "liveContent",
+        "officialSource",
+        "basketballSpecific",
+        "dateTimeRange",
+        "workingLink",
+        "directStreamVerification",
+    )
+
+    def _reference(self) -> str:
+        return (REPO_ROOT / "references" / "validation-workflow.md").read_text(
+            encoding="utf-8"
+        )
+
+    def test_the_reference_names_every_check_id(self):
+        body = self._reference()
+        missing = [check for check in self.CHECK_IDS if check not in body]
+        assert not missing, (
+            f"check id(s) {missing} are asserted by the eval set but named "
+            "nowhere in references/validation-workflow.md — a transcript could "
+            "never contain them"
+        )
+
+    @pytest.mark.parametrize("check", CHECK_IDS)
+    def test_each_id_is_stated_as_an_id_in_its_check_heading(self, check: str):
+        """Present is not enough — it must be presented *as* the check's id, in
+        a `check id:` note on the heading, so the association is readable rather
+        than incidental (the word also appears in prose like `duplicateCheck`)."""
+        heading = next(
+            line for line in self._reference().splitlines()
+            if line.startswith("## Check") and f"`{check}`" in line
+        )
+        assert "check id:" in heading, heading
+
+    def test_every_asserted_token_is_named_in_a_reference_the_case_declares(
+        self, tmp_path
+    ):
+        """The whole vocabulary, generalised over the real eval set.
+
+        Every `<id> expected PASS|FAIL` assertion's id must be found in at least
+        one *markdown* reference the case declares (the material `build_prompt`
+        actually inlines). A case may declare several references, so the pin is
+        existential — named somewhere it will receive — not "in every file it
+        names". This is the test that found cases 22, 23, 26, 32, 33 asserting
+        check ids without declaring the reference that names them.
+        """
+        import re
+
+        needle = re.compile(r"^(\w+) expected (?:PASS|FAIL)$")
+        gaps = []
+        for case in load_cases(REPO_ROOT, []):
+            tokens = {
+                m.group(1)
+                for assertion in case.get("assertions") or []
+                if (m := needle.match(assertion))
+            }
+            for token in sorted(tokens):
+                delivered = any(
+                    token
+                    in (REPO_ROOT / name).read_text(encoding="utf-8")
+                    for name in case.get("files") or []
+                    if name.endswith(".md")
+                    and (REPO_ROOT / name).is_file()
+                )
+                if not delivered:
+                    gaps.append((case["id"], token))
+        assert not gaps, (
+            f"assertion id(s) {gaps} are named in no reference their case "
+            "declares — a transcript could never contain them"
+        )
+
+    def test_the_inlined_prompt_contains_every_id_a_case_asserts(self):
+        """End to end over the real eval set: build the real prompt for one
+        real case and require the ids it will be graded on to be inside it."""
+        case = load_cases(REPO_ROOT, [1])[0]
+        prompt = build_prompt(case, root=REPO_ROOT)
+        for check in self.CHECK_IDS:
+            assert f"`{check}`" in prompt
+
 
 class TestLoadCases:
     def test_loads_all_cases(self):
