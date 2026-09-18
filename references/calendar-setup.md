@@ -82,11 +82,16 @@ verification state. `get_color_id(league, event_type, state=None)` combines them
 **Dimension 2 — verification state.** Precedence rule: a non-`VERIFIED` state
 **wins** over the league colour.
 
-| State | `colorId` | Colour | Title prefix | Meaning |
-|---|---|---|---|---|
-| `VERIFIED` | league colour (`6`/`11`/`2`) | — | *(none)* | Free access **and** a live stream confirmed |
-| `UNVERIFIED` | `5` | Banana (amber = caution) | `[UNVERIFIED] ` | Live stream plausible, free access **not** confirmed |
-| `WRONG` | `7` | Peacock | `[WRONG] ` | The audit proved it was paid, or never live |
+The **ids** in the last column are the tokens the runtime's graders match a
+validation result on (`checks: <id>=PASS|FAIL`): a live-but-unconfirmed stream
+is still created, `unverifiedLabelled` — and the label and colour come from the
+state machine, `stateColourApplied` — never presented as confirmed.
+
+| State | `colorId` | Colour | Title prefix | Meaning | ids |
+|---|---|---|---|---|---|
+| `VERIFIED` | league colour (`6`/`11`/`2`) | — | *(none)* | Free access **and** a live stream confirmed | — |
+| `UNVERIFIED` | `5` | Banana (amber = caution) | `[UNVERIFIED] ` | Live stream plausible, free access **not** confirmed | `unverifiedLabelled=PASS`, `stateColourApplied=PASS` |
+| `WRONG` | `7` | Peacock | `[WRONG] ` | The audit proved it was paid, or never live | `stateColourApplied=PASS` |
 
 An uncertain event **never** keeps the league colour. Losing a final's Tomato red
 because colour `11` was "reserved" would hide exactly the uncertainty the state
@@ -196,13 +201,18 @@ duplicates. See Issue #14 in the repository.
 
 ### Upsert rules (replace-if-unverified)
 
-| Existing event | Candidate | Action |
-|---|---|---|
-| nothing | any | **create** |
-| `VERIFIED` | any | **skip** — a confirmed event is never touched, so re-runs are byte-identical |
-| `UNVERIFIED` | `VERIFIED` | **update** — promote (colour `5` → `6`, drop the prefix) |
-| `UNVERIFIED` | `UNVERIFIED` | **update** — refresh links and timestamp |
-| `WRONG` | anything but `WRONG` | **skip** — an audit verdict outranks a fresh guess |
+The **ids** in the last column are the tokens the runtime's graders match a
+validation result on (`checks: <id>=PASS|FAIL`): `duplicateCheck` — a duplicate
+exists under the criteria above — plus the outcome ids `duplicateDetected`,
+`verifiedUntouched`, `eventCreated`, `eventRelabelled` and `eventDeleted`.
+
+| Existing event | Candidate | Action | ids |
+|---|---|---|---|
+| nothing | any | **create** | `eventCreated=PASS` |
+| `VERIFIED` | any | **skip** — a confirmed event is never touched, so re-runs are byte-identical | `duplicateDetected=PASS`, `verifiedUntouched=PASS`, `eventCreated=FAIL` |
+| `UNVERIFIED` | `VERIFIED` | **update** — promote (colour `5` → `6`, drop the prefix) | `eventRelabelled=PASS` |
+| `UNVERIFIED` | `UNVERIFIED` | **update** — refresh links and timestamp | `eventRelabelled=PASS` |
+| `WRONG` | anything but `WRONG` | **skip** — an audit verdict outranks a fresh guess | `duplicateCheck=PASS`, `eventDeleted=FAIL` |
 
 That last-but-one row is deliberate: a `WRONG` label records a conclusion that
 the broadcast was not free or never live. Silently overwriting it with a new

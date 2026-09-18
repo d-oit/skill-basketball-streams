@@ -53,20 +53,27 @@ and worth it: `actualEndTime` is the single most reliable "this is over" signal.
 
 ## The gate (all must hold)
 
+Each rule has an **id** in brackets — the token the runtime's graders match a
+validation result on (`checks: <id>=PASS|FAIL`). A result reported for one of
+these outcomes names the outcome by its id.
+
 1. **URL shape** — `youtube.com/@handle/live`, `youtube.com/live/<id>`, or
    `youtube.com/watch?v=<id>`. `/channel/…`, `/user/…` (except `TheDBBTV`),
    `/c/…`, `/playlist`, `/results` → REJECT.
-2. **Real live** — `live_broadcast_content ∈ {live, upcoming}` **or**
+2. **Real live** (`liveOnly`) — `live_broadcast_content ∈ {live, upcoming}` **or**
    `is_live_now` **or** `is_live_content`. A regular upload (`none`) → REJECT.
-3. **Not over** — `actual_end` must be absent. An ended broadcast is an archived
-   live even though `isLiveContent` is still true → REJECT.
-4. **Not a recording** — a non-zero `duration_seconds` while not live now means
-   a fixed-length upload → REJECT.
-5. **Datetime > now** — for `upcoming` items `scheduled_start` must be strictly
-   greater than now. Missing or past `scheduled_start` → REJECT.
+3. **Not over** (`liveOnly`) — `actual_end` must be absent. An ended broadcast is
+   an archived live even though `isLiveContent` is still true → REJECT.
+4. **Not a recording** (`liveOnly`) — a non-zero `duration_seconds` while not live
+   now means a fixed-length upload → REJECT.
+5. **Datetime > now** (`futureDatetime`) — for `upcoming` items `scheduled_start`
+   must be strictly greater than now. Missing or past `scheduled_start` → REJECT.
    `is_live_now` items pass this gate because the broadcast is happening now
    (start ≤ now < end); an `is_live_now` item whose `actual_start` is in the
    future is an inconsistent payload → REJECT.
+
+Rules 2–4 share one id: they are three ways a candidate fails the live-only
+requirement. Rule 5 is the future-only requirement.
 
 Decisions: `LIVE` (live right now) and `SCHEDULED` (starts in the future) are
 promotable; `REJECT` is not.

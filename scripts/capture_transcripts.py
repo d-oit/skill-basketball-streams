@@ -592,7 +592,47 @@ def _exec(command: list[str]) -> str:
     return proc.stdout or ""
 
 
-def build_prompt(case: dict) -> str:
+def declared_files(case: dict) -> list[str]:
+    """The reference paths a case declares, in order, de-duplicated."""
+    names: list[str] = []
+    for entry in case.get("files") or []:
+        if isinstance(entry, str) and entry.strip():
+            name = entry.strip()
+            if name not in names:
+                names.append(name)
+    return names
+
+
+def case_prompt_files(case: dict, root: Path) -> list[Path]:
+    """Every reference a case declares, resolved against the skill root.
+
+    `evals[].files` names the references a case is decided from, and until this
+    existed the field was **write-only**: `synthesise_eval_case.py` emitted it,
+    `tests/test_synthesise_eval_case.py` asserted it, and no reader ever opened
+    one. That mattered because the prompt asks for "the check names exactly as
+    `references/validation-workflow.md` names them" — a file an HTTP rung has no
+    way to read, since `gemini` and `openrouter` post text and nothing else. So
+    the rungs that can serve asked for a vocabulary they were never given.
+    """
+    return [root / name for name in declared_files(case)]
+
+
+def missing_prompt_files(cases: list[dict], root: Path) -> list[str]:
+    """Declared references that are not on disk — a broken case, not a skip.
+
+    Skipping one silently is how a case stops being decided from its reference
+    while still capturing something, which is the failure mode this whole file
+    exists to make impossible.
+    """
+    absent: list[str] = []
+    for case in cases:
+        for name in declared_files(case):
+            if not (root / name).is_file() and name not in absent:
+                absent.append(name)
+    return absent
+
+
+def build_prompt(case: dict, *, root: Path | str = ".") -> str:
     """The prompt a capture run sends. Deliberately carries **no** answer.
 
     This used to append `Expected shape for reference: <expected_output[:200]>`.
@@ -601,16 +641,32 @@ def build_prompt(case: dict) -> str:
     needles by substring, a model that echoed the prompt back would score 100%.
     The check *vocabulary* is fair to state (the verdict is not), so the prompt
     names the form and points at the reference that names the checks.
+
+    Which is why the case's own `files` are inlined here. Pointing at a
+    reference is only fair if the reference arrives: every rung shares this
+    prompt, and the two HTTP rungs cannot read a file at all. The rule the
+    docstring above states is unchanged — the *verdict* stays out — while the
+    domain references the case names are the skill's own content, which a real
+    run reads before it decides anything.
     """
-    return (
+    root_path = Path(root)
+    prompt = (
         "You are executing the skill-basketball-streams pipeline for one case. "
         "Apply the 7 checks and reply with exactly one line, no prose:\n"
         "Decision=<CREATE|SKIP|REJECT>; reason=<short reason>; "
         "checks: <check>=PASS|FAIL, <check>=PASS|FAIL, ...\n\n"
         "Use the check names exactly as `references/validation-workflow.md` "
-        "names them.\n\n"
-        f"Case {case.get('id')}: {case.get('prompt', '')}"
+        "names them.\n"
     )
+    for name in declared_files(case):
+        path = root_path / name
+        if not path.is_file():
+            continue
+        prompt += (
+            f"\n--- {name} ---\n"
+            f"{path.read_text(encoding='utf-8', errors='replace').strip()}\n"
+        )
+    return prompt + f"\nCase {case.get('id')}: {case.get('prompt', '')}"
 
 
 def main() -> None:
@@ -708,6 +764,18 @@ def main() -> None:
     if args.runner == "replay" and not args.source:
         parser.error("--runner replay requires --from")
 
+    # A case whose reference is missing cannot be captured honestly: the prompt
+    # is where the reference now travels, and a silent skip would capture a
+    # model guessing at a vocabulary nobody gave it.
+    absent = missing_prompt_files(cases, root)
+    if absent:
+        print(
+            "FAIL: capture_transcripts: case reference(s) not found: "
+            f"{', '.join(absent)}",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
     replayed = load_transcripts(Path(args.source)) if args.runner == "replay" else {}
 
     # Resolve the Gemini model once, and say which one — a silent fallback is
@@ -728,19 +796,19 @@ def main() -> None:
         if args.runner == "replay":
             output = replayed.get(case_id, "")
         elif args.runner == "gemini":
-            output = run_gemini(build_prompt(case), args)
+            output = run_gemini(build_prompt(case, root=root), args)
         elif args.runner == "opencode":
-            output = run_opencode(build_prompt(case), args)
+            output = run_opencode(build_prompt(case, root=root), args)
         elif args.runner == "openrouter":
-            output = run_openrouter(build_prompt(case), args)
+            output = run_openrouter(build_prompt(case, root=root), args)
         elif args.runner == "ladder":
             served: list[str] = []
-            output = run_ladder(build_prompt(case), args, served)
+            output = run_ladder(build_prompt(case, root=root), args, served)
             if output.strip():
                 rung = served[-1]
                 rungs[str(case_id)] = rung
         else:
-            output = run_command(build_prompt(case), args)
+            output = run_command(build_prompt(case, root=root), args)
         if not output.strip():
             # A case that produced nothing is never attributed to a model: the
             # per-rung record still holds the last rung that DID answer, and
@@ -762,6 +830,14 @@ def main() -> None:
             )
         ],
     }
+    # What each case was decided from. The references now travel inside the
+    # prompt, so a transcript that fails grading can be traced to the material
+    # the model actually received rather than to the material the case names.
+    prompt_files = {
+        str(case.get("id")): declared_files(case) for case in cases if declared_files(case)
+    }
+    if prompt_files:
+        payload["prompt_files"] = prompt_files
     # Provenance, so a graded transcript can be traced to the model that wrote
     # it and the rung that served it rather than to "the ladder" in general.
     #
