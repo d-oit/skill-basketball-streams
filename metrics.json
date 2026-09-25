@@ -11,8 +11,8 @@
   "fixture_recall": null,
   "recall": {
     "captured": 0,
-    "eligible": 225,
-    "missed": 225,
+    "eligible": 230,
+    "missed": 230,
     "missed_keys": [
       "https://apps.apple.com/",
       "https://basketball.nationalmannschaft.net/frauen-wm-2026-uebertragung/",
@@ -26,6 +26,7 @@
       "https://basketnews.com/news-254411-where-to-watch-wembanyama-jokic-live-in-fiba-basketball.html",
       "https://ca.pcmag.com/video-streaming-services/17805/how-to-watch-the-2026-fiba-womens-basketball-world-cup-live-even-without-cable",
       "https://cms.magentasport.de/",
+      "https://de.beauty-healthy.info/wie-man-nba-basketball-live-fur-freies-zusieht-9145",
       "https://de.headtopics.com/news/basketball-bbl-alba-gegen-chemnitz-liveticker-1-87894725",
       "https://de.headtopics.com/news/basketball-bbl-munchen-gegen-bamberg-liveticker-1-87945131",
       "https://de.headtopics.com/news/sportbild-de-und-dyn-starten-gro-e-live-sport-offensive-87881735",
@@ -96,6 +97,7 @@
       "https://watch-live-stream.com/category/basketball/euroleague",
       "https://wetten.com/sportwetten/sportuebertragung-im-tv/basketball/",
       "https://www.ardmediathek.de/video/br24sport/fc-bayern-alba-berlin-re-live-i-bbl-play-offs-finale-spiel-5/br/Y3JpZDovL2JyLmRlL2Jyb2FkY2FzdC81MjVmOTgzNS03MWM4LTQwMTMtYjk1YS0xZDFlYjE1NTRjMmI",
+      "https://www.ariva.de/aktien/deutsche-telekom-ag-aktie/news/magentasport-der-telekom-erhaelt-exklusivrechte-an-basketball-12148432",
       "https://www.basketball-bund.de/",
       "https://www.basketball-bund.de/herren-laenderspiele-weiterhin-live-kostenfrei-magentasport/",
       "https://www.basketball-world.news/artikel/wer-zeigt-das-bcl-achtelfinale-mit-berlin-und-wuerzburg-live-1153261",
@@ -105,6 +107,7 @@
       "https://www.bblprofis.de/index.php/2025/09/30/kostenloser-livestream-panathinaikos-aktor-athen-gegen-den-fc-bayern-basketball/",
       "https://www.bblprofis.de/index.php/2026/01/07/kostenloser-livestream-fc-bayern-basketball-gegen-kosner-baskonia-vitoria-gasteiz/",
       "https://www.bblprofis.de/index.php/2026/01/18/live-im-free-tv-niners-chemnitz-gegen-den-fc-bayern-basketball-2/",
+      "https://www.bblprofis.de/index.php/2026/01/25/live-im-free-tv-alba-berlin-gegen-die-bma365-bamberg-baskets/",
       "https://www.bild.de/sport/mehr-sport/alba-gegen-chemnitz-bbl-auftaktspiel-jetzt-hier-im-live-stream-6aacdf2cb1857e86757a5aa7",
       "https://www.bild.de/sport/mehr-sport/playoff-halbfinale-alba-bamberg-bild-de-zeigt-basketball-live-6a280aed2f1d399245057caf",
       "https://www.chip.de/downloads/FC-Bayern-Basketball-Live-Stream_67553512.html",
@@ -136,6 +139,7 @@
       "https://www.eurosport.de/basketball/bbl/2024-2025/live-fc-bayern-muenchen-niners-chemnitz_mtc1553576/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2025-2026/live-fc-bayern-muenchen-trier_mtc21868511/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/alba-berlin-frankfurt_mtc21940152/live.shtml",
+      "https://www.eurosport.de/basketball/bbl/2026-2027/bayern-muenchen-alba-berlin_mtc21940263/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/bayern-muenchen-bamberg_mtc21940099/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/frankfurt-fitness-first-wuerzburg-baskets_mtc21940026/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/live-alba-berlin-niners-chemnitz_mtc21939999/live.shtml",
@@ -203,6 +207,7 @@
       "https://www.sport.de/basketball/deutschland-bbl/ma12415672/fc-bayern-muenchen_bamberg-baskets/liveticker/",
       "https://www.sport.de/basketball/deutschland-bbl/ma12415678/alba-berlin_skyliners/liveticker/",
       "https://www.sport.de/basketball/heute-live/dn2026-09-24/",
+      "https://www.sport.de/news/ne17182786/hier-laeuft-fc-bayern-gegen-alba-berlin-live-free-tv-uebertragung-im-stream-zum-bbl-spitzenspiel/",
       "https://www.sport1.de/news/basketball/bbl/2026/06/finalkracher-fc-bayern-alba-berlin-heute-live-im-gratis-stream-liveticker-entscheidung-oder-5-bbl-finale",
       "https://www.sportingnews.com/in/nba/news/fiba-live-streams-eurobasket-americup-asia-cup-afrobasket/e517c9b5e948dde20391f488",
       "https://www.sportingnews.com/in/tsn/news/fiba-basketball-live-streams-watch-olympic-qualifiers-online/52da829c5af8eae93de16d99",
@@ -241,9 +246,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 958,
-    "unique_games": 333,
-    "unverifiable": 225,
+    "rows": 1031,
+    "unique_games": 342,
+    "unverifiable": 230,
     "unverifiable_keys": [
       "https://apps.apple.com/",
       "https://basketball.nationalmannschaft.net/frauen-wm-2026-uebertragung/",
@@ -257,6 +262,7 @@
       "https://basketnews.com/news-254411-where-to-watch-wembanyama-jokic-live-in-fiba-basketball.html",
       "https://ca.pcmag.com/video-streaming-services/17805/how-to-watch-the-2026-fiba-womens-basketball-world-cup-live-even-without-cable",
       "https://cms.magentasport.de/",
+      "https://de.beauty-healthy.info/wie-man-nba-basketball-live-fur-freies-zusieht-9145",
       "https://de.headtopics.com/news/basketball-bbl-alba-gegen-chemnitz-liveticker-1-87894725",
       "https://de.headtopics.com/news/basketball-bbl-munchen-gegen-bamberg-liveticker-1-87945131",
       "https://de.headtopics.com/news/sportbild-de-und-dyn-starten-gro-e-live-sport-offensive-87881735",
@@ -327,6 +333,7 @@
       "https://watch-live-stream.com/category/basketball/euroleague",
       "https://wetten.com/sportwetten/sportuebertragung-im-tv/basketball/",
       "https://www.ardmediathek.de/video/br24sport/fc-bayern-alba-berlin-re-live-i-bbl-play-offs-finale-spiel-5/br/Y3JpZDovL2JyLmRlL2Jyb2FkY2FzdC81MjVmOTgzNS03MWM4LTQwMTMtYjk1YS0xZDFlYjE1NTRjMmI",
+      "https://www.ariva.de/aktien/deutsche-telekom-ag-aktie/news/magentasport-der-telekom-erhaelt-exklusivrechte-an-basketball-12148432",
       "https://www.basketball-bund.de/",
       "https://www.basketball-bund.de/herren-laenderspiele-weiterhin-live-kostenfrei-magentasport/",
       "https://www.basketball-world.news/artikel/wer-zeigt-das-bcl-achtelfinale-mit-berlin-und-wuerzburg-live-1153261",
@@ -336,6 +343,7 @@
       "https://www.bblprofis.de/index.php/2025/09/30/kostenloser-livestream-panathinaikos-aktor-athen-gegen-den-fc-bayern-basketball/",
       "https://www.bblprofis.de/index.php/2026/01/07/kostenloser-livestream-fc-bayern-basketball-gegen-kosner-baskonia-vitoria-gasteiz/",
       "https://www.bblprofis.de/index.php/2026/01/18/live-im-free-tv-niners-chemnitz-gegen-den-fc-bayern-basketball-2/",
+      "https://www.bblprofis.de/index.php/2026/01/25/live-im-free-tv-alba-berlin-gegen-die-bma365-bamberg-baskets/",
       "https://www.bild.de/sport/mehr-sport/alba-gegen-chemnitz-bbl-auftaktspiel-jetzt-hier-im-live-stream-6aacdf2cb1857e86757a5aa7",
       "https://www.bild.de/sport/mehr-sport/playoff-halbfinale-alba-bamberg-bild-de-zeigt-basketball-live-6a280aed2f1d399245057caf",
       "https://www.chip.de/downloads/FC-Bayern-Basketball-Live-Stream_67553512.html",
@@ -367,6 +375,7 @@
       "https://www.eurosport.de/basketball/bbl/2024-2025/live-fc-bayern-muenchen-niners-chemnitz_mtc1553576/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2025-2026/live-fc-bayern-muenchen-trier_mtc21868511/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/alba-berlin-frankfurt_mtc21940152/live.shtml",
+      "https://www.eurosport.de/basketball/bbl/2026-2027/bayern-muenchen-alba-berlin_mtc21940263/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/bayern-muenchen-bamberg_mtc21940099/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/frankfurt-fitness-first-wuerzburg-baskets_mtc21940026/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/live-alba-berlin-niners-chemnitz_mtc21939999/live.shtml",
@@ -434,6 +443,7 @@
       "https://www.sport.de/basketball/deutschland-bbl/ma12415672/fc-bayern-muenchen_bamberg-baskets/liveticker/",
       "https://www.sport.de/basketball/deutschland-bbl/ma12415678/alba-berlin_skyliners/liveticker/",
       "https://www.sport.de/basketball/heute-live/dn2026-09-24/",
+      "https://www.sport.de/news/ne17182786/hier-laeuft-fc-bayern-gegen-alba-berlin-live-free-tv-uebertragung-im-stream-zum-bbl-spitzenspiel/",
       "https://www.sport1.de/news/basketball/bbl/2026/06/finalkracher-fc-bayern-alba-berlin-heute-live-im-gratis-stream-liveticker-entscheidung-oder-5-bbl-finale",
       "https://www.sportingnews.com/in/nba/news/fiba-live-streams-eurobasket-americup-asia-cup-afrobasket/e517c9b5e948dde20391f488",
       "https://www.sportingnews.com/in/tsn/news/fiba-basketball-live-streams-watch-olympic-qualifiers-online/52da829c5af8eae93de16d99",
@@ -472,10 +482,10 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-09-24T13:39Z",
+  "run_id": "2026-09-25T14:00Z",
   "source": {
     "audit_rows": 0,
-    "candidates_rows": 958,
+    "candidates_rows": 1031,
     "fixtures_rows": 0
   },
   "trend": [
@@ -597,7 +607,24 @@
       "rows": 142,
       "run_id": "2026-09-24T13:39Z",
       "unique_games": 142
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 48,
+      "missed": 48,
+      "recall": 0.0,
+      "rows": 73,
+      "run_id": "2026-09-25T14:00Z",
+      "unique_games": 73
     }
   ],
-  "ts": "2026-09-24T13:39:53.585741+00:00"
+  "ts": "2026-09-25T14:00:41.979766+00:00"
 }
