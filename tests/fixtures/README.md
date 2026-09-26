@@ -46,7 +46,7 @@ it does **not** quote `expected_output`, so a transcript cannot pass by echoing
 the answer back. The prompt does carry each case's declared `files`, inlined:
 the HTTP rungs cannot read a filesystem, and the grader matches check ids that
 `references/validation-workflow.md` names on its check headings, so the
-vocabulary has to travel with the question. 15 of the 36 cases also assert
+vocabulary has to travel with the question. 15 of the 38 cases also assert
 tokens no document uses yet (`duplicateCheck`, `liveOnly`, `linkStatus`, …);
 until those references name them too, a live capture can pass the check-only
 cases but not those.

@@ -286,4 +286,5 @@ class TestCli:
         assert result.returncode == 1
         payload = json.loads(report.read_text(encoding="utf-8"))
         assert payload["summary"]["INVALID"] == 1
-        assert payload["summary"]["OK"] == 40
+        # 41 approved-domain entries: registry grew by dyn.sport on 2026-09-26.
+        assert payload["summary"]["OK"] == 41

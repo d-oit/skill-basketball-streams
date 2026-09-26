@@ -99,7 +99,7 @@ live-stream-runtime-spec.md           Spec: daily runtime, evals, self-improveme
   ├── corpus-refresh.yml              Weekly: re-record the evidence corpus; ONE issue per verdict flip, never per byte change
   └── codeql.yml                      CodeQL analysis
 evals/
-  └── evals.json                      36 standard-schema eval cases (driving the rubric)
+  └── evals.json                      38 standard-schema eval cases (driving the rubric)
 scripts/
   ├── validate.py                     Self-contained validator (stdlib only): four checks plus smoke-test regression guard.
   ├── runtime_eval.py                 Runtime skill-evaluator: structural + canned-stub passes, plus --transcripts for real captured runs.
@@ -208,7 +208,7 @@ references/
 - Mandatory source reference URL and ISO validation timestamp on every event.
 - Duplicate detection via `GOOGLECALENDAR_EVENTS_LIST` over the whole window (±30 min, team pair, compatible league).
 - Mandatory `## Rationalizations` / `## Red Flags` sections to defend against agent drift.
-- Schema-conformant `evals/evals.json` (36 standard-shape cases passable by any external evaluator).
+- Schema-conformant `evals/evals.json` (38 standard-shape cases passable by any external evaluator).
 
 ## Approved Sources (top-level categories)
 
@@ -269,7 +269,7 @@ Run before each release; every item is checkable without external tooling.
 - [ ] Frontmatter contains `name`, `description`, `category`, and `version`
 - [ ] `description` line is ≤ 1024 chars
 - [ ] Includes `## Rationalizations` and `## Red Flags` sections
-- [ ] Contains at least 3 realistic eval cases in `evals/evals.json` (currently 36)
+- [ ] Contains at least 3 realistic eval cases in `evals/evals.json` (currently 38)
 - [ ] JSON-shape validation passes (`id:int`, `prompt`, `expected_output`, `assertions[]`)
 - [ ] Every assertion needle `"<name>=PASS|FAIL"` appears in its case's `expected_output`
 - [ ] All backtick-wrapped `.md` paths in `SKILL.md` and `README.md` resolve to real files

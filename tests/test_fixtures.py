@@ -595,4 +595,97 @@ class TestCli:
 
     def test_diff_mode_requires_both_files(self):
         assert _run(["--fixtures", str(FIXTURES / "league_fixtures.jsonl")]).returncode == 2
+
+
+class TestPartialSourceFailure:
+    """A source that yields nothing fails the run even when another parsed.
+
+    The old contract was exit 0 with `(empty: 2)` inside an OK line, which is
+    how two of the three recall sources can be dead at once — one retired
+    domain, one rate-limiting — while every gate stays green and
+    `fixture_recall` silently means "the one league that still parses".
+
+    These drive `main()` with `fetch` patched, so they exercise the real
+    multi-source path without touching the network.
+    """
+
+    @staticmethod
+    def _argv(*args):
+        return ["fixtures.py", *args]
+
+    def test_a_dead_fetch_fails_even_when_the_other_source_parsed(
+        self, tmp_path, monkeypatch, capsys
+    ):
+        import scripts.fixtures as mod
+
+        page = _page(JSONLD_PAGE)
+        monkeypatch.setattr(
+            mod, "fetch", lambda url: "" if "euroleague" in url else page
+        )
+        out = tmp_path / "fixtures.jsonl"
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            self._argv(
+                "--source", "bbl", "--source", "euroleague",
+                "--now", "2026-09-14T08:30:00Z", "--out", str(out),
+            ),
+        )
+        with pytest.raises(SystemExit) as exc:
+            mod.main()
+        assert exc.value.code == 1
+        captured = capsys.readouterr()
+        assert "FAIL: fixtures: source 'euroleague'" in captured.err
+        assert "fetch returned nothing" in captured.err
+        # Partial data is still written: the failure is loud, not destructive.
+        assert len(out.read_text(encoding="utf-8").strip().splitlines()) == 3
+        assert "OK: fixtures: 3 fixtures" in captured.out
+
+    def test_a_source_that_parses_nothing_blames_the_parser_not_the_network(
+        self, monkeypatch, capsys
+    ):
+        import scripts.fixtures as mod
+
+        page = _page(JSONLD_PAGE)
+        monkeypatch.setattr(
+            mod,
+            "fetch",
+            lambda url: "<html><body>redesigned</body></html>"
+            if "euroleaguebasketball" in url
+            else page,
+        )
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            self._argv(
+                "--source", "bbl", "--source", "euroleague",
+                "--now", "2026-09-14T08:30:00Z",
+            ),
+        )
+        with pytest.raises(SystemExit) as exc:
+            mod.main()
+        assert exc.value.code == 1
+        captured = capsys.readouterr()
+        assert "no fixture parsed" in captured.err
+        assert "add a parser fixture" in captured.err
+
+    def test_every_source_parsing_keeps_the_run_green(self, monkeypatch, capsys):
+        """The regression guard for the guard: a healthy multi-source run must
+        not be reddened by the very check that catches a dead one."""
+        import scripts.fixtures as mod
+
+        page = _page(JSONLD_PAGE)
+        monkeypatch.setattr(mod, "fetch", lambda url: page)
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            self._argv(
+                "--source", "bbl", "--source", "euroleague",
+                "--now", "2026-09-14T08:30:00Z",
+            ),
+        )
+        mod.main()
+        captured = capsys.readouterr()
+        assert "FAIL" not in captured.err
+        assert "OK: fixtures:" in captured.out
         assert _run(["--ledger", str(FIXTURES / "candidates_ledger.jsonl")]).returncode == 2

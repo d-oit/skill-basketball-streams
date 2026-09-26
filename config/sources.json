@@ -54,7 +54,7 @@
       "type": "broadcaster",
       "domains": ["sportschau.de", "ard.de", "ardmediathek.de"],
       "free_access": "free",
-      "notes": "Free public broadcaster"
+      "notes": "Free public broadcaster. Streams selected BBL top games free, announced days ahead (worked 2026-09-26: FC Bayern Muenchen vs ALBA BERLIN, 26.09.2026 ab 15:30 Uhr im Ersten) — a dedicated sportschau.de livestream page plus the same game in the ARD Mediathek. sportschau.de is the stored link."
     },
     {
       "tier": 2,
@@ -89,10 +89,10 @@
       "tier": 4,
       "name": "Dyn Sport Mix",
       "type": "streaming_platform",
-      "domains": ["joyn.de", "pluto.tv", "zattoo.com"],
+      "domains": ["dyn.sport", "joyn.de", "pluto.tv", "zattoo.com"],
       "social": [],
       "free_access": "free_tier",
-      "notes": "Free tier only. amazon.de / primevideo.com require a Prime subscription -> reject."
+      "notes": "Free tier only. amazon.de / primevideo.com require a Prime subscription -> reject. Free access is decided PER GAME from dyn.sport/deinsender/dyn-sport-mix/ ('Dyn Free Spiele' / 'Basketball Free Spiele', a month of games at a time): on the list -> Check 1 PASS, absent -> Check 1 FAIL even though Dyn broadcasts the very same game. dyn.sport is announcement evidence and the sourceReference, NEVER the directLink — its own player sits behind the paid Dyn service; the link must be joyn.de / pluto.tv / zattoo.com, and the indexed channel URL is the one that answers: zattoo.com/de/live-tv/sender/dyn-sport-mix and joyn.de/sender/dyn-sport-mix both returned 404 on 2026-09-26 while https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4 returned 200. Promoted from a quarantined discovery on 2026-09-26 (tier row + this entry + eval cases 37 accept / 38 reject)."
     },
     {
       "tier": 4,

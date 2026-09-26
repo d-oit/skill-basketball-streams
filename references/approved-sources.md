@@ -22,7 +22,7 @@ National public broadcasters with dedicated sports coverage.
 
 | Source | Type | Domains | Notes |
 |--------|------|---------|-------|
-| Sportschau (ARD) | National Public | `sportschau.de`, `ard.de`, `ardmediathek.de` | Free public broadcaster |
+| Sportschau (ARD) | National Public | `sportschau.de`, `ard.de`, `ardmediathek.de` | Free public broadcaster. Streams selected **BBL top games** free: a dedicated `sportschau.de/basketball/…,livestream-…html` page *and* the ARD Mediathek, announced days ahead (worked: FC Bayern München vs ALBA BERLIN, 26.09.2026 ab 15:30 Uhr im Ersten). Both answers are Check-1 free; `sportschau.de` is the stored link. |
 | ZDF | National Public | `zdf.de`, `zdfmediathek.de` | Free public broadcaster |
 
 ### Tier 3: Regional Broadcasters (Medium Confidence)
@@ -39,7 +39,7 @@ Platforms that carry official free basketball streams.
 
 | Platform | Domains | Notes |
 |----------|---------|-------|
-| Dyn Sport Mix | `amazon.de`, `primevideo.com`, `joyn.de`, `pluto.tv`, `zattoo.com` | Free tier only; NOT behind Prime paywall |
+| Dyn Sport Mix | `dyn.sport` (announcement/programme), `joyn.de`, `pluto.tv`, `zattoo.com` (free-tier links), `amazon.de`, `primevideo.com` | Free tier only; NOT behind Prime paywall. **Free access is decided per game**, from the official monthly free-games list on `dyn.sport/deinsender/dyn-sport-mix/` — see "Dyn Sport Mix" in `references/validation-workflow.md`. `dyn.sport` is evidence and the `sourceReference`, never the `directLink`: its own player is behind the paid Dyn service. |
 | MagentaSport / MagentaTV | `magentasport.de`, `magenta.tv` | One free EuroLeague game per matchday; requires two-domain verification. `magenta.tv` is a JS-rendered, bot-blocked SPA — see `references/magenta-tv.md` |
 
 ### Tier 5: Official Club Websites (Medium Confidence)

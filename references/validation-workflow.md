@@ -206,9 +206,19 @@ If a `magenta.tv` URL passes HTTP 200 but no official free-access announcement c
 
 ### Dyn Sport Mix
 
-- Free via Joyn, Pluto TV, Zattoo (no subscription required)
-- NOT free via Amazon Prime (requires Prime subscription)
-- Verify which platform is being used
+Dyn splits the same way Magenta does, and — like the BCL — the free decision is made **per game, not per platform**.
+
+**Domain separation:**
+- `dyn.sport` = **programme/announcement site.** `dyn.sport/deinsender/dyn-sport-mix/` publishes the official per-month list *"Dyn Free Spiele" / "Basketball Free Spiele"* — every game the free linear channel carries, with date, tip-off, league and pairing. That list is what proves **this** game is free.
+- `joyn.de`, `pluto.tv`, `zattoo.com` = **free-tier platforms.** The linear channel *Dyn Sport Mix* plays there with no account and no Abo. The stored `directLink` comes from one of these.
+- The `dyn.sport` player itself sits behind the **paid** Dyn service: a `dyn.sport` URL is announcement evidence and the `sourceReference`, never the direct link.
+
+**Rules:**
+1. **On the list → Check 1 PASS; not on the list → Check 1 FAIL**, even when the very same game is broadcast on Dyn elsewhere (`"Alles live und auf Abruf zu sehen bei Dyn Basketball"` describes the paid platform, not a free stream).
+2. The list carries a **month** of games at a time; a game whose tip-off disagrees with the league's own schedule means the list is stale — record the discrepancy, do not guess.
+3. Store the **indexed channel URL** (`https://pluto.tv/gsa/live-tv/<id>`). The obvious deep links `zattoo.com/de/live-tv/sender/dyn-sport-mix` and `joyn.de/sender/dyn-sport-mix` answer **404**: that rejects the *link*, not the game — quarantine the URL and keep the event (worked, 2026-09-26).
+
+**Worked example (2026-09-26):** FC Bayern München vs ALBA BERLIN (26.09.2026, 15:40) is announced by Dyn as *"der erste Klassiker der diesjährigen easyCredit BBL-Saison"* yet is **absent** from the month's free list → Check 1 FAIL on Dyn; the game was created from its Sportschau/ARD livestream instead. EWE Baskets Oldenburg vs Veolia Towers Hamburg (27.09.2026, 16:30) and ALBA BERLIN vs BMA365 Bamberg Baskets (03.10.2026, 18:30) **are** on the list → Check 1 PASS with the Pluto TV channel as the link.
 
 ### YouTube Live Verification
 

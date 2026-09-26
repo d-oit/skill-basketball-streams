@@ -221,7 +221,7 @@ jobs:
           python3 scripts/fixtures.py \
             --source bbl --source bcl --source euroleague \
             --out .tmp/telemetry/fixtures.jsonl \
-            || echo "::warning::fixture fetch produced nothing — fixture_recall will be n/a this run"
+            || echo "::warning::at least one league fixture source produced nothing (see the FAIL lines above) — fixture_recall is partial or n/a this run"
 
       - name: Recall report
         run: python3 scripts/candidates.py --ledger .tmp/telemetry/candidates.jsonl recall || true
