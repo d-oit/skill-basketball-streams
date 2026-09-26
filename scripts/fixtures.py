@@ -43,8 +43,9 @@ Usage:
     python3 scripts/fixtures.py --source bbl --now 2026-09-14T08:30:00Z --days 7
 
 Exit codes:
-    0  PASS — at least one fixture normalised
-    1  FAIL — sources returned nothing parseable
+    0  PASS — every named source produced fixtures inside the window
+    1  FAIL — a named source produced nothing (even when another source
+           parsed), or no fixture fell inside the window
     2  USAGE — bad arguments or unreadable input
 """
 from __future__ import annotations
@@ -531,22 +532,42 @@ def main() -> None:
 
     fixtures: list[dict] = []
     empty: list[str] = []
+    empty_cause: dict[str, str] = {}
     for name, html, url in pages:
         config = DEFAULT_SOURCES[name]
         if not html:
             empty.append(name)
+            empty_cause[name] = (
+                "the fetch returned nothing (network failure, bot block or "
+                "TLS error)"
+            )
             continue
         found = parse_page(
             html, league=config["league"], source=name, source_url=url
         )
         if not found:
             empty.append(name)
+            empty_cause[name] = (
+                "the page fetched but no fixture parsed (markup change?) — "
+                "capture it and add a parser fixture"
+            )
         fixtures.extend(found)
 
     parsed = len(fixtures)
     fixtures = dedupe(
         [fixture for fixture in fixtures if in_window(fixture, now=now, days=args.days)]
     )
+
+    # Named first, whichever branch goes on to report the run: a source that
+    # fetched nothing has to be named even when the window is empty too, or the
+    # message below claims "the pages parsed" about a page that never arrived.
+    if empty:
+        for name in empty:
+            print(
+                f"FAIL: fixtures: source {name!r} produced no fixtures — "
+                f"{empty_cause[name]}",
+                file=sys.stderr,
+            )
 
     if not fixtures:
         # Two different failures, told apart rather than merged: "the page said
@@ -558,8 +579,8 @@ def main() -> None:
             print(
                 f"FAIL: fixtures: {parsed} fixture(s) parsed from {sources} but "
                 f"none inside the {args.days}-day window from "
-                f"{now.isoformat()} — the pages parsed; this is the window, not "
-                "the markup",
+                f"{now.isoformat()} — the sources that did parse did so "
+                "correctly; this is the window, not the markup",
                 file=sys.stderr,
             )
         else:
@@ -598,6 +619,12 @@ def main() -> None:
             + (f" ({skipped} already present)" if skipped else "")
         )
 
+    # A source that produced nothing fails the run **even when another league's
+    # page parsed.** It used to exit 0 with `(empty: 2)` inside an OK line — which
+    # is how two of the three recall sources can sit dead (one retired domain,
+    # one rate-limiting) while every gate stays green and `fixture_recall` quietly
+    # means "BCL only". The docstring has always promised exit 1 for this; the
+    # partial case was the one it never delivered.
     if args.json:
         print(json.dumps({"fixtures": fixtures, "empty_sources": empty}, indent=2))
     else:
@@ -607,6 +634,11 @@ def main() -> None:
             f"OK: fixtures: {len(fixtures)} fixtures in the "
             f"{args.days}-day window (empty: {len(empty)})"
         )
+
+    if empty:
+        # After the payload: `--json` consumers still get what *was* parsed, and
+        # the exit code is what says the run was incomplete.
+        sys.exit(1)
 
 
 def _read_jsonl(path: Path) -> list[dict]:

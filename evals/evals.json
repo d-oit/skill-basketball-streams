@@ -478,6 +478,39 @@
       "files": [
         "references/calendar-setup.md"
       ]
+    },
+    {
+      "id": 37,
+      "prompt": "A game named on the official Dyn Sport Mix free-games list passes Check 1 with the free-tier channel as the link. Input: url=https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4; title=Watch Dyn Sport Mix: Live TV Channel for Free; league=BBL; teams=EWE Baskets Oldenburg vs Veolia Towers Hamburg; date=2026-09-27T16:30:00+02:00; free_game_listed=True (dyn.sport: 'So. 27.09.2026, 16:30 Uhr - EWE Baskets Oldenburg - Veolia Towers Hamburg'); announcement=https://www.dyn.sport/deinsender/dyn-sport-mix/; no account and no Abo required.",
+      "expected_output": "Decision=CREATE; reason=; checks: freeAccess=PASS, liveContent=PASS, officialSource=PASS, basketballSpecific=PASS, dateTimeRange=PASS, workingLink=PASS, directStreamVerification=PASS",
+      "assertions": [
+        "freeAccess expected PASS",
+        "liveContent expected PASS",
+        "officialSource expected PASS",
+        "basketballSpecific expected PASS",
+        "dateTimeRange expected PASS",
+        "workingLink expected PASS",
+        "directStreamVerification expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md"
+      ]
+    },
+    {
+      "id": 38,
+      "prompt": "A game that Dyn broadcasts but does NOT list among its free games fails Check 1 on the approved platform — the per-game list decides, not the platform. Input: url=https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4; title=Watch Dyn Sport Mix: Live TV Channel for Free; league=BBL; teams=FC Bayern Muenchen vs ALBA Berlin; date=2026-09-26T15:40:00+02:00; free_game_listed=False (absent from dyn.sport/deinsender/dyn-sport-mix 'Basketball Free Spiele'); dyn_preview=https://www.dyn.sport/deinsender/easycredit-bbl-klassiker-preview/ says 'Alles live und auf Abruf zu sehen bei Dyn Basketball'; the Dyn service behind that preview is subscription-gated.",
+      "expected_output": "Decision=SKIP; reason=game is absent from the official Dyn Sport Mix free-game list — Dyn's own broadcast is subscription-gated, so an approved platform does not make this game free; checks: freeAccess=FAIL, officialSource=PASS, workingLink=PASS, liveContent=PASS",
+      "assertions": [
+        "freeAccess expected FAIL",
+        "officialSource expected PASS",
+        "workingLink expected PASS",
+        "liveContent expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md"
+      ]
     }
   ]
 }

@@ -28,7 +28,7 @@ Search for FREE basketball live streams in Germany from official sources, valida
 
 ## Approved Sources
 
-Full list and YouTube URL rules: `references/approved-sources.md`; machine-readable mirror in `config/sources.json`. Summary: Dyn Sport Mix (Joyn / Pluto TV / Zattoo free tier only), MagentaSport / MagentaTV (one free EuroLeague game per matchday), Sportschau / ARD, regional broadcasters (MDR, BR24, RBB24), **Basketball Champions League (`championsleague.basketball`, selected games only)**, official BBL club websites, and official YouTube channels only. **Accepted YouTube URL patterns:** `youtube.com/@handle/live`, `youtube.com/live/<id>`, `youtube.com/watch?v=<id>` (live/upcoming only), `youtube.com/@handle`, `youtube.com/user/TheDBBTV`. **Rejected:** `youtube.com/@FIBAWorld`, any `youtube.com/user/[*]` except `TheDBBTV`, any `youtube.com/channel/UC…`, `/playlist`, `/results`, `/shorts`.
+Full list and YouTube URL rules: `references/approved-sources.md`; machine-readable mirror in `config/sources.json`. Summary: Dyn Sport Mix (free **per game** — the official free-games list lives on `dyn.sport`; streams on Joyn / Pluto TV / Zattoo free tier only), MagentaSport / MagentaTV (one free EuroLeague game per matchday), Sportschau / ARD (also streams selected BBL top games free), regional broadcasters (MDR, BR24, RBB24), **Basketball Champions League (`championsleague.basketball`, selected games only)**, official BBL club websites, and official YouTube channels only. **Accepted YouTube URL patterns:** `youtube.com/@handle/live`, `youtube.com/live/<id>`, `youtube.com/watch?v=<id>` (live/upcoming only), `youtube.com/@handle`, `youtube.com/user/TheDBBTV`. **Rejected:** `youtube.com/@FIBAWorld`, any `youtube.com/user/[*]` except `TheDBBTV`, any `youtube.com/channel/UC…`, `/playlist`, `/results`, `/shorts`.
 
 **Social media is validation evidence, never a source link.** `@BasketballCL` / `facebook.com/BasketballCL` (mandatory per BCL game), `@MagentaSport` / `facebook.com/MagentaSport`, `@EuroLeague`, `@easyCreditBBL` may confirm free access for Check 1; a social URL is never stored as the `directLink`.
 
@@ -178,7 +178,7 @@ All scripts are stdlib-only on Python 3.8+ and share the same exit codes: `0` PA
 - **`scripts/audit_events.py`** — post-hoc verdicts and the promotion sweep (Step 6.5). `--events events.json --evidence evidence.json [--now ISO] [--out audit.jsonl]`; `--events` accepts JSONL as well as JSON.
 - **`scripts/extract_candidates.py`** — the transcript → candidate seam for Steps 5/6. The runtime agent has no file-write tool, so this is its only channel; it refuses `state=WRONG` (an audit verdict, never a proposal) and any candidate without two teams and a parseable start.
 - **`scripts/calendar_io.py`** — the only module that reads or writes the calendar, through Composio tool execution (`COMPOSIO_API_KEY`; no Google project). `list` recovers the verification state from the title prefix, which is what lets Step 6 honour "never touch a verified event"; `apply` makes **no HTTP request at all** unless `--live` is passed.
-- **`scripts/fixtures.py`** — official league fixtures → `game_key`s, so recall can be measured against something other than our own search results. JSON-LD first, microdata fallback, and a fixture that fails to parse is dropped, never guessed.
+- **`scripts/fixtures.py`** — official league fixtures → `game_key`s, so recall can be measured against something other than our own search results. JSON-LD first, microdata fallback, and a fixture that fails to parse is dropped, never guessed. A named source that yields nothing is a failure **even when another league parsed** (`exit 1` + a `FAIL:` line per source), so two dead sources cannot hide behind one healthy `OK` line.
 - **`scripts/synthesise_eval_case.py`** — audit verdict → regression eval case (Step 6.5 feeds it). `--verify` asserts every assertion needle resolves, so no case can be filed that grades nothing.
 - **`scripts/bump_version.py`** — keeps `SKILL.md` and `CHANGELOG.md` versions in sync.
 
@@ -235,4 +235,4 @@ All scripts are stdlib-only on Python 3.8+ and share the same exit codes: `0` PA
 - `docs/runtime.md` — daily runtime operations: cadence, secrets, telemetry schema, rung health, recovery runbook, AGPL notice
 - `references/lessons-learned.md` — incident post-mortem (broken `/user/FIBA` events), root causes, prevention checklist, validation log template and worked examples
 - `config/sources.json` — machine-readable approved-source registry + excluded sources
-- `evals/evals.json` — 36 eval cases (driving the `skill-evaluator` rubric; see `README.md` → Self-Validation)
+- `evals/evals.json` — 38 eval cases (driving the `skill-evaluator` rubric; see `README.md` → Self-Validation)

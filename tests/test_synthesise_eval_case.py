@@ -357,14 +357,16 @@ class TestCli:
         assert first.returncode == 0
 
         payload = json.loads(target.read_text(encoding="utf-8"))
-        assert len(payload["evals"]) == 39
-        assert [c["id"] for c in payload["evals"]][-3:] == [37, 38, 39]
+        # 38 committed cases + the 3 the verdicts synthesise; the new ids are
+        # max+1..max+3, so they move whenever the eval set grows.
+        assert len(payload["evals"]) == 41
+        assert [c["id"] for c in payload["evals"]][-3:] == [39, 40, 41]
 
         second = _run(["--verdicts", str(VERDICTS), "--evals", str(target)])
         assert second.returncode == 1
         assert "already filed" in second.stderr
-        # Still 39 — the second run must not duplicate anything.
-        assert len(json.loads(target.read_text(encoding="utf-8"))["evals"]) == 39
+        # Still 41 — the second run must not duplicate anything.
+        assert len(json.loads(target.read_text(encoding="utf-8"))["evals"]) == 41
 
     def test_appended_file_still_validates(self, tmp_path):
         target = self._copy_evals(tmp_path)
@@ -377,7 +379,7 @@ class TestCli:
             ["--verdicts", str(VERDICTS), "--evals", str(target), "--limit", "1"]
         )
         assert result.returncode == 0
-        assert len(json.loads(target.read_text(encoding="utf-8"))["evals"]) == 37
+        assert len(json.loads(target.read_text(encoding="utf-8"))["evals"]) == 39
 
     def test_limit_below_one_is_a_usage_error(self, tmp_path):
         target = self._copy_evals(tmp_path)
