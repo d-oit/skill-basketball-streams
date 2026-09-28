@@ -120,15 +120,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   directions of the rule against the *same* pluto.tv URL, so the platform cannot
   decide the answer.
 
-
-
-## [Unreleased]
-
-
-
-
-### Fixed
-
 - **`recall` could only ever report 0.000, because nothing ever wrote the row it
   counts.** `captured` is "unique games with `disposition == "created"`", and
   `candidates.jsonl` has exactly one writer: Phase 0's `run_daily.py`, which only
@@ -185,6 +176,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   invisible precisely because `candidates_ledger.jsonl` is hand-built *with* a
   `created` row, so CI read 0.5 while production could only produce 0. That
   fixture's README entry now says so outright.
+
+
+
+## [Unreleased]
+
+
+
 
 ### Notes
 
