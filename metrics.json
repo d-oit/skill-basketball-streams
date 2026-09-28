@@ -11,8 +11,8 @@
   "fixture_recall": null,
   "recall": {
     "captured": 0,
-    "eligible": 302,
-    "missed": 302,
+    "eligible": 303,
+    "missed": 303,
     "missed_keys": [
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
@@ -29,6 +29,7 @@
       "https://basketballimtv.de/live/2026/telekom-baskets-bonn-syntainics-mbc-64927.html",
       "https://basketballsphere.com/en/watch-euroleague-for-free/",
       "https://basketnews.com/news-254411-where-to-watch-wembanyama-jokic-live-in-fiba-basketball.html",
+      "https://buffsports.io/watch-fiba-stream",
       "https://ca.pcmag.com/video-streaming-services/17805/how-to-watch-the-2026-fiba-womens-basketball-world-cup-live-even-without-cable",
       "https://cms.magentasport.de/",
       "https://converseer.com/live-stream-kosner-baskonia-vs-olympiacos-piraeus-2026-euroleague/",
@@ -318,9 +319,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 2129,
-    "unique_games": 448,
-    "unverifiable": 302,
+    "rows": 2338,
+    "unique_games": 449,
+    "unverifiable": 303,
     "unverifiable_keys": [
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
@@ -337,6 +338,7 @@
       "https://basketballimtv.de/live/2026/telekom-baskets-bonn-syntainics-mbc-64927.html",
       "https://basketballsphere.com/en/watch-euroleague-for-free/",
       "https://basketnews.com/news-254411-where-to-watch-wembanyama-jokic-live-in-fiba-basketball.html",
+      "https://buffsports.io/watch-fiba-stream",
       "https://ca.pcmag.com/video-streaming-services/17805/how-to-watch-the-2026-fiba-womens-basketball-world-cup-live-even-without-cable",
       "https://cms.magentasport.de/",
       "https://converseer.com/live-stream-kosner-baskonia-vs-olympiacos-piraeus-2026-euroleague/",
@@ -626,30 +628,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-09-28T17:07Z",
+  "run_id": "2026-09-28T17:21Z",
   "source": {
     "audit_rows": 0,
-    "candidates_rows": 2129,
+    "candidates_rows": 2338,
     "fixtures_rows": 0
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 96,
-      "missed": 96,
-      "recall": 0.0,
-      "rows": 147,
-      "run_id": "2026-09-17T12:03Z",
-      "unique_games": 147
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -870,7 +855,24 @@
       "rows": 178,
       "run_id": "2026-09-28T17:07Z",
       "unique_games": 160
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 111,
+      "missed": 111,
+      "recall": 0.0,
+      "rows": 209,
+      "run_id": "2026-09-28T17:20Z",
+      "unique_games": 173
     }
   ],
-  "ts": "2026-09-28T17:07:30.476057+00:00"
+  "ts": "2026-09-28T17:21:09.527124+00:00"
 }
