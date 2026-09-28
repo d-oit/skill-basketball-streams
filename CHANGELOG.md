@@ -58,6 +58,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   rung serves; `LLM_MODEL` still overrides everything; `--check-rungs` remains
   the gate.
 
+## [1.5.0] - 2026-09-28
+
+### Added
+
+- **Every check now has an id, and the reference that names it reaches the model
+  that has to use it.** The transcript grader matches `checks: <id>=PASS|FAIL` by
+  substring, but the ids existed only in `evals/evals.json` and the grader — no
+  document a model could read named them, and `evals[].files` had a writer
+  (`synthesise_eval_case.py`) and **no reader**. The capture prompt asked for "the
+  check names exactly as `references/validation-workflow.md` names them" while
+  delivering that file to no one, so the first live capture produced a *correct
+  decision with every assertion missing*. Now: `build_prompt` inlines each case's
+  declared `files`; a case whose reference is missing is **refused** rather than
+  captured without it; the payload records `prompt_files` so a failing transcript
+  can be traced to the material the model actually received; the check headings,
+  the upsert table, the audit verdict table, the revalidation cadence and the
+  YouTube gate all name their ids. A test over the real eval set refuses any
+  assertion id that no declared reference contains — the pin that found cases
+  22, 23, 26, 32 and 33 asserting ids whose reference they never declared.
+  `tests/fixtures/README.md` records the residue: 15 of the 38 cases still assert
+  tokens (`duplicateCheck`, `liveOnly`, `linkStatus`, …) that no document names.
+
+- **`fixtures.py` decodes the BCL's Next.js flight payload, so the site stops
+  being unparseable by construction.** `championsleague.basketball` publishes
+  neither JSON-LD nor microdata anywhere — not on its game list, and on a game page
+  its only JSON-LD node is a `BreadcrumbList` — so its `fixture_recall` was `n/a`
+  for ever. Joining the `self.__next_f` literals is decoding, not scraping, and it
+  is a third rung *after* JSON-LD and microdata, not a replacement. Three
+  distinctions keep it from inventing data: season placeholders (no tip-off, one
+  side null) are refused, so a phantom fixture is never reported as a game no
+  backend surfaced; the empty `"games": []` array the page sends first is not
+  trusted as the list; and a window with games parsed but none in range is
+  reported as **the window**, not as a markup change. The source URL moves from
+  the site root (which redirects to a fixture-free landing page) to `/en/games`.
+  The recorded page fixture is trimmed from the live response with its provenance
+  in its own header, and `tests/test_fixture_contracts.py` pins the two games the
+  CI step is worth.
+
+### Fixed
+
+- **`fixtures.py` now fails the run when *a* named source produced nothing, not
+  only when every one did.** The docstring always promised exit 1; the partial case
+  was the one it never delivered. It exited 0 behind an `OK` line reading
+  `(empty: 2)`, which is how two of the three recall sources could sit dead — one a
+  retired domain, one rate-limiting — while every gate stayed green and
+  `fixture_recall` quietly meant "BCL only". Each dead source now names its own
+  cause, the healthy source's fixtures are still written (so `--json` consumers
+  keep what *was* parsed), and the `--input` CI steps are untouched.
+
+- **Dyn Sport Mix's free access is decided per game, and the skill can now say
+  so.** Check 1 for a Dyn game had no documented evidence source at all. The
+  official monthly free-games list on `dyn.sport` decides it: on the list, free;
+  absent, **failed** — even though Dyn broadcasts the same game on its paid
+  service, which is exactly how today's Klassiker nearly went in. Written into
+  `references/validation-workflow.md` with explicit domain separation
+  (`dyn.sport` is announcement evidence, never the stored link), the tier table and
+  the registry. `dyn.sport` is promoted out of quarantine on that basis, and the
+  Sportschau row now carries the ARD BBL livestream that served the 2026-09-26
+  game. Evals 37 (accept a listed game) and 38 (reject an unlisted one) pin both
+  directions of the rule against the *same* pluto.tv URL, so the platform cannot
+  decide the answer.
+
 
 ## [Unreleased]
 
