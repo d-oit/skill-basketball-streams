@@ -177,6 +177,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `created` row, so CI read 0.5 while production could only produce 0. That
   fixture's README entry now says so outright.
 
+- **Five rehearsal tests were asserting a report's *shape* by spending a live
+  request — so a free provider's uptime decided whether the build passed.**
+  `search:exa-mcp-keyless` needs no credential and is therefore probed for real
+  on every non-`--offline` run, and `TestCli` called the bare CLI eight times to
+  check exit codes, the `--json` stdout contract and the markdown table. Measured
+  on this checkout: a 429 from Exa and a `401 User not found` from the
+  `OPENROUTER_API_KEY` in this shell turned those five red — a property of the
+  provider, not of the repository, and the reason the same suite passed hours
+  earlier. Two count assertions (`"9 missing"`) also failed purely because a
+  developer's shell has keys set; they now assert the *property*
+  (`0 valid, 0 invalid, N (missing|unverified)`) rather than a number any machine
+  can change.
+
+  The fix is in the script, not the tests: `rehearse.py --no-probe` classifies
+  the full matrix without calling anything, and every present credential reports
+  `unverified` — which is precisely what that state is for ("present, and nothing
+  was asked of it"), and is distinct from `--offline`, which only covers the
+  credential-free structural half. The suite now passes **with sockets blocked**,
+  which is the only version of "hermetic" that means anything.
+
 
 
 ## [Unreleased]

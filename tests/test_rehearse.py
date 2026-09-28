@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -522,18 +523,18 @@ class TestCli:
             assert name in result.stdout
 
     def test_unconfigured_surfaces_exit_zero_without_require_all(self):
-        result = self._run()
+        result = self._run("--no-probe")
         assert result.returncode == 0
         assert "0 invalid" in result.stderr
         assert "NO" in result.stderr
 
     def test_require_all_fails_on_a_missing_credential(self):
-        result = self._run("--require-all")
+        result = self._run("--no-probe", "--require-all")
         assert result.returncode == 1
         assert "FAIL: rehearse" in result.stderr
 
     def test_json_stdout_is_payload_only(self):
-        result = self._run("--json")
+        result = self._run("--json", "--no-probe")
         payload = json.loads(result.stdout)  # raises if a human line leaked
         assert payload["ok"] is True and payload["require_all"] is False
         assert set(payload["counts"]) == {"valid", "invalid", "missing", "unverified"}
@@ -547,13 +548,35 @@ class TestCli:
         The single `valid` row is `github-issues:grant`, which is read from the
         workflows and needs no key — so it is `valid` on a bare checkout, and
         asserting `0 valid` here would be asserting the wrong thing.
+
+        These run `--no-probe`, not the bare CLI, and that is the point: the
+        credential-free `search:exa-mcp-keyless` rung is probed for real on every
+        other run, so a test of the report's *shape* that omits the flag spends a
+        live request and fails whenever a free tier rate-limits. This suite
+        asserted the format; the provider decided whether it passed. Measured:
+        the same five tests red on a 429 and on a key answering `401 User not
+        found`, neither of which is a property of this repository.
         """
-        result = self._run()
+        result = self._run("--no-probe")
         assert "probe raised" not in result.stderr
         assert "0 invalid" in result.stderr
-        assert "0 unverified" in result.stderr
-        assert "9 missing" in result.stderr
+        assert "not probed" in result.stderr
         assert "github-issues:grant" in result.stderr
+        # The count is whatever this machine has configured, so assert the
+        # property instead of a number a developer's shell changes.
+        assert re.search(r"0 valid, 0 invalid, \d+ (?:missing|unverified)", result.stderr)
+
+    def test_a_present_credential_is_unverified_when_nothing_is_probed(self):
+        """`unverified` means "not probed", not "not checked".
+
+        Without the flag this row is the difference between a key that works
+        and one the provider rejected, which is the whole reason the rehearsal
+        exists; with it, the report is a statement about configuration only.
+        """
+        result = self._run("--no-probe", extra_env={"OPENROUTER_API_KEY": "k"})
+        assert "unverified" in result.stderr
+        assert "not probed" in result.stderr
+        assert "0 invalid" in result.stderr
 
     def test_offline_probes_the_grant_and_says_what_it_did_not_answer(self):
         result = self._run("--offline")
@@ -601,7 +624,7 @@ class TestCli:
         assert "1 valid" in result.stderr
 
     def test_markdown_is_payload_only_and_reads_as_a_table(self):
-        result = self._run("--markdown")
+        result = self._run("--markdown", "--no-probe")
         assert result.returncode == 0
         lines = result.stdout.splitlines()
         assert lines[0] == "## Production rehearsal"
@@ -613,12 +636,12 @@ class TestCli:
 
     def test_json_and_markdown_together_is_a_usage_error(self):
         """Two payloads, one stdout: refused rather than interleaved."""
-        result = self._run("--json", "--markdown")
+        result = self._run("--json", "--markdown", "--no-probe")
         assert result.returncode == 2
         assert "pick one" in result.stderr
 
     def test_a_missing_env_file_is_named_and_nothing_is_probed(self):
-        result = self._run("--env-file", ".env.does-not-exist")
+        result = self._run("--env-file", ".env.does-not-exist", "--no-probe")
         assert result.returncode == 1
         assert "is not a readable file" in result.stderr
         assert ".env.does-not-exist" in result.stderr
@@ -641,9 +664,8 @@ class TestCli:
         a different costume.
         """
         (tmp_path / ".env").write_text("GEMINI_API_KEY=not-a-real-key\n")
-        result = self._run(cwd=tmp_path)
+        result = self._run("--no-probe", cwd=tmp_path)
         assert result.returncode == 0
-        assert "9 missing" in result.stderr
         assert "NO   llm:gemini" in result.stderr
         assert "0 invalid" in result.stderr
 
