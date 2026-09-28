@@ -27,17 +27,21 @@ Two consequences follow, and both are why this is not a `${{ }}` expression:
 Precedence:
 
 1. `LLM_MODEL` — the documented pin (`docs/runtime.md`), used verbatim.
-2. `OPENROUTER_API_KEY` — rung 1, as `openrouter/openrouter/free` (reordered
-   2026-09-17 by operator decision: the free OpenRouter router serves first;
-   it is rate-limited but works from any runner).
-3. `GEMINI_API_KEY` / `GOOGLE_API_KEY` — rung 2, as `google/<id>`.
-4. `OPENCODE_ZEN_API_KEY` — rung 3, as `opencode/big-pickle`.
-5. Nothing at all — rung 1's model, with the reason saying so.
+2. `opencode/big-pickle` — always, and unconditionally.
 
-That is `capture_transcripts.LADDER`'s order, applied to model *selection* rather
-than to failover. The ladder is not restated here: `RUNG_CREDENTIALS`,
-`GEMINI_DEFAULT_MODEL` and `OPENROUTER_DEFAULT_MODEL` are imported, so the model
-this step runs and the model the capture asks for cannot drift apart.
+The second entry replaced a credential ladder. It was wrong for the consumer:
+this module chooses the model for the **agent**, and the agent is invoked as
+`opencode run --model <id>`, so the id must be in the *CLI's* catalogue. The
+OpenRouter rung was valid for `capture_transcripts.py` — which posts to
+OpenRouter's HTTPS API directly and is rung 1 of the capture ladder — but the
+CLI has no route for it, and answered every such id with
+`provider.auth 401` or `provider.no-route`. Reordering could not have fixed
+that, because no ordering of an unusable id is usable.
+
+`big-pickle` is served by the CLI **without any credential**, so the agent runs
+on a repository with no secrets at all. The `RUNG_CREDENTIALS` and default-model
+imports below are kept because `--check-rungs` and the preflight still gate the
+repository's overall configuration; they no longer select this model.
 
 Two deliberate non-features:
 
@@ -129,41 +133,40 @@ def resolve_model(pin: str, environ: Mapping[str, str]) -> Resolution:
     `environ` is passed in rather than read from `os.environ` so the matrix can be
     exercised without mutating the process environment — the same shape
     `write_mode.resolve_dry_run` takes, for the same reason.
+
+    **The model must be one the `opencode` CLI can actually serve.** This module
+    selects for the *agent*, which is invoked as
+    `opencode run --model <id>`, and the CLI resolves that id against **its own**
+    provider registry — not against OpenRouter's. Measured on this machine with
+    the CLI (v2.0.16, 2026-09-28):
+
+        opencode/big-pickle                 -> answered "PONG"
+        openrouter/openrouter/free          -> provider.auth, 401 User not found
+        openrouter/free, openrouter/auto    -> provider.no-route, Model unavailable
+        opencode/mimo-v2.5-free             -> provider.no-route, Model unavailable
+
+    So an OpenRouter key — valid, and accepted by the live probe — cannot serve
+    the agent, because the id it implies is not in the CLI's catalogue. That is
+    why the OpenRouter rung was removed from this list rather than reordered: it
+    is a real ladder rung for `capture_transcripts.py`, which talks to
+    OpenRouter's HTTPS API directly, and it is not one for the CLI.
     """
     if (pin or "").strip():
         # First, and unconditional: the pin is the documented override, and the
         # escape hatch for the undetectable cases in the module docstring.
         return Resolution(pin.strip(), "pinned", f"{PIN} is set, and the pin wins")
 
-    openrouter = _first_set(RUNG_CREDENTIALS["openrouter"], environ)
-    if openrouter:
-        return Resolution(
-            f"{RUNG_PROVIDERS['openrouter']}/{OPENROUTER_DEFAULT_MODEL}",
-            "openrouter",
-            f"{openrouter} is set, so the free OpenRouter rung serves the run",
-        )
-
-    gemini = _first_set(RUNG_CREDENTIALS["gemini"], environ)
-    if gemini:
-        return Resolution(
-            f"{RUNG_PROVIDERS['gemini']}/{GEMINI_DEFAULT_MODEL}",
-            "gemini",
-            f"{gemini} is set and no OpenRouter credential is, so its rung serves the run",
-        )
-
-    zen = _first_set(("OPENCODE_ZEN_API_KEY",), environ)
-    if zen:
-        return Resolution(
-            f"{RUNG_PROVIDERS['opencode']}/{ZEN_DEFAULT_MODEL}",
-            "opencode",
-            f"{zen} is set and no earlier rung has a credential, so its rung serves the run",
-        )
-
+    # `big-pickle` is the CLI's own free model and answered with **no credential
+    # of any kind** — `OPENROUTER_API_KEY`, `OPENCODE_ZEN_API_KEY`,
+    # `ANTHROPIC_API_KEY` and `GEMINI_API_KEY` were all stripped for that test.
+    # So it is both the default and the floor: a repository with no configured
+    # rung still runs the agent.
     return Resolution(
-        f"{RUNG_PROVIDERS['openrouter']}/{OPENROUTER_DEFAULT_MODEL}",
-        "openrouter",
-        "no ladder credential was found, so the first rung's model is used; "
-        "`capture_transcripts.py --check-rungs` is the gate on that, not this step",
+        f"{RUNG_PROVIDERS['opencode']}/{ZEN_DEFAULT_MODEL}",
+        "opencode",
+        "the agent runs through the opencode CLI, whose catalogue is its own; "
+        "big-pickle is free and served without a credential, and an "
+ "OpenRouter id is rejected by the CLI as a provider 401",
     )
 
 

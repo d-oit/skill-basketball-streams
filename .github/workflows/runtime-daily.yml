@@ -494,7 +494,17 @@ jobs:
           mkdir -p .tmp
           opencode run --attach http://127.0.0.1:4096 \
             --model "$LLM_MODEL" --format json \
-            --file SKILL.md --file references/ \
+            --file SKILL.md \
+            --file references/validation-workflow.md \
+            --file references/youtube-live-search.md \
+            --file references/magenta-tv.md \
+            --file references/approved-sources.md \
+            --file references/calendar-setup.md \
+            --file references/self-learning.md \
+            --file references/search-backends.md \
+            --file references/lessons-learned.md \
+            --file references/implementation-notes.md \
+            --file config/sources.json --file config/calendar.json \
             "Execute Steps 1-7 for today (Europe/Berlin). DRY_RUN=$DRY_RUN. Emit the Step 7 table." \
             | tee .tmp/transcript.json
 

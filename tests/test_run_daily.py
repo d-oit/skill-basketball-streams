@@ -672,6 +672,53 @@ class TestTheLlmPreflightSeesTheCredentialsItGatesOn:
                     "credentials that server will use"
                 )
 
+    def test_the_agent_step_attaches_no_directory(self):
+        """`--file` takes a file, and the CLI refuses a directory.
+
+        The step passed `--file references/`, which the CLI rejects outright:
+        *"Cannot attach a directory, special file, or file larger than 10
+        MiB"*. A second blocker in the same step, independent of the model, and
+        it failed the run just as hard.
+        """
+        step = self._step("Run the skill")
+        code = "\n".join(
+            line for line in step.splitlines() if not line.lstrip().startswith("#")
+        )
+        attached = re.findall(r"--file\s+(\S+)", code)
+        assert attached, "the agent is given the contract by --file"
+        for path in attached:
+            assert not (RUNTIME_DAILY.parent / path).is_dir(), (
+                f"--file {path} is a directory; the CLI cannot attach one"
+            )
+
+    def test_every_attached_reference_exists(self):
+        """A missing `--file` is the same class of failure, silently.
+
+        `check_workflow_refs.py` reads the whole workflow, but this pins the
+        list at the point it is consumed, so a reference that disappears cannot
+        leave the agent quietly short of the document a check depends on.
+        """
+        step = self._step("Run the skill")
+        code = "\n".join(
+            line for line in step.splitlines() if not line.lstrip().startswith("#")
+        )
+        for path in re.findall(r"--file\s+(\S+)", code):
+            assert (REPO_ROOT / path).is_file(), f"--file {path} does not exist"
+
+    def test_every_reference_the_contract_names_is_attached(self):
+        """The other direction: a reference the agent needs but never receives.
+
+        `SKILL.md` names its references by backtick path, and the agent runs
+        with a **fixed** file list, so a reference added to the contract without
+        being attached here is documented as a source of truth and absent from
+        the run. The two lists cannot drift.
+        """
+        step = self._step("Run the skill")
+        attached = set(re.findall(r"--file\s+(\S+)", step))
+        named = set(re.findall(r"`(references/[\w./-]+\.md)`", (REPO_ROOT / "SKILL.md").read_text(encoding="utf-8")))
+        assert named, "SKILL.md names references; this pins that they are attached"
+        assert named <= attached, f"not attached to the agent: {sorted(named - attached)}"
+
 class TestExaMcpKeylessBackend:
     """The free hosted Exa MCP rung (`https://mcp.exa.ai/mcp`, no API key).
 
