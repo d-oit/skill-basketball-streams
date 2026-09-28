@@ -310,37 +310,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Notes
 
-- **The `opencode serve` backend booted with no credentials, so the model call
-  was authenticated against the wrong provider.** The second instance of the
-  class above, found the moment the first was fixed — which is what a real gate
-  does: fixing it exposed the next one.
+- **The `--attach` flag does not exist, and the CLI reported someone else's
+  error for it.** This is what actually failed the run, and it is why three
+  earlier diagnoses were wrong.
 
-  The agent step runs `opencode run --attach http://127.0.0.1:4096`, so the
-  model call is made by the long-lived **`serve` process**, not by the step
-  holding the key. `Start the opencode backend` had no `env:` block, so the
-  server started with an empty environment and resolved
-  `openrouter/openrouter/free` against OpenCode's own provider, which refuses
-  its free tier from anywhere else. Passing the credential to the *client* is a
-  no-op by construction: it forwards the prompt over HTTP.
+  The step started a long-lived `opencode serve` and attached the agent to it.
+  Against opencode v2.0.16 **both halves are broken**:
 
-  The log made the cause unambiguous — the key was accepted one second before
-  the failure it should have prevented:
+  - `--attach` is not a flag of the agent command at all. It is `--server`. The
+    CLI rejected the unknown flag and then surfaced the **default provider's**
+    refusal — *"OpenCode's free tier can only be used from within OpenCode"* —
+    which reads unmistakably like a credential problem. Every diagnosis that
+    followed chased a credential, because the CLI's own error said to.
+  - `--server` does not work either: the handshake fails with *"did not provide
+    a compatible V2 health response"* / `UnsupportedContentType`.
 
-  ```
-  OK   openrouter key: key accepted
-  OK: llm_model: rung openrouter -> openrouter/openrouter/free
-  LLM failed: OpenCode's free tier can only be used from within OpenCode
-  ```
+  `--standalone` is what the CLI documents for a private server, and it answers.
+  The serve step is deleted; the cost is one server boot per run instead of one
+  per job, which at one run a day is not worth optimising. A step that cannot
+  affect the run is a step that hides the one that can.
 
-  The serve step now carries the same credential list as the preflight, and
-  `test_every_step_that_starts_a_server_carries_the_credentials` states the
-  property over the workflow rather than this one step.
+  A new proof step runs the agent CLI once, before the skill, and asserts the
+  model answered — so a broken CLI now reports its own message instead of
+  arriving 40 seconds later inside the skill run.
 
-  **I first recorded this as a provider-side refusal the repository did not
-  own.** That was wrong, and wrong in the way this changelog keeps warning
-  about: the error named an external limit, so it read as somebody else's
-  fault, and the config sat in a step that could not possibly affect it. The
-  CLI was the right call — the server simply had no key.
+  **Three times in this release I wrote a confident cause that was wrong**, and
+  every wrong one named something *external* — the provider's free tier, then
+  the server's environment — so each read as somebody else's fault while the
+  real cause sat in this repository: a credential, then a model id, then a flag
+  that does not exist. What settled it each time was running the real CLI on
+  this machine and reading what it said, which takes seconds. The generalisable
+  lesson is already in `AGENTS.md`: **a step that cannot affect the run is a
+  step that hides the one that can** — and an error message from a tool about a
+  *different* thing than the one you asked is a first-class finding, not noise.
 
 - **A sweep for settings that are read but never written found a second instance — and the
   "documented gap" it produced was the wrong answer.** The first instance was `visibility`, now

@@ -642,35 +642,42 @@ class TestTheLlmPreflightSeesTheCredentialsItGatesOn:
         step = self._step("Run the skill")
         assert "OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}" in step
 
-    def test_the_serve_backend_receives_them_too(self):
-        """The second instance of the same class, and the one that bit.
+    def test_no_long_lived_backend_is_started(self):
+        """The serve/attach pair is gone, because both halves were broken.
 
-        The agent step runs `opencode run --attach http://127.0.0.1:4096`, so
-        the model call is made by the long-lived **`serve` process**, not by the
-        step that holds the key. `Start the opencode backend` had no `env:`
-        block, so the server booted with an empty environment and authenticated
-        against OpenCode's own provider — which refuses its free tier from
-        anywhere else. The run reported `OK openrouter key: key accepted` one
-        second before failing for want of a key the *server* never had.
+        `--attach` is not a flag of the agent command in opencode v2.0.16 (it is
+        `--server`), and `--server` fails the V2 health handshake. The CLI
+        rejected the unknown flag and reported the *default provider's*
+        refusal, so the run looked like a credential fault twice over.
 
-        Passing the credential to the client is a no-op by construction: it
-        forwards the prompt over HTTP and the server does the rest.
+        Stated as an absence so the pair cannot come back half-applied: a
+        `serve` with no consumer, or an agent attaching to nothing, is the state
+        this file has already had once.
         """
-        step = self._step("Start the opencode backend (one MCP boot for the job)")
-        for name in self.RUNG_SECRETS:
-            assert f"{name}: ${{{{ secrets.{name} }}}}" in step, (
-                f"the serve process cannot see {name}, so the model call is "
-                "authenticated against the CLI's own provider"
-            )
-
-    def test_every_step_that_starts_a_server_carries_the_credentials(self):
-        """Stated as a property, because the two instances shared a cause."""
         for step in self._runtime_steps():
-            if "opencode serve" in step:
-                assert "OPENROUTER_API_KEY" in step, (
-                    "a step that starts the model server must carry the "
-                    "credentials that server will use"
-                )
+            assert "opencode serve" not in step, "the long-lived backend is gone"
+        agent = self._step("Run the skill")
+        # The *script*, not the whole step: a comment explaining the removal
+        # necessarily names both broken flags, and asserting on prose would make
+        # documenting the defect a way to fail.
+        script = "\n".join(
+            line for line in agent.splitlines() if not line.lstrip().startswith("#")
+        )
+        assert "--attach" not in script and "--server" not in script, (
+            "neither flag works against v2.0.16; the agent must run --standalone"
+        )
+        assert "--standalone" in agent
+
+    def test_the_cli_is_proved_before_the_skill_runs(self):
+        """A broken CLI is reported by its own message, not as a failed run.
+
+        The probe runs first and asserts the model answered, so the failure names
+        the CLI rather than arriving 40 seconds later inside the skill step.
+        """
+        steps = self._runtime_steps()
+        probe = next(i for i, s in enumerate(steps) if "Confirm the opencode CLI" in s)
+        agent = next(i for i, s in enumerate(steps) if "- name: Run the skill\n" in s)
+        assert probe < agent, "the proof must precede the thing it proves"
 
     def test_the_agent_step_attaches_no_directory(self):
         """`--file` takes a file, and the CLI refuses a directory.
