@@ -1,0 +1,37 @@
+{
+  "candidates": [
+    {
+      "league": "BBL",
+      "teams": [
+        "FC Bayern M\u00fcnchen",
+        "ALBA Berlin"
+      ],
+      "start": "2026-09-26T15:40:00+02:00",
+      "state": "VERIFIED",
+      "url": "https://www.sportschau.de/basketball/bbl-pokal/bbl-fc-bayern-muenchen-gegen-alba-berlin,livestream-bbl-fcb-alba-100.html",
+      "game_key": "BBL|FC Bayern M\u00fcnchen|ALBA Berlin|2026-09-26T13:40Z"
+    },
+    {
+      "league": "BBL",
+      "teams": [
+        "EWE Baskets Oldenburg",
+        "Veolia Towers Hamburg"
+      ],
+      "start": "2026-09-27T16:30:00+02:00",
+      "state": "VERIFIED",
+      "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
+      "game_key": "BBL|EWE Baskets Oldenburg|Veolia Towers Hamburg|2026-09-27T14:30Z"
+    },
+    {
+      "league": "BBL",
+      "teams": [
+        "ALBA Berlin",
+        "Bamberg Baskets"
+      ],
+      "start": "2026-10-03T18:30:00+02:00",
+      "state": "VERIFIED",
+      "url": "https://www.sportschau.de/basketball/bbl/alba-berlin-ratiopharm-ulm-64990.html",
+      "game_key": "BBL|ALBA Berlin|Bamberg Baskets|2026-10-03T16:30Z"
+    }
+  ]
+}

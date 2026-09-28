@@ -83,6 +83,15 @@ jobs:
           python3 scripts/candidates.py recall --ledger tests/fixtures/candidates_ledger.jsonl
           python3 scripts/candidates.py retry  --ledger tests/fixtures/candidates_ledger.jsonl
 
+      # The seam that gives `recall` a numerator. Without it the metric reads
+      # 0.000 every day and can only ever read that, because nothing wrote a
+      # `created` row — while the hand-built fixture beside it supplies one, so
+      # the step above keeps passing on a field production never produces.
+      - name: Run the recall seam
+        run: |
+          python3 -m pytest tests/test_recall_seam.py \
+            tests/test_recall_seam_wiring.py -q
+
       - name: Run render_ladder (rung registry + licence guard)
         run: python3 scripts/render_ladder.py --list
 

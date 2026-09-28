@@ -133,6 +133,75 @@ inflate it either way. `fixture_recall` reports `dropped` (no usable `game_key`
 — a parser regression) and `duplicates` (a re-observation — harmless) separately,
 because those two numbers mean opposite things.
 
+## Who writes `recall`'s numerator
+
+    eligible  = unique game_keys with live_signal == true
+    captured  = unique game_keys with disposition == "created"
+
+`candidates.jsonl` has exactly **one** writer: Phase 0's `run_daily.py`. Phase 0
+only searches, so it labels every row `unverifiable` — a search hit is not a
+decision. Nothing appended the row saying what the run decided, so `captured` was
+0 on every run for the life of the project and `metrics.json` reported
+`recall 0.000 (0/270)` as if it were a measured total failure. Measured on the
+branch's own ledger: 1322 rows, 1322 `unverifiable`, 0 `created`, 0 non-empty
+`game_key`.
+
+`candidates.py record` is the missing writer, and the runtime is the only job
+that can call it:
+
+```bash
+python3 scripts/candidates.py record \
+  --ledger .tmp/outcomes.jsonl \
+  --plan .tmp/plan.json --applied .tmp/applied.json \
+  --candidates .tmp/candidates.json \
+  --run-id "$(date -u +%Y-%m-%dT%H:%MZ)"
+```
+
+The rows go out in the `run-ledger` artifact and the `audit` job **appends** them
+to `candidates.jsonl` on the telemetry branch, because `runtime` holds no
+`contents: write` (it holds the calendar credential). The commit step is
+deliberately `if: always()` and gated on the commit's own emptiness check, not on
+the audit's inputs: a day that decided games but wrote no new event used to
+commit its rows and exit without pushing them.
+
+Three things it will not do:
+
+* **A dry run records nothing.** `--applied` carries `dry_run`, and no event was
+  written, so a `created` row would be a claim about a calendar that does not
+  hold it.
+* **It does not assert `live_signal`.** The agent planned a game; that is not the
+  same claim as "this URL is a live broadcast", which is what Phase 0 observed.
+  The outcome row joins the game through the identity union, so Phase 0's own
+  flag still supplies eligibility.
+* **It does not treat every `skip` as a success.** "verified event exists" is a
+  duplicate. "audit verdict WRONG stands" is the audit *refusing* the game, and
+  is recorded as `rejected_auditWrong` — scoring a condemned game as a duplicate
+  would break §17's hard requirement in the ledger rather than only in the
+  planner.
+
+### Joining the two halves, and the one case where it must not
+
+Phase 0 names a game by **URL** (it has a search hit, not a parsed fixture) and
+Phase 1/2 names it by **`game_key`** (the agent decided on a game). A naive
+append therefore opens a *second* bucket per game, and the fix for "recall is
+always 0" inflates the denominator instead — measured on the real ledger, two
+outcome rows took `unique_games` 399 → 401 and `eligible` 270 → 272, so both
+numbers moved in the direction that hides the bug. `game_buckets()` unions the
+two identities so the denominator holds.
+
+A URL is a **hint, never proof**. One pluto.tv channel page backed two different
+games in the 2026-09-26 run, so a URL that has named two `game_key`s is
+ambiguous and joins nothing. The consequence is deliberate: that game stays
+eligible and uncaptured, and the metric **understates** rather than crediting a
+capture it cannot attribute. For a metric whose failure mode is a false success,
+understating is the safe direction.
+
+`--candidates` is required in practice, because a plan row carries no `url` — the
+planner is not a scraper and an event body has no field for one. The join also
+cannot rely on `game_key` alone: on the **update** path `upsert_events.py`
+deliberately replaces the candidate's key with the existing event's, so the
+writer falls back to the teams and start the planner matched on.
+
 ## Self-improvement
 
 `.github/workflows/self-improve.yml` runs after the daily run. It reads the audit
