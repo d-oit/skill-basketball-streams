@@ -6,14 +6,20 @@ promotable to the 7-check pipeline when it is a *real live broadcast* (not a
 recorded video, not an archived live) AND its start datetime is **greater than
 now** (or it is live right now with no end timestamp).
 
-Two search entry points are supported:
+One search entry point is used: the **HTML live filter, which needs no API
+key.** Append `sp=EgJAAQ%3D%3D` to a YouTube results URL — this is YouTube's
+"Live" search filter, so the page only returns live/upcoming broadcasts. Build
+it with `build_live_search_url()`.
 
-1. **HTML live filter (no API key).** Append `sp=EgJAAQ%3D%3D` to a YouTube
-   results URL — this is YouTube's "Live" search filter, so the page only
-   returns live/upcoming broadcasts. Build it with `build_live_search_url()`.
-2. **YouTube Data API v3 (free, 10k units/day).** `search.list` with
-   `eventType=live&type=video` costs 100 units per call (~100 calls/day on the
-   free quota). Build it with `build_api_live_search_url()`.
+The **YouTube Data API v3 path was removed.** `build_api_live_search_url()`
+existed, and `YOUTUBE_API_KEY` was a rehearsal surface, but nothing ever
+*fetched* the URL it built: its only callers were `--print-urls` and a test
+asserting the string. So the runtime reached YouTube through this keyless
+filter while the release rehearsal asked for a key that no code path
+consumed — a `missing` surface that fixing it would never have changed, in a
+report whose only value is being trustworthy. `references/youtube-live-search.md`
+still documents the raw-payload field mapping, because the agent normalises
+whatever the search returns, not only what this URL produces.
 
 Raw YouTube payloads are NOT parsed here — the agent normalizes them into the
 candidate schema below (see `references/youtube-live-search.md` for the field
@@ -177,14 +183,6 @@ def build_live_search_url(query: str) -> str:
         f"{quote_plus(query)}&sp={LIVE_SEARCH_SP}"
     )
 
-
-def build_api_live_search_url(query: str, api_key: str = "YOUR_API_KEY") -> str:
-    """YouTube Data API v3 search URL with eventType=live (100 units per call)."""
-    return (
-        "https://www.googleapis.com/youtube/v3/search"
-        "?part=snippet&type=video&eventType=live&maxResults=25"
-        f"&q={quote_plus(query)}&key={api_key}"
-    )
 
 
 def classify_stream(
@@ -365,21 +363,12 @@ def main() -> None:
     parser.add_argument(
         "--print-urls",
         metavar="QUERY",
-        help="print the live-filtered HTML search URL and the API URL for QUERY",
-    )
-    parser.add_argument(
-        "--api-key",
-        default="YOUR_API_KEY",
-        help="key used when building the API URL (default: YOUR_API_KEY)",
+        help="print the live-filtered HTML search URL for QUERY (no API key)",
     )
     args = parser.parse_args()
 
     if args.print_urls:
         print(f"OK: html: {build_live_search_url(args.print_urls)}")
-        print(
-            "OK: api:  "
-            + build_api_live_search_url(args.print_urls, api_key=args.api_key)
-        )
         return
 
     if not args.input:

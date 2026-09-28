@@ -573,13 +573,6 @@ def build_checks(*, timeout: int = 60) -> list[Check]:
             probe=None,
             optional=True,
         ),
-        Check(
-            name="youtube-data-api",
-            env=("YOUTUBE_API_KEY",),
-            what="optional: only the Data API path; the HTML live filter needs no key",
-            probe=None,
-            optional=True,
-        ),
     ]
 
 

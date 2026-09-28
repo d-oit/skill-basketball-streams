@@ -6,12 +6,10 @@ datetime is greater than now** (or that are live at this moment) may enter the
 broadcast is rejected **before** Check 1.
 
 Implementation: `scripts/youtube_live.py` (`classify_stream`,
-`filter_candidates`, `build_live_search_url`, `build_api_live_search_url`).
+`filter_candidates`, `build_live_search_url`).
 Eval cases 21–24 in `evals/evals.json` pin this behaviour.
 
-## Two search entry points
-
-### 1. HTML live filter — no API key, no quota
+## The search entry point: HTML live filter — no API key, no quota
 
 Append YouTube's "Live" search filter to a results URL:
 
@@ -23,16 +21,14 @@ https://www.youtube.com/results?search_query=<query>&sp=EgJAAQ%3D%3D
 contains only live-now and upcoming broadcasts. Build it with
 `build_live_search_url(query)` — never hand-assemble the URL.
 
-### 2. YouTube Data API v3 — free, 10,000 units/day
-
-```
-https://www.googleapis.com/youtube/v3/search
-  ?part=snippet&type=video&eventType=live&maxResults=25&q=<query>&key=<KEY>
-```
-
-`search.list` costs **100 units**, so the free quota allows ~100 live searches
-per day. `eventType=live` already excludes VODs; the datetime gate below still
-runs on the returned items.
+**The Data API v3 entry point was removed.** It was documented here and built by
+`build_api_live_search_url()`, and `YOUTUBE_API_KEY` was a rehearsal surface, but
+nothing ever *fetched* the URL it produced: the only callers were `--print-urls`
+and a test asserting the string. YouTube is reached through the agent's
+`youtubeLiveSearch` tool, and this keyless filter is the whole search path. The
+field-mapping table below still carries the API v3 column, because the agent
+normalises whatever a search returns — that mapping is about the *payload*, not
+about a credential this repository never used.
 
 ## Field mapping (raw payload → candidate schema)
 
