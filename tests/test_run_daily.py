@@ -642,6 +642,36 @@ class TestTheLlmPreflightSeesTheCredentialsItGatesOn:
         step = self._step("Run the skill")
         assert "OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}" in step
 
+    def test_the_serve_backend_receives_them_too(self):
+        """The second instance of the same class, and the one that bit.
+
+        The agent step runs `opencode run --attach http://127.0.0.1:4096`, so
+        the model call is made by the long-lived **`serve` process**, not by the
+        step that holds the key. `Start the opencode backend` had no `env:`
+        block, so the server booted with an empty environment and authenticated
+        against OpenCode's own provider — which refuses its free tier from
+        anywhere else. The run reported `OK openrouter key: key accepted` one
+        second before failing for want of a key the *server* never had.
+
+        Passing the credential to the client is a no-op by construction: it
+        forwards the prompt over HTTP and the server does the rest.
+        """
+        step = self._step("Start the opencode backend (one MCP boot for the job)")
+        for name in self.RUNG_SECRETS:
+            assert f"{name}: ${{{{ secrets.{name} }}}}" in step, (
+                f"the serve process cannot see {name}, so the model call is "
+                "authenticated against the CLI's own provider"
+            )
+
+    def test_every_step_that_starts_a_server_carries_the_credentials(self):
+        """Stated as a property, because the two instances shared a cause."""
+        for step in self._runtime_steps():
+            if "opencode serve" in step:
+                assert "OPENROUTER_API_KEY" in step, (
+                    "a step that starts the model server must carry the "
+                    "credentials that server will use"
+                )
+
 class TestExaMcpKeylessBackend:
     """The free hosted Exa MCP rung (`https://mcp.exa.ai/mcp`, no API key).
 
