@@ -265,14 +265,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Notes
 
-- **The run still failed, for a reason this repository does not own.** With the
-  key correctly wired, `opencode run --model openrouter/openrouter/free` was
-  answered by the CLI's own provider: *"OpenCode's free tier can only be used
-  from within OpenCode"* — the same refusal that motivated reordering the ladder
-  to OpenRouter-first in 1.4.0, now arriving through the CLI rather than
-  directly. The resolver's model id is correct and its reasoning is sound; the
-  agent step invokes the **opencode CLI**, which resolves providers from its own
-  configuration. That is the next thing to look at, and it is not this fix.
+- **The `opencode serve` backend booted with no credentials, so the model call
+  was authenticated against the wrong provider.** The second instance of the
+  class above, found the moment the first was fixed — which is what a real gate
+  does: fixing it exposed the next one.
+
+  The agent step runs `opencode run --attach http://127.0.0.1:4096`, so the
+  model call is made by the long-lived **`serve` process**, not by the step
+  holding the key. `Start the opencode backend` had no `env:` block, so the
+  server started with an empty environment and resolved
+  `openrouter/openrouter/free` against OpenCode's own provider, which refuses
+  its free tier from anywhere else. Passing the credential to the *client* is a
+  no-op by construction: it forwards the prompt over HTTP.
+
+  The log made the cause unambiguous — the key was accepted one second before
+  the failure it should have prevented:
+
+  ```
+  OK   openrouter key: key accepted
+  OK: llm_model: rung openrouter -> openrouter/openrouter/free
+  LLM failed: OpenCode's free tier can only be used from within OpenCode
+  ```
+
+  The serve step now carries the same credential list as the preflight, and
+  `test_every_step_that_starts_a_server_carries_the_credentials` states the
+  property over the workflow rather than this one step.
+
+  **I first recorded this as a provider-side refusal the repository did not
+  own.** That was wrong, and wrong in the way this changelog keeps warning
+  about: the error named an external limit, so it read as somebody else's
+  fault, and the config sat in a step that could not possibly affect it. The
+  CLI was the right call — the server simply had no key.
 
 - **A sweep for settings that are read but never written found a second instance — and the
   "documented gap" it produced was the wrong answer.** The first instance was `visibility`, now

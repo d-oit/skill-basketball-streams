@@ -395,7 +395,27 @@ jobs:
           python3 scripts/capture_transcripts.py --check-rungs
           python3 scripts/capture_transcripts.py --list-models
 
+      # The credentials belong to the **server**, not to the client. The agent
+      # step attaches to it, so the model call is made by the
+      # long-lived `serve` process — and this step had no `env:` block, so the
+      # server booted with an empty environment. Passing the key to the client
+      # step (as it does) changes nothing, because the client only forwards the
+      # prompt over HTTP.
+      #
+      # That is why a run with a perfectly good `OPENROUTER_API_KEY` reported
+      # `OK openrouter key: key accepted` and then failed with "OpenCode's free
+      # tier can only be used from within OpenCode": the provider the server
+      # authenticated was OpenCode's own, because it had no OpenRouter key of
+      # its own to use instead.
       - name: Start the opencode backend (one MCP boot for the job)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           opencode serve --port 4096 --hostname 127.0.0.1 &
           for i in $(seq 1 30); do
