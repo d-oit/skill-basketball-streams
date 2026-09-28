@@ -63,7 +63,6 @@ TINYFISH_API_KEY   https://agent.tinyfish.ai/api-keys
 FIRECRAWL_API_KEY  https://www.firecrawl.dev/           (keyless mode works without one)
 TAVILY_API_KEY     https://www.tavily.com/
 EXA_API_KEY        https://dashboard.exa.ai
-YOUTUBE_API_KEY    https://console.cloud.google.com/   (enable YouTube Data API v3)
 COMPOSIO_API_KEY   https://composio.dev/                (Google Calendar toolkit connected)
 COMPOSIO_USER_ID   the Composio user whose connected account the call acts as
 ```

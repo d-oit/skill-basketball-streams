@@ -397,11 +397,34 @@ class TestTheRegistryStaysComplete:
         """Optional means a missing key degrades a rung, not a broken run.
 
         The render ladder climbs past a dead hosted rung to the keyless `urllib`
-        one, and the YouTube Data API is an alternative to the keyless HTML live
-        filter. Everything else is required for the scheduled workflows.
+        one. Everything else is required for the scheduled workflows.
+
+        `youtube-data-api` used to be the second member of this set, and that
+        was the defect: `YOUTUBE_API_KEY` was read by nothing. The only consumer
+        of the key was a function that *built* a Data API URL and returned it —
+        nothing ever fetched it, and the runtime used the keyless HTML live
+        filter throughout. So the rehearsal asked for a credential that fixing
+        it would never have made valid, reporting a `missing` surface forever.
+        A probe that reads a field nothing consumes is the same class of error
+        as a rule that reads a field nothing writes.
         """
         optional = {check.name for check in build_checks() if check.optional}
-        assert optional == {"render:firecrawl", "youtube-data-api"}
+        assert optional == {"render:firecrawl"}
+
+    def test_no_surface_names_a_credential_the_code_never_reads(self):
+        """The regression guard for that class, over the real registry.
+
+        A surface earns its place by being consumed. This asserts the property
+        rather than the one instance that has been fixed, so the next dead
+        credential fails here instead of in a release report.
+        """
+        sources = " ".join(
+            path.read_text(encoding="utf-8")
+            for path in REPO_ROOT.glob("scripts/*.py")
+        )
+        for check in build_checks():
+            for name in check.env:
+                assert name in sources, f"{check.name} names {name}, which no script reads"
 
 
 class TestOfflineIsStructural:

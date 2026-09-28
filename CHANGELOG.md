@@ -204,6 +204,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+### Removed
+
+- **`YOUTUBE_API_KEY` is gone, because no code ever read it.** The rehearsal
+  asked for a credential whose only consumer was `build_api_live_search_url()`
+  — a function that *assembles a URL string* and returns it. Nothing ever
+  fetched that URL: its only callers were `--print-urls` and a unit test
+  asserting the returned string. Meanwhile `runtime-daily.yml` never referenced
+  YouTube at all; the runtime reaches it through the agent's `youtubeLiveSearch`
+  tool, and the gate that actually decides live-vs-VOD is the **keyless** HTML
+  Live filter (`sp=EgJAAQ%3D%3D`, YouTube's own filter). So every release
+  reported a `missing` surface that setting the key could never have resolved —
+  noise in the one report whose entire value is being trustworthy.
+
+  Removed: the `youtube-data-api` rehearsal surface, `build_api_live_search_url()`,
+  `--api-key`, the `api:` line from `--print-urls`, and the key from
+  `.env.example`, `SETUP.md` and `references/search-backends.md`.
+  `references/youtube-live-search.md` keeps its field-mapping table — including
+  the API v3 column — because the agent normalises whatever a search returns;
+  that mapping is about the payload, not about a credential.
+
+  This is the mirror image of the "a rule that reads a field nothing writes"
+  class this repository has been bitten by repeatedly: a *probe* reading a field
+  nothing *consumes*. `test_no_surface_names_a_credential_the_code_never_reads`
+  now asserts the property over the real registry, so the next dead credential
+  fails in the suite instead of in a release report.
+
+  Found by asking why the rehearsal wanted a YouTube key at all, when the
+  calendar goes through Composio and YouTube goes through the keyless filter.
+
 ### Notes
 
 - **A sweep for settings that are read but never written found a second instance — and the

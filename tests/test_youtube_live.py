@@ -22,7 +22,6 @@ from scripts.youtube_live import (
     DECISION_REJECT,
     DECISION_SCHEDULED,
     LIVE_SEARCH_SP,
-    build_api_live_search_url,
     build_live_search_url,
     classify_stream,
     filter_candidates,
@@ -332,12 +331,6 @@ class TestUrlBuilders:
         assert f"sp={LIVE_SEARCH_SP}" in url
         assert "EuroLeague+live" in url
 
-    def test_api_url_is_live_only(self):
-        url = build_api_live_search_url("BBL live", api_key="KEY")
-        assert "eventType=live" in url
-        assert "type=video" in url
-        assert "key=KEY" in url
-
 
 def _run(args: list[str]) -> subprocess.CompletedProcess:
     return subprocess.run(
@@ -346,11 +339,19 @@ def _run(args: list[str]) -> subprocess.CompletedProcess:
 
 
 class TestCli:
-    def test_print_urls_exits_zero(self):
+    def test_print_urls_emits_the_keyless_filter_and_nothing_else(self):
+        """One entry point, so the output cannot imply a credential exists.
+
+        `--print-urls` used to print an `OK: api:` line as well, which is how a
+        reader could believe the Data API path was a supported one. The key it
+        named was never read by anything, so the line advertised a credential
+        this repository does not use.
+        """
         result = _run(["--print-urls", "EuroLeague live"])
         assert result.returncode == 0
         assert "OK: html:" in result.stdout
-        assert "OK: api:" in result.stdout
+        assert "OK: api:" not in result.stdout
+        assert "key=" not in result.stdout
 
     def test_promotable_fixture_exits_zero(self, tmp_path):
         fixture = tmp_path / "c.json"
