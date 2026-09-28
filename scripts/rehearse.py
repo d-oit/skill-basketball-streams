@@ -626,6 +626,19 @@ def _live_prober(check: Check) -> tuple[bool | None, str]:
         return False, f"probe raised {type(exc).__name__}: {exc}"[:200]
 
 
+def _no_probe(check: Check) -> tuple[bool | None, str]:
+    """Classify without calling anything.
+
+    `unverified` is the honest state here, and it is exactly why that state
+    exists: the credential is *present* and nothing was asked of it. The
+    alternative — probing — means a test asserting the report's shape, its exit
+    codes or its stdout contract spends a real request, and so inherits the
+    provider's uptime. A free tier rate-limiting the build is not a property
+    of this repository.
+    """
+    return None, "not probed (--no-probe)"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
@@ -650,6 +663,15 @@ def main() -> None:
         "--markdown",
         action="store_true",
         help="print the report as a PR-ready table on stdout",
+    )
+    parser.add_argument(
+        "--no-probe",
+        action="store_true",
+        help="classify without calling anything: every present credential "
+        "reports `unverified` instead of being probed. This is what makes the "
+        "CLI's own report, exit codes and stdout contracts testable offline — "
+        "`--offline` only covers the credential-free structural half, and a "
+        "test that wanted the *full* matrix had to spend a real request",
     )
     parser.add_argument(
         "--env-file",
@@ -695,7 +717,16 @@ def main() -> None:
             file=sys.stderr,
         )
 
-    rows = assess(probed, os.environ, prober=_live_prober)
+    prober = _no_probe if args.no_probe else _live_prober
+    if args.no_probe:
+        print(
+            f"OK: rehearse: no-probe — {len(probed)} surface(s) classified "
+            f"without calling anything, so `unverified` means 'not probed', "
+            f"not 'not checked'",
+            file=sys.stderr,
+        )
+
+    rows = assess(probed, os.environ, prober=prober)
     code = exit_code(rows, require_all=args.require_all)
 
     # `OK` / `NO` / `FAIL` per row is the vocabulary `run_daily --check-backends`
