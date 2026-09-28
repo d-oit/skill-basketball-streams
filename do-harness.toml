@@ -119,6 +119,27 @@ argv = ["python3", "scripts/candidates.py", "recall", "--ledger", "tests/fixture
 when-changed = ["scripts/candidates.py", "tests/fixtures/**"]
 
 [[sensors]]
+name = "recall-seam"
+# `metrics.json` read `recall 0.000 (0/270)` on the telemetry branch every day
+# and could only ever read that: `candidates.jsonl` has one writer (Phase 0,
+# which only searches, so every row is `unverifiable`) and nothing appended the
+# row saying what the run decided. This is the seam that fixes it, asserted over
+# fixtures in the REAL shapes: the ledger looks like Phase 0 output (URL only,
+# no `game_key`), the plan carries no `url`, and one page backs two games exactly
+# as the 2026-09-26 Dyn run did. `candidates_ledger.jsonl` is hand-built with a
+# `created` row, so the pre-existing sensor read 0.5 while production could only
+# produce 0 — the fixture supplied the field the pipeline never wrote.
+argv = ["python3", "-m", "pytest", "tests/test_recall_seam.py", "tests/test_recall_seam_wiring.py", "-q"]
+when-changed = [
+  "scripts/candidates.py",
+  "scripts/upsert_events.py",
+  ".github/workflows/runtime-daily.yml",
+  "tests/fixtures/recall_seam_*",
+  "tests/test_recall_seam.py",
+  "tests/test_recall_seam_wiring.py",
+]
+
+[[sensors]]
 name = "audit-verdict"
 argv = [
   "python3",
@@ -209,6 +230,7 @@ verification = [
   "upsert-plan",
   "upsert-verdicts",
   "candidates-recall",
+  "recall-seam",
   "metrics",
   "audit-verdict",
   "event-ledger",
@@ -228,6 +250,7 @@ release = [
   "upsert-plan",
   "upsert-verdicts",
   "candidates-recall",
+  "recall-seam",
   "metrics",
   "audit-verdict",
   "event-ledger",

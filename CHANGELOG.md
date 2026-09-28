@@ -121,10 +121,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   decide the answer.
 
 
+
 ## [Unreleased]
 
 
 
+
+### Fixed
+
+- **`recall` could only ever report 0.000, because nothing ever wrote the row it
+  counts.** `captured` is "unique games with `disposition == "created"`", and
+  `candidates.jsonl` has exactly one writer: Phase 0's `run_daily.py`, which only
+  *searches*, so every row it writes is `unverifiable` — a search hit is not a
+  decision. The decision lives in Phase 1/2 (`plan.json`, `applied.json`) and
+  nothing joined it back. Measured on the branch's own ledger, 10 runs and 1322
+  rows: **1322 `unverifiable`, 0 `created`, 0 non-empty `game_key`**, and
+  `metrics.json` printing `recall 0.000 (0/270)` as though it were a measured
+  total failure. `candidates.py record` is the missing writer; `runtime` produces
+  the rows, hands them off in the `run-ledger` artifact (it holds no
+  `contents: write` — it holds the calendar credential), and `audit` **appends**
+  them to the existing ledger and recomputes the snapshot.
+
+  Four things it took to get right, each of which the obvious version gets
+  wrong, and each measured rather than assumed:
+
+  1. **A naive append fixes nothing.** Phase 0 names a game by URL (it has a
+     search hit, not a parsed fixture); Phase 1/2 names it by `game_key`. The
+     naive append opens a *second* bucket per game, so the "fix" moves the
+     denominator too — on the real ledger, two outcome rows took `unique_games`
+     399 → 401 and `eligible` 270 → 272, i.e. both numbers moved in the direction
+     that hides the bug. `game_buckets()` unions the two identities, so the
+     denominator holds at 399/270 while `captured` goes 0 → 2.
+  2. **A URL is a hint, never proof.** One pluto.tv channel page backed two
+     different games in the 2026-09-26 run, so a URL that has named two
+     `game_key`s is ambiguous and joins nothing. The consequence is deliberate:
+     that game stays eligible and uncaptured, and the metric **understates**
+     rather than crediting a capture it cannot attribute.
+  3. **The join cannot be `game_key`-only.** On the **update** path
+     `upsert_events.py` deliberately replaces the candidate's key with the
+     existing event's, so the two spellings differ for exactly the games that
+     already have an event. A `game_key`-only match found nothing, the row was
+     written with no URL, and it became a second game: recall read **0.5** on a
+     run that captured the only game there was. The writer falls back to the
+     teams and start the planner matched on.
+  4. **An audit `WRONG` hold is not a duplicate.** The planner emits `skip` for
+     both "verified event exists" and "audit verdict WRONG stands", and they
+     mean opposite things — the second is the audit *refusing* the game. Both
+     as `skipped_duplicate` would score a condemned game as a success, which is
+     what §17's hard requirement forbids; it is recorded as
+     `rejected_auditWrong`.
+
+  The writer asserts **no** `live_signal`: the agent planned a game, which is
+  not the claim that a page was live, and setting it would put a game into the
+  denominator that no backend ever saw live. A dry run records nothing. And the
+  audit job's commit step is no longer gated on the audit's inputs alone — a day
+  that decided games but wrote no new event used to append to the worktree,
+  commit nothing, and exit without pushing.
+
+  `tests/test_recall_seam.py` drives the **real** artifacts in the real shapes
+  and asserts the pair, not the number: an outcome must move the numerator
+  *without* moving the denominator. `tests/test_recall_seam_wiring.py` pins the
+  three-job wiring, and the `recall-seam` sensor gates both — the defect was
+  invisible precisely because `candidates_ledger.jsonl` is hand-built *with* a
+  `created` row, so CI read 0.5 while production could only produce 0. That
+  fixture's README entry now says so outright.
 
 ### Notes
 

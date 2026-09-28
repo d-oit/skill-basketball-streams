@@ -629,6 +629,42 @@ jobs:
             --dest .tmp \
             --run-id "$(date -u +%Y-%m-%dT%H:%MZ)"
 
+      # ── Phase 1/2's answer, joined back into the candidate ledger. ────────
+      # `candidates.jsonl` is written by ONE job — Phase 0 — and Phase 0 only
+      # searches: it labels every row `unverifiable` because a search hit is not
+      # a decision. Nothing else ever appended the row saying what the run
+      # decided, so `captured` was 0 on every run for the life of the project and
+      # `metrics.json` reported `recall 0.000 (0/270)` as a measured total
+      # failure. Measured on the real branch ledger: 1322 rows, 1322
+      # `unverifiable`, 0 `created`.
+      #
+      # The rows go out in the same artifact as the event ledger, because this
+      # job holds no `contents: write` (it holds the calendar credential) and
+      # `audit` is the job that publishes to the telemetry branch.
+      #
+      # A dry run records nothing, and that is the whole point of passing
+      # `--applied`: no event was written, so a `created` row would be a claim
+      # about a calendar that does not hold it.
+      - name: Record the run's outcome into the candidate ledger
+        id: outcome
+        if: always()
+        run: |
+          if [ ! -f .tmp/plan.json ] || [ ! -f .tmp/applied.json ]; then
+            echo "::notice::No plan or apply result this run, so no game was decided — nothing to record."
+            exit 0
+          fi
+          set -- --candidates .tmp/candidates.json
+          if [ ! -f .tmp/candidates.json ]; then
+            set --
+          fi
+          python3 scripts/candidates.py record \
+            --ledger .tmp/outcomes.jsonl \
+            --plan .tmp/plan.json \
+            --applied .tmp/applied.json \
+            "$@" \
+            --run-id "$(date -u +%Y-%m-%dT%H:%MZ)" \
+            --json > .tmp/outcomes-summary.json
+
       - name: Ledger summary
         if: always()
         run: |
@@ -694,6 +730,7 @@ jobs:
           path: |
             .tmp/events.jsonl
             .tmp/evidence.json
+            .tmp/outcomes.jsonl
           if-no-files-found: ignore
           retention-days: 30
 
@@ -816,16 +853,60 @@ jobs:
             --out .tmp/telemetry/audit.jsonl \
             --run-id "$(date -u +%Y-%m-%dT%H:%MZ)" || true
 
+      # The other half of the recall seam, and the only place the ledger can
+      # grow: `candidates.jsonl` already exists in this worktree (Phase 0
+      # committed it), so the outcome rows are **appended** to it rather than
+      # written beside it. The append is the whole trick — `recall` buckets by
+      # game, so an outcome row joins the game Phase 0 already recorded and moves
+      # the numerator without touching the denominator.
+      #
+      # `if: always()` and independent of the audit inputs: a run that decided
+      # nothing on the calendar still decided something about the search, and a
+      # missing audit must not swallow the ledger row.
+      - name: Append this run's outcome to candidates.jsonl
+        id: outcomes
+        if: always()
+        run: |
+          if [ ! -f .tmp/telemetry/outcomes.jsonl ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No outcome rows this run (nothing was decided), so recall is unchanged for this run."
+            exit 0
+          fi
+          if [ ! -f .tmp/telemetry/candidates.jsonl ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No candidate ledger on the branch yet, so the outcome rows have nothing to join."
+            exit 0
+          fi
+          cat .tmp/telemetry/outcomes.jsonl >> .tmp/telemetry/candidates.jsonl
+          rm .tmp/telemetry/outcomes.jsonl
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+          echo "Candidate ledger rows: $(wc -l < .tmp/telemetry/candidates.jsonl)"
+          # The snapshot is derived and regenerable, so it is rewritten here
+          # rather than left describing a ledger without its numerator. Phase 0
+          # already wrote it; this run changed the input it is derived from.
+          python3 scripts/metrics.py --dest .tmp/telemetry || echo "::warning::metrics snapshot failed"
+
+      - name: Recall report
+        if: always()
+        run: |
+          if [ -f .tmp/telemetry/candidates.jsonl ]; then
+            python3 scripts/candidates.py --ledger .tmp/telemetry/candidates.jsonl recall || true
+          fi
+
+      # Gated on EITHER producer, not on the audit's inputs alone: before the
+      # recall seam this step's condition was the only thing deciding whether a
+      # run's rows reached the branch, so a day that decided games but wrote no
+      # new event committed its ledger rows and exited without pushing them.
       - name: Commit telemetry (one commit per run, never per row)
-        if: steps.inputs.outputs.ready == 'true'
+        if: always()
         run: |
           cd .tmp/telemetry
           git add -A
           if git diff --cached --quiet; then
-            echo "No new audit rows."
+            echo "No new telemetry rows."
             exit 0
           fi
-          git commit -m "telemetry: audit $(date -u +%Y-%m-%dT%H:%MZ)"
+          git commit -m "telemetry: run $(date -u +%Y-%m-%dT%H:%MZ)"
           git push origin telemetry
 
       - name: Job summary
@@ -836,6 +917,7 @@ jobs:
           # in the `run:` block reaches the shell unexpanded, where it is a bash
           # "bad substitution". This step failed in `replay_ci.py` for exactly that.
           INPUTS_READY: ${{ steps.inputs.outputs.ready }}
+          OUTCOMES_READY: ${{ steps.outcomes.outputs.ready }}
         run: |
           {
             echo "## Post-hoc audit (Phase 3)"
@@ -847,7 +929,17 @@ jobs:
             else
               echo "| Audit rows | 0 |"
             fi
+            if [ -f .tmp/telemetry/candidates.jsonl ]; then
+              echo "| Candidate ledger rows | $(wc -l < .tmp/telemetry/candidates.jsonl) |"
+            else
+              echo "| Candidate ledger rows | 0 |"
+            fi
+            echo "| Outcome recorded this run | ${OUTCOMES_READY:-no} |"
             echo "| Inputs present | ${INPUTS_READY:-no} |"
+            echo ""
+            echo "The outcome rows are what make \`recall\` move: without them every"
+            echo "candidate is \`unverifiable\` and the metric reads 0.000 while"
+            echo "measuring nothing about the run."
             echo ""
             echo "A \`WRONG\` verdict relabels an event; it never deletes one. Fix the gate on the self-improvement branch, never the event."
           } >> "$GITHUB_STEP_SUMMARY"

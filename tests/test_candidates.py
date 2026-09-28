@@ -12,7 +12,9 @@ from scripts.candidates import (
     append_rows,
     distinct_fixtures,
     fixture_recall,
+    game_buckets,
     normalise_row,
+    outcome_rows,
     read_ledger,
     recall_metrics,
     select_retry,
@@ -438,3 +440,144 @@ class TestCli:
         result = _run(["recall", "--ledger", str(ledger)])
         assert result.returncode == 0
         assert "fixture_recall" not in result.stdout
+
+
+class TestGameBuckets:
+    """One bucket per *game*, whatever identity each row happens to carry.
+
+    Phase 0 rows name only a URL and Phase 1/2 rows usually name only a
+    `game_key`, so bucketing on either alone splits a game in two. That is not
+    a cosmetic difference: the outcome row for a game Phase 0 already recorded
+    would open a second bucket, moving the denominator as well as the
+    numerator, and `recall` would stay ~0 while looking like progress.
+    """
+
+    def test_a_game_key_outcome_joins_a_url_only_phase_zero_row(self):
+        rows = [
+            _row(url="https://pluto.tv/x", game_key="", disposition="unverifiable"),
+            _row(url="https://pluto.tv/x", game_key="BBL|A|B|t", disposition="created"),
+        ]
+        metrics = recall_metrics(rows)
+        assert metrics["unique_games"] == 1
+        assert metrics["captured"] == 1
+        assert metrics["recall"] == 1.0
+
+    def test_the_denominator_does_not_move_when_an_outcome_is_recorded(self):
+        before = recall_metrics([_row(url="https://pluto.tv/x", game_key="")])
+        after = recall_metrics(
+            [
+                _row(url="https://pluto.tv/x", game_key=""),
+                _row(
+                    url="https://pluto.tv/x",
+                    game_key="BBL|A|B|t",
+                    disposition="created",
+                ),
+            ]
+        )
+        assert after["eligible"] == before["eligible"]
+        assert after["unique_games"] == before["unique_games"]
+        assert after["captured"] == before["captured"] + 1
+
+    def test_one_url_backing_two_games_does_not_merge_them(self):
+        """The Dyn free-games case, and the reason a URL is only a hint.
+
+        One pluto.tv channel page carried two different games in a single run.
+        Unioning on it would merge them, and the first game's `created` would
+        mark the second captured — recall would report a success nobody achieved.
+        """
+        shared = "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4"
+        rows = [
+            _row(url=shared, game_key="G1", disposition="created"),
+            _row(url=shared, game_key="G2", disposition="unverifiable"),
+        ]
+        assert len(game_buckets(rows)) == 2
+        metrics = recall_metrics(rows)
+        assert metrics["captured"] == 1
+        assert metrics["eligible"] == 2
+
+    def test_buckets_are_keyed_by_the_game_not_the_internal_tag(self):
+        buckets = game_buckets([_row(url="https://pluto.tv/x", game_key="")])
+        assert list(buckets) == ["https://pluto.tv/x"]
+
+
+class TestOutcomeRows:
+    """The writer `recall`'s numerator never had.
+
+    Without it `captured` is 0 on every run and the metric reports a measured
+    total failure rather than a field nothing writes.
+    """
+
+    def test_create_and_update_are_created(self):
+        plan = [
+            {"action": "create", "game_key": "G1"},
+            {"action": "update", "game_key": "G2"},
+        ]
+        assert [r["disposition"] for r in outcome_rows(plan, [])] == [
+            "created",
+            "created",
+        ]
+
+    def test_a_duplicate_skip_is_not_a_miss_and_leaves_the_retry_queue(self):
+        plan = [{"action": "skip", "game_key": "G1", "reason": "verified event exists — never modified"}]
+        rows = outcome_rows(plan, [{"game_key": "G1", "url": "https://x/y"}])
+        assert rows[0]["disposition"] == "skipped_duplicate"
+        assert select_retry(rows) == []
+
+    def test_an_audit_wrong_hold_is_not_scored_a_duplicate(self):
+        """A condemned game reached a calendar and was found wrong.
+
+        Recording it as a duplicate would score it as a success, which is the
+        one thing §17's hard requirement forbids.
+        """
+        plan = [
+            {
+                "action": "skip",
+                "game_key": "G1",
+                "reason": "audit verdict WRONG stands (recorded ts) — a fresh "
+                "guess does not overwrite it",
+            }
+        ]
+        rows = outcome_rows(plan, [{"game_key": "G1", "url": "https://x/y"}])
+        assert rows[0]["disposition"] == "rejected_auditWrong"
+        assert recall_metrics(rows)["captured"] == 0
+
+    def test_a_dry_run_records_nothing(self):
+        """No event was written, so a `created` row would be a false claim."""
+        plan = [{"action": "create", "game_key": "G1"}]
+        assert outcome_rows(plan, [], applied={"dry_run": True}) == []
+
+    def test_the_url_is_joined_even_when_the_planner_rewrote_the_key(self):
+        """`upsert_events` replaces an update's key with the existing event's.
+
+        A `game_key`-only match then found nothing and the row became a second
+        game: recall read 0.5 on a run that captured the only game there was.
+        """
+        candidates = [
+            {
+                "url": "https://pluto.tv/x",
+                "game_key": "BBL|Agent Spelling|Two|t",
+                "teams": ["A", "B"],
+                "start": "2026-09-27T16:30:00+02:00",
+            }
+        ]
+        plan = [
+            {
+                "action": "update",
+                "game_key": "BBL|Existing Key|Spelling|t",
+                "teams": ["A", "B"],
+                "start": "2026-09-27T16:30:00+02:00",
+            }
+        ]
+        rows = outcome_rows(plan, candidates)
+        assert rows[0]["url"] == "https://pluto.tv/x"
+        joined = recall_metrics(
+            [
+                _row(url="https://pluto.tv/x", game_key="", disposition="unverifiable"),
+                *rows,
+            ]
+        )
+        assert joined["recall"] == 1.0
+        assert joined["unique_games"] == 1
+
+    def test_a_row_with_no_game_key_is_refused(self):
+        assert outcome_rows([{"action": "create"}], []) == []
