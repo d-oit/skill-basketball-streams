@@ -374,7 +374,23 @@ jobs:
       # Placed AFTER the CLI install on purpose: a runner whose only credential
       # is the CLI's own auth store is configured, and checking before the
       # install would red it.
+      # The credentials are the same list `--check-rungs` considers, including
+      # the CLI's own providers. It had **no `env:` block**, so it could not see
+      # a single one of them: with `OPENROUTER_API_KEY` set the preflight printed
+      # `NO rung openrouter: none of OPENROUTER_API_KEY is set` and
+      # `--check-rungs` passed only because the `opencode` CLI was on PATH. Two
+      # steps in the same job, in the same second, answered opposite questions
+      # about the same variable — the resolver said "openrouter serves this run"
+      # while the gate that precedes it said openrouter was not configured.
       - name: Preflight — at least one LLM rung is configured
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           python3 scripts/capture_transcripts.py --check-rungs
           python3 scripts/capture_transcripts.py --list-models
@@ -704,8 +720,20 @@ jobs:
       # Which LLM rungs this run actually had. Free tiers are withdrawn without
       # notice, and "the run found nothing" is indistinguishable from "every
       # rung was dead" unless the rung state is printed next to it.
+      # Same defect as the preflight, and it matters most here: this step exists
+      # so "the run found nothing" can be told apart from "every rung was dead",
+      # and with no `env:` it answered the second question for the wrong reason —
+      # reporting a rung unconfigured when the run had used it.
       - name: Report which LLM rungs are configured
         if: always()
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           python3 scripts/capture_transcripts.py --list-models \
             || echo "::notice::The Gemini rung is unavailable — see the FAIL line above. The ladder uses the rungs that are configured."

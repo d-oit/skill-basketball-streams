@@ -550,6 +550,98 @@ class TestRuntimeDailyWiring:
         )
 
 
+
+class TestTheLlmPreflightSeesTheCredentialsItGatesOn:
+    """A gate that cannot see the variable it gates on is not a gate.
+
+    Found on the first real `Phase 1/2` run (2026-09-28). The preflight had no
+    `env:` block, so `--check-rungs` saw an empty environment and printed:
+
+        NO   rung openrouter: none of OPENROUTER_API_KEY is set
+
+    while the resolver, one step later, printed:
+
+        OK: llm_model: rung openrouter -> openrouter/openrouter/free —
+            OPENROUTER_API_KEY is set, so the free OpenRouter rung serves the run
+
+    Two steps in the same job, in the same second, answering opposite questions
+    about the same variable. The gate passed only because the `opencode` CLI
+    happened to be on PATH — so a repository with a perfectly good key and no
+    CLI would have been **red**, and one with a CLI and no key would have been
+    **green**. Both directions wrong, and neither visible in a passing run.
+    """
+
+    STEP_START = re.compile(r"^      - (?:name|uses|id):", re.M)
+
+    # The credential list `capture_transcripts.RUNG_CREDENTIALS` considers,
+    # including the CLI's own providers. If the resolver sees a wider set than
+    # the gate, the two disagree about what "configured" means — which is
+    # exactly what happened.
+    RUNG_SECRETS = (
+        "GEMINI_API_KEY",
+        "GOOGLE_API_KEY",
+        "OPENCODE_ZEN_API_KEY",
+        "ANTHROPIC_API_KEY",
+        "ANTHROPIC_AUTH_TOKEN",
+        "OPENAI_API_KEY",
+        "OPENROUTER_API_KEY",
+    )
+
+    @classmethod
+    def _runtime_steps(cls) -> list[str]:
+        text = RUNTIME_DAILY.read_text(encoding="utf-8")
+        start = text.index("\n  runtime:")
+        end = text.index("\n  audit:")
+        job = text[start:end]
+        starts = [m.start() for m in cls.STEP_START.finditer(job)]
+        return [job[s:e] for s, e in zip(starts, starts[1:] + [len(job)])]
+
+    @classmethod
+    def _step(cls, name: str) -> str:
+        """Matched on the step's own `name:`, never on prose.
+
+        A comment explaining the defect names `--check-rungs` too, and matching
+        the command text found three steps instead of one — which would have
+        made the assertions below pass for the wrong reason.
+        """
+        marker = f"- name: {name}\n"
+        matches = [s for s in cls._runtime_steps() if marker in s]
+        assert len(matches) == 1, f"expected exactly one step named {name!r}"
+        return matches[0]
+
+    def test_the_preflight_receives_every_rung_credential(self):
+        step = self._step("Preflight — at least one LLM rung is configured")
+        for name in self.RUNG_SECRETS:
+            assert f"{name}: ${{{{ secrets.{name} }}}}" in step, (
+                f"the preflight cannot see {name}, so --check-rungs reports a "
+                "rung unconfigured while the resolver uses it"
+            )
+
+    def test_the_rung_report_receives_them_too(self):
+        """It exists to separate "found nothing" from "every rung was dead".
+
+        Without the credentials it answered the second question for the wrong
+        reason — reporting the rung unconfigured on a run that had just used it.
+        """
+        step = self._step("Report which LLM rungs are configured")
+        for name in self.RUNG_SECRETS:
+            assert f"{name}: ${{{{ secrets.{name} }}}}" in step, name
+
+    def test_the_gate_and_the_resolver_see_the_same_credential_set(self):
+        """The two must not drift: a wider resolver is the original bug."""
+        gate = self._step("Preflight — at least one LLM rung is configured")
+        resolver = self._step("Resolve the model")
+        gate_keys = set(re.findall(r"^\s*(\w+): \$\{\{ secrets\.", gate, re.M))
+        resolver_keys = set(re.findall(r"^\s*(\w+): \$\{\{ secrets\.", resolver, re.M))
+        assert gate_keys == resolver_keys, (
+            f"gate sees {sorted(gate_keys)}, resolver {sorted(resolver_keys)}"
+        )
+
+    def test_the_agent_step_still_receives_the_openrouter_key(self):
+        """The step that actually runs the model, pinned separately."""
+        step = self._step("Run the skill")
+        assert "OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}" in step
+
 class TestExaMcpKeylessBackend:
     """The free hosted Exa MCP rung (`https://mcp.exa.ai/mcp`, no API key).
 

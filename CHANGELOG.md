@@ -233,7 +233,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Found by asking why the rehearsal wanted a YouTube key at all, when the
   calendar goes through Composio and YouTube goes through the keyless filter.
 
+### Fixed
+
+- **The LLM preflight could not see any credential, so it gated on a rung it
+  believed was unconfigured.** `Preflight — at least one LLM rung is configured`
+  had **no `env:` block**, while the resolver one step later and the agent step
+  after that both received all seven. The first real Phase 1/2 run (2026-09-28,
+  dispatched after `ENABLE_CALENDAR_WRITES` and `OPENROUTER_API_KEY` were set)
+  showed both answers in the same log, seconds apart:
+
+  ```
+  NO   rung openrouter: none of OPENROUTER_API_KEY is set
+  ...
+  OK: llm_model: rung openrouter -> openrouter/openrouter/free
+      — OPENROUTER_API_KEY is set, so the free OpenRouter rung serves the run
+  ```
+
+  `--check-rungs` passed only because the `opencode` CLI was on PATH, so both
+  directions were wrong: a repository with a good key and no CLI would have
+  been **red**, and one with a CLI and no key **green**. Neither is visible in a
+  passing run — the gate is satisfied by a fallback rather than by the thing it
+  checks. `Report which LLM rungs are configured` had the same missing `env:`,
+  and it matters more there: that step exists precisely to separate "the run
+  found nothing" from "every rung was dead", and it was reporting a rung
+  unconfigured on a run that had just used it.
+
+  Both steps now receive the same credential list the resolver does, and
+  `tests/test_run_daily.py` pins that the gate and the resolver see the **same
+  set** — so they cannot drift apart again, which is how the two disagreed in
+  the first place.
+
 ### Notes
+
+- **The run still failed, for a reason this repository does not own.** With the
+  key correctly wired, `opencode run --model openrouter/openrouter/free` was
+  answered by the CLI's own provider: *"OpenCode's free tier can only be used
+  from within OpenCode"* — the same refusal that motivated reordering the ladder
+  to OpenRouter-first in 1.4.0, now arriving through the CLI rather than
+  directly. The resolver's model id is correct and its reasoning is sound; the
+  agent step invokes the **opencode CLI**, which resolves providers from its own
+  configuration. That is the next thing to look at, and it is not this fix.
 
 - **A sweep for settings that are read but never written found a second instance — and the
   "documented gap" it produced was the wrong answer.** The first instance was `visibility`, now
