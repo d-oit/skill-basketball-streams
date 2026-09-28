@@ -263,6 +263,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   set** — so they cannot drift apart again, which is how the two disagreed in
   the first place.
 
+- **The agent's model id had to come from the CLI's catalogue, not OpenRouter's
+  — and the CLI cannot attach a directory.** Two independent blockers in the same
+  step, both found by running the real `opencode` v2.0.16 locally rather than
+  reasoning about it.
+
+  `llm_model.py` selected the agent's model from the *capture* ladder, so a
+  configured `OPENROUTER_API_KEY` produced `openrouter/openrouter/free`. That
+  slug is correct for `capture_transcripts.py`, which posts to OpenRouter's
+  HTTPS API, and **wrong** for the agent, which is invoked as
+  `opencode run --model <id>` and resolved against the CLI's own provider
+  registry. Measured:
+
+  | model id | CLI answer |
+  |---|---|
+  | `opencode/big-pickle` | **answered** |
+  | `openrouter/openrouter/free` | `provider.auth` — 401 `User not found` |
+  | `openrouter/free`, `openrouter/auto` | `provider.no-route` — Model unavailable |
+  | `opencode/mimo-v2.5-free` | `provider.no-route` — Model unavailable |
+
+  Three of the six free ids in `references/search-backends.md` no longer
+  resolve, so that table is stale on its own evidence. The resolver no longer
+  selects on credentials at all: it returns `opencode/big-pickle` unless
+  `LLM_MODEL` pins something else, and that id is served by the CLI **with no
+  credential of any kind** — verified with `OPENROUTER_API_KEY`,
+  `OPENCODE_ZEN_API_KEY`, `ANTHROPIC_API_KEY` and `GEMINI_API_KEY` all stripped.
+  So the agent now runs on a repository with no secrets at all.
+
+  The same test found `--file references/`: the CLI answers *"Cannot attach a
+  directory, special file, or file larger than 10 MiB"*, so the agent received
+  the contract and none of the references it depends on. Every reference is now
+  passed explicitly.
+
+  Three guards, each falsified by reintroducing the defect: no `--file` may be a
+  directory, every attached path must exist, and **every reference `SKILL.md`
+  names must be attached** — the last in the other direction, because a
+  reference added to the contract without being attached is documented as a
+  source of truth and silently absent from the run.
+
+  **Twice in this release I wrote a confident cause that was wrong.** First the
+  provider's free tier, then the server's missing environment. Both errors
+  named something *external*, so they read as somebody else's fault, and in both
+  cases a credential or a path sat in this repository the whole time. What
+  actually settled it was running the real CLI on this machine and reading what
+  it said — a step that would have taken seconds and is now the habit.
+
 ### Notes
 
 - **The `opencode serve` backend booted with no credentials, so the model call

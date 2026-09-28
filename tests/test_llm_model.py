@@ -99,85 +99,93 @@ class TestTheLadderDecides:
         assert resolution.model == "anthropic/claude-sonnet-4.5"
         assert resolution.rung == "pinned"
 
-    def test_a_gemini_key_selects_the_gemini_rung(self):
-        resolution = resolve_model("", _env("GEMINI_API_KEY"))
-        assert resolution.model == f"{RUNG_PROVIDERS['gemini']}/{ct.GEMINI_DEFAULT_MODEL}"
-        assert resolution.rung == "gemini"
+    def test_a_gemini_key_does_not_change_the_agent_model(self):
+        """A credential the CLI cannot use must not select the agent's model.
 
-    def test_the_google_alias_counts_as_the_gemini_rung(self):
-        # `capture_transcripts.gemini_api_key()` accepts both names; a resolver
-        # that only knew one of them would send a configured runner to rung 3.
-        resolution = resolve_model("", _env("GOOGLE_API_KEY"))
-        assert resolution.rung == "gemini"
+        `google/<id>` is a Gemini **API** model. The agent is invoked as
+        `opencode run --model <id>`, and the CLI resolves that id against its own
+        catalogue — so selecting it here would emit an id the consumer rejects.
+        The pin (`LLM_MODEL`) is the override.
+        """
+        resolution = resolve_model("", _env("GEMINI_API_KEY"))
+        assert resolution.model == "opencode/big-pickle"
+        assert resolution.rung == "opencode"
+
+    def test_the_google_alias_does_not_select_it_either(self):
+        # `capture_transcripts.gemini_api_key()` accepts both names, so the
+        # preflight treats a `GOOGLE_API_KEY` runner as configured. The agent's
+        # model is a separate question with one answer.
+        assert resolve_model("", _env("GOOGLE_API_KEY")).rung == "opencode"
 
     def test_a_zen_key_selects_the_zen_rung(self):
         resolution = resolve_model("", _env("OPENCODE_ZEN_API_KEY"))
         assert resolution.model == "opencode/big-pickle"
         assert resolution.rung == "opencode"
 
-    def test_an_openrouter_key_alone_selects_the_free_router(self):
-        """The case the change exists for.
+    def test_an_openrouter_key_does_not_select_an_openrouter_model(self):
+        """The defect this replaced, stated as an assertion.
 
-        No Gemini key, no Zen key: the run must use OpenRouter's free router
-        rather than a Zen model id the repository has no credential for.
+        The key is valid — the live probe answers `key accepted` — and it is rung
+        1 of the **capture** ladder, which posts to OpenRouter's HTTPS API. But
+        the agent runs through the CLI, and the CLI has no route for an
+        `openrouter/*` id: measured, `provider.auth 401` for
+        `openrouter/openrouter/free` and `provider.no-route` for
+        `openrouter/free`. So the key must not decide the agent's model.
         """
         resolution = resolve_model("", _env("OPENROUTER_API_KEY"))
-        assert resolution.model == "openrouter/openrouter/free"
-        assert resolution.rung == "openrouter"
+        assert resolution.model == "opencode/big-pickle"
+        assert resolution.rung == "opencode"
 
-    def test_an_earlier_rung_beats_a_later_one(self):
-        # Order is the ladder's (openrouter -> gemini -> opencode, reordered
-        # 2026-09-17 by operator decision), not dict order: a repo with several
-        # keys must not pick a later rung just because it was checked first.
-        resolution = resolve_model("", _env("OPENROUTER_API_KEY", "GEMINI_API_KEY"))
-        assert resolution.rung == "openrouter"
-        resolution = resolve_model("", _env("GEMINI_API_KEY", "OPENCODE_ZEN_API_KEY"))
-        assert resolution.rung == "gemini"
+    def test_every_credential_combination_resolves_to_the_same_model(self):
+        """The ladder is gone; nothing an operator sets may change this.
+
+        A repository with many keys must not get a different agent model from
+        one with a single key, because the id has to be in the CLI's catalogue
+        either way.
+        """
+        combos = [
+            {},
+            _env("OPENROUTER_API_KEY"),
+            _env("GEMINI_API_KEY"),
+            _env("OPENCODE_ZEN_API_KEY"),
+            _env("OPENROUTER_API_KEY", "GEMINI_API_KEY", "OPENCODE_ZEN_API_KEY"),
+            _env("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_AUTH_TOKEN"),
+        ]
+        for environ in combos:
+            assert resolve_model("", environ).model == "opencode/big-pickle", environ
 
     def test_nothing_configured_still_resolves_and_says_why(self):
         # A selector, not a gate: refusing to run here would break a replay,
         # where the parent environment's keys are stripped by design. The gate
-        # is `--check-rungs`, upstream in the same job.
+        # is `--check-rungs`, upstream in the same job — and it does not apply to
+        # this model, which needs no credential at all.
         resolution = resolve_model("", {})
-        assert resolution.model == "openrouter/openrouter/free"
-        assert "check-rungs" in resolution.reason
+        assert resolution.model == "opencode/big-pickle"
+        assert "without a credential" in resolution.reason
 
     def test_a_blank_credential_is_not_a_credential(self):
         # GitHub renders an unset secret as the empty string, so "" must never
-        # read as "configured" — that is the whole difference between choosing a
-        # rung and choosing nothing.
-        resolution = resolve_model("", {"GEMINI_API_KEY": "   "})
-        assert resolution.rung != "gemini"
+        # read as "configured". It cannot change the model now, but the pin must
+        # stay the only thing that does.
+        assert resolve_model("", {"GEMINI_API_KEY": "   "}).rung != "pinned"
 
-    def test_the_cli_providers_do_not_claim_a_zen_model(self):
-        """`--check-rungs` accepts them, selection does not.
+    def test_the_model_is_one_the_cli_actually_serves(self):
+        """The id's provider prefix, which is the part that must not drift.
 
-        A runner authenticated only through `opencode auth login` is configured,
-        and `RUNG_CREDENTIALS` says so so the *preflight* does not red it. But a
-        Zen id is meaningless without a Zen key, and this module deliberately does
-        not probe `auth.json` — that case is what `LLM_MODEL` pins. Falling
-        through to the free router is honest; emitting `opencode/big-pickle` here
-        would be the original bug.
+        `opencode/…` is the CLI's own provider; an `openrouter/…` id is the API's
+        slug and the CLI has no route for it. The catalogue itself rotates —
+        three of the six free ids documented in `references/search-backends.md`
+        no longer resolve — so this asserts the provider, not the model, and the
+        live proof is the dispatch log.
         """
-        resolution = resolve_model("", _env("ANTHROPIC_API_KEY"))
-        assert resolution.model != "opencode/big-pickle"
-        assert resolution.rung == "openrouter"
+        model = resolve_model("", {}).model
+        assert model.startswith(f"{RUNG_PROVIDERS['opencode']}/")
+        assert not model.startswith(f"{RUNG_PROVIDERS['openrouter']}/")
 
     def test_the_precedence_covers_exactly_the_ladder(self):
-        # If the ladder is ever reordered or a rung added, this module's branches
-        # have to be re-derived rather than silently disagreeing with it.
+        # If the capture ladder is ever reordered or a rung added, this module's
+        # provider mapping has to be re-derived rather than silently disagreeing.
         assert set(RUNG_PROVIDERS) == set(ct.LADDER)
-
-    def test_each_rung_names_its_provider_prefix(self):
-        # opencode composes the id as `provider/model`; a bare id would be sent
-        # to whatever provider the CLI defaults to.
-        for model, rung in (
-            (resolve_model("", _env("GEMINI_API_KEY")).model, "gemini"),
-            (resolve_model("", _env("OPENCODE_ZEN_API_KEY")).model, "opencode"),
-            (resolve_model("", _env("OPENROUTER_API_KEY")).model, "openrouter"),
-        ):
-            assert model.startswith(f"{RUNG_PROVIDERS[rung]}/")
-
 
 # ---------------------------------------------------------------------------
 # the CLI surface and the $GITHUB_OUTPUT contract
@@ -188,7 +196,7 @@ class TestCli:
     def test_the_payload_is_only_output_lines(self):
         result = _run(env=_clean_env(OPENROUTER_API_KEY="dummy"))
         assert result.returncode == 0, result.stderr
-        assert _outputs(result.stdout)["model"] == "openrouter/openrouter/free"
+        assert _outputs(result.stdout)["model"] == "opencode/big-pickle"
 
     def test_the_human_line_goes_to_stderr(self):
         """`>> "$GITHUB_OUTPUT"` would fail the step on a stray stdout line."""
@@ -198,8 +206,8 @@ class TestCli:
 
     def test_the_report_names_the_rung_and_the_model(self):
         result = _run(env=_clean_env(OPENROUTER_API_KEY="dummy"))
-        assert "rung openrouter" in result.stderr
-        assert "openrouter/openrouter/free" in result.stderr
+        assert "rung opencode" in result.stderr
+        assert "opencode/big-pickle" in result.stderr
 
     def test_the_env_var_is_the_pin(self):
         result = _run(env=_clean_env(**{PIN: "opencode/mimo-v2.5-free"}))
@@ -214,7 +222,7 @@ class TestCli:
 
     def test_an_explicit_empty_pin_is_not_a_pin(self):
         result = _run(["--pin", ""], env=_clean_env(GEMINI_API_KEY="dummy"))
-        assert _outputs(result.stdout)["rung"] == "gemini"
+        assert _outputs(result.stdout)["rung"] == "opencode"
 
     def test_a_reason_never_carries_a_newline(self):
         # A credential value cannot reach the reason, but the contract has to
@@ -223,9 +231,14 @@ class TestCli:
         assert len(result.stdout.splitlines()) == 3
 
     def test_no_credential_at_all_is_still_a_decision(self):
+        """The strongest form: the agent runs on a repository with no secrets.
+
+        `big-pickle` answered through the CLI with every credential stripped, so
+        this is the case the dispatch proved rather than assumed.
+        """
         result = _run(env={"PATH": os.environ.get("PATH", "")})
         assert result.returncode == 0, result.stderr
-        assert _outputs(result.stdout)["model"] == "openrouter/openrouter/free"
+        assert _outputs(result.stdout)["model"] == "opencode/big-pickle"
 
 
 # ---------------------------------------------------------------------------
