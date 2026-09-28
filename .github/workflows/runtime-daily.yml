@@ -395,19 +395,26 @@ jobs:
           python3 scripts/capture_transcripts.py --check-rungs
           python3 scripts/capture_transcripts.py --list-models
 
-      # The credentials belong to the **server**, not to the client. The agent
-      # step attaches to it, so the model call is made by the
-      # long-lived `serve` process — and this step had no `env:` block, so the
-      # server booted with an empty environment. Passing the key to the client
-      # step (as it does) changes nothing, because the client only forwards the
-      # prompt over HTTP.
+      # There is no long-lived backend. The step used to start one and attach to
+      # it, and **both halves were broken against opencode v2.0.16**:
       #
-      # That is why a run with a perfectly good `OPENROUTER_API_KEY` reported
-      # `OK openrouter key: key accepted` and then failed with "OpenCode's free
-      # tier can only be used from within OpenCode": the provider the server
-      # authenticated was OpenCode's own, because it had no OpenRouter key of
-      # its own to use instead.
-      - name: Start the opencode backend (one MCP boot for the job)
+      #   * `--attach` is not a flag of the agent command. It is `--server`. The
+      #     CLI rejected the unknown flag and then reported the *default*
+      #     provider's refusal — "OpenCode's free tier can only be used from
+      #     within OpenCode" — which reads like a credential problem and sent
+      #     two earlier diagnoses down the wrong path entirely.
+      #   * `--server` does not work either: the handshake fails with "did not
+      #     provide a compatible V2 health response" / `UnsupportedContentType`.
+      #
+      # `--standalone` is what the CLI documents for a private server, and it
+      # answers (measured, with every credential stripped). The cost is one
+      # server boot per run instead of one per job; at one run a day that is not
+      # worth optimising, and it is the mode the tool actually supports.
+      #
+      # So the agent step runs `--standalone` and the serve step is gone. A step
+      # that cannot affect the run is a step that hides the one that can — the
+      # same reasoning that removed the Google auth step when Composio arrived.
+      - name: Confirm the opencode CLI can run a model
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
@@ -417,11 +424,15 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
-          opencode serve --port 4096 --hostname 127.0.0.1 &
-          for i in $(seq 1 30); do
-            curl -fsS http://127.0.0.1:4096/ >/dev/null 2>&1 && break
-            sleep 1
-          done
+          set -o pipefail
+          # Zero-token proof that the binary starts and can reach a model, so a
+          # broken CLI is reported here with its own message rather than as a
+          # failed skill run 40 seconds later.
+          opencode run --standalone --model opencode/big-pickle --format json \
+            "Reply with exactly: OK" \
+            | tee /tmp/opencode-check.json \
+            | grep -q '"text":"OK"' \
+            || { echo "::error::the opencode CLI could not serve a model — see the log above"; exit 1; }
 
       # ONE decision, in tested Python, of which model the run below uses.
       #
@@ -492,7 +503,12 @@ jobs:
           # `if-no-files-found: ignore` hid that: the run was failing to record a
           # transcript while looking like a quiet day.
           mkdir -p .tmp
-          opencode run --attach http://127.0.0.1:4096 \
+          # `--standalone`, not `--attach`: v2.0.16 has no `--attach`, and the
+          # failure it reported for the unknown flag was the *default*
+          # provider's refusal, which reads as a credential fault. The
+          # credentials are still passed because the model the resolver picked
+          # may need one; `big-pickle` does not.
+          opencode run --standalone \
             --model "$LLM_MODEL" --format json \
             --file SKILL.md \
             --file references/validation-workflow.md \

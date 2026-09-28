@@ -262,13 +262,17 @@ class TestRuntimeDailyWiring:
     def test_the_resolver_precedes_its_consumers(self):
         steps = self._runtime_steps()
         resolver = next(i for i, s in enumerate(steps) if "Resolve the write mode" in s)
-        agent = next(i for i, s in enumerate(steps) if "opencode run" in s)
+        agent = next(
+            i
+            for i, s in enumerate(steps)
+            if "opencode run" in s and "Confirm the opencode CLI" not in s
+        )
         apply_ = next(i for i, s in enumerate(steps) if "calendar_io.py apply" in s)
         assert resolver < agent, "the agent's DRY_RUN env would be empty"
         assert resolver < apply_
 
     def test_the_agent_env_reads_the_resolved_mode(self):
-        step = self._find("opencode run")
+        step = self._find("Run the skill")
         assert "DRY_RUN: ${{ steps.mode.outputs.dry_run }}" in step
 
     def test_the_apply_step_reads_the_resolved_mode(self):

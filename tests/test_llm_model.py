@@ -304,7 +304,9 @@ class TestWorkflowWiring:
     def test_the_resolver_precedes_its_consumer_in_runtime_daily(self):
         text = RUNTIME_DAILY.read_text(encoding="utf-8")
         resolver = text.index("name: Resolve the model")
-        consumer = text.index("opencode run --attach")
+        # The agent step by its own name: the CLI proof step runs the agent CLI
+        # too, and it must not satisfy this ordering by appearing first.
+        consumer = text.index("- name: Run the skill")
         assert resolver < consumer, "the agent's LLM_MODEL env would be empty"
 
     def test_the_resolver_sees_exactly_what_the_gate_sees(self):

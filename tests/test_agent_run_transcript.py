@@ -70,12 +70,28 @@ def _script(step: str) -> str:
     return _without_comments(step.partition("run: |")[2])
 
 
+def _agent_step() -> str:
+    """The `Run the skill` step, matched by name.
+
+    Matching the command text found two steps once the CLI probe was added —
+    the probe also invokes `opencode run` — and a test that resolves to the
+    wrong step passes for the wrong reason.
+    """
+    matches = [s for s in _runtime_steps() if "- name: Run the skill\n" in s]
+    assert len(matches) == 1, f"expected exactly one `Run the skill` step, got {len(matches)}"
+    return matches[0]
+
+
 class TestTheAgentStepsReportTheirExitCode:
     """A `| tee` without `pipefail` reports tee's status, not the CLI's."""
 
     @pytest.mark.parametrize("workflow", [RUNTIME_DAILY, SELF_IMPROVE])
     def test_a_piped_agent_run_arms_pipefail(self, workflow):
-        agent_steps = [s for s in _all_steps(workflow) if "opencode run" in s]
+        agent_steps = [
+            s
+            for s in _all_steps(workflow)
+            if "opencode run" in s and "Confirm the opencode CLI" not in s
+        ]
         assert agent_steps, f"{workflow.name} has no `opencode run` step"
         for step in agent_steps:
             code = _script(step)
@@ -90,7 +106,7 @@ class TestTheAgentStepsReportTheirExitCode:
     def test_the_runtime_step_still_writes_the_transcript(self):
         # `pipefail` must not be bought by dropping the file the later steps and
         # the artifact consume.
-        code = _script(_find(_runtime_steps(), "opencode run --attach"))
+        code = _script(_agent_step())
         assert "tee .tmp/transcript.json" in code
 
     def test_the_self_improve_step_still_writes_the_transcript(self):
@@ -100,7 +116,7 @@ class TestTheAgentStepsReportTheirExitCode:
 
 class TestTheTranscriptDirectoryExists:
     def test_the_runtime_step_creates_dot_tmp_before_writing(self):
-        code = _script(_find(_runtime_steps(), "opencode run --attach"))
+        code = _script(_agent_step())
         assert "mkdir -p .tmp" in code, (
             "nothing earlier in this job creates `.tmp`, so `tee` could not open "
             "its own output file and `if-no-files-found: ignore` hid it"
@@ -117,7 +133,7 @@ class TestTheTranscriptDirectoryExists:
         happens to create the directory.
         """
         steps = _runtime_steps()
-        agent = steps.index(_find(steps, "opencode run --attach"))
+        agent = steps.index(_agent_step())
         earlier = [
             step
             for step in steps[:agent]
