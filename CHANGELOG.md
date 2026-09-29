@@ -25,6 +25,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The audit could not read the first event it ever produced.** `events.jsonl`
+  is JSONL, so a file holding exactly one row parses as *that row* — a dict — and
+  `_load` returned it where a list was required, failing with `--events must be a
+  list`. Two rows worked, which is why every existing fixture passed: the bug
+  fires only on the first event, and the first event is what a fresh install
+  writes. Phase 3 would have failed on exactly the run that produced its first
+  input. Proven by hand before and after: 1 row → hard failure, 2 rows → pass.
+
 - **The render rung could never fire: its browser was installed in a different
   job.** `patchright` was installed in the `runtime` job while `render-arena`
   runs in Phase 0 — a separate job, on a separate runner, with no browser.
