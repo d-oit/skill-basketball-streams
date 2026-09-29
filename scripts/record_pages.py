@@ -79,6 +79,20 @@ PAGES: tuple[RecordedPage, ...] = (
         note="JS app shell: 942 bytes, no readable text, no media token at all",
     ),
     RecordedPage(
+        "magenta-tv-sport-shell",
+        "https://www.magenta.tv/sport",
+        NO_EVIDENCE,
+        note=(
+            "THE FREE ARENA (operator, 2026-09-29): carries the second "
+            "'KOSTENLOS & OHNE LOGIN' live-events section where the free "
+            "basketball games are listed, and is in NO web-search index. A plain "
+            "GET is an 858-byte app shell with no 'kostenlos', no game and no "
+            "media token, so the free indication is only readable through a "
+            "rendering backend. Recorded precisely because it is unindexed: the "
+            "corpus is how a page search cannot reach is still gated."
+        ),
+    ),
+    RecordedPage(
         "magentasport-home",
         "https://www.magentasport.de/",
         NO_EVIDENCE,

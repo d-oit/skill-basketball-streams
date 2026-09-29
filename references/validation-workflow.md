@@ -174,16 +174,21 @@ Log which of the three sources carried the announcement in
 ### MagentaSport/MagentaTV — the free arena is magenta.tv
 
 > **Changed 2026-09-29 (operator):** the free basketball game is **no longer
-> announced on `magentasport.de`**. The free ("kostenlos") arena now lives
-> **only on `magenta.tv`**. The previous rule required an announcement on
-> `magentasport.de` and rejected anything without one, which produced a **false
-> rejection** on the first live run of that rule — see "What changed and why" below.
+> announced on `magentasport.de`**. It now lives in a second section on
+> **`magenta.tv/sport`**, headed **"KOSTENLOS & OHNE LOGIN"** — *live events of
+> Magenta Sport*, where the basketball games are listed. That page is **in no
+> web-search index** (it is a dynamic SPA), so the free game is found by
+> **rendering the page**, never by searching for it. The previous rule required
+> an announcement on `magentasport.de` and rejected anything without one, which
+> produced a **false rejection** on the first live run of that rule — see
+> "What changed and why" below.
 
 **Domain Separation (current):**
-- `magenta.tv` = **the free-access evidence AND the streaming platform.** This is
-  where "kostenlos für alle" is stated for the current matchday, and where the
-  live stream plays. URLs follow `magenta.tv/tv/live-[game-slug]/[dynamic-id]` and
-  are often **not indexed** by search engines.
+- **`magenta.tv/sport` = the free arena.** The second section on that page,
+  **"KOSTENLOS & OHNE LOGIN"**, is where the current free basketball game is
+  listed. This is the page to render.
+- `magenta.tv/tv/live-[game-slug]/[dynamic-id]` = **the stream itself**, read
+  from the rendered arena page. Dynamic and usually unindexed.
 - `magentasport.de` = **secondary corroboration only.** It may still carry a
   schedule or a pointer, but a free game is **not** established by its absence
   there, and its silence is **not** evidence against free access.
@@ -195,15 +200,17 @@ Log which of the three sources carried the announcement in
   subscription → REJECT.
 - Free access is decided **per game**, never per platform.
 
-**Mandatory Two-Step Search Strategy:**
-1. **Evidence Search on `magenta.tv`** — find the current free-game indication
-   for the matchday. Keywords: `kostenlos`, `kostenlos für alle`, `ohne Abo`,
-   `für alle`, `gratis`. A `magenta.tv` page is a JS-rendered, bot-blocked SPA: a
-   plain GET returns an app shell with no readable text, so this **requires** a
-   browser-rendering backend (Firecrawl / TinyFish Fetch / Playwright). Full
-   fetch ladder, acceptance markers and worked logs: `references/magenta-tv.md`.
-2. **Cross-reference** — the free indication found in step 1 must name **this
-   game**. A stream URL without a matching free indication is **REJECT**.
+**Mandatory Three-Step Strategy:**
+1. **Render `magenta.tv/sport`** — the free arena. Take the **second section,
+   "KOSTENLOS & OHNE LOGIN"**, and read the basketball games listed in it. This
+   step **requires** a browser-rendering backend (Firecrawl / TinyFish Fetch /
+   Playwright): measured 2026-09-29, a plain GET returns **858 bytes of app
+   shell** containing no `kostenlos`, no game and no media token. The page is in
+   **no web-search index**, so `webSearch` cannot substitute for it. Full fetch
+   ladder, acceptance markers and worked logs: `references/magenta-tv.md`.
+2. **Cross-reference** — the game in that section must be **this** game. A
+   `magenta.tv` stream URL for a game absent from "KOSTENLOS & OHNE LOGIN" is
+   **REJECT**; the platform existing says nothing.
 3. **Corroboration (optional)** — `site:magentasport.de` and the official social
    accounts may confirm the same game. Their agreement raises confidence; their
    silence changes nothing.
