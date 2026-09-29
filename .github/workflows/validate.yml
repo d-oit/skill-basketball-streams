@@ -176,6 +176,19 @@ jobs:
             --transcript tests/fixtures/agent_transcript_sample.json \
             --out .tmp/candidates.json
 
+      # The shape the runtime ACTUALLY produces: `opencode run --format json`
+      # writes one JSON event per line, and the pipeline `tee`s that stdout
+      # verbatim to `.tmp/transcript.json`. The step above reads a single JSON
+      # *document*, so the only shape the pipeline ever hands the extractor was
+      # untested — and it failed in production, where a run that emitted a
+      # perfect `{"candidates": …}` was reported as "no usable candidates"
+      # because the block was read with its escapes still intact.
+      - name: Run extract_candidates (real JSONL transcript shape)
+        run: |
+          python3 scripts/extract_candidates.py \
+            --transcript tests/fixtures/agent_transcript_jsonl.txt \
+            --out .tmp/candidates-jsonl.json
+
       - name: Run the write path (plan + dry-run apply, no credentials)
         run: |
           python3 scripts/upsert_events.py \

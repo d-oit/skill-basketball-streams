@@ -82,15 +82,78 @@ def _collect(node: object, into: list[str], *, only_text_keys: bool) -> None:
             _collect(item, into, only_text_keys=only_text_keys)
 
 
+def _decode_jsonl(text: str) -> object | None:
+    """`text` decoded as JSON — one document, else one event per line.
+
+    Returns the **document**, not a list wrapper, and `None` when the text is not
+    JSON in either shape. `json_blocks` already knows how to read a bare
+    top-level document, so wrapping a single-document transcript in a list hands
+    the collector a one-element list and flattens its candidate objects to bare
+    strings — the same zero-candidate outcome, from the other direction.
+
+    The whole document is tried **first**, because a single-document transcript
+    is also "text". In the line-by-line case *every* non-blank line must parse: a
+    file that merely starts with valid JSON lines is a different document, and
+    half-decoding it would produce a partial candidate list that looks complete.
+    """
+    stripped = text.strip()
+    if not stripped:
+        return None
+    try:
+        return json.loads(stripped)
+    except json.JSONDecodeError:
+        pass
+
+    events: list[object] = []
+    for line in stripped.splitlines():
+        if not line.strip():
+            continue
+        try:
+            events.append(json.loads(line))
+        except json.JSONDecodeError:
+            return None
+    return events or None
+
+
+
+
 def transcript_text(payload: object) -> str:
     """All model-output text in a transcript, in document order.
 
     Prefers known output keys, then falls back to every string leaf. The fallback
     exists because the envelope is a third-party format that can change without
     notice, and returning nothing is a silent zero-candidate run — the failure
-    mode most likely to look like \"no games today\".
+    mode most likely to look like "no games today".
+
+    **A JSONL event stream is decoded before anything else.** `opencode run
+    --format json` writes one JSON event per line, and the pipeline `tee`s that
+    stdout verbatim to `.tmp/transcript.json`. Handed the raw text, the escape
+    sequences inside each event's `text` field survive into the fenced block, so
+    the agent's own `{"candidates": …}` reached `json.loads` with literal
+    backslashes and the block was dropped — a run that emitted exactly the right
+    answer reported *no usable candidates*.
+
+    So the *shape* of the file, not its content, decided whether the planner
+    worked at all. The line-by-line parse is tried first and falls back to the
+    previous behaviour, so a single-document transcript is unaffected.
     """
     if isinstance(payload, str):
+        # A *single* JSON document is already the answer, and `json_blocks`
+        # reads it directly. Walking it would flatten each candidate object to
+        # its bare string leaves and leave nothing to parse, so it is
+        # re-serialised untouched.
+        stripped = payload.strip()
+        if stripped.startswith(("{", "[")):
+            try:
+                return json.dumps(json.loads(stripped), ensure_ascii=False)
+            except json.JSONDecodeError:
+                pass
+        decoded = _decode_jsonl(payload)
+        if decoded is not None:
+            # An event stream. Recurse so the collector reads the `text` leaves,
+            # which is where the fenced block lives — re-serialising *this*
+            # would bury the block inside escaped JSON and lose it again.
+            return transcript_text(decoded)
         return payload
     chunks: list[str] = []
     _collect(payload, chunks, only_text_keys=True)

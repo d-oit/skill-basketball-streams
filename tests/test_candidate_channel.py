@@ -173,3 +173,21 @@ class TestTheChannelIsTheOnlyOneThereIs:
             "the parser's fence pattern is the other half of this contract; if it "
             "changes, SKILL.md's example must change with it"
         )
+
+    def test_ci_exercises_both_transcript_shapes(self):
+        """`validate.yml` is the only gate that runs the extractor end to end.
+
+        It ran the *document* shape alone, which is how the stream shape reached
+        production untested. Both are named now, so a future step cannot quietly
+        drop one — and the runtime uses the stream, so the gate must match the
+        consumer rather than the easier shape.
+        """
+        ci = (REPO_ROOT / ".github" / "workflows" / "validate.yml").read_text(
+            encoding="utf-8"
+        )
+        for fixture in (
+            "agent_transcript_sample.json",
+            "agent_transcript_jsonl.txt",
+        ):
+            assert fixture in ci, f"{fixture} is not exercised by validate.yml"
+        assert "transcript.json" in RUNTIME_DAILY.read_text(encoding="utf-8")

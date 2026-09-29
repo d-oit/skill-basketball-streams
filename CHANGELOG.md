@@ -389,6 +389,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   A table for the human and a block for the machine is not redundancy; it is the
   only way one channel serves a reader and a parser.
 
+- **The agent did everything right and the planner read nothing, because the
+  transcript was never decoded.** With the contract above in place, the next run
+  emitted exactly the right block — and `extract_candidates.py` still reported
+  *no usable candidates*. Feeding its own output to the parser proved the block
+  was fine, and the file was the problem.
+
+  `runtime-daily.yml` runs `opencode run --format json` and `tee`s that stdout
+  verbatim to `.tmp/transcript.json`. That is a **JSONL event stream** — one
+  JSON object per line, 22 of them. `transcript_text` received it as a *string*,
+  so the escape sequences inside each event's `text` field survived into the
+  fenced block, and the agent's own `{"candidates": …}` reached `json.loads`
+  carrying literal backslashes. `json_blocks` dropped it without a word, and the
+  step reported the failure mode this repository calls its worst: **a run that
+  found two real games, read exactly like a day with none.**
+
+  The **shape** of the file decided whether the planner worked at all, and every
+  transcript fixture in the suite was a single JSON *document* — so the only
+  shape the pipeline ever produced was untested. `validate.yml` ran the document
+  shape on every push and called it covered.
+
+  Two things now guard it, and the second is the one that matters:
+
+  - `tests/fixtures/agent_transcript_jsonl.txt` is the **real** shape, two lines
+    long so the shape is the point. On the pre-fix parser it reproduces the exact
+    CI failure; the assertions include one that a merely "contains ```json" test
+    would have passed, because the fence *was* there and the quotes were not.
+  - `validate.yml` runs **both** shapes, so the gate matches the consumer rather
+    than the easier input.
+
+  I got this one wrong in the middle: a first attempt decoded the stream and
+  then walked it, which flattened each candidate object to its bare string
+  leaves and produced *the same zero-candidate outcome from the other
+  direction*. A second attempt re-serialised the stream, which buried the block
+  inside escaped JSON and lost it again. Both were caught only by running the
+  real command, not by reasoning about the code — which is now four for four in
+  this release.
+
 ### Notes
 
 - **The prompt was the last argument, and `--file` is an array.** The real cause,
