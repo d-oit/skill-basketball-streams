@@ -5,7 +5,42 @@ All notable changes to `skill-basketball-streams` will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.1] - 2026-09-17
+## [1.6.0] - 2026-09-29
+
+### Added
+
+- **`render-arena`: a Phase 0 rung that can actually read the free arena.**
+  Every rung in the search ladder was a *search*, and `magenta.tv/sport` is a
+  client-rendered app shell in no web index — so searching for its games
+  returned nothing and the run reported "no free streams found today", the one
+  failure that is invisible from the outside. Measured 2026-09-29: a plain GET
+  returns **858 bytes** of shell with no game and no media token, and Firecrawl
+  with a valid key returns `SCRAPE_ALL_ENGINES_FAILED`. `patchright` renders
+  the same URL (10,085 chars; `KOSTENLOS` ×11, `OHNE LOGIN` ×10). The rung
+  renders that one fixed arena — the only host it will read — and asserts the
+  `KOSTENLOS` marker, so an unreadable page is a **transport failure**, never
+  an empty result. `runtime-daily.yml` installs the browser, and the Phase 0
+  job now receives `FIRECRAWL_API_KEY`, without which the rung skips silently
+  and the ladder reports three healthy rungs while finding nothing.
+
+### Fixed
+
+- **The free arena listed basketball that the agent could not classify.** The
+  page never writes the word "basketball" — it writes the competition name — so
+  a keyword filter finds no basketball, and reading "no BBL" as "no basketball"
+  is a wrong answer rather than a safe default. Each listing is now classified
+  by research (`"<teams>"` + competition) and accepted only when confirmed:
+  **EuroLeague, EuroCup, any national team, any league, any nation**. The
+  arena is no longer narrowed to one competition.
+
+  Rendered 2026-09-29, the live block held `Panathinaikos AKTOR Athen -
+  ASVEL Villeurbanne` (20:00), `FC Bayern München - Partizan Mozzart Bet
+  Belgrad` (Fr. 02.10. 19:30) and `Olympiakos Piräus - Anadolu Efes Istanbul`
+  (Fr. 09.10. 20:00), plus `Hapoel Midown Jerusalem - Rostock Seawolves` in
+  EuroCup, alongside volleyball, football and darts. `Bayern - Partizan` was
+  wrongly rejected by the last three runs as "no per-game free indication
+  found" — it is listed free.
+
 
 ### Fixed
 
@@ -27,6 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   check cannot be silently disarmed by a rename.
 
 
+## [1.2.1] - 2026-09-17
 ## [1.3.0] - 2026-09-17
 
 ### Added
@@ -200,6 +236,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+
 
 
 

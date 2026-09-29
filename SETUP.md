@@ -391,6 +391,7 @@ when nothing is configured-but-rejected and nothing required is missing.
 | `search:exa-mcp` | `EXA_API_KEY` | [dashboard.exa.ai](https://dashboard.exa.ai) |
 | `search:exa-mcp-keyless` | *(none — free keyless tier)* | Nothing to set up: Phase 0's middle rung talks to the hosted MCP server at `mcp.exa.ai` without a key. Rate-limited by Exa; the paid rung above remains the upgrade path and takes precedence when its key is set |
 | `search:tinyfish` | `TINYFISH_API_KEY` | [agent.tinyfish.ai/api-keys](https://agent.tinyfish.ai/api-keys) |
+| `search:render-arena` | `FIRECRAWL_API_KEY` | **The only rung that can read `magenta.tv/sport`.** That page is a client-rendered app shell in no web index, so searching for its games finds nothing and the run reports "no free games today". This rung renders the page locally with `patchright` (`pip install patchright && patchright install chromium`) and asserts the `KOSTENLOS` marker a bare GET cannot show. The key is a presence flag, not the working part: Firecrawl returns `SCRAPE_ALL_ENGINES_FAILED` on this host, so the local render is what actually reads it |
 | `render:firecrawl` *(optional)* | `FIRECRAWL_API_KEY` | [firecrawl.dev](https://www.firecrawl.dev/) — the hosted escape hatch for SPA pages like `magenta.tv`; keyless mode exists without it |
 
 Reading the output:

@@ -314,11 +314,101 @@ class TinyFishSearchBackend(Backend):
         )
 
 
+class RenderArenaBackend(Backend):
+    """Fetch a KNOWN arena URL by rendering it, not by searching for it.
+
+    Every other rung in this ladder is a *search*, and that is why the free
+    arena stayed invisible: `magenta.tv/sport` is a dynamic app shell that no
+    index has ever seen, so a search for its games returns nothing and the run
+    reports "no free streams found today" — the one failure that is invisible
+    from the outside. Measured 2026-09-29: a plain GET returns 858 bytes of
+    shell, and Firecrawl with a valid key returns `SCRAPE_ALL_ENGINES_FAILED`,
+    so the hosted rungs cannot read it either. `patchright` renders it
+    (10,085 chars; `KOSTENLOS` x11, `OHNE LOGIN` x10).
+
+    This rung therefore takes a URL, not a query, and returns that one page as a
+    single candidate. It is **last** in the ladder because it costs a browser
+    launch and cannot answer an open-ended question; the search rungs stay
+    ahead of it and it is the rung that catches a game no index carries.
+
+    The arena is a constant, not configuration: it is the only host the skill
+    may read this way, and an agent cannot steer this rung to an arbitrary URL.
+    """
+
+    name = "render-arena"
+    env_var = "FIRECRAWL_API_KEY"  # presence-gated; patchright needs no key
+    arena = "https://www.magenta.tv/sport"
+
+    #: The marker the page is read for. Absent from the 858-byte shell, present
+    #: only after rendering, so its absence is the signal to try the next rung.
+    marker = "KOSTENLOS"
+
+    def available(self) -> bool:
+        # Gated on a credential so a runner with no browser still skips it
+        # cleanly. The key itself is NOT what makes this work — see the class
+        # docstring — it is the flag that says a rendering backend is licensed.
+        return bool(os.environ.get(self.env_var)) and _patchright_importable()
+
+    def status_detail(self, configured: bool) -> str:
+        if not configured:
+            return "no rendering credential; the arena cannot be read"
+        return f"renders {self.arena} with patchright (marker: {self.marker!r})"
+
+    def search(self, query: str, limit: int) -> list[dict]:
+        text = _render_once(self.arena)
+        if self.marker not in text:
+            # Recorded as a transport failure, not an empty result: an empty
+            # result would read as "nothing free today", which is precisely the
+            # conclusion this rung exists to make unprovable.
+            self._fail(f"rendered page lacks {self.marker!r} ({len(text)} chars)")
+            return []
+        return [{"url": self.arena, "title": f"MagentaSport free arena (rendered)"}]
+
+
+def _patchright_importable() -> bool:
+    """True when the local renderer can be imported. Offline and cheap."""
+    try:
+        import patchright.sync_api  # noqa: F401
+    except Exception:
+        return False
+    return True
+
+
+def _render_once(url: str, wait_ms: int = 6000) -> str:
+    """Render `url` headless and return the visible text. Empty string on failure.
+
+    The wait is deliberate: the page is a client-rendered app shell, so its
+    text does not exist at `domcontentloaded`. A shorter wait returns the shell
+    again and the caller mistakes "unreadable" for "nothing free".
+    """
+    try:
+        from patchright.sync_api import sync_playwright
+    except Exception as exc:  # pragma: no cover - import guarded by caller
+        return ""
+    try:
+        with sync_playwright() as play:
+            browser = play.chromium.launch(headless=True, args=["--no-sandbox"])
+            try:
+                page = browser.new_page(user_agent=USER_AGENT)
+                page.goto(url, wait_until="domcontentloaded", timeout=60000)
+                page.wait_for_timeout(wait_ms)
+                return page.inner_text("body")
+            finally:
+                browser.close()
+    except Exception:
+        return ""
+
+
 ALL_BACKENDS: dict[str, Backend] = {
     backend.name: backend
-    for backend in (ExaBackend(), ExaMcpKeylessBackend(), TinyFishSearchBackend())
+    for backend in (
+        ExaBackend(),
+        ExaMcpKeylessBackend(),
+        TinyFishSearchBackend(),
+        RenderArenaBackend(),
+    )
 }
-LADDER = ("exa-mcp", "exa-mcp-keyless", "tinyfish")
+LADDER = ("exa-mcp", "exa-mcp-keyless", "tinyfish", "render-arena")
 
 # Hosts that must never be recorded as candidate stream sources.
 NEVER_SOURCE_HOSTS = (
