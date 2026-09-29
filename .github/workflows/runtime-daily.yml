@@ -456,11 +456,31 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
+          # `disown` is load-bearing, and the step used to hang for **45
+          # minutes** — the job timeout — with every line of it correct. The
+          # health loop reached the server on its first iteration and printed
+          # nothing further, but the step never *returned*: Actions runs the
+          # script under `bash -e`, and bash waits for every job it started, so
+          # the step sat there holding the long-lived server open. Measured
+          # locally on 1.18.33: the same body exits in 67s without `disown` and
+          # in **2s** with it.
+          #
+          # The failure read as a hang, not as a bug, and nothing after this
+          # step ran — so a green preflight and a green CLI proof were followed
+          # by a cancelled job.
           opencode serve --port 4096 --hostname 127.0.0.1 &
+          SERVER_PID=$!
+          disown
           for i in $(seq 1 30); do
             curl -fsS http://127.0.0.1:4096/ >/dev/null 2>&1 && break
             sleep 1
           done
+          if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+            echo "::error::the opencode server exited before it became ready"
+            exit 1
+          fi
+          curl -fsS http://127.0.0.1:4096/ >/dev/null \
+            || { echo "::error::the opencode server did not become ready in 30s"; exit 1; }
 
       # ONE decision, in tested Python, of which model the run below uses.
       #

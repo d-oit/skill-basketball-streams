@@ -751,6 +751,45 @@ class TestTheLlmPreflightSeesTheCredentialsItGatesOn:
         assert named, "SKILL.md names references; this pins that they are attached"
         assert named <= attached, f"not attached to the agent: {sorted(named - attached)}"
 
+    def test_the_server_step_returns_instead_of_waiting_on_it(self):
+        """A step that starts a long-lived process must *detach* it.
+
+        Actions runs a `run:` block under `bash -e`, and bash waits for every job
+        it started before the script can exit. So a step that backgrounds a
+        server and then health-checks it looks successful — the loop breaks on
+        the first iteration — and then **never returns**. It held the job for 45
+        minutes until the timeout cancelled it, so every step after it was
+        skipped while the preflight and the CLI proof above it both reported
+        success.
+
+        Measured on 1.18.33: the same body exits in 67s without `disown` and in
+        2s with it. A hang is the worst shape this repository has, because
+        nothing in the log says which step is wrong.
+        """
+        step = self._step("Start the opencode backend (one MCP boot for the job)")
+        script = "\n".join(
+            line for line in step.splitlines() if not line.lstrip().startswith("#")
+        )
+        assert "opencode serve" in script
+        assert "disown" in script, (
+            "the step backgrounds a process and must detach it, or bash waits "
+            "for the server and the step never returns"
+        )
+        assert "$!" in script, "the pid is needed to report a server that died"
+
+    def test_the_server_step_fails_fast_rather_than_looping_forever(self):
+        """A health loop that exhausts its retries must say so, not fall through."""
+        step = self._step("Start the opencode backend (one MCP boot for the job)")
+        script = "\n".join(
+            line for line in step.splitlines() if not line.lstrip().startswith("#")
+        )
+        assert "seq 1 30" in script, "the readiness loop must be bounded"
+        assert "did not become ready" in script, (
+            "a loop that exhausts its retries must red the step, not continue "
+            "into a step that will fail on an unready server"
+        )
+
+
 class TestExaMcpKeylessBackend:
     """The free hosted Exa MCP rung (`https://mcp.exa.ai/mcp`, no API key).
 
