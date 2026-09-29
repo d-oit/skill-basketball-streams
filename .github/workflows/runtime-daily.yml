@@ -441,57 +441,25 @@ jobs:
             | grep -q '"text":"OK"' \
             || { echo "::error::the opencode CLI could not serve a model — see the log above"; exit 1; }
 
-      # One MCP boot for the whole job, then the agent attaches to it. The
-      # credentials belong to the **server**, not to the client: the agent step
-      # only forwards the prompt over HTTP, so a key held solely there changes
-      # nothing. This step had no `env:` block, and a repository with a valid
-      # `OPENROUTER_API_KEY` then reported `key accepted` and failed anyway.
-      - name: Start the opencode backend (one MCP boot for the job)
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-        run: |
-          # The step must not inherit the server's **streams**. Actions runs a
-          # `run:` block under `bash -e`, and bash waits for every child whose
-          # stdio it still holds — so a backgrounded server that keeps stdout
-          # attached leaves the step *apparently finished* and never returned.
-          # The dispatch before this fix hung for 45 minutes on the job timeout
-          # with every line correct and two green steps above it.
-          #
-          # `disown` alone was tried first, and is **not** sufficient. Measured
-          # five runs each on 1.18.33: the body with `disown` and no
-          # redirection blocked **2 in 5**; with all three streams redirected,
-          # **1 in 5**. That difference is inside the noise, and the honest
-          # reading is that **neither was verified to fix it** — the single-run
-          # measurement that made me confident about `disown` was one sample of a
-          # flaky behaviour read as a fact. This step therefore detaches the
-          # streams *and* the job, and the test refuses the form that has now
-          # failed twice. Whoever reads this next should re-measure rather than
-          # trust either number.
-          #
-          # A hang is the worst failure shape this repository has: nothing in the
-          # log says which step is wrong, and every step after it is skipped.
-          opencode serve --port 4096 --hostname 127.0.0.1 </dev/null >/dev/null 2>&1 &
-          SERVER_PID=$!
-          disown
-          for i in $(seq 1 30); do
-            curl -fsS http://127.0.0.1:4096/ >/dev/null 2>&1 && break
-            sleep 1
-          done
-          if ! kill -0 "$SERVER_PID" 2>/dev/null; then
-            echo "::error::the opencode server exited before it became ready"
-            exit 1
-          fi
-          curl -fsS http://127.0.0.1:4096/ >/dev/null \
-            || { echo "::error::the opencode server did not become ready in 30s"; exit 1; }
-          # The server outlives this step on purpose, so nothing may be written
-          # back to it: the log would keep filling for the rest of the job.
-          echo "opencode backend is ready on 127.0.0.1:4096 (pid $SERVER_PID)"
+      # **There is no long-lived backend, and that is the fix.**
+      #
+      # The step used to `opencode serve` in the background and attach the agent
+      # to it, to avoid one MCP re-boot per run. At **one run a day** that is not
+      # worth a step that can hang — and it hung on three dispatches in five
+      # (45 minutes, 34 minutes, 18 minutes, 7 minutes), each time with the two
+      # steps above it green, which is the signature of a step that never
+      # returned rather than of one that is still working.
+      #
+      # Two shell-level fixes were tried and neither is a fix: `disown`, then
+      # redirecting all three streams. Measured eight trials each on identical
+      # code, the same body blocked 2/8 in one run and 0/8 in the next — **the
+      # environment is the variable, not the code.** A detached child inside a
+      # step that must return is the wrong shape, and I reached for shell
+      # mechanics three times before questioning that.
+      #
+      # The agent step now runs `--standalone`, which starts its own server and
+      # exits with the answer. The cost is one boot per run; the benefit is a
+      # step that cannot outlive its job.
 
       # ONE decision, in tested Python, of which model the run below uses.
       #
@@ -585,9 +553,20 @@ jobs:
           #
           # A directory is refused (`Cannot attach local directory without a
           # shared filesystem: references/`), so every reference is named
-          # explicitly. `--attach` is correct for 1.18.33 — an earlier revision
-          # removed it, having tested a 2.0.16 binary that is not published.
-          opencode run --attach http://127.0.0.1:4096 \
+          # explicitly.
+          #
+          # `--standalone`, because **there is no server to attach to** — the
+          # long-lived `opencode serve` is gone, and the CLI starts and stops
+          # its own inside this step, so this step cannot outlive its job. That
+          # is the fix for a hang that cost three dispatches in five, and two
+          # shell-level patches (`disown`, then stream redirection) did not.
+          #
+          # Bounded by `timeout` for the same reason: a step that runs unbounded
+          # produces a 45-minute cancellation with nothing in the log saying
+          # which step was wrong, whereas a timeout is a red that names itself.
+          # The run needs ~8 minutes, so 20 is generous and still an answer.
+          timeout --signal=TERM --kill-after=30s 1200 \
+            opencode run --standalone \
             --model "$LLM_MODEL" --format json \
             "Execute Steps 1-7 for today (Europe/Berlin). DRY_RUN=$DRY_RUN. Emit the Step 7 table.
 

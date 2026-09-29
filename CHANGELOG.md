@@ -582,6 +582,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `result["actions"]` holds only create/update rows, so a skips-only plan looks
   empty through it. The check counts `created + updated + skipped`.
 
+- **The long-lived `opencode serve` is gone, and three dispatches in five were
+  the argument for it.** The step started a server in the background and the
+  agent attached to it, to avoid one MCP re-boot per run. At **one run a day**
+  that is not a trade worth making against a step that can hang.
+
+  It hung on 45 minutes, 34 minutes, 18 minutes, and — after the stream
+  redirection went in — 7 minutes more. Every time the two steps above it were
+  green, which is the signature of a step that never returned rather than of one
+  still working.
+
+  **Two shell-level fixes failed, and the second is the instructive one.**
+  `disown` was the first, and it was reported as working on the strength of *one*
+  run returning in 1 second. The next dispatch hung identically. Stream
+  redirection was the second, and re-measuring it eight times, twice, on
+  identical code gave:
+
+  ```
+  2/8 blocked      …and, minutes later, the same body:
+  0/8 blocked
+  ```
+
+  The environment was the variable, not the code — so a fix I could not reproduce
+  was not a fix, and I had already written that lesson up one commit earlier and
+  then repeated it. A detached child inside a step that must return is the wrong
+  *shape*; I reached for shell mechanics three times before questioning that.
+
+  So the failure is deleted rather than patched: the agent step runs
+  `--standalone`, which starts and stops its own server and exits with the answer,
+  and the cost is one boot per run. The step is also bounded by
+  `timeout --signal=TERM --kill-after=30s 1200`, because an unbounded step
+  produces a 45-minute cancellation that says only "Phase 1/2" — not which step,
+  and not that it was waiting. The run needs ~8 minutes, so 20 is generous and
+  still an answer.
+
+  `test_no_step_starts_a_long_lived_service` asserts the **absence**, so the
+  shape cannot come back half-applied.
+
 ### Notes
 
 - **The prompt was the last argument, and `--file` is an array.** The real cause,
