@@ -549,3 +549,62 @@ class TestCli:
         )
         assert result.returncode == 0
         assert json.loads(result.stdout)["summary"]["WRONG"] == 1
+
+
+class TestTheFirstEventIsAuditable:
+    """A one-row `events.jsonl` must load, because the first one ever is.
+
+    `events.jsonl` is JSONL, so a file holding exactly one row parses as *that
+    row* — a dict. `_load` returned the dict, and the caller rejected it as
+    "--events must be a list", so the audit job failed on exactly the run that
+    produced its first input. A two-row file worked, which is why every existing
+    fixture passed: the bug only fires on the first event, and the first event is
+    the one a fresh install writes.
+    """
+
+    def _run(self, tmp_path: Path, events_text: str) -> subprocess.CompletedProcess:
+        events = tmp_path / "events.jsonl"
+        events.write_text(events_text, encoding="utf-8")
+        evidence = tmp_path / "evidence.json"
+        evidence.write_text(json.dumps({"e1": {"free_confirmed": True, "live_confirmed": True}}), encoding="utf-8")
+        return subprocess.run(
+            [sys.executable, "scripts/audit_events.py",
+             "--events", str(events), "--evidence", str(evidence),
+             "--out", str(tmp_path / "audit.jsonl"),
+             "--now", "2026-10-03T00:00:00+02:00"],
+            capture_output=True, text=True,
+        )
+
+    def test_a_single_row_ledger_is_audited_not_rejected(self, tmp_path):
+        row = {"ts": "2026-10-02T17:30:00+00:00", "run_id": "r1", "event_id": "e1",
+               "game_key": "g1", "action": "create", "state": "VERIFIED",
+               "summary": "Bayern vs Partizan", "start": "2026-10-02T19:30:00+02:00",
+               "end": "2026-10-02T22:30:00+02:00", "dry_run": False}
+        result = self._run(tmp_path, json.dumps(row) + "\n")
+
+        assert "must be a list" not in result.stderr, result.stderr
+        assert "1 events audited" in (result.stdout + result.stderr)
+        verdicts = (tmp_path / "audit.jsonl").read_text(encoding="utf-8").splitlines()
+        assert json.loads(verdicts[0])["verdict"] == VERDICT_VERIFIED
+
+    def test_a_wrapper_document_still_unwraps(self, tmp_path):
+        """The single-row fix must not break `{"events": [...]}`."""
+        row = {"ts": "2026-10-02T17:30:00+00:00", "run_id": "r1", "event_id": "e1",
+               "game_key": "g1", "action": "create", "state": "VERIFIED",
+               "summary": "Bayern vs Partizan", "start": "2026-10-02T19:30:00+02:00",
+               "end": "2026-10-02T22:30:00+02:00", "dry_run": False}
+        result = self._run(tmp_path, json.dumps({"events": [row]}))
+
+        assert "must be a list" not in result.stderr, result.stderr
+        assert "1 events audited" in (result.stdout + result.stderr)
+
+    def test_an_evidence_shaped_dict_is_not_mistaken_for_an_event(self):
+        """Evidence rows carry neither `action` nor `game_key`."""
+        from scripts.audit_events import _looks_like_one_event
+
+        assert not _looks_like_one_event(
+            {"e1": {"free_confirmed": True, "live_confirmed": True}}
+        )
+        assert not _looks_like_one_event({"events": []})
+        assert _looks_like_one_event({"event_id": "e1", "action": "create"})
+

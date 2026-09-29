@@ -285,9 +285,28 @@ def _load(path: Path, key: str) -> object:
             sys.exit(2)
         return rows
 
-    if isinstance(payload, dict) and key in payload:
-        return payload[key]
+    if isinstance(payload, dict):
+        # A JSONL file holding exactly ONE row parses as that row, so the
+        # JSON-document path cannot tell "a dict of events" from "a JSONL file
+        # with one event in it" — and it returned the dict, which the caller
+        # then rejected as "must be a list". The first event a fresh install
+        # records is therefore unauditable, and the audit job would have failed
+        # on exactly the run that produced its first input.
+        if key in payload:
+            return payload[key]
+        if _looks_like_one_event(payload):
+            return [payload]
     return payload
+
+
+def _looks_like_one_event(row: dict) -> bool:
+    """A single `events.jsonl` row, as opposed to a `{"events": [...]}` wrapper.
+
+    Keyed on the fields the writer in `event_ledger.py` emits. A wrapper object
+    has none of them, so a `{"events": [...]}` file is still unwrapped by the
+    `key in payload` branch above and never reaches here.
+    """
+    return "event_id" in row and ("action" in row or "game_key" in row)
 
 
 def main() -> None:
