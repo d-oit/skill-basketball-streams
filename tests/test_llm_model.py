@@ -32,6 +32,7 @@ import capture_transcripts as ct  # noqa: E402
 from scripts.llm_model import (  # noqa: E402
     PIN,
     RUNG_PROVIDERS,
+    ZEN_DEFAULT_MODEL,
     resolve_model,
 )
 
@@ -108,7 +109,7 @@ class TestTheLadderDecides:
         The pin (`LLM_MODEL`) is the override.
         """
         resolution = resolve_model("", _env("GEMINI_API_KEY"))
-        assert resolution.model == "opencode/big-pickle"
+        assert resolution.model == f"opencode/{ZEN_DEFAULT_MODEL}"
         assert resolution.rung == "opencode"
 
     def test_the_google_alias_does_not_select_it_either(self):
@@ -119,7 +120,7 @@ class TestTheLadderDecides:
 
     def test_a_zen_key_selects_the_zen_rung(self):
         resolution = resolve_model("", _env("OPENCODE_ZEN_API_KEY"))
-        assert resolution.model == "opencode/big-pickle"
+        assert resolution.model == f"opencode/{ZEN_DEFAULT_MODEL}"
         assert resolution.rung == "opencode"
 
     def test_an_openrouter_key_does_not_select_an_openrouter_model(self):
@@ -133,7 +134,7 @@ class TestTheLadderDecides:
         `openrouter/free`. So the key must not decide the agent's model.
         """
         resolution = resolve_model("", _env("OPENROUTER_API_KEY"))
-        assert resolution.model == "opencode/big-pickle"
+        assert resolution.model == f"opencode/{ZEN_DEFAULT_MODEL}"
         assert resolution.rung == "opencode"
 
     def test_every_credential_combination_resolves_to_the_same_model(self):
@@ -152,7 +153,7 @@ class TestTheLadderDecides:
             _env("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_AUTH_TOKEN"),
         ]
         for environ in combos:
-            assert resolve_model("", environ).model == "opencode/big-pickle", environ
+            assert resolve_model("", environ).model == f"opencode/{ZEN_DEFAULT_MODEL}", environ
 
     def test_nothing_configured_still_resolves_and_says_why(self):
         # A selector, not a gate: refusing to run here would break a replay,
@@ -160,7 +161,7 @@ class TestTheLadderDecides:
         # is `--check-rungs`, upstream in the same job — and it does not apply to
         # this model, which needs no credential at all.
         resolution = resolve_model("", {})
-        assert resolution.model == "opencode/big-pickle"
+        assert resolution.model == f"opencode/{ZEN_DEFAULT_MODEL}"
         assert "without a credential" in resolution.reason
 
     def test_a_blank_credential_is_not_a_credential(self):
@@ -196,7 +197,7 @@ class TestCli:
     def test_the_payload_is_only_output_lines(self):
         result = _run(env=_clean_env(OPENROUTER_API_KEY="dummy"))
         assert result.returncode == 0, result.stderr
-        assert _outputs(result.stdout)["model"] == "opencode/big-pickle"
+        assert _outputs(result.stdout)["model"] == f"opencode/{ZEN_DEFAULT_MODEL}"
 
     def test_the_human_line_goes_to_stderr(self):
         """`>> "$GITHUB_OUTPUT"` would fail the step on a stray stdout line."""
@@ -207,7 +208,7 @@ class TestCli:
     def test_the_report_names_the_rung_and_the_model(self):
         result = _run(env=_clean_env(OPENROUTER_API_KEY="dummy"))
         assert "rung opencode" in result.stderr
-        assert "opencode/big-pickle" in result.stderr
+        assert ZEN_DEFAULT_MODEL in result.stderr
 
     def test_the_env_var_is_the_pin(self):
         result = _run(env=_clean_env(**{PIN: "opencode/mimo-v2.5-free"}))
@@ -238,7 +239,7 @@ class TestCli:
         """
         result = _run(env={"PATH": os.environ.get("PATH", "")})
         assert result.returncode == 0, result.stderr
-        assert _outputs(result.stdout)["model"] == "opencode/big-pickle"
+        assert _outputs(result.stdout)["model"] == f"opencode/{ZEN_DEFAULT_MODEL}"
 
 
 # ---------------------------------------------------------------------------

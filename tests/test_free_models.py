@@ -41,6 +41,14 @@ CATALOGUE = {
     "opencode": {
         "id": "opencode",
         "models": {
+            "longcat-2.5-preview-free": {
+                "id": "longcat-2.5-preview-free",
+                "cost": {"input": 0, "output": 0, "cache_read": 0, "cache_write": 0},
+                "release_date": "2026-09-25",
+                "reasoning": True,
+                "tool_call": True,
+                "limit": {"context": 1000000},
+            },
             "big-pickle": {
                 "id": "big-pickle",
                 "cost": {"input": 0, "output": 0, "cache_read": 0, "cache_write": 0},
@@ -98,14 +106,22 @@ class TestFreeIsDecidedByCost:
     def test_a_paid_model_is_excluded(self):
         ids = [m["id"] for m in free_models.free_models(CATALOGUE)]
         assert "some-paid-model" not in ids
-        assert ids == ["muse-spark-1.3-contributor-free", "big-pickle"]
+        assert ids == [
+            "longcat-2.5-preview-free",
+            "muse-spark-1.3-contributor-free",
+            "big-pickle",
+        ]
 
 
 class TestTheListing:
     def test_it_is_newest_release_first(self):
         """Most useful exactly when the pin is ageing."""
         ids = [m["id"] for m in free_models.free_models(CATALOGUE)]
-        assert ids == ["muse-spark-1.3-contributor-free", "big-pickle"]
+        assert ids == [
+            "longcat-2.5-preview-free",
+            "muse-spark-1.3-contributor-free",
+            "big-pickle",
+        ]
 
     def test_another_provider_can_be_asked_for(self):
         assert [m["id"] for m in free_models.free_models(CATALOGUE, "openrouter")] == [
@@ -125,7 +141,7 @@ class TestThePinnedStatus:
     def test_it_reports_a_pin_that_is_still_free(self):
         status = free_models.pinned_status(free_models.free_models(CATALOGUE))
         assert status["status"] == "free"
-        assert status["released"] == "2025-10-17"
+        assert status["released"] == "2026-09-25"
         assert status["tool_call"] is True
 
     def test_it_reports_a_pin_that_has_gone_paid(self):
@@ -143,7 +159,12 @@ class TestThePinnedStatus:
         assert status["status"] == "not-free"
 
     def test_the_pinned_constant_matches_the_runtime(self):
-        """One pin, in one place, checked — not two that drift."""
+        """One pin, in one place, checked — not two that drift.
+
+        The pin changed on 2026-09-29 (`big-pickle` -> `longcat-2.5-preview-free`)
+        and this test is what makes a second copy of the id a failure rather than
+        a silent divergence.
+        """
         from scripts.llm_model import ZEN_DEFAULT_MODEL, resolve_model
 
         model, rung, _ = resolve_model("", {})
@@ -198,7 +219,7 @@ class TestTheCli:
         captured = capsys.readouterr()
         parsed = json.loads(captured.out)  # raises if a human line leaked
         assert parsed["provider"] == "opencode"
-        assert len(parsed["free"]) == 2
+        assert len(parsed["free"]) == 3
         assert "OK: free_models:" in captured.err
         assert "OK: free_models:" not in captured.out
 
@@ -208,7 +229,7 @@ class TestTheCli:
             pinned=free_models.pinned_status(free_models.free_models(CATALOGUE)),
         )
         assert free_models.CATALOGUE_URL in table
-        assert "big-pickle" in table
+        assert free_models.PINNED_MODEL.split("/", 1)[1] in table
         assert "**free**" in table
 
     def test_an_unreachable_catalogue_is_reported_not_guessed(self, monkeypatch, capsys):

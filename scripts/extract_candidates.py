@@ -74,8 +74,21 @@ def _collect(node: object, into: list[str], *, only_text_keys: bool) -> None:
         for key, value in node.items():
             if key in TEXT_KEYS and isinstance(value, str):
                 into.append(value)
-            elif not only_text_keys:
-                _collect(value, into, only_text_keys=False)
+            else:
+                # **Descend either way.** The `elif not only_text_keys` this
+                # replaces meant a non-`TEXT_KEYS` key was never walked in
+                # `only_text_keys` mode — so the real opencode envelope
+                # (`{"part": {"text": …}}`) yielded *nothing*, and extraction
+                # only ever worked because the caller then fell back to
+                # "every string leaf". That fallback is why 73,425 characters of
+                # envelope noise were being scored as if they were the model's
+                # answer. Measured on the degenerate transcript: model text
+                # 0.986 unique tokens, whole envelope 0.638 — the same file.
+                #
+                # Recursing unconditionally is also *correct* rather than merely
+                # broader: an output key can sit at any depth, and refusing to
+                # look for it is what turned a fixable shape into noise.
+                _collect(value, into, only_text_keys=only_text_keys)
         return
     if isinstance(node, list):
         for item in node:
@@ -277,6 +290,160 @@ def extract(payload: object) -> tuple[list[dict], list[str]]:
     return accepted, rejected
 
 
+# Thresholds for the degeneration signal, measured against real output — see
+# `_token_diversity` for why they are where they are. Reported beside the verdict
+# rather than instead of it, so a reader can disagree with the call.
+DEGENERATION_DIVERSITY = 0.93  # near-unique tokens: random, not language
+MIN_TOKENS_FOR_SIGNAL = 200
+# Below this, there is no answer to judge: a run that emitted a word is not a run
+# that emitted a contract miss, and the two need different responses.
+MIN_ANSWER_CHARS = 200
+
+
+def _token_diversity(text: str) -> float | None:
+    """Share of tokens that are unique — the degeneration signal.
+
+    The intuitive measure is the **opposite** one, and finding that out cost a
+    round of wrong code. I assumed a collapsed model repeats itself, so I scored
+    repeated 12-grams — and measured the real degenerate transcript at **0.6%**,
+    because `reat` alternates with other fragments and no 12-gram repeats. A
+    healthy markdown answer scored **83%**: tables genuinely *are* repetitive,
+    with `|` and `---` everywhere.
+
+    So the signal is not repetition but **randomness**. A model that has collapsed
+    emits near-unique tokens, because what it produces is not language any more:
+
+    | output | unique-token share | measured on |
+    |---|---|---|
+    | degenerate run | **0.986** | 39,289 chars of the 2026-09-29 transcript |
+    | healthy answer | **0.787** | `tests/fixtures/agent_transcript_jsonl.txt` |
+    | degenerate run | 0.006 repeated 12-grams | — the measure that failed |
+
+    `None` for too-short output, because a short answer is not a random one and
+    must not be judged on a statistic with no sample.
+    """
+    tokens = text.split()
+    if len(tokens) < MIN_TOKENS_FOR_SIGNAL:
+        return None
+    return round(len(set(tokens)) / len(tokens), 3)
+
+
+
+def _model_text(payload: object) -> str:
+    """Only the model's **own prose**, with everything else removed.
+
+    `transcript_text` deliberately returns every string leaf, because returning
+    nothing is the failure mode that looks like "no games today". That is the
+    right trade for *extraction* and the wrong one for *diagnosis*: the same walk
+    also yields tool output, `part.id`, session ids and state hashes, and every
+    token of a JSON tool result is unique. Measured on the degenerate transcript,
+    diversity is **0.986** over the model's text and **0.646** over the collected
+    envelope — the same file, so a diagnostic scored on the envelope reports
+    "ordinary" for output that is nothing of the kind.
+
+    So this takes only `part.text` of a `text`-type part, which is the one place
+    the model speaks. A `tool_use` part's `output` is the *tool's* answer — the
+    harness reporting back — and is excluded.
+
+    The payload is decoded first, exactly as `transcript_text` does, so a raw
+    string transcript reaches this as events rather than as one leaf.
+    """
+    decoded = _decode_jsonl(payload) if isinstance(payload, str) else payload
+    if decoded is None:
+        return payload if isinstance(payload, str) else ""
+    parts: list[object] = decoded if isinstance(decoded, list) else [decoded]
+    chunks: list[str] = []
+    for node in parts:
+        if not isinstance(node, dict):
+            continue
+        part = node.get("part")
+        if not isinstance(part, dict) or part.get("type") != "text":
+            continue
+        value = part.get("text")
+        if isinstance(value, str):
+            chunks.append(value)
+    if chunks:
+        return "\n".join(chunks)
+    # A transcript with no `part` shape at all — the hand-written fixtures use
+    # the flat `{"text": …}` form — falls back to the collector rather than
+    # reporting "the model said nothing".
+    fallback: list[str] = []
+    _collect(decoded, fallback, only_text_keys=True)
+    return "\n".join(chunk for chunk in fallback if chunk)
+
+def diagnose(payload: object, *, text: str | None = None) -> dict[str, Any]:
+    """What the agent actually did, in terms a human can act on.
+
+    The failure this replaces reported one message for three different faults:
+
+    * a **degenerate model** — tens of thousands of characters of near-random
+      tokens and no answer. Blaming the output contract for this sends you to
+      edit a contract the model never read, which is what happened here.
+    * a **contract miss** — a normal, sensible answer with no fenced block. The
+      contract *is* the thing to look at.
+    * **a run that stopped early** — almost no output, which is neither of the
+      above; there is nothing to extract and nothing to diagnose.
+
+    Telling them apart costs one pass over the text and turns a mystery into a
+    decision. Each verdict carries the evidence that produced it, so a reader does
+    not have to take the classification on trust — the numbers are printed beside
+    it, and `diversity` is the statistic the call rests on.
+    """
+    # Scored on the model's **own** text, never on the collected envelope. The
+    # collector also returns `part.id`, session ids and state hashes — machine
+    # tokens that are *all* unique, so including them dragged the real degenerate
+    # transcript from 0.986 down to 0.638 and hid the signal entirely. Measured
+    # both: model text 0.986, whole envelope 0.638, same file.
+    model_text = _model_text(payload)
+    stripped = (text if text is not None else transcript_text(payload)).strip()
+    diversity = _token_diversity(model_text)
+    has_fence = bool(FENCED_BLOCK.search(stripped))
+    length = len(stripped)
+    degenerate = diversity is not None and diversity >= DEGENERATION_DIVERSITY
+    if degenerate:
+        verdict = "degenerate"
+        reason = (
+            f"{diversity:.1%} of the model's tokens are unique - near-random, so "
+            "it collapsed rather than answering and the contract was never "
+            "reached. This is a MODEL fault, not a contract fault: see "
+            "`python3 scripts/free_models.py --pinned` and change the pinned "
+            "model in scripts/llm_model.py"
+        )
+    elif length < MIN_ANSWER_CHARS:
+        verdict = "empty"
+        reason = (
+            f"the agent produced only {length} character(s) of output, so there "
+            "is nothing to extract and nothing to diagnose. The run stopped "
+            "before it answered"
+        )
+    elif has_fence:
+        # A fence is present but yielded no candidate — a *shape* fault, and the
+        # rejection lines above already name which rule refused it.
+        verdict = "malformed-block"
+        reason = (
+            "a fenced block was present but produced no usable candidate; the "
+            "rejection lines above say which rule refused it"
+        )
+    else:
+        verdict = "no-block"
+        reason = (
+            f"the agent wrote {length} characters of ordinary prose and no fenced "
+            "json block, so the contract in SKILL.md Step 7 was not followed"
+        )
+    return {
+        "verdict": verdict,
+        "reason": reason,
+        "chars": length,
+        "fence": has_fence,
+        "diversity": diversity,
+        # Enough to recognise the output without downloading the artifact. The
+        # transcript is uploaded separately; a reader who needs all of it should
+        # have to go and get it.
+        "head": stripped[:200],
+        "tail": stripped[-200:],
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Extract candidate games from an agent transcript.",
@@ -309,12 +476,34 @@ def main() -> None:
         print(f"WARN: extract_candidates: rejected {reason}", file=sys.stderr)
 
     if not candidates:
+        # One message for three different faults sent every investigation to
+        # the wrong place: a degenerate model was reported as a contract miss,
+        # and the response was to edit a contract the model never read. So the
+        # failure now says what the agent actually did, and names where the fault
+        # is.
+        report = diagnose(payload, text=text)
         print(
-            "FAIL: extract_candidates: no usable candidates "
-            f"({len(rejected)} rejected) — the agent must emit a fenced ```json "
-            "block of candidate objects",
+            f"FAIL: extract_candidates: no usable candidates "
+            f"({len(rejected)} rejected) — {report['verdict']}",
             file=sys.stderr,
         )
+        print(f"  {report['reason']}", file=sys.stderr)
+        print(
+            f"  observed: {report['chars']} chars, "
+            f"fenced block: {'yes' if report['fence'] else 'no'}, "
+            f"unique tokens: {report['diversity']}",
+            file=sys.stderr,
+        )
+        if args.json:
+            print(
+                json.dumps(
+                    {"candidates": [], "rejected": rejected, "diagnosis": report},
+                    indent=2,
+                )
+            )
+        else:
+            print(f"  head: {report['head'][:160]!r}", file=sys.stderr)
+            print(f"  tail: {report['tail'][-160:]!r}", file=sys.stderr)
         sys.exit(1)
 
     if args.out:

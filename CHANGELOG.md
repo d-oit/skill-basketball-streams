@@ -490,11 +490,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     rather than inventing a list — inventing a list is how the hand-written one
     went stale in the first place.
 
-  The degenerate run also showed the sharpest remaining gap: the extraction
-  failure message says *"the agent must emit a fenced block"*, which blames the
-  contract for a **model quality** failure. Those are different faults with
-  different fixes, and the step cannot tell them apart — the same
-  error-names-the-wrong-thing pattern as most of this release.
+- **The extraction failure named the wrong fault, so the fix went to the wrong
+  place.** The 2026-09-29 run failed with:
+
+  ```
+  FAIL: extract_candidates: no usable candidates — the agent must emit a fenced
+  ```json block of candidate objects
+  ```
+
+  and the model had in fact emitted **39,289 characters of near-random tokens**
+  and no answer at all. The contract was never read. That message covers three
+  unrelated faults, and I responded to it by editing `SKILL.md` Step 7 **twice**
+  before reading the transcript — which is the most expensive possible reading
+  of an error that was pointing away from the truth.
+
+  `diagnose()` now classifies what the agent actually did — `degenerate`,
+  `no-block`, `malformed-block` or `empty` — and prints the evidence beside the
+  verdict, plus a head and tail excerpt so the artifact does not have to be
+  opened. A model fault says so, and points at `free_models.py`.
+
+  **The signal is randomness, not repetition, and the first implementation was
+  exactly inverted.** I assumed a collapsed model repeats itself and scored
+  repeated 12-grams: the real degenerate output scored **0.6%**, because the
+  fragments alternate and no 12-gram repeats, while a *healthy* markdown answer
+  scored **83%** — tables genuinely are repetitive. Token **diversity** separates
+  them cleanly:
+
+  | output | unique-token share |
+  |---|---|
+  | degenerate run (real) | **0.986** |
+  | contract miss | 0.093 |
+  | healthy answer | 0.787 |
+
+  And the score must be taken over the **model's own prose**, never the collected
+  envelope: tool results, session ids and state hashes are all unique-token noise
+  that dragged the same file from 0.986 down to 0.646 — a diagnostic that reported
+  "ordinary" for a collapsed model. `tests/fixtures/agent_transcript_degenerate.jsonl`
+  is reduced from the real transcript for exactly this reason: a synthetic
+  "gibberish" string would score whatever the generator happened to produce, and
+  the whole point is that it did not.
+
+  Two smaller things fell out of measuring. `_collect` used an `elif` in
+  `only_text_keys` mode, so it **never descended into a nested key** — the real
+  envelope puts the model's output at `part.text`, so the preferred path returned
+  nothing and extraction only ever worked via the "every string leaf" fallback.
+  That fallback is where the 73,425 characters of noise came from. And the model
+  pin moved from `big-pickle` to `longcat-2.5-preview-free` (newest free id, 1M
+  context, measured answering the contract) — `big-pickle` was never paid, it is
+  simply the **oldest** model in the free catalogue, which is why it collapsed.
 
 ### Notes
 

@@ -60,7 +60,7 @@ DEFAULT_TIMEOUT = 30
 # The model the runtime pins today. Duplicated as a constant rather than imported
 # so this file stays a stdlib-only report and cannot be broken by an import cycle
 # with `llm_model.py`; `test_free_models.py` asserts the two agree.
-PINNED_MODEL = "opencode/big-pickle"
+PINNED_MODEL = "opencode/longcat-2.5-preview-free"
 
 # Characters that would break a `>> "$GITHUB_OUTPUT"` line or a markdown table
 # cell if a provider ever put them in a display name. Same set as
