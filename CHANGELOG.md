@@ -608,9 +608,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   then repeated it. A detached child inside a step that must return is the wrong
   *shape*; I reached for shell mechanics three times before questioning that.
 
-  So the failure is deleted rather than patched: the agent step runs
-  `--standalone`, which starts and stops its own server and exits with the answer,
-  and the cost is one boot per run. The step is also bounded by
+  So the failure is deleted rather than patched: the agent step now runs
+  `opencode run --port 4096`, which makes **the CLI own the server lifecycle** —
+  it starts one, uses it, and exits with the answer, so the step cannot outlive
+  its job. The cost is one boot per run. The step is also bounded by
   `timeout --signal=TERM --kill-after=30s 1200`, because an unbounded step
   produces a 45-minute cancellation that says only "Phase 1/2" — not which step,
   and not that it was waiting. The run needs ~8 minutes, so 20 is generous and
@@ -618,6 +619,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   `test_no_step_starts_a_long_lived_service` asserts the **absence**, so the
   shape cannot come back half-applied.
+
+  **The first version of that fix used `--standalone`, which does not exist.**
+  1.18.33's `run --help` lists `--attach` and `--port`; there is no such flag, and
+  an unknown flag makes the CLI print its usage and exit. The dispatch that proved
+  it produced an **empty transcript** and a red step in 30 seconds — and I had
+  written the changelog entry for the fix before the dispatch that falsified it.
+
+  So `KNOWN_RUN_FLAGS` in `tests/test_agent_run_transcript.py` is now recorded
+  **verbatim from `opencode run --help`** on the pinned binary, and
+  `test_the_agent_step_uses_only_flags_this_cli_has` fails on any flag outside it.
+  That is the third flag-shape change in this file — `--standalone` invented from
+  an unpublished 2.0.16, `--attach` removed on the strength of that same binary,
+  and now `--port` — and every one was committed before anyone ran `--help`
+  against the version CI actually installs. The list is the fix; the intent is
+  what I kept getting wrong.
 
 ### Notes
 
