@@ -173,20 +173,29 @@ Log which of the three sources carried the announcement in
 
 ### MagentaSport/MagentaTV — the free arena is magenta.tv
 
-> **Changed 2026-09-29 (operator):** the free basketball game is **no longer
-> announced on `magentasport.de`**. It now lives in a second section on
-> **`magenta.tv/sport`**, headed **"KOSTENLOS & OHNE LOGIN"** — *live events of
-> Magenta Sport*, where the basketball games are listed. That page is **in no
-> web-search index** (it is a dynamic SPA), so the free game is found by
-> **rendering the page**, never by searching for it. The previous rule required
+> **Changed 2026-09-29 (operator, then measured):** the free basketball game is
+> **no longer announced on `magentasport.de`**. Free games now live on
+> **`magenta.tv/sport`**, under **"KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON
+> MAGENTA SPORT"** — *live events of Magenta Sport*. That page is **in no
+> web-search index** (a dynamic SPA), so the free game is found by
+> **rendering the page**, never by searching for it.
+> 
+> **The listings are EuroLeague basketball**, rendered 2026-09-29 as:
+> `Panathinaikos AKTOR Athen - ASVEL Villeurbanne` (20:00), `FC Bayern München -
+> Partizan Mozzart Bet Belgrad` (Fr. 02.10. 19:30), `Olympiakos Piräus -
+> Anadolu Efes Istanbul` (Fr. 09.10. 20:00). Two traps the page sets: it never
+> writes the word *basketball* — it writes *Euroleague* — and it never lists the
+> BBL. So the league is read from each **entry**, and an absent string is not an
+> absent game. Both were read backwards once during this change, which is why
+> the rendered listing is recorded here rather than only its conclusion. The previous rule required
 > an announcement on `magentasport.de` and rejected anything without one, which
 > produced a **false rejection** on the first live run of that rule — see
 > "What changed and why" below.
 
 **Domain Separation (current):**
-- **`magenta.tv/sport` = the free arena.** The second section on that page,
-  **"KOSTENLOS & OHNE LOGIN"**, is where the current free basketball game is
-  listed. This is the page to render.
+- **`magenta.tv/sport` = the free arena.** The "KOSTENLOS & OHNE LOGIN: LIVE-EVENTS
+  VON MAGENTA SPORT" section lists the current **free EuroLeague basketball**
+  games. This is the page to render.
 - `magenta.tv/tv/live-[game-slug]/[dynamic-id]` = **the stream itself**, read
   from the rendered arena page. Dynamic and usually unindexed.
 - `magentasport.de` = **secondary corroboration only.** It may still carry a
@@ -200,18 +209,23 @@ Log which of the three sources carried the announcement in
   subscription → REJECT.
 - Free access is decided **per game**, never per platform.
 
-**Mandatory Three-Step Strategy:**
-1. **Render `magenta.tv/sport`** — the free arena. Take the **second section,
-   "KOSTENLOS & OHNE LOGIN"**, and read the basketball games listed in it. This
+**Mandatory Four-Step Strategy:**
+1. **Render `magenta.tv/sport`** — the free arena. Read the games listed under
+   **"KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT"**. This
    step **requires** a browser-rendering backend (Firecrawl / TinyFish Fetch /
    Playwright): measured 2026-09-29, a plain GET returns **858 bytes of app
    shell** containing no `kostenlos`, no game and no media token. The page is in
    **no web-search index**, so `webSearch` cannot substitute for it. Full fetch
    ladder, acceptance markers and worked logs: `references/magenta-tv.md`.
-2. **Cross-reference** — the game in that section must be **this** game. A
-   `magenta.tv` stream URL for a game absent from "KOSTENLOS & OHNE LOGIN" is
-   **REJECT**; the platform existing says nothing.
-3. **Corroboration (optional)** — `site:magentasport.de` and the official social
+2. **Classify each listing as basketball by research, not by keyword.** The block
+   mixes volleyball, football and darts, and the page never writes the word
+   *basketball* — so search each entry (`"<teams>"` + competition) and accept
+   only what research confirms: **EuroLeague, EuroCup, any national team, any
+   league, any nation**. An absent string is never an absent game.
+3. **Cross-reference** — the listed game must be **this** game. A `magenta.tv`
+   stream URL for a game absent from the listing is **REJECT**; the platform
+   existing says nothing.
+4. **Corroboration (optional)** — `site:magentasport.de` and the official social
    accounts may confirm the same game. Their agreement raises confidence; their
    silence changes nothing.
 

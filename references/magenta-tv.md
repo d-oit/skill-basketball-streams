@@ -2,9 +2,32 @@
 
 Canonical playbook for the MagentaSport/MagentaTV rule
 (see `references/validation-workflow.md` → *MagentaSport/MagentaTV*).
-**`magenta.tv` announces *and* streams** — the free ("kostenlos") indication is
+**`magenta.tv` announces *and* streams** — the free ("kostenlos") listing is
 read off the rendered page itself. `magentasport.de` is corroboration only
 (changed 2026-09-29, operator).
+
+**The listings are EuroLeague basketball.** Rendered 2026-09-29, the section
+"KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT" held:
+
+```
+Euroleague - LIVE: Panathinaikos AKTOR Athen - ASVEL Villeurbanne   20:00 - 23:05
+Euroleague - LIVE: FC Bayern München - Partizan Mozzart Bet Belgrad  Fr. 02.10. 19:30
+Euroleague - LIVE: Olympiakos Piräus - Anadolu Efes Istanbul       Fr. 09.10. 20:00
+```
+
+**The listing must be classified as basketball by research, not by keyword.**
+The same block carries volleyball, football and darts, and the page never
+writes the word *basketball* — so search each entry (`"<teams>"` + competition)
+and accept only what research confirms: **EuroLeague, EuroCup, any national
+team, any league, any nation**. The league comes from each **entry**, never from
+the absence of a word: two traps here were read backwards while making this
+change — "no BBL" read as "no basketball", when the page simply never labels
+the sport. An absent string is not an absent game.
+
+**A renderer is mandatory, and the hosted one fails here.** `patchright`
+rendered it (10,085 chars; `KOSTENLOS` ×11, `OHNE LOGIN` ×10). Firecrawl with a
+valid key returned `SCRAPE_ALL_ENGINES_FAILED` on the same URL — the page
+blocks it — so a local rung is the working path, not the hosted one.
 
 ## Why a plain fetch fails
 

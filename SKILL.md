@@ -42,19 +42,18 @@ Run `webSearch` against each approved source with `limit: 20`, focusing on offic
 
 ### Step 2.3 — MagentaSport/MagentaTV Special Handling
 
-**CRITICAL:** the free game is listed in the **second section of
-`magenta.tv/sport`**, headed **"KOSTENLOS & OHNE LOGIN"** (live events of Magenta
-Sport) — and that page is in **no web-search index**, so it is found by
-**rendering** it, never by searching:
-
-1. **Domains**: `magenta.tv/sport` = the free arena; `magentasport.de` / social =
-   corroboration only, their silence **not** evidence against free access.
-2. **Render the arena** via the Step 2.8 ladder and read the basketball games in
-   the "KOSTENLOS & OHNE LOGIN" section. **Required** — a plain GET returns 858
-   bytes of app shell with no game and no media token, and the page is unindexed.
-3. **Stream URL** is `magenta.tv/tv/live-[game-slug]/[dynamic-id]`, read from
+1. **Render `magenta.tv/sport`** via the Step 2.8 ladder — required (a plain GET
+   is an 858-byte app shell) — and take the live listings under "KOSTENLOS &
+   OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT". `magentasport.de` / social are
+   corroboration only; their silence is **not** evidence against free access.
+3. **Classify each listing as basketball by research, not by keyword** — the
+   block mixes volleyball, football and darts, and the page never writes
+   "basketball". Search each entry ("<teams>" + competition) and accept only
+   what research confirms: EuroLeague, EuroCup, any national team, any league,
+   **any nation**. An absent string is never an absent game.
+4. **Stream URL** is `magenta.tv/tv/live-[game-slug]/[dynamic-id]`, read from
    the rendered page.
-4. **PASS** on `"kostenlos für alle"`, `"ohne Abo"`, `"ohne Login"`,
+5. **PASS** on `"kostenlos für alle"`, `"ohne Abo"`, `"ohne Login"`,
    `"für alle zugänglich"`, `"Jeden Spieltag eine Partie kostenlos"`. **REJECT**
    `"mit MagentaSport Abo"`, `"nur für Abonnenten"`, `"Login erforderlich"`.
 5. **Cross-reference**: the game in that section must be **this** game — a
@@ -168,7 +167,7 @@ Refused rather than repaired, so get them right: exactly two teams, a `start` th
 8. **YouTube URL rules** — only `@handle`, `@handle/live`, and `/user/TheDBBTV` are accepted.
 9. **Include references** — every event description must contain `sourceReference` and validation timestamp.
 10. **No event without a live stream** — Check 7 must pass; if the live content itself is unverified there is no event. Free access that is merely *unconfirmed* is different: it is still created, but labelled `[UNVERIFIED]` (colour `5`) instead of being rejected.
-11. **Magenta per-game free rule (changed 2026-09-29)** — the free game is listed in the **second section of `magenta.tv/sport`** ("KOSTENLOS & OHNE LOGIN"), a page in **no search index**: render it, never search it. `magentasport.de` / social are corroboration only, and their silence is **not** evidence against free access. A `magenta.tv` game absent from that section is **REJECTED** — such a game may only be created `UNVERIFIED`, never `VERIFIED`.
+11. **Magenta per-game free rule (changed 2026-09-29)** — free **EuroLeague basketball** games are listed under "KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT" on `magenta.tv/sport`, a page in **no search index**: render it, never search it. `magentasport.de` / social are corroboration only, and their silence is **not** evidence against free access. A `magenta.tv` game absent from that section is **REJECTED** — such a game may only be created `UNVERIFIED`, never `VERIFIED`.
 12. **Magenta render rule** — a `magenta.tv` URL only counts as *working* after a browser-rendering backend (Step 2.8) returns player + live markers. A plain GET returning 200 on the app shell fails Check 6/7 and creates no event.
 13. **BCL per-game rule** — Basketball Champions League free access is decided per game via site + `@BasketballCL` + BCL Facebook; silence is not consent.
 14. **YouTube live-only rule** — only real live broadcasts with `scheduled_start` strictly greater than now (or a live-now stream with no `actualEndTime`) may be promoted. VODs, recordings, replays and ended broadcasts never are.

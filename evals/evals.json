@@ -212,8 +212,8 @@
     },
     {
       "id": 17,
-      "prompt": "MagentaSport stream with NO free-access indication in the \"KOSTENLOS & OHNE LOGIN\" section of magenta.tv/sport for that game must be REJECTED. Input: url=https://www.magenta.tv/tv/live-basketball-euroleague-12345; title=EuroLeague LIVE: Real Madrid vs ALBA Berlin; league=EuroLeague; teams=Real Madrid vs ALBA Berlin; date=2026-06-26T20:30:00+02:00; free_tier=True; magenta_tv_sport_free_section_lists_game=false.",
-      "expected_output": "Decision=SKIP; reason=No free-access indication found on magenta.tv for this game; checks: freeAccess=FAIL",
+      "prompt": "EuroLeague game NOT listed under \"KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT\" on magenta.tv/sport must be REJECTED. Input: url=https://www.magenta.tv/tv/live-basketball-euroleague-12345; title=Euroleague - LIVE: Panathinaikos AKTOR Athen vs ASVEL Villeurbanne; league=EuroLeague; teams=Panathinaikos AKTOR Athen vs ASVEL Villeurbanne; date=2026-09-30T20:00:00+02:00; free_tier=True; magenta_tv_sport_free_section_lists_game=false.",
+      "expected_output": "Decision=SKIP; reason=Game absent from the free LIVE-EVENTS section of magenta.tv/sport; checks: freeAccess=FAIL",
       "assertions": [
         "freeAccess expected FAIL"
       ],
@@ -225,8 +225,8 @@
     },
     {
       "id": 18,
-      "prompt": "MagentaSport stream whose game IS listed in the \"KOSTENLOS & OHNE LOGIN\" section of magenta.tv/sport should be ACCEPTED. Input: url=https://www.magenta.tv/tv/live-basketball-euroleague-12345; title=EuroLeague LIVE: Real Madrid vs ALBA Berlin; league=EuroLeague; teams=Real Madrid vs ALBA Berlin; date=2026-06-26T20:30:00+02:00; free_tier=True; magenta_tv_sport_free_section_lists_game=true; magenta_tv_free_keywords=kostenlos fuer alle.",
-      "expected_output": "Decision=CREATE; reason=Game listed in the \"KOSTENLOS & OHNE LOGIN\" section of magenta.tv/sport; checks: freeAccess=PASS, officialSource=PASS",
+      "prompt": "MagentaSport stream whose game IS listed under \"KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT\" on magenta.tv/sport should be ACCEPTED. Input: url=https://www.magenta.tv/tv/live-basketball-euroleague-12345; title=EuroLeague LIVE: Real Madrid vs ALBA Berlin; league=EuroLeague; teams=FC Bayern Muenchen vs Partizan Mozzart Bet Belgrad; date=2026-10-02T19:30:00+02:00; free_tier=True; magenta_tv_sport_free_section_lists_game=true; magenta_tv_free_keywords=kostenlos fuer alle.",
+      "expected_output": "Decision=CREATE; reason=Game listed under the free LIVE-EVENTS section of magenta.tv/sport; checks: freeAccess=PASS, officialSource=PASS",
       "assertions": [
         "freeAccess expected PASS",
         "officialSource expected PASS"
@@ -514,8 +514,8 @@
     },
     {
       "id": 39,
-      "prompt": "A game listed in the \"KOSTENLOS & OHNE LOGIN\" section of magenta.tv/sport must be accepted even when magentasport.de says nothing at all, because magentasport.de is corroboration only since 2026-09-29 and its silence is not evidence against free access. Input: url=https://www.magenta.tv/tv/live-basketball-euroleague-12345; title=EuroLeague LIVE: Fenerbahce vs FC Bayern; league=EuroLeague; teams=Fenerbahce vs FC Bayern Muenchen; date=2026-10-01T19:45:00+02:00; free_tier=True; magenta_tv_sport_free_section_lists_game=true; magenta_tv_free_keywords=kostenlos fuer alle; magentasport_announcement_found=false.",
-      "expected_output": "Decision=CREATE; reason=Game listed in the \"KOSTENLOS & OHNE LOGIN\" section of magenta.tv/sport; magentasport.de silence is not evidence against it; checks: freeAccess=PASS, officialSource=PASS",
+      "prompt": "A game listed under the free LIVE-EVENTS section of magenta.tv/sport must be accepted even when magentasport.de says nothing at all, because magentasport.de is corroboration only since 2026-09-29 and its silence is not evidence against free access. Input: url=https://www.magenta.tv/tv/live-basketball-euroleague-12345; title=EuroLeague LIVE: Fenerbahce vs FC Bayern; league=EuroLeague; teams=Fenerbahce vs FC Bayern Muenchen; date=2026-10-01T19:45:00+02:00; free_tier=True; magenta_tv_sport_free_section_lists_game=true; magenta_tv_free_keywords=kostenlos fuer alle; magentasport_announcement_found=false.",
+      "expected_output": "Decision=CREATE; reason=Game listed under the free LIVE-EVENTS section of magenta.tv/sport; magentasport.de silence is not evidence against it; checks: freeAccess=PASS, officialSource=PASS",
       "assertions": [
         "freeAccess expected PASS",
         "officialSource expected PASS"

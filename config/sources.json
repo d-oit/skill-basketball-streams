@@ -152,7 +152,7 @@
         "facebook.com/MagentaSport"
       ],
       "free_access": "selected",
-      "notes": "One free EuroLeague game per matchday, decided PER GAME. Since 2026-09-29 the free game is listed in the SECOND section of magenta.tv/sport, headed 'KOSTENLOS & OHNE LOGIN' (live events of Magenta Sport). That page is in NO web-search index and a plain GET returns an 858-byte app shell, so the indication requires the render ladder - see references/magenta-tv.md. magentasport.de and the social accounts are corroboration only: their silence is NOT evidence against free access.",
+      "notes": "Free access is decided PER GAME. Since 2026-09-29 the free games are listed on magenta.tv/sport under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT', which is in NO web-search index; a plain GET returns an 858-byte app shell, so the listing is only readable through a rendering backend. The listings are EuroLeague basketball - the page never writes the word 'basketball' and never lists the BBL, so the league is read from each entry and an absent string is not an absent game. magentasport.de and the social accounts are corroboration only: their silence is NOT evidence against free access. See references/magenta-tv.md.",
       "free_access_evidence": [
         "magenta.tv/sport"
       ],
@@ -161,8 +161,16 @@
         "x.com/MagentaSport",
         "facebook.com/MagentaSport"
       ],
-      "free_access_section": "KOSTENLOS & OHNE LOGIN",
-      "free_access_indexed": false
+      "free_access_section": "KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT",
+      "free_access_indexed": false,
+      "free_access_leagues": [
+        "EuroLeague"
+      ],
+      "free_access_observed": [
+        "Panathinaikos AKTOR Athen - ASVEL Villeurbanne",
+        "FC Bayern Muenchen - Partizan Mozzart Bet Belgrad",
+        "Olympiakos Piraeus - Anadolu Efes Istanbul"
+      ]
     },
     {
       "tier": 6,
