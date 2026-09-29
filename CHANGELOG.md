@@ -203,6 +203,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+### Changed
+
+- **The free Magenta game is announced on `magenta.tv`, not `magentasport.de`**
+  (operator, 2026-09-29). The rule in force was *"a `magenta.tv` URL is only
+  valid if a free announcement exists on `magentasport.de`; no announcement =
+  REJECT"*, and on the first live run of that rule it rejected **two real
+  EuroLeague games**:
+
+  > the Magenta two-domain rule requires a matching per-game free announcement —
+  > none found
+
+  Both were rejected because the evidence had moved. The rule is now:
+
+  | | role | effect of silence |
+  |---|---|---|
+  | `magenta.tv` | free-access evidence **and** stream | n/a — this is where you look |
+  | `magentasport.de` | corroboration only | **never** rejects |
+  | official social | corroboration only | **never** rejects |
+
+  What did **not** change is the rule that actually matters: free access is
+  decided **per game**, and a `magenta.tv` game whose rendered page shows no
+  free indication is still **REJECTED** at Check 1. Only the *domain the evidence
+  is read from* moved.
+
+  Rewritten together across `SKILL.md` (note, Constraint 11, Step 2.3, Red
+  Flags, references index), `references/validation-workflow.md`,
+  `references/magenta-tv.md` (header, cross-reference rule, worked log,
+  rationalisation), `references/approved-sources.md` (tier-4 row, social rows) and
+  `config/sources.json`, which now separates the two roles as data —
+  `free_access_evidence: ["magenta.tv"]` and `free_access_corroboration: [...]` —
+  because they were previously indistinguishable in the registry.
+
+  Eval cases 17 and 18 were rewritten to the new rule and a **39th** added for
+  the regression itself: a free indication on `magenta.tv` plus silence on
+  `magentasport.de` must be **accepted**. Nothing asserted that before, which is
+  why a live run could regress it silently.
+
+  `tests/test_magenta_evidence_domain.py` pins the change and — just as
+  importantly — pins that the rule which *requires* evidence survives it, that
+  free access is still per-game, and that the superseded rule does not linger as
+  a second contradicting copy.
+
+  **Web search cannot settle this fact.** Every search for it returned mutually
+  contradictory summaries — some claiming a free game per matchday, some
+  claiming none at all, most about other sports or other seasons. The change is
+  therefore recorded as an **operator statement**, and the tests assert the
+  codebase agrees rather than trying to re-derive it. A rule that rejects valid
+  games is worse than no rule: it is invisible, it looks like correct caution,
+  and it silently shrinks coverage.
+
 
 ### Removed
 

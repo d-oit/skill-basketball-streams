@@ -40,7 +40,7 @@ Platforms that carry official free basketball streams.
 | Platform | Domains | Notes |
 |----------|---------|-------|
 | Dyn Sport Mix | `dyn.sport` (announcement/programme), `joyn.de`, `pluto.tv`, `zattoo.com` (free-tier links), `amazon.de`, `primevideo.com` | Free tier only; NOT behind Prime paywall. **Free access is decided per game**, from the official monthly free-games list on `dyn.sport/deinsender/dyn-sport-mix/` — see "Dyn Sport Mix" in `references/validation-workflow.md`. `dyn.sport` is evidence and the `sourceReference`, never the `directLink`: its own player is behind the paid Dyn service. |
-| MagentaSport / MagentaTV | `magentasport.de`, `magenta.tv` | One free EuroLeague game per matchday; requires two-domain verification. `magenta.tv` is a JS-rendered, bot-blocked SPA — see `references/magenta-tv.md` |
+| MagentaSport / MagentaTV | `magenta.tv` (free-access evidence **and** stream), `magentasport.de` (corroboration only) | One free EuroLeague game per matchday, decided **per game**; the free indication is read off the rendered `magenta.tv` page, and `magentasport.de` silence is **not** evidence against free access (changed 2026-09-29, operator). `magenta.tv` is a JS-rendered, bot-blocked SPA — Checks 6/7 need a browser-rendering backend. See `references/magenta-tv.md` |
 
 ### Tier 5: Official Club Websites (Medium Confidence)
 Official websites of BBL clubs that may host live streams.
@@ -110,8 +110,8 @@ is free; it can never be the `directLink`.
 |---------|--------|------------------|
 | `@BasketballCL` | `x.com/BasketballCL` | BCL free-game announcements (mandatory per game) |
 | Basketball Champions League | `facebook.com/BasketballCL` | BCL free-game announcements (mandatory per game) |
-| `@MagentaSport` | `x.com/MagentaSport` | MagentaSport free-game announcements |
-| MagentaSport | `facebook.com/MagentaSport` | MagentaSport free-game announcements |
+| `@MagentaSport` | `x.com/MagentaSport` | MagentaSport free-game announcements — **corroboration only** since 2026-09-29 |
+| MagentaSport | `facebook.com/MagentaSport` | MagentaSport free-game announcements — **corroboration only** since 2026-09-29 |
 | `@EuroLeague` | `x.com/EuroLeague` | EuroLeague broadcaster/timing confirmations |
 | `@easyCreditBBL` | `x.com/easyCreditBBL` | BBL schedule/broadcast confirmations. Verified 2026-09-17 and linked from the league's own homepage; `x.com/BBLofficial` is a 404 |
 | Basketball Bundesliga | `facebook.com/BBLofficial` | **Unverifiable by probe**: facebook.com answers HTTP 400 to any non-browser user agent, so check by hand |

@@ -353,20 +353,27 @@ class TestCli:
 
     def test_append_is_idempotent(self, tmp_path):
         target = self._copy_evals(tmp_path)
+        # Read the committed count from the file rather than writing it here, so
+        # adding an eval case is not a three-line test edit — this test is about
+        # *idempotency*, and a hardcoded total turned every product change into
+        # a red that said nothing about the thing under test.
+        before = len(json.loads(target.read_text(encoding="utf-8"))["evals"])
+
         first = _run(["--verdicts", str(VERDICTS), "--evals", str(target)])
         assert first.returncode == 0
 
         payload = json.loads(target.read_text(encoding="utf-8"))
-        # 38 committed cases + the 3 the verdicts synthesise; the new ids are
-        # max+1..max+3, so they move whenever the eval set grows.
-        assert len(payload["evals"]) == 41
-        assert [c["id"] for c in payload["evals"]][-3:] == [39, 40, 41]
+        # The 3 the verdicts synthesise take the ids after the committed max,
+        # so they move whenever the eval set grows.
+        assert len(payload["evals"]) == before + 3
+        ids = [c["id"] for c in payload["evals"]]
+        assert ids[-3:] == [ids[-4] + 1, ids[-4] + 2, ids[-4] + 3]
 
         second = _run(["--verdicts", str(VERDICTS), "--evals", str(target)])
         assert second.returncode == 1
         assert "already filed" in second.stderr
-        # Still 41 — the second run must not duplicate anything.
-        assert len(json.loads(target.read_text(encoding="utf-8"))["evals"]) == 41
+        # Unchanged: the second run must not duplicate anything.
+        assert len(json.loads(target.read_text(encoding="utf-8"))["evals"]) == before + 3
 
     def test_appended_file_still_validates(self, tmp_path):
         target = self._copy_evals(tmp_path)
@@ -379,7 +386,10 @@ class TestCli:
             ["--verdicts", str(VERDICTS), "--evals", str(target), "--limit", "1"]
         )
         assert result.returncode == 0
-        assert len(json.loads(target.read_text(encoding="utf-8"))["evals"]) == 39
+        committed = len(
+            json.loads((REPO_ROOT / "evals" / "evals.json").read_text(encoding="utf-8"))["evals"]
+        )
+        assert len(json.loads(target.read_text(encoding="utf-8"))["evals"]) == committed + 1
 
     def test_limit_below_one_is_a_usage_error(self, tmp_path):
         target = self._copy_evals(tmp_path)
