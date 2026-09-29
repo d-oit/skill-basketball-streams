@@ -426,6 +426,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   real command, not by reasoning about the code — which is now four for four in
   this release.
 
+- **A step that started a server never returned, and held the job for 45
+  minutes.** The run was *cancelled*, not failed — and the two steps above it,
+  the preflight and the CLI proof, both reported success, so the log read like a
+  clean run that stopped for no reason.
+
+  ```bash
+  opencode serve --port 4096 --hostname 127.0.0.1 &
+  for i in $(seq 1 30); do
+    curl -fsS http://127.0.0.1:4096/ >/dev/null 2>&1 && break
+    sleep 1
+  done
+  ```
+
+  Every line is correct. The loop reaches the server on its first iteration and
+  breaks. But Actions runs a `run:` block under `bash -e`, and **bash waits for
+  every job it started** before the script can exit — so the step held the
+  long-lived server open and never returned, until the job timeout cancelled it
+  and every step below was skipped.
+
+  Measured on 1.18.33, same body, same machine:
+
+  | | step exits after |
+  |---|---|
+  | as written | **67s** |
+  | with `disown` | **2s** |
+
+  The fix is `disown`, plus two things the loop should have had from the start: a
+  check that the server is still alive (`kill -0 "$SERVER_PID"`) so a crash is
+  reported as a crash, and a **failing** readiness check so exhausting the
+  retries reds the step rather than continuing into a step that will fail on an
+  unready server.
+
+  A hang is the worst failure shape this repository has, because nothing in the
+  log says which step is wrong — and a backgrounded process is the one thing in
+  a step that can hang while every command inside it succeeds. Both guards were
+  falsified by removing `disown` and by removing the fail-fast.
+
 ### Notes
 
 - **The prompt was the last argument, and `--file` is an array.** The real cause,
