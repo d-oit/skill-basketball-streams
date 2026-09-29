@@ -445,23 +445,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   long-lived server open and never returned, until the job timeout cancelled it
   and every step below was skipped.
 
-  Measured on 1.18.33, same body, same machine:
+  **The first fix was wrong, and the correction is the useful part.** I added
+  `disown`, measured one run that returned in 2s against one that took 67s, and
+  concluded `disown` was the cause. The next dispatch **hung identically** — 18
+  minutes on the server step. Re-measuring five runs each showed the truth:
 
-  | | step exits after |
+  | body | blocked |
   |---|---|
-  | as written | **67s** |
-  | with `disown` | **2s** |
+  | `disown`, no redirection | **2 in 5** |
+  | all three streams to `/dev/null` | **1 in 5** |
 
-  The fix is `disown`, plus two things the loop should have had from the start: a
-  check that the server is still alive (`kill -0 "$SERVER_PID"`) so a crash is
-  reported as a crash, and a **failing** readiness check so exhausting the
-  retries reds the step rather than continuing into a step that will fail on an
-  unready server.
+  That difference is inside the noise. **Neither form was verified to fix it**,
+  and the single-run measurement that convinced me was one sample of a flaky
+  behaviour read as a fact — the same error as everywhere else in this release,
+  one level up: I concluded from a single observation what only a distribution
+  could settle. The step now detaches the streams *and* the job, the test
+  refuses the form that has now failed twice, and the comment in the workflow
+  says to re-measure rather than trust either number.
+
+  The loop also gained what it should always have had: a check that the server is
+  still alive (`kill -0 "$SERVER_PID"`) so a crash is reported as a crash, and a
+  **failing** readiness check so exhausting the retries reds the step rather
+  than continuing into one that will fail on an unready server.
 
   A hang is the worst failure shape this repository has, because nothing in the
   log says which step is wrong — and a backgrounded process is the one thing in
-  a step that can hang while every command inside it succeeds. Both guards were
-  falsified by removing `disown` and by removing the fail-fast.
+  a step that can hang while every command inside it succeeds. The tell is
+  **"the steps above it are green"**, which is what I should have treated as the
+  anomaly rather than as evidence that the failing step was still running.
 
 - **The free-model list was three-quarters stale and had the right warning
   anyway.** `references/search-backends.md` carried six "genuinely free" OpenCode

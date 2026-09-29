@@ -751,31 +751,43 @@ class TestTheLlmPreflightSeesTheCredentialsItGatesOn:
         assert named, "SKILL.md names references; this pins that they are attached"
         assert named <= attached, f"not attached to the agent: {sorted(named - attached)}"
 
-    def test_the_server_step_returns_instead_of_waiting_on_it(self):
-        """A step that starts a long-lived process must *detach* it.
+    def test_the_server_step_detaches_the_servers_streams(self):
+        """A step that starts a long-lived process must not hold its stdio.
 
-        Actions runs a `run:` block under `bash -e`, and bash waits for every job
-        it started before the script can exit. So a step that backgrounds a
-        server and then health-checks it looks successful — the loop breaks on
-        the first iteration — and then **never returns**. It held the job for 45
-        minutes until the timeout cancelled it, so every step after it was
-        skipped while the preflight and the CLI proof above it both reported
-        success.
+        Actions runs a `run:` block under `bash -e`, and bash waits for a child
+        whose streams it still holds. So a step that backgrounds a server and
+        health-checks it looks successful — the loop breaks on the first
+        iteration — and then **never returns**. It held the job for 45 minutes
+        until the timeout cancelled it, skipping every step below while the
+        preflight and the CLI proof above it both reported success.
 
-        Measured on 1.18.33: the same body exits in 67s without `disown` and in
-        2s with it. A hang is the worst shape this repository has, because
-        nothing in the log says which step is wrong.
+        **`disown` alone was tried first, and is not sufficient.** Measured five
+        runs each on 1.18.33, the body with `disown` and no redirection blocked
+        **2 in 5**; with all three streams redirected, **1 in 5**. That
+        difference is inside the noise, and the honest reading is that *neither*
+        was verified to fix it — the single-run measurement that made me
+        confident about `disown` was one sample of a flaky behaviour read as a
+        fact. So this asserts the belt-and-braces version, and says why.
+
+        The real cause is in the runtime log, not here: the step completed and
+        the *server* kept the step's stdout open. A reader who wants the truth
+        should re-measure; what this test does is refuse the form that has now
+        failed twice.
         """
         step = self._step("Start the opencode backend (one MCP boot for the job)")
         script = "\n".join(
             line for line in step.splitlines() if not line.lstrip().startswith("#")
         )
         assert "opencode serve" in script
-        assert "disown" in script, (
-            "the step backgrounds a process and must detach it, or bash waits "
-            "for the server and the step never returns"
-        )
         assert "$!" in script, "the pid is needed to report a server that died"
+        serve_line = next(line for line in script.splitlines() if "opencode serve" in line)
+        assert "</dev/null" in serve_line, (
+            "the server's stdin must be detached from the step's, or bash waits "
+            "on the child and the step never returns"
+        )
+        assert ">/dev/null" in serve_line, "and its stdout for the same reason"
+        assert "2>&1" in serve_line, "and its stderr, so the step's log is its own"
+        assert "disown" in script, "belt and braces: detach the job as well"
 
     def test_the_server_step_fails_fast_rather_than_looping_forever(self):
         """A health loop that exhausts its retries must say so, not fall through."""
