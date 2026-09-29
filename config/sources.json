@@ -6,8 +6,14 @@
       "tier": 1,
       "name": "FIBA",
       "type": "federation",
-      "domains": ["fiba.basketball", "fiba.com"],
-      "social": ["x.com/FIBA", "facebook.com/FIBA"],
+      "domains": [
+        "fiba.basketball",
+        "fiba.com"
+      ],
+      "social": [
+        "x.com/FIBA",
+        "facebook.com/FIBA"
+      ],
       "free_access": "selected",
       "notes": "Official international basketball federation"
     },
@@ -15,8 +21,13 @@
       "tier": 1,
       "name": "EuroLeague",
       "type": "league",
-      "domains": ["euroleaguebasketball.net"],
-      "social": ["x.com/EuroLeague", "facebook.com/EuroLeague"],
+      "domains": [
+        "euroleaguebasketball.net"
+      ],
+      "social": [
+        "x.com/EuroLeague",
+        "facebook.com/EuroLeague"
+      ],
       "free_access": "selected",
       "notes": "Official EuroLeague site"
     },
@@ -24,8 +35,13 @@
       "tier": 1,
       "name": "Basketball Bundesliga",
       "type": "league",
-      "domains": ["easycredit-bbl.de"],
-      "social": ["x.com/easyCreditBBL", "facebook.com/BBLofficial"],
+      "domains": [
+        "easycredit-bbl.de"
+      ],
+      "social": [
+        "x.com/easyCreditBBL",
+        "facebook.com/BBLofficial"
+      ],
       "free_access": "selected",
       "notes": "Official easyCredit BBL site. The league renamed: `basketball-bundesliga.de` no longer serves this site (TLS SNI failure on both the bare and www host, while DNS still resolves) and `x.com/BBLofficial` is a 404 while the other four approved X accounts answer 200 — the current locators are `easycredit-bbl.de`, `x.com/easyCreditBBL` and `youtube.com/@basketballbundesliga`. Verified 2026-09-17 by `scripts/link_inventory.py` + `scripts/link_check.py`. The Facebook page is UNVERIFIED either way and deliberately left as it was: facebook.com answers HTTP 400 to every user agent this repo sends, for every handle including a known-good one, so a probe there cannot tell a dead page from a blocked one."
     },
@@ -34,8 +50,13 @@
       "name": "Basketball Champions League",
       "type": "league",
       "domain": "championsleague.basketball",
-      "domains": ["championsleague.basketball"],
-      "social": ["x.com/BasketballCL", "facebook.com/BasketballCL"],
+      "domains": [
+        "championsleague.basketball"
+      ],
+      "social": [
+        "x.com/BasketballCL",
+        "facebook.com/BasketballCL"
+      ],
       "free_access": "selected",
       "notes": "Official BCL site. Free for selected games only — a BCL page, the @BasketballCL X/Twitter account and the Basketball Champions League Facebook page must ALWAYS be checked for the free-game marker. Some games are free, others are behind a broadcaster subscription; a page that does not state free access is REJECTED."
     },
@@ -43,8 +64,12 @@
       "tier": 1,
       "name": "DBB (Deutscher Basketball Bund)",
       "type": "federation",
-      "domains": ["basketball-bund.de"],
-      "social": ["youtube.com/user/TheDBBTV"],
+      "domains": [
+        "basketball-bund.de"
+      ],
+      "social": [
+        "youtube.com/user/TheDBBTV"
+      ],
       "free_access": "free",
       "notes": "German Basketball Federation"
     },
@@ -52,7 +77,11 @@
       "tier": 2,
       "name": "Sportschau (ARD)",
       "type": "broadcaster",
-      "domains": ["sportschau.de", "ard.de", "ardmediathek.de"],
+      "domains": [
+        "sportschau.de",
+        "ard.de",
+        "ardmediathek.de"
+      ],
       "free_access": "free",
       "notes": "Free public broadcaster. Streams selected BBL top games free, announced days ahead (worked 2026-09-26: FC Bayern Muenchen vs ALBA BERLIN, 26.09.2026 ab 15:30 Uhr im Ersten) — a dedicated sportschau.de livestream page plus the same game in the ARD Mediathek. sportschau.de is the stored link."
     },
@@ -60,7 +89,10 @@
       "tier": 2,
       "name": "ZDF",
       "type": "broadcaster",
-      "domains": ["zdf.de", "zdfmediathek.de"],
+      "domains": [
+        "zdf.de",
+        "zdfmediathek.de"
+      ],
       "free_access": "free",
       "notes": "Free public broadcaster"
     },
@@ -68,28 +100,41 @@
       "tier": 3,
       "name": "MDR",
       "type": "broadcaster",
-      "domains": ["mdr.de"],
+      "domains": [
+        "mdr.de"
+      ],
       "free_access": "free"
     },
     {
       "tier": 3,
       "name": "BR24",
       "type": "broadcaster",
-      "domains": ["br.de", "br24.de"],
+      "domains": [
+        "br.de",
+        "br24.de"
+      ],
       "free_access": "free"
     },
     {
       "tier": 3,
       "name": "RBB24",
       "type": "broadcaster",
-      "domains": ["rbb-online.de", "rbb24.de"],
+      "domains": [
+        "rbb-online.de",
+        "rbb24.de"
+      ],
       "free_access": "free"
     },
     {
       "tier": 4,
       "name": "Dyn Sport Mix",
       "type": "streaming_platform",
-      "domains": ["dyn.sport", "joyn.de", "pluto.tv", "zattoo.com"],
+      "domains": [
+        "dyn.sport",
+        "joyn.de",
+        "pluto.tv",
+        "zattoo.com"
+      ],
       "social": [],
       "free_access": "free_tier",
       "notes": "Free tier only. amazon.de / primevideo.com require a Prime subscription -> reject. Free access is decided PER GAME from dyn.sport/deinsender/dyn-sport-mix/ ('Dyn Free Spiele' / 'Basketball Free Spiele', a month of games at a time): on the list -> Check 1 PASS, absent -> Check 1 FAIL even though Dyn broadcasts the very same game. dyn.sport is announcement evidence and the sourceReference, NEVER the directLink — its own player sits behind the paid Dyn service; the link must be joyn.de / pluto.tv / zattoo.com, and the indexed channel URL is the one that answers: zattoo.com/de/live-tv/sender/dyn-sport-mix and joyn.de/sender/dyn-sport-mix both returned 404 on 2026-09-26 while https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4 returned 200. Promoted from a quarantined discovery on 2026-09-26 (tier row + this entry + eval cases 37 accept / 38 reject)."
@@ -98,16 +143,32 @@
       "tier": 4,
       "name": "MagentaSport / MagentaTV",
       "type": "streaming_platform",
-      "domains": ["magentasport.de", "magenta.tv"],
-      "social": ["x.com/MagentaSport", "facebook.com/MagentaSport"],
+      "domains": [
+        "magentasport.de",
+        "magenta.tv"
+      ],
+      "social": [
+        "x.com/MagentaSport",
+        "facebook.com/MagentaSport"
+      ],
       "free_access": "selected",
-      "notes": "One free EuroLeague game per matchday. magenta.tv is the JS-rendered streaming platform (bot-blocked) and requires a matching free-access announcement on magentasport.de. See references/magenta-tv.md."
+      "notes": "One free EuroLeague game per matchday, decided PER GAME. Since 2026-09-29 the free-access indication lives on magenta.tv itself, not magentasport.de - which is now corroboration only, and its silence is NOT evidence against free access. magenta.tv is the JS-rendered streaming platform (bot-blocked), so the free indication needs a rendered page. See references/magenta-tv.md.",
+      "free_access_evidence": [
+        "magenta.tv"
+      ],
+      "free_access_corroboration": [
+        "magentasport.de",
+        "x.com/MagentaSport",
+        "facebook.com/MagentaSport"
+      ]
     },
     {
       "tier": 6,
       "name": "Official YouTube channels",
       "type": "youtube",
-      "domains": ["youtube.com"],
+      "domains": [
+        "youtube.com"
+      ],
       "handles": [
         "youtube.com/@fiba",
         "youtube.com/@basketballbundesliga",
@@ -120,10 +181,25 @@
     }
   ],
   "excluded": [
-    {"name": "Sky Sport", "reason": "paid subscription"},
-    {"name": "DAZN", "reason": "paid subscription"},
-    {"name": "Sport1+", "reason": "paid"},
-    {"name": "Amazon Prime (general)", "reason": "paid; Dyn Sport Mix free tier only"},
-    {"name": "Pirate/aggregator sites", "reason": "unofficial"}
+    {
+      "name": "Sky Sport",
+      "reason": "paid subscription"
+    },
+    {
+      "name": "DAZN",
+      "reason": "paid subscription"
+    },
+    {
+      "name": "Sport1+",
+      "reason": "paid"
+    },
+    {
+      "name": "Amazon Prime (general)",
+      "reason": "paid; Dyn Sport Mix free tier only"
+    },
+    {
+      "name": "Pirate/aggregator sites",
+      "reason": "unofficial"
+    }
   ]
 }

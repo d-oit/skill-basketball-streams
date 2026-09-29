@@ -1,8 +1,10 @@
 # MagentaTV (`magenta.tv`) — Dynamic, Bot-Blocked Streaming Platform
 
-Canonical playbook for the second half of the MagentaSport two-domain rule
-(see `references/validation-workflow.md` → MagentaSport/MagentaTV Special Case).
-`magentasport.de` announces; **`magenta.tv` streams**.
+Canonical playbook for the MagentaSport/MagentaTV rule
+(see `references/validation-workflow.md` → *MagentaSport/MagentaTV*).
+**`magenta.tv` announces *and* streams** — the free ("kostenlos") indication is
+read off the rendered page itself. `magentasport.de` is corroboration only
+(changed 2026-09-29, operator).
 
 ## Why a plain fetch fails
 
@@ -112,28 +114,48 @@ https://www.magenta.tv/einstellungen/menu           # settings — never a strea
 - Any other `magenta.tv/tv/…` path is a channel/landing page → Check 7 FAIL.
 - `?utm_*` / `#` fragments are stripped before storing the link in the event.
 
-## Cross-reference rule (Check 1, unchanged and mandatory)
+## Cross-reference rule (Check 1 — **changed 2026-09-29, operator**)
 
-A `magenta.tv` URL is **only** valid when a matching official free-access
-announcement exists on `magentasport.de` or official MagentaSport social media
-(`x.com/MagentaSport`, `facebook.com/MagentaSport`):
+The free-access indication now lives **here**, on `magenta.tv` — it is no longer
+announced on `magentasport.de`:
+
+```
+https://www.magenta.tv/tv/live-basketball-euroleague-88213   # the game, rendered
+```
+
+Read the rendered page (Step 2.8 ladder — a plain GET returns the app shell) and
+look for the per-matchday free indication:
 
 PASS markers: `kostenlos für alle`, `ohne Abo`, `ohne Login`,
 `für alle zugänglich`, `Jeden Spieltag eine Partie kostenlos`.
 FAIL markers: `mit MagentaSport Abo`, `nur für Abonnenten`,
 `Login erforderlich`, `kostenpflichtig`.
 
-No announcement → treat as subscription-gated → REJECT at Check 1, and log the
-discrepancy.
+The indication must name **this** game. No indication for that game → treat as
+subscription-gated → REJECT at Check 1, and log the discrepancy.
+
+`magentasport.de` and the official social accounts (`x.com/MagentaSport`,
+`facebook.com/MagentaSport`) are **corroboration only**. Their agreement raises
+confidence; **their silence is not evidence against free access** and must never
+trigger a rejection.
+
+**Why this changed.** The old rule required an announcement on
+`magentasport.de` and rejected without one. On 2026-09-29 that rule rejected two
+real EuroLeague games — *"the Magenta two-domain rule requires a matching
+per-game free announcement — none found"* — because the announcement had moved.
+A rule that rejects valid games is worse than no rule: it looks like correct
+caution and silently shrinks coverage.
 
 ## Worked validation log — magenta.tv accepted
 
 ```
 Stream URL: https://www.magenta.tv/tv/live-basketball-euroleague-88213
 Backend: firecrawl scrape (1 credit)
-Source: https://www.magentasport.de/live/basketball/euroleague
+Source: the same rendered magenta.tv page (free indication lives there)
 Timestamp: 2026-09-14T09:12:00Z
-Check 1 - Free Access: PASS — "kostenlos für alle" on magentasport.de announcement
+Check 1 - Free Access: PASS — "kostenlos für alle" naming THIS game on the
+  rendered magenta.tv page; magentasport.de carried no announcement and that
+  changed nothing.
 Check 2 - Live Content: PASS — "Jetzt live" present in rendered text
 Check 3 - Official Source: PASS — magenta.tv in Tier 4
 Check 4 - Basketball-Specific: PASS — EuroLeague, Real Madrid vs ALBA Berlin
@@ -161,4 +183,4 @@ not stream evidence.
 |---|---|
 | "The URL returns 200, so it works" | The SPA shell always returns 200. Stream evidence must come from a rendered body. |
 | "Firecrawl hit a 403, so the game isn't free" | 403 is anti-bot, not a paywall. Climb the fetch ladder before concluding anything. |
-| "magentasport.de announced a free game, so every magenta.tv link today is free" | Only **one** game per matchday is free. Match the teams, not the date. |
+| "magentasport.de is silent, so the game is paid" | Since 2026-09-29 `magentasport.de` is **corroboration only**. Silence is not evidence against free access; the indication is read off the rendered `magenta.tv` page. |

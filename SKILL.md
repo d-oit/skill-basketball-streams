@@ -31,9 +31,7 @@ Search for FREE basketball live streams in Germany from official sources, valida
 Full list and YouTube URL rules: `references/approved-sources.md`; machine-readable mirror in `config/sources.json`. Summary: Dyn Sport Mix (free **per game** — the official free-games list lives on `dyn.sport`; streams on Joyn / Pluto TV / Zattoo free tier only), MagentaSport / MagentaTV (one free EuroLeague game per matchday), Sportschau / ARD (also streams selected BBL top games free), regional broadcasters (MDR, BR24, RBB24), **Basketball Champions League (`championsleague.basketball`, selected games only)**, official BBL club websites, and official YouTube channels only. **Accepted YouTube URL patterns:** `youtube.com/@handle/live`, `youtube.com/live/<id>`, `youtube.com/watch?v=<id>` (live/upcoming only), `youtube.com/@handle`, `youtube.com/user/TheDBBTV`. **Rejected:** `youtube.com/@FIBAWorld`, any `youtube.com/user/[*]` except `TheDBBTV`, any `youtube.com/channel/UC…`, `/playlist`, `/results`, `/shorts`.
 
 **Social media is validation evidence, never a source link.** `@BasketballCL` / `facebook.com/BasketballCL` (mandatory per BCL game), `@MagentaSport` / `facebook.com/MagentaSport`, `@EuroLeague`, `@easyCreditBBL` may confirm free access for Check 1; a social URL is never stored as the `directLink`.
-
-> **IMPORTANT MAGENTA NOTE:** `magentasport.de` is the **content/announcement provider** (where free games are announced); `magenta.tv` is the **streaming platform** (where the actual live streams play). Free streams may appear on `magenta.tv` with dynamic URLs (e.g. `magenta.tv/tv/live-[game-slug]/[dynamic-id]`) that are not indexed by search engines. Always check **both domains** and verify free access via an official MagentaSport announcement on `magentasport.de` or official MagentaSport social media before treating any stream as free. **`magenta.tv` is a JavaScript-rendered SPA and blocks plain HTTP clients — a bare 200 returns an app shell with no readable text, so Checks 6 and 7 need a browser-rendering backend.** See `references/validation-workflow.md` → MagentaSport Special Case for the two-step search strategy and `references/magenta-tv.md` for the fetch ladder, URL shapes and worked validation logs.
-
+> **MAGENTA (changed 2026-09-29, operator):** the free ("kostenlos") game is **no longer announced on `magentasport.de`** — the free arena now lives **only on `magenta.tv`**, which is where the indication is read *and* where the stream plays. `magentasport.de` and official social accounts are **corroboration only**; their silence is **not** evidence against free access. `magenta.tv` is a JS-rendered SPA that blocks plain HTTP clients — a bare 200 returns an app shell, so Checks 6 and 7 need a browser-rendering backend. Procedure: Step 2.3 below.
 ## Process
 
 ### Step 1 — Determine Date Range
@@ -46,13 +44,21 @@ Run `webSearch` against each approved source with `limit: 20`, focusing on offic
 
 ### Step 2.3 — MagentaSport/MagentaTV Special Handling
 
-**CRITICAL:** MagentaSport and MagentaTV require a mandatory two-step search due to their split-domain structure:
+**CRITICAL:** the free-access evidence and the stream now live on the **same**
+domain, so the free indication is read off the `magenta.tv` page itself:
 
-1. **Domain Separation**: `magentasport.de` = Content/announcement site (where free games are announced); `magenta.tv` = Streaming platform (where the actual live streams play).
-2. **Announcement Search**: Search `site:magentasport.de`, `site:facebook.com/magentasport`, and `site:twitter.com/MagentaSport` for keywords like `kostenlos` or `kostenlos für alle` to find the official free-game announcement.
-3. **Stream Search**: Search `site:magenta.tv/tv/live*` for the matching game content. URLs are dynamic and often not indexed — cross-reference with the announcement.
-4. **Free Stream Indicators**: Look for `"kostenlos für alle"`, `"ohne Abo"`, `"ohne Login"`, `"für alle zugänglich"`, `"Jeden Spieltag eine Partie kostenlos"`. **Reject** streams marked `"mit MagentaSport Abo"`, `"nur für Abonnenten"`, or `"Login erforderlich"`.
-5. **Cross-reference Rule**: A `magenta.tv` stream URL is only valid if a matching official free-access announcement exists on `magentasport.de` or official MagentaSport social media. No announcement = REJECT.
+1. **Domains**: `magenta.tv` = free-access evidence **and** stream; the silence of
+   `magentasport.de` / social is corroboration only, **not** evidence against it.
+2. **Evidence Search on `magenta.tv`** — the matchday's free indication
+   (`kostenlos`, `kostenlos für alle`, `ohne Abo`, `für alle`, `gratis`). Needs the
+   Step 2.8 render ladder: a plain GET returns the app shell, not the text.
+3. **Stream URL** is `magenta.tv/tv/live-[game-slug]/[dynamic-id]` — dynamic and
+   often unindexed, so read it from the rendered page rather than searching.
+4. **PASS** on `"kostenlos für alle"`, `"ohne Abo"`, `"ohne Login"`,
+   `"für alle zugänglich"`, `"Jeden Spieltag eine Partie kostenlos"`. **REJECT**
+   `"mit MagentaSport Abo"`, `"nur für Abonnenten"`, `"Login erforderlich"`.
+5. **Cross-reference**: the indication must name **this** game — no indication for
+   that game = REJECT.
 
 ### Step 2.5 — Validate Direct URLs
 
@@ -162,7 +168,7 @@ Refused rather than repaired, so get them right: exactly two teams, a `start` th
 8. **YouTube URL rules** — only `@handle`, `@handle/live`, and `/user/TheDBBTV` are accepted.
 9. **Include references** — every event description must contain `sourceReference` and validation timestamp.
 10. **No event without a live stream** — Check 7 must pass; if the live content itself is unverified there is no event. Free access that is merely *unconfirmed* is different: it is still created, but labelled `[UNVERIFIED]` (colour `5`) instead of being rejected.
-11. **Magenta two-domain rule** — a `magenta.tv` stream URL requires a matching official free-access announcement on `magentasport.de` or MagentaSport social media; without it the game may only be created as `UNVERIFIED`, never as `VERIFIED`.
+11. **Magenta per-game free rule** — a `magenta.tv` stream URL is free only if a free-access indication naming **that game** is found on `magenta.tv` itself (the free arena moved there from `magentasport.de` on 2026-09-29). `magentasport.de` and official social media are corroboration only — their silence is **not** evidence against free access. Without the indication the game may only be created as `UNVERIFIED`, never as `VERIFIED`.
 12. **Magenta render rule** — a `magenta.tv` URL only counts as *working* after a browser-rendering backend (Step 2.8) returns player + live markers. A plain GET returning 200 on the app shell fails Check 6/7 and creates no event.
 13. **BCL per-game rule** — Basketball Champions League free access is decided per game via site + `@BasketballCL` + BCL Facebook; silence is not consent.
 14. **YouTube live-only rule** — only real live broadcasts with `scheduled_start` strictly greater than now (or a live-now stream with no `actualEndTime`) may be promoted. VODs, recordings, replays and ended broadcasts never are.
@@ -205,7 +211,7 @@ All scripts are stdlib-only on Python 3.8+ and share the same exit codes: `0` PA
 | "Page returned HTTP 200, so it's live" | A 200 can be a channel homepage with no active stream; Check 7 requires reading the body. |
 | "Highlights are 'live content' enough" | Replays and highlight reels explicitly FAIL Check 2 (`highlights`, `replay`, `zusammenfassung`). |
 | "The user can filter Sky / DAZN themselves" | Rejecting paid broadcasters is the skill's contract; don't pass the decision upstream. |
-| "The magenta.tv URL looks valid so no announcement needed" | `magenta.tv` streams require a matching official free-access announcement on `magentasport.de`; URL alone is never sufficient. |
+| "The magenta.tv URL looks valid so the free indication isn't needed" | Free access is decided per game, and the indication is read off the `magenta.tv` page. A URL alone is never sufficient. |
 | "The magenta.tv URL returns 200, so it works" | The SPA shell always returns 200 with no readable body. Stream evidence must come from a rendered page (Step 2.8). |
 | "Firecrawl hit a 403 so the game isn't free" | 403 is anti-bot, not a paywall. Climb the fetch ladder before concluding anything. |
 | "The BCL site lists the game, so it's free" | BCL free access is per game. Silence on the site, X and Facebook means NOT free. |
@@ -222,8 +228,8 @@ All scripts are stdlib-only on Python 3.8+ and share the same exit codes: `0` PA
 - [ ] Used a date outside the today…today+7d window.
 - [ ] Added an event without running `GOOGLECALENDAR_EVENTS_LIST` for duplicates first.
 - [ ] Logged a `CREATE` decision when any of the 7 checks were FAIL.
-- [ ] Used a `magenta.tv` stream URL without first finding a matching free-access announcement on `magentasport.de`.
-- [ ] Searched only `magentasport.de` and skipped `magenta.tv` for the actual stream URL (or vice versa).
+- [ ] Used a `magenta.tv` stream URL without first finding a free-access indication for **that game** on `magenta.tv`.
+- [ ] Treated silence on `magentasport.de` as evidence against free access — it is corroboration only since 2026-09-29.
 - [ ] Accepted a `magenta.tv` link on an HTTP 200 without a rendered body (Check 6/7 passed on the SPA shell).
 - [ ] Promoted a YouTube item whose `scheduled_start` is not greater than now, or whose `actualEndTime` is set.
 - [ ] Treated a YouTube VOD (`liveBroadcastContent == none` or a fixed duration) as a live stream.
@@ -239,7 +245,7 @@ All scripts are stdlib-only on Python 3.8+ and share the same exit codes: `0` PA
 ## References
 
 - `references/approved-sources.md` — full approved source list and YouTube URL allow/reject table
-- `references/validation-workflow.md` — 7-check pipeline, decision logic, special cases (MagentaSport two-domain rule + 1-game rule, Dyn Sport Mix free tier, YouTube live-URL-only, duplicate handling)
+- `references/validation-workflow.md` — 7-check pipeline, decision logic, special cases (MagentaSport/MagentaTV free-per-game rule, Dyn Sport Mix free tier, YouTube live-URL-only, duplicate handling)
 - `references/calendar-setup.md` — Google Calendar event schema, color codes, duplicate detection parameters, time-handling rules
 - `references/implementation-notes.md` — query templates, time-handling, team-name variants, exclusion vocabulary, full `validateStreamUrl` implementation and end-to-end workflow TypeScript
 - `references/magenta-tv.md` — magenta.tv fetch ladder, URL shapes, acceptance markers, worked validation logs
