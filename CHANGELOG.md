@@ -323,6 +323,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   lesson: a step that cannot reach a model reports a provider's opinion about
   the provider, and that reads as somebody else's fault.
 
+- **`BASKETBALL_CALENDAR_ID` was a 23-character paste of a 90-character id, and
+  every step before the calendar call succeeded anyway.** The value was
+  `f8a14c4037d9ab411f93...` — the elision a UI shows when a value will not fit
+  on screen — so the run installed the CLI, passed the preflight, proved the
+  model, started the server, resolved the model, created the agent, **ran the
+  seven-step skill for seven minutes**, and was then told by *Google* that the
+  calendar did not exist. The error named the calendar, four steps from the
+  cause.
+
+  It was silent in the way that matters at every layer: `gh variable list` shows
+  the value, so it *looked* configured; the env var was non-empty, so the
+  override branch ran and `config/calendar.json`'s correct id was never
+  consulted. `calendar_config.py` now **refuses** an elided id — a calendar id
+  is hex plus an optional `@group.calendar.google.com` and can never contain an
+  ellipsis, so the check is exact — and it refuses rather than falling back,
+  because falling back would write to a calendar the operator did not name.
+
+  The tell was in this repository's own output. `validate.py` printed
+  `calendarId=f8a14c4037d9ab411f93... (valid format)`, so the elided form was
+  on screen every time a gate ran, indistinguishable from a real value. It now
+  labels the abbreviation as its own and says so:
+
+  ```
+  calendarId=f8a14c4037d9ab411f93… (90 chars, elided here for display only —
+  never copy this form into a variable)
+  ```
+
+  **A credential that is present but unusable is neither set nor missing**, and
+  the two cases need opposite handling: one is a value to use, the other is a
+  value to fix. Every gate in this repository answered "set", and the chain
+  between the mistake and the report was four steps and seven minutes long.
+
 ### Notes
 
 - **The prompt was the last argument, and `--file` is an array.** The real cause,
