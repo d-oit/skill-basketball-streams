@@ -363,8 +363,31 @@ jobs:
       # a step that cannot affect anything is a step that hides a real one being
       # missing.
 
-      - name: Install opencode CLI
-        run: npm install -g opencode-ai@latest || npm install -g opencode
+      # **Pinned to the version that is actually published.**
+      #
+      # An earlier version of this step pinned `2.0.16` from
+      # `https://opencode.ai/install`, on the strength of a `2.0.16` binary that
+      # happened to be on a developer's machine. That release does not exist:
+      # `opencode-ai@latest` is **1.18.33** and the upstream release feed has no
+      # `v2.0.16`, so the installer downloaded nothing, extracted nothing, and
+      # the version check passed against whatever stale binary was already on
+      # PATH. A guard that cannot fail is the vacuous pass this repository keeps
+      # warning about — in a step whose whole job was to catch exactly that.
+      - name: Install opencode CLI (pinned)
+        run: |
+          set -euo pipefail
+          npm install -g "opencode-ai@$OPENCODE_VERSION"
+          installed=$(opencode --version)
+          echo "opencode: $installed"
+          # Checked against a *fresh* lookup, so a failed install cannot pass on
+          # a binary that was already on PATH.
+          case "$installed" in
+            *"$OPENCODE_VERSION"*) ;;
+            *) echo "::error::expected opencode $OPENCODE_VERSION, got $installed"; exit 1 ;;
+          esac
+          command -v opencode
+        env:
+          OPENCODE_VERSION: 1.18.33
 
       # A configuration fault, not a quiet day. With no LLM rung configured the
       # run cannot apply the 7 checks at all, and the summary would look exactly
@@ -395,25 +418,12 @@ jobs:
           python3 scripts/capture_transcripts.py --check-rungs
           python3 scripts/capture_transcripts.py --list-models
 
-      # There is no long-lived backend. The step used to start one and attach to
-      # it, and **both halves were broken against opencode v2.0.16**:
+      # Zero-token proof that the installed CLI can start and reach a model,
+      # before anything depends on it. A broken CLI is then reported here with
+      # its own message rather than as a failed skill run 40 seconds later.
       #
-      #   * `--attach` is not a flag of the agent command. It is `--server`. The
-      #     CLI rejected the unknown flag and then reported the *default*
-      #     provider's refusal — "OpenCode's free tier can only be used from
-      #     within OpenCode" — which reads like a credential problem and sent
-      #     two earlier diagnoses down the wrong path entirely.
-      #   * `--server` does not work either: the handshake fails with "did not
-      #     provide a compatible V2 health response" / `UnsupportedContentType`.
-      #
-      # `--standalone` is what the CLI documents for a private server, and it
-      # answers (measured, with every credential stripped). The cost is one
-      # server boot per run instead of one per job; at one run a day that is not
-      # worth optimising, and it is the mode the tool actually supports.
-      #
-      # So the agent step runs `--standalone` and the serve step is gone. A step
-      # that cannot affect the run is a step that hides the one that can — the
-      # same reasoning that removed the Google auth step when Composio arrived.
+      # The prompt precedes `--file` because in 1.18.33 `--file` is an array;
+      # here there is one flag, so the ordering only documents the rule.
       - name: Confirm the opencode CLI can run a model
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -425,14 +435,32 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           set -o pipefail
-          # Zero-token proof that the binary starts and can reach a model, so a
-          # broken CLI is reported here with its own message rather than as a
-          # failed skill run 40 seconds later.
-          opencode run --standalone --model opencode/big-pickle --format json \
+          opencode run --model opencode/big-pickle --format json \
             "Reply with exactly: OK" \
             | tee /tmp/opencode-check.json \
             | grep -q '"text":"OK"' \
             || { echo "::error::the opencode CLI could not serve a model — see the log above"; exit 1; }
+
+      # One MCP boot for the whole job, then the agent attaches to it. The
+      # credentials belong to the **server**, not to the client: the agent step
+      # only forwards the prompt over HTTP, so a key held solely there changes
+      # nothing. This step had no `env:` block, and a repository with a valid
+      # `OPENROUTER_API_KEY` then reported `key accepted` and failed anyway.
+      - name: Start the opencode backend (one MCP boot for the job)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          opencode serve --port 4096 --hostname 127.0.0.1 &
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:4096/ >/dev/null 2>&1 && break
+            sleep 1
+          done
 
       # ONE decision, in tested Python, of which model the run below uses.
       #
@@ -503,13 +531,20 @@ jobs:
           # `if-no-files-found: ignore` hid that: the run was failing to record a
           # transcript while looking like a quiet day.
           mkdir -p .tmp
-          # `--standalone`, not `--attach`: v2.0.16 has no `--attach`, and the
-          # failure it reported for the unknown flag was the *default*
-          # provider's refusal, which reads as a credential fault. The
-          # credentials are still passed because the model the resolver picked
-          # may need one; `big-pickle` does not.
-          opencode run --standalone \
+          # The prompt comes **before** the `--file` flags, and that is not
+          # style. In opencode 1.18.33 `--file` is declared as an *array*, so it
+          # swallows every following token: with the prompt last, the CLI read
+          # the message as a filename and answered `Error: File not found:
+          # Reply with exactly: PONG`. Measured both orders on the published
+          # binary — prompt first answers, prompt last does not.
+          #
+          # A directory is refused (`Cannot attach local directory without a
+          # shared filesystem: references/`), so every reference is named
+          # explicitly. `--attach` is correct for 1.18.33 — an earlier revision
+          # removed it, having tested a 2.0.16 binary that is not published.
+          opencode run --attach http://127.0.0.1:4096 \
             --model "$LLM_MODEL" --format json \
+            "Execute Steps 1-7 for today (Europe/Berlin). DRY_RUN=$DRY_RUN. Emit the Step 7 table." \
             --file SKILL.md \
             --file references/validation-workflow.md \
             --file references/youtube-live-search.md \
@@ -521,7 +556,6 @@ jobs:
             --file references/lessons-learned.md \
             --file references/implementation-notes.md \
             --file config/sources.json --file config/calendar.json \
-            "Execute Steps 1-7 for today (Europe/Berlin). DRY_RUN=$DRY_RUN. Emit the Step 7 table." \
             | tee .tmp/transcript.json
 
       # ── The write path. Ordered, and each step is inspectable on its own. ──

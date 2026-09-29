@@ -642,31 +642,32 @@ class TestTheLlmPreflightSeesTheCredentialsItGatesOn:
         step = self._step("Run the skill")
         assert "OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}" in step
 
-    def test_no_long_lived_backend_is_started(self):
-        """The serve/attach pair is gone, because both halves were broken.
+    def test_the_agent_attaches_to_the_backend_that_is_started(self):
+        """The pair must exist together, and the server must hold the credentials.
 
-        `--attach` is not a flag of the agent command in opencode v2.0.16 (it is
-        `--server`), and `--server` fails the V2 health handshake. The CLI
-        rejected the unknown flag and reported the *default provider's*
-        refusal, so the run looked like a credential fault twice over.
-
-        Stated as an absence so the pair cannot come back half-applied: a
-        `serve` with no consumer, or an agent attaching to nothing, is the state
-        this file has already had once.
+        `--attach` is the documented flag in opencode 1.18.33 and was wrongly
+        removed once, on the strength of a 2.0.16 binary that was never
+        published. Stated as a pair so neither half can be deleted alone: a
+        `serve` with no consumer, or an agent attaching to nothing, is a step
+        that cannot affect the run.
         """
-        for step in self._runtime_steps():
-            assert "opencode serve" not in step, "the long-lived backend is gone"
+        serve = [s for s in self._runtime_steps() if "opencode serve" in s]
+        assert serve, "the long-lived backend is part of the design"
         agent = self._step("Run the skill")
-        # The *script*, not the whole step: a comment explaining the removal
-        # necessarily names both broken flags, and asserting on prose would make
-        # documenting the defect a way to fail.
         script = "\n".join(
             line for line in agent.splitlines() if not line.lstrip().startswith("#")
         )
-        assert "--attach" not in script and "--server" not in script, (
-            "neither flag works against v2.0.16; the agent must run --standalone"
+        assert "--attach http://127.0.0.1:4096" in script, (
+            "the agent must attach to the port the server was started on"
         )
-        assert "--standalone" in agent
+        # The *script*, not the whole step: a comment explaining why a flag was
+        # once removed necessarily names it, and asserting on prose would make
+        # documenting the defect a way to fail.
+        for name in self.RUNG_SECRETS:
+            assert f"{name}: ${{{{ secrets.{name} }}}}" in serve[0], (
+                f"the serve process cannot see {name}, so the model call is "
+                "authenticated against the CLI's own provider"
+            )
 
     def test_the_cli_is_proved_before_the_skill_runs(self):
         """A broken CLI is reported by its own message, not as a failed run.

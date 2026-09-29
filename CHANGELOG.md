@@ -310,39 +310,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Notes
 
-- **The `--attach` flag does not exist, and the CLI reported someone else's
-  error for it.** This is what actually failed the run, and it is why three
-  earlier diagnoses were wrong.
+- **The prompt was the last argument, and `--file` is an array.** The real cause,
+  found by running the CLI that CI actually installs rather than the one on the
+  machine I happened to be using.
 
-  The step started a long-lived `opencode serve` and attached the agent to it.
-  Against opencode v2.0.16 **both halves are broken**:
+  In opencode **1.18.33** the flag is declared `-f, --file … [array]`, so every
+  token after one is consumed as a filename. The prompt was last, so the CLI
+  read the message as a path:
 
-  - `--attach` is not a flag of the agent command at all. It is `--server`. The
-    CLI rejected the unknown flag and then surfaced the **default provider's**
-    refusal — *"OpenCode's free tier can only be used from within OpenCode"* —
-    which reads unmistakably like a credential problem. Every diagnosis that
-    followed chased a credential, because the CLI's own error said to.
-  - `--server` does not work either: the handshake fails with *"did not provide
-    a compatible V2 health response"* / `UnsupportedContentType`.
+  ```
+  Error: File not found: Execute Steps 1-7 for today (Europe/Berlin). DRY_RUN=…
+  ```
 
-  `--standalone` is what the CLI documents for a private server, and it answers.
-  The serve step is deleted; the cost is one server boot per run instead of one
-  per job, which at one run a day is not worth optimising. A step that cannot
-  affect the run is a step that hides the one that can.
+  A directory is refused for a related reason — `Cannot attach local directory
+  without a shared filesystem: references/` — so every reference is named
+  explicitly. The prompt now precedes the `--file` flags, verified by running
+  the exact workflow command against the published binary: it answers.
 
-  A new proof step runs the agent CLI once, before the skill, and asserts the
-  model answered — so a broken CLI now reports its own message instead of
-  arriving 40 seconds later inside the skill run.
+  ### The correction, which is the point of recording it
 
-  **Three times in this release I wrote a confident cause that was wrong**, and
-  every wrong one named something *external* — the provider's free tier, then
-  the server's environment — so each read as somebody else's fault while the
-  real cause sat in this repository: a credential, then a model id, then a flag
-  that does not exist. What settled it each time was running the real CLI on
-  this machine and reading what it said, which takes seconds. The generalisable
-  lesson is already in `AGENTS.md`: **a step that cannot affect the run is a
-  step that hides the one that can** — and an error message from a tool about a
-  *different* thing than the one you asked is a first-class finding, not noise.
+  An earlier revision of this entry claimed `--attach` did not exist and
+  replaced it with `--standalone`. **Both were wrong.** They were tested against
+  a `2.0.16` binary found on a local machine, and:
+
+  - `opencode-ai@latest` is **1.18.33**;
+  - the upstream release feed has **no `v2.0.16`** — the tag 404s;
+  - the pinned `https://opencode.ai/install --version 2.0.16` therefore fetched
+    nothing, failed to extract, and left no binary, while the version check
+    **passed against the stale binary already on `PATH`**.
+
+  That last point is the one worth keeping. A guard that passes when the thing
+  it guards is absent is the vacuous pass this repository keeps warning about,
+  and it was introduced *in the step written to catch exactly that*. The check
+  now runs `command -v opencode` alongside the version comparison, and the
+  install is pinned to a version that is published.
+
+  The transferable lesson, and the reason three wrong diagnoses shared a shape:
+  **every one of them named something external** — the provider's free tier,
+  then the server's environment, then a CLI version — so each read as somebody
+  else's fault while the cause sat in this repository. The fix is to test
+  against the artifact the *consumer* gets. Here that was one command:
+
+  ```bash
+  npm install opencode-ai@latest --prefix /tmp/x && /tmp/x/node_modules/…/opencode --version
+  ```
+
+  The runner had been logging `OK   opencode cli: 1.18.33` in plain sight since
+  the first dispatch. Reading the log the tool writes about itself is cheaper
+  than any of the four diagnoses, and it is the habit to keep.
 
 - **A sweep for settings that are read but never written found a second instance — and the
   "documented gap" it produced was the wrong answer.** The first instance was `visibility`, now

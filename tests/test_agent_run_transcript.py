@@ -113,6 +113,103 @@ class TestTheAgentStepsReportTheirExitCode:
         code = _script(_find(_all_steps(SELF_IMPROVE), "opencode run --model"))
         assert "tee .tmp/agent-edit.json" in code
 
+    def test_the_cli_is_installed_pinned_to_a_version_that_exists(self):
+        """`@latest` is a moving target; an *unpublished* pin is worse.
+
+        An earlier revision pinned `2.0.16` from `https://opencode.ai/install`,
+        on the strength of a binary found on a developer's machine. There is no
+        `v2.0.16` release — `opencode-ai@latest` is 1.18.33 and the upstream
+        release feed has no such tag — so the installer fetched nothing, the
+        extract failed, and the version check then passed against whatever
+        stale binary was already on PATH.
+
+        That is a guard that cannot fail, in the step written to catch exactly
+        that. Pinned to a real version, from the channel that actually serves it.
+        """
+        for workflow in (RUNTIME_DAILY, SELF_IMPROVE):
+            scripts = "\n".join(_script(s) for s in _all_steps(workflow))
+            assert "opencode.ai/install" not in scripts, workflow.name
+            assert "opencode-ai@" in scripts, workflow.name
+            assert "OPENCODE_VERSION" in scripts, workflow.name
+
+    def test_the_pinned_version_is_one_that_is_published(self):
+        """The pin and the registry must agree, checked in the tree.
+
+        Offline, so it cannot query npm: it asserts the pin is the version
+        `opencode-ai@latest` resolved to on 2026-09-28, and the install step
+        checks the installed binary against the same pin. A pin that drifts from
+        the registry is caught by the install step, which runs against the real
+        one.
+        """
+        scripts = "\n".join(
+            _script(step) for step in _all_steps(RUNTIME_DAILY) if "opencode" in step
+        )
+        pinned = set(re.findall(r"OPENCODE_VERSION[=:]\s*([\d.]+)", scripts))
+        assert pinned, "the CLI version must be pinned, not `@latest`"
+        for version in pinned:
+            assert version == "1.18.33", (
+                f"pinned {version}, but opencode-ai@latest resolved to 1.18.33 "
+                "(2026-09-28) and no other release is published"
+            )
+
+    def test_no_workflow_attaches_a_directory_to_the_agent(self):
+        """v2.0.16 refuses a directory, and says so instead of running."""
+        for workflow in (RUNTIME_DAILY, SELF_IMPROVE):
+            for step in _all_steps(workflow):
+                code = _script(step)
+                for path in re.findall(r"--file\s+(\S+)", code):
+                    name = path.split("/")[-1]
+                    assert (REPO_ROOT / path).is_file() or path.startswith("."), (
+                        f"{workflow.name}: --file {path} is not a file; the CLI "
+                        "cannot attach a directory"
+                    )
+                    del name
+
+
+    def test_the_prompt_precedes_the_file_array(self):
+        """`--file` is an **array** in opencode 1.18.33, so order is load-bearing.
+
+        The flags are declared `-f, --file ... [array]`, which means every token
+        after one is consumed as a filename. With the prompt last, the CLI read
+        the message as a path and answered `Error: File not found: Reply with
+        exactly: PONG`. Measured on the published binary: prompt first answers
+        `PONG`, prompt last does not.
+
+        This is the opposite failure to the one it replaced, and both are silent
+        in a way a reader would not expect: the removed flag failed loudly, and
+        this one fails with a message about a *file*.
+        """
+        for workflow in (RUNTIME_DAILY, SELF_IMPROVE):
+            for step in _all_steps(workflow):
+                code = _script(step)
+                if "--file" not in code or "opencode run" not in code:
+                    continue
+                first_file = code.index("--file")
+                prompt = re.search(
+                    r'"(Execute Steps|The appended audit verdicts)', code
+                )
+                assert prompt, workflow.name
+                assert prompt.start() < first_file, (
+                    f"{workflow.name}: the prompt must precede --file, or the "
+                    "array swallows it and the CLI reports the message as a "
+                    "missing file"
+                )
+
+    def test_the_agent_step_still_uses_attach(self):
+        """`--attach` is correct for 1.18.33 and was wrongly removed once.
+
+        An earlier revision dropped it after testing a 2.0.16 binary that was
+        never published. The runner logs the version it actually ran
+        (`OK   opencode cli: 1.18.33`), and that is the ground truth to test
+        against — not whatever happens to be installed locally.
+        """
+        for workflow in (RUNTIME_DAILY,):
+            for step in _all_steps(workflow):
+                code = _script(step)
+                if "opencode run" in code and "--model" in code and "--file" in code:
+                    assert "--attach" in code, (
+                        f"{workflow.name}: 1.18.33 attaches with --attach"
+                    )
 
 class TestTheTranscriptDirectoryExists:
     def test_the_runtime_step_creates_dot_tmp_before_writing(self):
