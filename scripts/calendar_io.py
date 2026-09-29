@@ -929,20 +929,32 @@ def main() -> None:
             file=sys.stderr,
         )
         sys.exit(1)
-    if result["dry_run"] and not (result["created"] or result["updated"]):
-        # Reachable only when every planned row was a skip — the "nothing to
-        # write" case, which is a result and says so on stderr.
+    if not (result["created"] or result["updated"]):
+        # **Uniform across both modes, and the asymmetry was a defect.** This
+        # branch previously exited 1 for a live run and 0 for a dry one, on the
+        # reasoning that "writes were permitted and none happened, so a skip
+        # reason is not an explanation". The first live dispatch (2026-09-29)
+        # disproved that: the plan was two skips, and the skip reason *was* the
+        # explanation — every planned game was already on the calendar as
+        # VERIFIED. Same fact, same night, opposite exit code, which is the
+        # definition of a red that carries no information.
+        #
+        # Enumerating every reachable tuple shows what the live branch actually
+        # detected: with `failed` already handled above, it is reachable **only**
+        # when the plan is all-skips. So it never caught a write problem - it
+        # re-reported a dedupe decision, and without the `game_key` that
+        # `result["failed"]` carries.
+        #
+        # The real live fault is a create/update row whose *write* was rejected,
+        # and that already exits 1 with a name and a reason per event. This exit
+        # code still has two jobs - an empty plan is a fault, and a rejected
+        # write is a fault - and it no longer has a third that means "already
+        # up to date".
         print(
             "OK: calendar_io: nothing to create or update — every planned game is "
             "already on the calendar, so this is a result rather than a failure",
             file=sys.stderr,
         )
-    if not result["dry_run"] and not (result["created"] or result["updated"]):
-        # A *live* run that wrote nothing is different from a dry run that
-        # planned nothing: writes were permitted and none happened, so a skip
-        # reason is not an explanation.
-        print("FAIL: calendar_io: no writes were performed", file=sys.stderr)
-        sys.exit(1)
 
 
 if __name__ == "__main__":
