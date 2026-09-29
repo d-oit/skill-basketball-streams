@@ -714,14 +714,48 @@ class TestCli:
         plan.write_text(json.dumps({"plan": "nope"}), encoding="utf-8")
         assert _run(["apply", "--plan", str(plan)]).returncode == 2
 
-    def test_a_plan_with_nothing_to_do_exits_one(self, tmp_path):
+    def test_a_plan_of_only_skips_is_a_result_not_a_failure(self, tmp_path):
+        """"Nothing to write" is a result; "the planner decided nothing" is a fault.
+
+        The first complete dry-run hit this: the agent found two real BBL games,
+        both already on the calendar as `VERIFIED`, so the planner correctly
+        emitted two skips — and the step went red. A night with no free game is
+        the most common legitimate outcome, so a workflow that reds on it has a
+        red that carries no information.
+        """
         plan = tmp_path / "plan.json"
         plan.write_text(
             json.dumps({"plan": [_plan_row(action=ACTION_SKIP)]}), encoding="utf-8"
         )
         result = _run(["apply", "--plan", str(plan)])
-        assert result.returncode == 1
+        assert result.returncode == 0, result.stderr
         assert "nothing to create or update" in result.stderr
+        assert "result rather than a failure" in result.stderr
+
+    def test_an_empty_plan_is_still_a_failure(self, tmp_path):
+        """The other half, and the reason the distinction is worth making.
+
+        No rows at all means the planner produced nothing — not "it decided
+        nothing to do". Those read identically in a workflow log if only the exit
+        code distinguishes them, and the second one is a broken pipeline.
+        """
+        plan = tmp_path / "plan.json"
+        plan.write_text(json.dumps({"plan": []}), encoding="utf-8")
+        result = _run(["apply", "--plan", str(plan)])
+        assert result.returncode == 1
+        assert "no rows at all" in result.stderr
+        assert "not the same as" in result.stderr
+
+    def test_a_mixed_plan_that_writes_nothing_is_not_an_empty_plan(self, tmp_path):
+        """One create row is a decision even if every write failed — that is
+        already `failed`, which exits 1 for its own reason."""
+        plan = tmp_path / "plan.json"
+        plan.write_text(
+            json.dumps({"plan": [_plan_row(action=ACTION_CREATE), _plan_row(action=ACTION_SKIP)]}),
+            encoding="utf-8",
+        )
+        result = _run(["apply", "--plan", str(plan)])
+        assert result.returncode == 0, result.stderr
 
     def test_bad_now_is_a_usage_error(self):
         assert _run(["list", "--now", "soon"]).returncode == 2
