@@ -757,6 +757,48 @@ class TestCli:
         result = _run(["apply", "--plan", str(plan)])
         assert result.returncode == 0, result.stderr
 
+    def test_both_modes_agree_on_a_nothing_to_write_plan(self, tmp_path):
+        """The asymmetry that made a live run red for the same fact a dry run
+        called a result.
+
+        The live branch previously exited 1 while the dry branch exited 0 on an
+        identical all-skips plan, justified as "writes were permitted and none
+        happened, so a skip reason is not an explanation". The first live
+        dispatch (2026-09-29) disproved it: the plan was two skips, and the skip
+        reason *was* the explanation — every planned game was already on the
+        calendar as `VERIFIED`.
+        """
+        plan = tmp_path / "plan.json"
+        plan.write_text(
+            json.dumps({"plan": [_plan_row(action=ACTION_SKIP)]}), encoding="utf-8"
+        )
+        # A stub credential so the run reaches the exit-code logic rather than
+        # stopping at the "no Composio API key" usage check. Nothing is written:
+        # every row is a skip, which is the case under test.
+        stub = {
+            "COMPOSIO_API_KEY": "not-a-real-key",
+            "COMPOSIO_USER_ID": "not-a-real-user",
+        }
+        dry = _run(["apply", "--plan", str(plan)], env=stub)
+        live = _run(["apply", "--plan", str(plan), "--live"], env=stub)
+        assert dry.returncode == 0, dry.stderr
+        assert live.returncode == 0, live.stderr
+        assert "nothing to create or update" in live.stderr
+
+    def test_a_rejected_write_is_still_a_failure(self, tmp_path):
+        """The exit code keeps the two jobs that matter.
+
+        A create/update row whose *write* the toolkit rejected is a real fault,
+        and it is the case the removed live branch was never actually detecting.
+        """
+        plan = tmp_path / "plan.json"
+        plan.write_text(
+            json.dumps({"plan": [_plan_row(action=ACTION_CREATE)]}), encoding="utf-8"
+        )
+        result = _run(["apply", "--plan", str(plan), "--live"])
+        assert result.returncode != 0, result.stdout
+        assert "FAIL: calendar_io:" in result.stderr
+
     def test_bad_now_is_a_usage_error(self):
         assert _run(["list", "--now", "soon"]).returncode == 2
 

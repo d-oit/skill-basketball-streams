@@ -572,7 +572,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   |---|---|---|
   | rows, all skips | the planner decided: nothing to write | **0** |
   | no rows at all | the planner produced nothing — a broken pipeline | **1** |
-  | rows, writes permitted, none happened | something is wrong with the write path | **1** |
+  | rows, a write was rejected | the toolkit refused an event | **1** |
 
   The middle row is the one that keeps the exit code worth having: a plan the
   planner *emitted* is a decision even when every row is a skip, and an empty plan
@@ -581,6 +581,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   One detail worth recording, because the obvious implementation is wrong:
   `result["actions"]` holds only create/update rows, so a skips-only plan looks
   empty through it. The check counts `created + updated + skipped`.
+
+  **The first revision of that table was wrong, and the first live dispatch
+  proved it.** It had a third row — "writes permitted, none happened" → exit 1 —
+  on the reasoning that a skip reason is not an explanation when writes were
+  allowed. The live run (2026-09-29) planned two skips and the skip reason *was*
+  the explanation: both games were already on the calendar as `VERIFIED`.
+
+  | | dry run | live run |
+  |---|---|---|
+  | the same all-skips plan | exit 0 | exit 1 |
+
+  Same fact, same night, opposite exit code. Enumerating every reachable
+  `(created, updated, skipped, failed)` tuple shows the live branch was
+  reachable **only** when the plan was all-skips — with `failed` already handled
+  above it, it never caught a write problem at all, and re-reported a dedupe
+  decision without the `game_key` that `result["failed"]` carries. So the
+  asymmetry was pure noise, and the third row is now a *rejected write* — which
+  `result["failed"]` already reports per event, by name and by reason.
+
+  The live path itself is now proven end to end: `write_mode` resolved to
+  `LIVE WRITES PERMITTED`, Composio authenticated, the calendar read returned 22
+  real events, and both apply invocations ran — the dry one and `--live`. The
+  only path still unexercised is Composio **creating** an event, because there
+  was nothing new to create.
 
 - **The long-lived `opencode serve` is gone, and three dispatches in five were
   the argument for it.** The step started a server in the background and the
