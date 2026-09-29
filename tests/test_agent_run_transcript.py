@@ -195,21 +195,39 @@ class TestTheAgentStepsReportTheirExitCode:
                     "missing file"
                 )
 
-    def test_the_agent_step_still_uses_attach(self):
-        """`--attach` is correct for 1.18.33 and was wrongly removed once.
+    def test_the_agent_step_owns_its_own_server(self):
+        """No backgrounded service in a step that has to return.
 
-        An earlier revision dropped it after testing a 2.0.16 binary that was
-        never published. The runner logs the version it actually ran
-        (`OK   opencode cli: 1.18.33`), and that is the ground truth to test
-        against — not whatever happens to be installed locally.
+        The long-lived `opencode serve` is gone. It hung on three dispatches in
+        five — 45, 34 and 18 minutes, plus a 7-minute one after the stream
+        redirection went in — each time with the two steps above it green, which
+        is the signature of a step that never returned rather than one still
+        working. Two shell-level patches were tried and neither held: measured
+        eight trials each on identical code, the same body blocked 2/8 in one run
+        and 0/8 in the next. So the environment was the variable and the shape was
+        wrong; the step now runs `--standalone` and cannot outlive its job.
         """
-        for workflow in (RUNTIME_DAILY,):
-            for step in _all_steps(workflow):
-                code = _script(step)
-                if "opencode run" in code and "--model" in code and "--file" in code:
-                    assert "--attach" in code, (
-                        f"{workflow.name}: 1.18.33 attaches with --attach"
-                    )
+        step = _agent_step()
+        code = _script(step)
+        assert "opencode run --standalone" in code, (
+            "the agent must start its own server; there is nothing to attach to"
+        )
+        assert "--attach" not in code, "no server exists to attach to"
+        assert "opencode serve" not in code, (
+            "a backgrounded service in a step that must return is what hung"
+        )
+
+    def test_the_agent_step_is_bounded(self):
+        """An unbounded step produces a cancellation that names nothing.
+
+        45 minutes of job timeout says only "Phase 1/2" — not which step, and
+        not that it was waiting. A timeout is a red with a name on it. The run
+        needs ~8 minutes, so the bound is generous and still an answer.
+        """
+        code = _script(_agent_step())
+        assert "timeout --signal=TERM" in code, "the skill run must be bounded"
+        assert "opencode run" in code
+
 
 class TestTheTranscriptDirectoryExists:
     def test_the_runtime_step_creates_dot_tmp_before_writing(self):

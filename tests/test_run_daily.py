@@ -642,33 +642,6 @@ class TestTheLlmPreflightSeesTheCredentialsItGatesOn:
         step = self._step("Run the skill")
         assert "OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}" in step
 
-    def test_the_agent_attaches_to_the_backend_that_is_started(self):
-        """The pair must exist together, and the server must hold the credentials.
-
-        `--attach` is the documented flag in opencode 1.18.33 and was wrongly
-        removed once, on the strength of a 2.0.16 binary that was never
-        published. Stated as a pair so neither half can be deleted alone: a
-        `serve` with no consumer, or an agent attaching to nothing, is a step
-        that cannot affect the run.
-        """
-        serve = [s for s in self._runtime_steps() if "opencode serve" in s]
-        assert serve, "the long-lived backend is part of the design"
-        agent = self._step("Run the skill")
-        script = "\n".join(
-            line for line in agent.splitlines() if not line.lstrip().startswith("#")
-        )
-        assert "--attach http://127.0.0.1:4096" in script, (
-            "the agent must attach to the port the server was started on"
-        )
-        # The *script*, not the whole step: a comment explaining why a flag was
-        # once removed necessarily names it, and asserting on prose would make
-        # documenting the defect a way to fail.
-        for name in self.RUNG_SECRETS:
-            assert f"{name}: ${{{{ secrets.{name} }}}}" in serve[0], (
-                f"the serve process cannot see {name}, so the model call is "
-                "authenticated against the CLI's own provider"
-            )
-
     def test_the_cli_is_proved_before_the_skill_runs(self):
         """A broken CLI is reported by its own message, not as a failed run.
 
@@ -751,56 +724,26 @@ class TestTheLlmPreflightSeesTheCredentialsItGatesOn:
         assert named, "SKILL.md names references; this pins that they are attached"
         assert named <= attached, f"not attached to the agent: {sorted(named - attached)}"
 
-    def test_the_server_step_detaches_the_servers_streams(self):
-        """A step that starts a long-lived process must not hold its stdio.
+    def test_no_step_starts_a_long_lived_service(self):
+        """The shape that hung, asserted as an absence so it cannot return.
 
-        Actions runs a `run:` block under `bash -e`, and bash waits for a child
-        whose streams it still holds. So a step that backgrounds a server and
-        health-checks it looks successful — the loop breaks on the first
-        iteration — and then **never returns**. It held the job for 45 minutes
-        until the timeout cancelled it, skipping every step below while the
-        preflight and the CLI proof above it both reported success.
-
-        **`disown` alone was tried first, and is not sufficient.** Measured five
-        runs each on 1.18.33, the body with `disown` and no redirection blocked
-        **2 in 5**; with all three streams redirected, **1 in 5**. That
-        difference is inside the noise, and the honest reading is that *neither*
-        was verified to fix it — the single-run measurement that made me
-        confident about `disown` was one sample of a flaky behaviour read as a
-        fact. So this asserts the belt-and-braces version, and says why.
-
-        The real cause is in the runtime log, not here: the step completed and
-        the *server* kept the step's stdout open. A reader who wants the truth
-        should re-measure; what this test does is refuse the form that has now
-        failed twice.
+        A backgrounded `opencode serve` in a step that must return hung on three
+        dispatches in five — 45, 34 and 18 minutes, plus a 7-minute one after the
+        stream redirection went in — each time with the two steps above it green,
+        which is the signature of a step that never returned rather than one still
+        working. Two shell-level patches were tried and neither held: measured
+        eight trials each on identical code, the same body blocked 2/8 in one run
+        and 0/8 in the next, so the environment was the variable and the *shape* was
+        wrong. The agent now runs `--standalone` and owns its own server.
         """
-        step = self._step("Start the opencode backend (one MCP boot for the job)")
-        script = "\n".join(
-            line for line in step.splitlines() if not line.lstrip().startswith("#")
-        )
-        assert "opencode serve" in script
-        assert "$!" in script, "the pid is needed to report a server that died"
-        serve_line = next(line for line in script.splitlines() if "opencode serve" in line)
-        assert "</dev/null" in serve_line, (
-            "the server's stdin must be detached from the step's, or bash waits "
-            "on the child and the step never returns"
-        )
-        assert ">/dev/null" in serve_line, "and its stdout for the same reason"
-        assert "2>&1" in serve_line, "and its stderr, so the step's log is its own"
-        assert "disown" in script, "belt and braces: detach the job as well"
-
-    def test_the_server_step_fails_fast_rather_than_looping_forever(self):
-        """A health loop that exhausts its retries must say so, not fall through."""
-        step = self._step("Start the opencode backend (one MCP boot for the job)")
-        script = "\n".join(
-            line for line in step.splitlines() if not line.lstrip().startswith("#")
-        )
-        assert "seq 1 30" in script, "the readiness loop must be bounded"
-        assert "did not become ready" in script, (
-            "a loop that exhausts its retries must red the step, not continue "
-            "into a step that will fail on an unready server"
-        )
-
+        for step in self._runtime_steps():
+            script = "\n".join(
+                line for line in step.splitlines() if not line.lstrip().startswith("#")
+            )
+            assert "opencode serve" not in script, (
+                "a long-lived service in a step that must return is what hung; the agent "
+                "runs --standalone instead"
+            )
 
 class TestExaMcpKeylessBackend:
     """The free hosted Exa MCP rung (`https://mcp.exa.ai/mcp`, no API key).
