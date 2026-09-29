@@ -170,6 +170,30 @@ class TestTheRuleStillRejects:
                 re.I | re.S,
             ), f"{path.name} must still reject a game with no free indication"
 
+    def test_basketball_is_classified_by_research_not_by_keyword(self):
+        """The listing block mixes sports and never says "basketball".
+
+        Rendered 2026-09-29, the same block carried volleyball, football, darts
+        **and** basketball, and the word "basketball" appeared zero times. So a
+        keyword filter finds no basketball, and an agent that concluded "the page
+        has no basketball" from that string was wrong — which is exactly the
+        misreading made while writing this change.
+        """
+        for path in (SKILL, WORKFLOW_REF, TV_REF):
+            text = _text(path)
+            assert re.search(
+                r"classif\w+.{0,80}research", text, re.I | re.S
+            ), f"{path.name} must classify a listing by research"
+            assert re.search(r"any nation|any league|national team", text, re.I), (
+                f"{path.name} must not narrow the arena to one competition"
+            )
+            assert re.search(
+                r"never (?:writes|says|labels)[\s\S]{0,60}?basketball"
+                r"|absent string is (?:never )?not an absent game",
+                text,
+                re.I | re.S,
+            ), f"{path.name} must record that the page never labels the sport"
+
     def test_free_access_is_still_per_game(self):
         """A free arena does not mean every game in it is free."""
         for path in (SKILL, WORKFLOW_REF):
