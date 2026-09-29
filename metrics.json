@@ -29,8 +29,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 311,
-    "missed": 311,
+    "eligible": 316,
+    "missed": 316,
     "missed_keys": [
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
@@ -45,6 +45,7 @@
       "https://basketballimtv.de/live/2026/mhp-riesen-ludwigsburg-rostock-seawolves-64908.html",
       "https://basketballimtv.de/live/2026/sc-rasta-vechta-bamberg-baskets-64909.html",
       "https://basketballimtv.de/live/2026/telekom-baskets-bonn-syntainics-mbc-64927.html",
+      "https://basketballsphere.com/en/watch-euroleague-2026-27-live-for-free/",
       "https://basketballsphere.com/en/watch-euroleague-for-free/",
       "https://basketnews.com/news-254411-where-to-watch-wembanyama-jokic-live-in-fiba-basketball.html",
       "https://buffsports.io/watch-fiba-stream",
@@ -88,6 +89,7 @@
       "https://liveimtv.de/live/basketball/alba-berlin---telekom-baskets-bonn-52990",
       "https://liveimtv.de/live/basketball/bayern-muenchen---alba-berlin-62264",
       "https://liveimtv.de/live/basketball/bayern-muenchen---alba-berlin-62837",
+      "https://livekick.info/basketball/wettbewerbe/basketball-champions-league/",
       "https://liveticker.morgenpost.de/basketball/bbl/live-konferenz/dn2026-09-24/",
       "https://liveticker.morgenpost.de/basketball/bbl/ma11487260/telekom-baskets-bonn_fitness-first-wuerzburg-baskets/liveticker/",
       "https://liveticker.morgenpost.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/",
@@ -127,8 +129,10 @@
       "https://sporteurope.tv/",
       "https://sporteurope.tv/barmer-2-basketball-bundesliga",
       "https://sporteurope.tv/videos/basketball",
+      "https://sports.justwatch.com/de/basketball",
       "https://sports.justwatch.com/de/basketball/BBL/alba-berlin-fraport-skyliners-26-27",
       "https://sports.justwatch.com/de/basketball/alba-berlin",
+      "https://sports.justwatch.com/de/basketball/champions-league",
       "https://sports.justwatch.com/de/basketball/kk-fmp-0",
       "https://sports.justwatch.com/de/basketball/sk-slavia-prague",
       "https://sports.justwatch.com/us/basketball/alba-berlin",
@@ -311,6 +315,7 @@
       "https://www.sportschau.de/live-und-ergebnisse/basketball/deutschland-bbl/ma12415681/mhp-riesen-ludwigsburg_rostock-seawolves/liveticker",
       "https://www.sportsgambler.com/",
       "https://www.sportsgambler.com/live-streaming/basketball/",
+      "https://www.sportsgambler.com/live-streaming/basketball/fiba-euroleague/",
       "https://www.sportwette.net/sportwetten-live-stream/basketball",
       "https://www.spox.com/basketball/listen/alba-berlin-vs-fc-bayern-muenchen-basketball-finale-heute-live-im-free-tv-wer-zeigt-uebertraegt-spiel-3-der-bbl-finals-im-tv-und-livestream/blt22bba66a434f7a6b",
       "https://www.spox.com/basketball/listen/fc-bayern-muenchen-vs-alba-berlin-basketball-finale-heute-live-im-free-tv-wer-zeigt-uebertraegt-spiel-1-der-bbl-finals-im-tv-und-livestream/blt5f8b4981340892bc",
@@ -345,9 +350,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 3594,
-    "unique_games": 461,
-    "unverifiable": 311,
+    "rows": 3798,
+    "unique_games": 469,
+    "unverifiable": 316,
     "unverifiable_keys": [
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
@@ -362,6 +367,7 @@
       "https://basketballimtv.de/live/2026/mhp-riesen-ludwigsburg-rostock-seawolves-64908.html",
       "https://basketballimtv.de/live/2026/sc-rasta-vechta-bamberg-baskets-64909.html",
       "https://basketballimtv.de/live/2026/telekom-baskets-bonn-syntainics-mbc-64927.html",
+      "https://basketballsphere.com/en/watch-euroleague-2026-27-live-for-free/",
       "https://basketballsphere.com/en/watch-euroleague-for-free/",
       "https://basketnews.com/news-254411-where-to-watch-wembanyama-jokic-live-in-fiba-basketball.html",
       "https://buffsports.io/watch-fiba-stream",
@@ -405,6 +411,7 @@
       "https://liveimtv.de/live/basketball/alba-berlin---telekom-baskets-bonn-52990",
       "https://liveimtv.de/live/basketball/bayern-muenchen---alba-berlin-62264",
       "https://liveimtv.de/live/basketball/bayern-muenchen---alba-berlin-62837",
+      "https://livekick.info/basketball/wettbewerbe/basketball-champions-league/",
       "https://liveticker.morgenpost.de/basketball/bbl/live-konferenz/dn2026-09-24/",
       "https://liveticker.morgenpost.de/basketball/bbl/ma11487260/telekom-baskets-bonn_fitness-first-wuerzburg-baskets/liveticker/",
       "https://liveticker.morgenpost.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/",
@@ -444,8 +451,10 @@
       "https://sporteurope.tv/",
       "https://sporteurope.tv/barmer-2-basketball-bundesliga",
       "https://sporteurope.tv/videos/basketball",
+      "https://sports.justwatch.com/de/basketball",
       "https://sports.justwatch.com/de/basketball/BBL/alba-berlin-fraport-skyliners-26-27",
       "https://sports.justwatch.com/de/basketball/alba-berlin",
+      "https://sports.justwatch.com/de/basketball/champions-league",
       "https://sports.justwatch.com/de/basketball/kk-fmp-0",
       "https://sports.justwatch.com/de/basketball/sk-slavia-prague",
       "https://sports.justwatch.com/us/basketball/alba-berlin",
@@ -628,6 +637,7 @@
       "https://www.sportschau.de/live-und-ergebnisse/basketball/deutschland-bbl/ma12415681/mhp-riesen-ludwigsburg_rostock-seawolves/liveticker",
       "https://www.sportsgambler.com/",
       "https://www.sportsgambler.com/live-streaming/basketball/",
+      "https://www.sportsgambler.com/live-streaming/basketball/fiba-euroleague/",
       "https://www.sportwette.net/sportwetten-live-stream/basketball",
       "https://www.spox.com/basketball/listen/alba-berlin-vs-fc-bayern-muenchen-basketball-finale-heute-live-im-free-tv-wer-zeigt-uebertraegt-spiel-3-der-bbl-finals-im-tv-und-livestream/blt22bba66a434f7a6b",
       "https://www.spox.com/basketball/listen/fc-bayern-muenchen-vs-alba-berlin-basketball-finale-heute-live-im-free-tv-wer-zeigt-uebertraegt-spiel-1-der-bbl-finals-im-tv-und-livestream/blt5f8b4981340892bc",
@@ -662,30 +672,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-09-29T08:37Z",
+  "run_id": "2026-09-29T09:34Z",
   "source": {
     "audit_rows": 0,
-    "candidates_rows": 3594,
+    "candidates_rows": 3798,
     "fixtures_rows": 8
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 48,
-      "missed": 48,
-      "recall": 0.0,
-      "rows": 73,
-      "run_id": "2026-09-25T14:00Z",
-      "unique_games": 73
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -906,7 +899,24 @@
       "rows": 208,
       "run_id": "2026-09-29T08:37Z",
       "unique_games": 178
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 112,
+      "missed": 112,
+      "recall": 0.0,
+      "rows": 204,
+      "run_id": "2026-09-29T09:33Z",
+      "unique_games": 177
     }
   ],
-  "ts": "2026-09-29T08:37:48.817130+00:00"
+  "ts": "2026-09-29T09:34:19.489789+00:00"
 }
