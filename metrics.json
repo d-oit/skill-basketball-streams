@@ -29,8 +29,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 310,
-    "missed": 310,
+    "eligible": 311,
+    "missed": 311,
     "missed_keys": [
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
@@ -225,6 +225,7 @@
       "https://www.freetips.com/basketball/anadolu-efes-vs-real-madrid-live-stream-20260928-0013/",
       "https://www.freetips.com/basketball/dubai-vs-real-madrid-live-stream-20260923-0013/",
       "https://www.freetips.com/basketball/paris-vs-partizan-live-stream-20260928-0024/",
+      "https://www.freetips.com/basketball/watch-euroleague-2026-27-matches-live-20260922-0019/",
       "https://www.freetips.com/basketball/watch-olympiakos-vs-real-madrid-live-stream-euroleague-2026-finals-20260523-0009/",
       "https://www.freiepresse.de/sport/basketball/niners-chemnitz/liveticker-niners-chemnitz-starten-beim-deutschen-meister-alba-berlin-in-die-bundesligasaison-artikel14413643",
       "https://www.fubo.tv/welcome/leagues/13324137",
@@ -344,9 +345,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 3386,
-    "unique_games": 459,
-    "unverifiable": 310,
+    "rows": 3594,
+    "unique_games": 461,
+    "unverifiable": 311,
     "unverifiable_keys": [
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
@@ -541,6 +542,7 @@
       "https://www.freetips.com/basketball/anadolu-efes-vs-real-madrid-live-stream-20260928-0013/",
       "https://www.freetips.com/basketball/dubai-vs-real-madrid-live-stream-20260923-0013/",
       "https://www.freetips.com/basketball/paris-vs-partizan-live-stream-20260928-0024/",
+      "https://www.freetips.com/basketball/watch-euroleague-2026-27-matches-live-20260922-0019/",
       "https://www.freetips.com/basketball/watch-olympiakos-vs-real-madrid-live-stream-euroleague-2026-finals-20260523-0009/",
       "https://www.freiepresse.de/sport/basketball/niners-chemnitz/liveticker-niners-chemnitz-starten-beim-deutschen-meister-alba-berlin-in-die-bundesligasaison-artikel14413643",
       "https://www.fubo.tv/welcome/leagues/13324137",
@@ -660,30 +662,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-09-29T08:09Z",
+  "run_id": "2026-09-29T08:37Z",
   "source": {
     "audit_rows": 0,
-    "candidates_rows": 3386,
+    "candidates_rows": 3594,
     "fixtures_rows": 8
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 93,
-      "missed": 93,
-      "recall": 0.0,
-      "rows": 142,
-      "run_id": "2026-09-24T13:39Z",
-      "unique_games": 142
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -904,7 +889,24 @@
       "rows": 208,
       "run_id": "2026-09-29T08:09Z",
       "unique_games": 177
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 112,
+      "missed": 112,
+      "recall": 0.0,
+      "rows": 208,
+      "run_id": "2026-09-29T08:37Z",
+      "unique_games": 178
     }
   ],
-  "ts": "2026-09-29T08:09:30.665469+00:00"
+  "ts": "2026-09-29T08:37:48.817130+00:00"
 }
