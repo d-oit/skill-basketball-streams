@@ -44,6 +44,15 @@ DEFAULT_CONFIG = {
 # Environment variable name for calendar ID override
 CALENDAR_ID_ENV_VAR = "BASKETBALL_CALENDAR_ID"
 
+
+class CalendarConfigError(ValueError):
+    """A configuration value is present but cannot be used as given.
+
+    Separate from a missing value, which `DEFAULT_CONFIG` already handles: a
+    *truncated* id is neither absent nor valid, and forwarding it turns a local
+    mistake into a remote 404 that names the wrong thing.
+    """
+
 # The values the Calendar tools accept for `visibility`, taken from the live tool
 # schema (recorded in `tests/fixtures/composio/`). Defined here, next to the field
 # it constrains, so the writer (`calendar_io.py --visibility`) and the grader
@@ -118,6 +127,22 @@ def get_calendar_config(root: Path | None = None) -> dict[str, Any]:
     # Apply environment variable override for calendarId
     env_calendar_id = os.environ.get(CALENDAR_ID_ENV_VAR)
     if env_calendar_id:
+        # A **truncated** id is refused, not forwarded. This repository's
+        # `BASKETBALL_CALENDAR_ID` was set to `f8a14c4037d9ab411f93...` — a
+        # 23-character paste of a 90-character id — and the run spent its whole
+        # budget failing at the far end of a long chain to be told, by Google,
+        # that the calendar did not exist. The `...` is the tell: Google calendar
+        # ids are hex plus an optional `@group.calendar.google.com`, so they
+        # never contain one.
+        #
+        # Refusing locally turns a remote 404 into a local, named fault, and it
+        # names the variable rather than the calendar.
+        if "..." in env_calendar_id or "…" in env_calendar_id:
+            raise CalendarConfigError(
+                f"{CALENDAR_ID_ENV_VAR} looks truncated "
+                f"({env_calendar_id!r}) — a calendar id is never elided. Set the "
+                f"full value, or unset it to fall back to config/calendar.json."
+            )
         config["calendarId"] = env_calendar_id
     
     return config

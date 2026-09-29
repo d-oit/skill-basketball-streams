@@ -313,9 +313,16 @@ def check_calendar_config(root: Path) -> None:
             file=sys.stderr,
         )
     
+    # The elision is labelled as *this module's* abbreviation, never as part of
+    # the value. `BASKETBALL_CALENDAR_ID` was set to `f8a14c4037d9ab411f93...`
+    # — 23 characters of a 90-character id, copied out of a line in a log that
+    # read exactly like this one. `calendar_config.py` now refuses an elided id;
+    # this line is the reason the mistake was so easy to make, so it says which
+    # half is the abbreviation.
     print(
         f"OK: calendar config: {config_path.relative_to(root)}: "
-        f"calendarId={calendar_id[:20]}... (valid format)"
+        f"calendarId={calendar_id[:20]}… ({len(calendar_id)} chars, elided here "
+        f"for display only — never copy this form into a variable)"
     )
 
 
