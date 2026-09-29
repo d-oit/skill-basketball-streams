@@ -173,6 +173,26 @@ jobs:
       # green, with absence looking exactly like a quiet day. Offline and
       # presence-based, so it cannot red for a network reason; validity is a
       # different failure and the ladder run below reports it.
+
+      # The render rung runs HERE, so its browser must be installed HERE. The
+      # install used to live only in the `runtime` job, which is a different job
+      # on a different runner: `render-arena` then reported `no rendering
+      # credential` forever, because `available()` requires the key *and* an
+      # importable patchright. The rung shipped green with a credential wired in
+      # and a browser that was never on this machine — the same
+      # reader-is-not-a-producer shape, one job over.
+      - name: Install the local render rung (patchright)
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet --disable-pip-version-check patchright
+          python3 -m patchright install --with-deps chromium
+          python3 -c "from patchright.sync_api import sync_playwright; print('render rung: patchright ready')"
+
+      # Phase 0 is the ONLY producer of the recall denominator. With no search
+      # backend configured it writes nothing at all — and the job would still be
+      # green, with absence looking exactly like a quiet day. Offline and
+      # presence-based, so it cannot red for a network reason; validity is a
+      # different failure and the ladder run below reports it.
       - name: Preflight — at least one search backend is configured
         env:
           # `--check-backends` reports EVERY rung, so it must see the same

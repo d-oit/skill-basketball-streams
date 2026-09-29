@@ -90,6 +90,36 @@ def test_a_probe_step_cannot_report_a_rung_it_cannot_see(step_name, exported):
         )
 
 
+def test_the_renderer_is_installed_in_the_job_that_uses_it():
+    """The browser and the rung must live in the same job.
+
+    `render-arena` shipped with its `patchright` install in the `runtime` job
+    while the rung itself runs in Phase 0 — a different job, a different
+    runner, no browser. `available()` requires the key *and* an importable
+    patchright, so the rung reported `no rendering credential` on a runner that
+    held the key, and the job stayed green. A credential wired in one job and a
+    browser installed in another is a rung that can never serve.
+    """
+    text = RUNTIME_DAILY.read_text(encoding="utf-8")
+    starts = [m.start() for m in re.finditer(r"^  ([a-z][a-z0-9-]*):$", text, re.M)]
+    jobs: dict[str, str] = {}
+    for i, start in enumerate(starts):
+        end = starts[i + 1] if i + 1 < len(starts) else len(text)
+        name = text[start:end].splitlines()[0].strip().rstrip(":")
+        jobs[name] = text[start:end]
+
+    install_jobs = {n for n, body in jobs.items() if "patchright install" in body}
+    assert install_jobs, "no job installs the renderer at all"
+
+    # The rung runs wherever run_daily.py is invoked.
+    use_jobs = {n for n, body in jobs.items() if "run_daily.py" in body}
+    for name in use_jobs:
+        assert name in install_jobs, (
+            f"job {name!r} runs the search ladder, so it needs the renderer "
+            f"installed in the same job — each job is its own runner"
+        )
+
+
 def test_the_render_arena_credential_reaches_both_phase_0_steps():
     """Named explicitly: the two steps must not drift apart again.
 

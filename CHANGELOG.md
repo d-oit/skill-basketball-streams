@@ -25,6 +25,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The render rung could never fire: its browser was installed in a different
+  job.** `patchright` was installed in the `runtime` job while `render-arena`
+  runs in Phase 0 — a separate job, on a separate runner, with no browser.
+  `available()` requires the key *and* an importable patchright, so the rung
+  reported `no rendering credential` on a runner that held the key, and the job
+  stayed green. Dispatch `36604509559` proved it: the credential was wired and
+  the preflight still printed `NO`. Each job is its own machine; a rung's
+  dependency has to be installed where the rung runs.
+
 - **The Phase 0 preflight reported a false negative about its own most
   important source.** `--check-backends` had no `env:` block, so it printed
   `NO backend render-arena: no rendering credential` and `NO backend tinyfish`
