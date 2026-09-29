@@ -106,6 +106,30 @@ RUNG_PROVIDERS = {
 ZEN_DEFAULT_MODEL = "big-pickle"
 
 
+# The CLI's free model this run uses. **Changed 2026-09-29** from `big-pickle`.
+#
+# `big-pickle` is still *free* — it did not become paid — but it is the **oldest**
+# model in the free catalogue (released 2025-10-17 against a current leader of
+# 2026-09-25), and on a real dispatch it **degenerated mid-generation**: 39,289
+# characters of near-random tokens, no Step 7 table, no candidate block, and an
+# extraction step that reported the fault as a missing output contract. The
+# contract was fine. The model was not.
+#
+# `longcat-2.5-preview-free` is the newest free id as of 2026-09-29 with a 1M
+# context, and it answers the candidate-block contract correctly (measured).
+# `scripts/free_models.py --pinned` reports the current free catalogue and
+# whether this pin is still free, so ageing is visible without anyone
+# remembering to look.
+#
+# A **preview** model is a deliberate choice, and the trade is worth stating: the
+# newest free ids are previews, so they are the ones most likely to change or
+# disappear. That is the same reason this stays a *pinned constant on a branch*
+# rather than a selection that follows the live catalogue — if this id stops
+# answering, the failure is a red step naming a model, not a silent change of
+# model under a pinned expectation.
+ZEN_DEFAULT_MODEL = "longcat-2.5-preview-free"
+
+
 class Resolution(NamedTuple):
     """What one run context resolves to. `reason` is written for a human log."""
 
