@@ -29,8 +29,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 316,
-    "missed": 316,
+    "eligible": 325,
+    "missed": 325,
     "missed_keys": [
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
@@ -81,6 +81,7 @@
       "https://live-sport-online.com/basketball/real-madrid-ea7-emporio-armani-milan",
       "https://live-sport-online.com/category/basketball/euroleague",
       "https://live.2basketballbundesliga.de/",
+      "https://live.allsportdb.com/",
       "https://liveimtv.de/live/basketball/alba-berlin---bayern-muenchen-62838",
       "https://liveimtv.de/live/basketball/alba-berlin---niners-chemnitz-53005",
       "https://liveimtv.de/live/basketball/alba-berlin---niners-chemnitz-64897",
@@ -112,8 +113,11 @@
       "https://sport-tv-guide.live/event/live-basketball-euroleague-anadoluefes-realmadrid/1628241",
       "https://sport-tv-guide.live/event/live-basketball-euroleague-baskonia-olympiakos/1628235",
       "https://sport-tv-guide.live/event/live-basketball-euroleague-crvenazvezdamts-zalgiriskaunas/1628232",
+      "https://sport-tv-guide.live/event/live-basketball-euroleague-fenerbahce-bayern/1628243",
       "https://sport-tv-guide.live/event/live-basketball-euroleague-olimpiamilano-virtussegafredobologna/1628245",
       "https://sport-tv-guide.live/event/live-basketball-euroleague-olympiakos-fenerbahce/1628298",
+      "https://sport-tv-guide.live/event/live-basketball-euroleague-paris-partizan/1628247",
+      "https://sport-tv-guide.live/event/live-basketball-euroleague-zalgiriskaunas-olympiakos/1628242",
       "https://sport-tv-guide.live/event/watch-live-sport-on-tv/1628233",
       "https://sport-tv-guide.live/event/watch-live-sport-on-tv/1628234",
       "https://sport.bild.de/basketball/bbl-pokal/ma11730604/fc-bayern-muenchen_bamberg-baskets/liveticker/",
@@ -128,6 +132,7 @@
       "https://sportdaten.wr.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/",
       "https://sporteurope.tv/",
       "https://sporteurope.tv/barmer-2-basketball-bundesliga",
+      "https://sporteurope.tv/en/barmer-2-basketball-bundesliga",
       "https://sporteurope.tv/videos/basketball",
       "https://sports.justwatch.com/de/basketball",
       "https://sports.justwatch.com/de/basketball/BBL/alba-berlin-fraport-skyliners-26-27",
@@ -137,6 +142,7 @@
       "https://sports.justwatch.com/de/basketball/sk-slavia-prague",
       "https://sports.justwatch.com/us/basketball/alba-berlin",
       "https://sports.justwatch.com/us/basketball/euroleague",
+      "https://sports.justwatch.com/us/basketball/euroleague/kk-crvena-zvezda-belgrade-hapoel-tel-aviv-26-27",
       "https://sportstar.thehindu.com/basketball/fiba-women-basketball-world-cup-2026-semifinal-schedule-teams-timing-live-streaming-info/article71459410.ece",
       "https://sportsvideotech.com/dyn-media-powers-live-sports-fast-channel-with-frequency-studio-live/",
       "https://sportticker.harzkurier.de/basketball/bbl/ma12415672/fc-bayern-muenchen_bamberg-baskets/liveticker/",
@@ -342,17 +348,20 @@
       "https://www.tvinfo.de/fernsehprogramm/2324037128-basketball-bundesliga-live-fc-bayern-muenchen-niners-chemnitz",
       "https://www.waipu.tv/",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/",
+      "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XBEK2Lix8FMK_xl4Xsr-2pmcod1J_QQCzkgZNcpItsndA30iZu",
       "https://www.welt.de/",
       "https://www.wettfreunde.net/sport-im-tv-live/basketball/",
       "https://www.youtube.com/watch?v=CQbozxkSjiI",
+      "https://www.youtube.com/watch?v=FNmWY99kc8Y",
       "https://www.youtube.com/watch?v=ZuSRsofRXn8",
+      "https://www.youtube.com/watch?v=c3NuYGiqcrY",
       "https://www.youtube.com/watch?v=nNVx-_qzLWE",
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 3798,
-    "unique_games": 469,
-    "unverifiable": 316,
+    "rows": 4008,
+    "unique_games": 479,
+    "unverifiable": 325,
     "unverifiable_keys": [
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
@@ -403,6 +412,7 @@
       "https://live-sport-online.com/basketball/real-madrid-ea7-emporio-armani-milan",
       "https://live-sport-online.com/category/basketball/euroleague",
       "https://live.2basketballbundesliga.de/",
+      "https://live.allsportdb.com/",
       "https://liveimtv.de/live/basketball/alba-berlin---bayern-muenchen-62838",
       "https://liveimtv.de/live/basketball/alba-berlin---niners-chemnitz-53005",
       "https://liveimtv.de/live/basketball/alba-berlin---niners-chemnitz-64897",
@@ -434,8 +444,11 @@
       "https://sport-tv-guide.live/event/live-basketball-euroleague-anadoluefes-realmadrid/1628241",
       "https://sport-tv-guide.live/event/live-basketball-euroleague-baskonia-olympiakos/1628235",
       "https://sport-tv-guide.live/event/live-basketball-euroleague-crvenazvezdamts-zalgiriskaunas/1628232",
+      "https://sport-tv-guide.live/event/live-basketball-euroleague-fenerbahce-bayern/1628243",
       "https://sport-tv-guide.live/event/live-basketball-euroleague-olimpiamilano-virtussegafredobologna/1628245",
       "https://sport-tv-guide.live/event/live-basketball-euroleague-olympiakos-fenerbahce/1628298",
+      "https://sport-tv-guide.live/event/live-basketball-euroleague-paris-partizan/1628247",
+      "https://sport-tv-guide.live/event/live-basketball-euroleague-zalgiriskaunas-olympiakos/1628242",
       "https://sport-tv-guide.live/event/watch-live-sport-on-tv/1628233",
       "https://sport-tv-guide.live/event/watch-live-sport-on-tv/1628234",
       "https://sport.bild.de/basketball/bbl-pokal/ma11730604/fc-bayern-muenchen_bamberg-baskets/liveticker/",
@@ -450,6 +463,7 @@
       "https://sportdaten.wr.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/",
       "https://sporteurope.tv/",
       "https://sporteurope.tv/barmer-2-basketball-bundesliga",
+      "https://sporteurope.tv/en/barmer-2-basketball-bundesliga",
       "https://sporteurope.tv/videos/basketball",
       "https://sports.justwatch.com/de/basketball",
       "https://sports.justwatch.com/de/basketball/BBL/alba-berlin-fraport-skyliners-26-27",
@@ -459,6 +473,7 @@
       "https://sports.justwatch.com/de/basketball/sk-slavia-prague",
       "https://sports.justwatch.com/us/basketball/alba-berlin",
       "https://sports.justwatch.com/us/basketball/euroleague",
+      "https://sports.justwatch.com/us/basketball/euroleague/kk-crvena-zvezda-belgrade-hapoel-tel-aviv-26-27",
       "https://sportstar.thehindu.com/basketball/fiba-women-basketball-world-cup-2026-semifinal-schedule-teams-timing-live-streaming-info/article71459410.ece",
       "https://sportsvideotech.com/dyn-media-powers-live-sports-fast-channel-with-frequency-studio-live/",
       "https://sportticker.harzkurier.de/basketball/bbl/ma12415672/fc-bayern-muenchen_bamberg-baskets/liveticker/",
@@ -664,38 +679,24 @@
       "https://www.tvinfo.de/fernsehprogramm/2324037128-basketball-bundesliga-live-fc-bayern-muenchen-niners-chemnitz",
       "https://www.waipu.tv/",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/",
+      "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XBEK2Lix8FMK_xl4Xsr-2pmcod1J_QQCzkgZNcpItsndA30iZu",
       "https://www.welt.de/",
       "https://www.wettfreunde.net/sport-im-tv-live/basketball/",
       "https://www.youtube.com/watch?v=CQbozxkSjiI",
+      "https://www.youtube.com/watch?v=FNmWY99kc8Y",
       "https://www.youtube.com/watch?v=ZuSRsofRXn8",
+      "https://www.youtube.com/watch?v=c3NuYGiqcrY",
       "https://www.youtube.com/watch?v=nNVx-_qzLWE",
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-09-29T09:34Z",
+  "run_id": "2026-09-29T10:51Z",
   "source": {
     "audit_rows": 0,
-    "candidates_rows": 3798,
+    "candidates_rows": 4008,
     "fixtures_rows": 8
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 89,
-      "missed": 89,
-      "recall": 0.0,
-      "rows": 145,
-      "run_id": "2026-09-26T13:16Z",
-      "unique_games": 145
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -916,7 +917,24 @@
       "rows": 204,
       "run_id": "2026-09-29T09:33Z",
       "unique_games": 177
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 115,
+      "missed": 115,
+      "recall": 0.0,
+      "rows": 210,
+      "run_id": "2026-09-29T10:50Z",
+      "unique_games": 177
     }
   ],
-  "ts": "2026-09-29T09:34:19.489789+00:00"
+  "ts": "2026-09-29T10:51:01.786397+00:00"
 }
