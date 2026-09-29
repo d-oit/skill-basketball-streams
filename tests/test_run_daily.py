@@ -680,6 +680,30 @@ class TestTheLlmPreflightSeesTheCredentialsItGatesOn:
         agent = next(i for i, s in enumerate(steps) if "- name: Run the skill\n" in s)
         assert probe < agent, "the proof must precede the thing it proves"
 
+    def test_every_step_that_invokes_the_cli_carries_credentials(self):
+        """The property behind four separate defects in this one job.
+
+        A step that runs the `opencode` CLI needs a credential to reach a model,
+        and without one the CLI fails with **its default provider's** error —
+        *"OpenCode's free tier can only be used from within OpenCode"* — which
+        reads as a dead key rather than a missing `env:`, and sent three
+        diagnoses down the wrong path.
+
+        Stated over every such step rather than one at a time, because each
+        instance was only found after the previous was fixed: the preflight, the
+        server, and the agent-creation step were all credential-less in turn.
+        """
+        for step in self._runtime_steps():
+            script = "\n".join(
+                line for line in step.splitlines() if not line.lstrip().startswith("#")
+            )
+            if "opencode run" not in script and "opencode agent" not in script:
+                continue
+            assert any(f"secrets.{name}" in step for name in self.RUNG_SECRETS), (
+                "a step that invokes the opencode CLI has no credentials; the "
+                "CLI then reports its default provider's error, which reads as "
+                f"a dead key rather than a missing env block:\n{step.strip()[:200]}"
+            )
     def test_the_agent_step_attaches_no_directory(self):
         """`--file` takes a file, and the CLI refuses a directory.
 

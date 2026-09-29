@@ -301,12 +301,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   reference added to the contract without being attached is documented as a
   source of truth and silently absent from the run.
 
-  **Twice in this release I wrote a confident cause that was wrong.** First the
-  provider's free tier, then the server's missing environment. Both errors
-  named something *external*, so they read as somebody else's fault, and in both
-  cases a credential or a path sat in this repository the whole time. What
-  actually settled it was running the real CLI on this machine and reading what
-  it said — a step that would have taken seconds and is now the habit.
+  **Four times in this release I wrote a confident cause that was wrong.** Every
+  one named something *external* — the provider's free tier, then the server's
+  missing environment, then a CLI version that does not exist — so each read as
+  somebody else's fault while a credential, a model id, a path and a flag order
+  sat in this repository the whole time. What settled it each time was reading
+  what the tool actually says, and specifically the log the runner writes about
+  itself: `OK   opencode cli: 1.18.33` had been in plain sight since the first
+  dispatch.
+
+- **`agent create` also needs a credential, and it is the fourth step in this job
+  to have had no `env:` block.** `opencode agent create` *generates* the agent
+  with a model, so without a credential it cannot reach one — and it fails with
+  the CLI's **default provider's** error rather than its own, which is the same
+  message that sent the first three diagnoses wrong.
+
+  The three before it were the preflight, the server, and the agent step itself.
+  Each was found only after the previous was fixed, which is what a real gate
+  looks like from the inside. The guard is now a **property over every step that
+  invokes the CLI**, not one assertion per step, because the pattern is the
+  lesson: a step that cannot reach a model reports a provider's opinion about
+  the provider, and that reads as somebody else's fault.
 
 ### Notes
 
