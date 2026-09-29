@@ -174,6 +174,20 @@ jobs:
       # presence-based, so it cannot red for a network reason; validity is a
       # different failure and the ladder run below reports it.
       - name: Preflight — at least one search backend is configured
+        env:
+          # `--check-backends` reports EVERY rung, so it must see the same
+          # credentials the ladder below does. Without this the preflight
+          # printed `NO backend render-arena: no rendering credential` on a
+          # runner where the secret *was* set — and it is the only rung that can
+          # read magenta.tv/sport, so the job reported a false negative about
+          # its own most important source.
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+          # TINYFISH_API_KEY was missing here for the same reason, and longer:
+          # the probe reported `NO backend tinyfish` on a runner that holds the
+          # key, so the two run_daily.py steps disagreed about their own
+          # configuration by two rungs.
+          TINYFISH_API_KEY: ${{ secrets.TINYFISH_API_KEY }}
+          EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
         run: python3 scripts/run_daily.py --check-backends
 
       - name: Configure git identity for telemetry commits
