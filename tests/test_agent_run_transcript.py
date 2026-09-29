@@ -35,6 +35,47 @@ STEP_START = re.compile(r"^      - (?:name|uses|id):", re.M)
 # A single `|` that is not part of `||`, and not the `|` opening a block scalar.
 PIPE = re.compile(r"(?<![\|])\|(?!\s*$)")
 
+# The CLI the workflow pins, from `Install opencode CLI` in `runtime-daily.yml`.
+PINNED_CLI = "1.18.33"
+
+# Flags `opencode run` actually accepts, recorded from `opencode run --help` on
+# the published 1.18.33 binary on 2026-09-29. Kept as a list rather than
+# inferred because the whole class of failure here is using a flag that does not
+# exist: `--standalone` (from an unpublished 2.0.16) and `--attach` (removed on
+# the strength of that same binary, then restored) were both committed before
+# anyone ran `run --help` against the version CI installs.
+KNOWN_RUN_FLAGS = frozenset(
+    {
+        # Recorded verbatim from `opencode run --help` on the published 1.18.33
+        # binary on 2026-09-29 — the version the workflow pins, not the one
+        # that happens to be on a developer's machine.
+        "--agent",
+        "--attach",
+        "--auto",
+        "--command",
+        "--continue",
+        "--dir",
+        "--file",
+        "--fork",
+        "--format",
+        "--help",
+        "--interactive",
+        "--log-level",
+        "--model",
+        "--password",
+        "--port",
+        "--print-logs",
+        "--pure",
+        "--session",
+        "--share",
+        "--thinking",
+        "--title",
+        "--username",
+        "--variant",
+        "--version",
+    }
+)
+
 
 def _all_steps(path: Path) -> list[str]:
     text = path.read_text(encoding="utf-8")
@@ -198,24 +239,45 @@ class TestTheAgentStepsReportTheirExitCode:
     def test_the_agent_step_owns_its_own_server(self):
         """No backgrounded service in a step that has to return.
 
-        The long-lived `opencode serve` is gone. It hung on three dispatches in
-        five — 45, 34 and 18 minutes, plus a 7-minute one after the stream
-        redirection went in — each time with the two steps above it green, which
-        is the signature of a step that never returned rather than one still
-        working. Two shell-level patches were tried and neither held: measured
-        eight trials each on identical code, the same body blocked 2/8 in one run
-        and 0/8 in the next. So the environment was the variable and the shape was
-        wrong; the step now runs `--standalone` and cannot outlive its job.
+        The long-lived `opencode serve` hung on four dispatches — 45, 34, 18 and
+        7 minutes, each time with the two steps above it green, which is the
+        signature of a step that never returned rather than one still working.
+        Two shell-level patches were tried and neither held: measured eight
+        trials each on identical code, the same body blocked 2/8 in one run and
+        0/8 in the next. So the environment was the variable and the *shape* was
+        wrong.
+
+        `--port` matches the shape: the CLI starts and stops its own server
+        inside the step, so the step cannot outlive its job.
         """
-        step = _agent_step()
-        code = _script(step)
-        assert "opencode run --standalone" in code, (
-            "the agent must start its own server; there is nothing to attach to"
+        code = _script(_agent_step())
+        assert "opencode run --port" in code, (
+            "the agent must start its own server; nothing else in the job uses it"
         )
-        assert "--attach" not in code, "no server exists to attach to"
+        assert "--attach" not in code, "there is no long-lived server to attach to"
         assert "opencode serve" not in code, (
             "a backgrounded service in a step that must return is what hung"
         )
+
+    def test_the_agent_step_uses_only_flags_this_cli_has(self):
+        """An unknown flag makes the CLI print its usage and exit.
+
+        `--standalone` was committed here on the strength of a 2.0.16 binary
+        that is not published. The first dispatch with it produced an **empty
+        transcript** and a red step in 30 seconds. 1.18.33's `run --help` lists
+        `--attach` and `--port`; it has no `--standalone`.
+
+        The flag list is pinned rather than the intent, because intent is what
+        went wrong twice: this is the third flag-shape change in this file, and
+        each was checked against a binary CI does not have.
+        """
+        code = _script(_agent_step())
+        for flag in re.findall(r"opencode run ((?:--[\w-]+ )*--[\w-]+)", code):
+            for single in flag.split():
+                assert single in KNOWN_RUN_FLAGS, (
+                    f"{single} is not a flag opencode {PINNED_CLI} accepts; check "
+                    "`opencode run --help` against the pinned CLI before using it"
+                )
 
     def test_the_agent_step_is_bounded(self):
         """An unbounded step produces a cancellation that names nothing.

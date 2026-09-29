@@ -554,19 +554,27 @@ jobs:
           # A directory is refused (`Cannot attach local directory without a
           # shared filesystem: references/`), so every reference is named
           # explicitly.
+          # `--port`, so **the CLI owns the server lifecycle**. This is the form
+          # that removes the hang: the step starts a server, uses it, and exits
+          # with the answer, so it cannot outlive its job. The long-lived
+          # `opencode serve` is gone — it hung on four dispatches, and two
+          # shell-level patches (`disown`, then stream redirection) did not hold.
           #
-          # `--standalone`, because **there is no server to attach to** — the
-          # long-lived `opencode serve` is gone, and the CLI starts and stops
-          # its own inside this step, so this step cannot outlive its job. That
-          # is the fix for a hang that cost three dispatches in five, and two
-          # shell-level patches (`disown`, then stream redirection) did not.
+          # `--port`, and not `--standalone`, because **1.18.33 has no
+          # `--standalone`**: checked against the published binary, whose
+          # `run --help` lists `--attach` and `--port` and no such flag. An unknown
+          # flag makes the CLI print its usage and exit, which is exactly what
+          # the first dispatch with this change did — an empty transcript and a
+          # red step in 30 seconds. `--attach` is the *other* correct flag, and is
+          # what a long-lived server would need; nothing else in this job talks
+          # to that server, so it is not needed here.
           #
-          # Bounded by `timeout` for the same reason: a step that runs unbounded
-          # produces a 45-minute cancellation with nothing in the log saying
-          # which step was wrong, whereas a timeout is a red that names itself.
-          # The run needs ~8 minutes, so 20 is generous and still an answer.
+          # Bounded by `timeout` regardless: an unbounded step produces a
+          # 45-minute cancellation saying only "Phase 1/2" — not which step, and
+          # not that it was waiting. The run needs ~8 minutes, so 20 is generous
+          # and still an answer.
           timeout --signal=TERM --kill-after=30s 1200 \
-            opencode run --standalone \
+            opencode run --port 4096 \
             --model "$LLM_MODEL" --format json \
             "Execute Steps 1-7 for today (Europe/Berlin). DRY_RUN=$DRY_RUN. Emit the Step 7 table.
 
