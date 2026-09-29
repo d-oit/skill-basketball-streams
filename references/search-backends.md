@@ -115,28 +115,37 @@ block as a template, not a pinned manifest.
 
 ## Free LLM APIs (the *decide* layer)
 
-### OpenCode Zen — has genuinely free model IDs
+### OpenCode Zen — the free catalogue, and how to see it
 
 Base URL `https://opencode.ai/zen/v1`, OpenAI-compatible
-`/chat/completions`. Free IDs observed 2026-09-14 (`GET /v1/models` returns the
-live list):
+`/chat/completions`. Config model id format is `opencode/<model-id>`.
 
+**Do not keep a list of the free ids here.** This section used to carry one — six
+ids observed 2026-09-14, with the correct warning that *"the free catalogue
+rotates"*. Two weeks later **three of the six no longer resolved** against the
+CLI, and the fourth, `big-pickle`, degenerated into gibberish mid-generation on
+a real run. A list that is out of date is worse than no list, because it reads as
+current.
+
+Fetch it instead:
+
+```bash
+python3 scripts/free_models.py --pinned          # the table, and is the pin still free?
+python3 scripts/free_models.py --json           # payload on stdout alone
 ```
-big-pickle
-mimo-v2.5-free
-ling-3.0-flash-fin-free
-nemotron-3-ultra-free
-nemotron-3.5-lightning-free
-muse-spark-1.3-contributor-free
-```
 
-Conventions:
+`https://models.dev/api.json` publishes every provider's catalogue with a `cost`
+block per model. **Free is decided by `cost`, not by a name suffix** — that
+distinction is not cosmetic: `big-pickle` is free and has no `-free` in it, while
+several `-free` ids have stopped resolving entirely. As of 2026-09-29 there are
+**34** free OpenCode models, all of them supporting reasoning and tool calls.
 
-- Config model id format is `opencode/<model-id>` (e.g. `opencode/mimo-v2.5-free`).
-- Only IDs suffixed `-free` (plus `big-pickle`) are $0. The rest of the Zen
-  catalogue is pay-as-you-go and needs billing details on the Zen account.
-- The free catalogue rotates — re-read `GET https://opencode.ai/zen/v1/models`
-  before relying on a specific ID.
+**It is a report, not a gate.** Nothing in the runtime calls it. A selection that
+follows a live catalogue changes the model under a pinned expectation with no
+diff to review, and turns a provider hiccup into a red cron at 08:30. The model a
+run uses is a pinned constant in `scripts/llm_model.py`, moved on a branch where
+the diff explains itself — the same separation as `--check-rungs` being
+presence-based and `write_mode.py` being a tested function.
 
 ```bash
 curl https://opencode.ai/zen/v1/chat/completions \

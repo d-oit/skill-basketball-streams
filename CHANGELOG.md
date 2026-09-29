@@ -463,6 +463,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a step that can hang while every command inside it succeeds. Both guards were
   falsified by removing `disown` and by removing the fail-fast.
 
+- **The free-model list was three-quarters stale and had the right warning
+  anyway.** `references/search-backends.md` carried six "genuinely free" OpenCode
+  ids, observed 2026-09-14, annotated *"the free catalogue rotates — re-read
+  before relying on a specific ID"*. Two weeks later **three of the six no longer
+  resolved** against the CLI, and the fourth — the one the runtime pins —
+  **degenerated into gibberish mid-generation** on a real run, emitting 39,289
+  characters with `reat` recurring throughout and no answer at all.
+
+  `scripts/free_models.py` fetches `https://models.dev/api.json` and reports every
+  provider model whose `cost` block is all-zero: **34 free OpenCode models** as of
+  2026-09-29, all supporting reasoning and tool calls. Two properties are load
+  bearing:
+
+  - **Free is decided by `cost`, not by a name suffix.** This is not pedantry:
+    `big-pickle` is free and has no `-free` in it, while several `-free` ids have
+    stopped resolving entirely. A suffix is a guess about a catalogue that
+    changes; `cost` is the fact.
+  - **It is a report, not a gate.** No workflow and no sensor calls it, and two
+    tests assert that separation. A *selection* that follows a live catalogue
+    changes the model under a pinned expectation with no diff to review, and turns
+    a provider hiccup into a red cron at 08:30; a *report* is read by a human,
+    who then moves a pinned constant on a branch where the diff explains itself.
+    That is the same reasoning as `--check-rungs` being presence-based and
+    `write_mode.py` being a tested function. Offline it exits 1 naming the URL
+    rather than inventing a list — inventing a list is how the hand-written one
+    went stale in the first place.
+
+  The degenerate run also showed the sharpest remaining gap: the extraction
+  failure message says *"the agent must emit a fenced block"*, which blames the
+  contract for a **model quality** failure. Those are different faults with
+  different fixes, and the step cannot tell them apart — the same
+  error-names-the-wrong-thing pattern as most of this release.
+
 ### Notes
 
 - **The prompt was the last argument, and `--file` is an array.** The real cause,
