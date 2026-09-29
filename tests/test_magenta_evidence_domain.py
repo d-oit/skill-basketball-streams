@@ -170,6 +170,25 @@ class TestTheRuleStillRejects:
                 re.I | re.S,
             ), f"{path.name} must still reject a game with no free indication"
 
+    def test_the_step_list_is_numbered_without_gaps_or_repeats(self):
+        """Step 2.3's numbers are load-bearing: the agent follows them in order.
+
+        Editing this list by hand left it numbered `1, 3, 4, 5, 5` — a reader
+        following the numbering would skip the classification step entirely,
+        which is the step the whole arena rule now hangs on. Nothing caught it:
+        the block is prose in a markdown list, and every test here checked its
+        *content* rather than its order.
+        """
+        text = _text(SKILL)
+        start = text.index("### Step 2.3")
+        end = text.index("### Step 2.5", start)
+        numbers = [int(m.group(1)) for m in re.finditer(r"^(\d+)\. \*\*", text[start:end], re.M)]
+        assert numbers, "no numbered steps found in Step 2.3"
+        assert numbers == list(range(1, len(numbers) + 1)), (
+            f"Step 2.3 is numbered {numbers}; it must be 1..{len(numbers)} with no "
+            f"gap and no repeat, or a reader following the numbers skips a step"
+        )
+
     def test_basketball_is_classified_by_research_not_by_keyword(self):
         """The listing block mixes sports and never says "basketball".
 

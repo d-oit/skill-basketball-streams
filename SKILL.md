@@ -46,18 +46,18 @@ Run `webSearch` against each approved source with `limit: 20`, focusing on offic
    is an 858-byte app shell) — and take the live listings under "KOSTENLOS &
    OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT". `magentasport.de` / social are
    corroboration only; their silence is **not** evidence against free access.
-3. **Classify each listing as basketball by research, not by keyword** — the
+2. **Classify each listing as basketball by research, not by keyword** — the
    block mixes volleyball, football and darts, and the page never writes
    "basketball". Search each entry ("<teams>" + competition) and accept only
    what research confirms: EuroLeague, EuroCup, any national team, any league,
    **any nation**. An absent string is never an absent game.
-4. **Stream URL** is `magenta.tv/tv/live-[game-slug]/[dynamic-id]`, read from
+3. **Stream URL** is `magenta.tv/tv/live-[game-slug]/[dynamic-id]`, read from
    the rendered page.
-5. **PASS** on `"kostenlos für alle"`, `"ohne Abo"`, `"ohne Login"`,
+4. **PASS** on `"kostenlos für alle"`, `"ohne Abo"`, `"ohne Login"`,
    `"für alle zugänglich"`, `"Jeden Spieltag eine Partie kostenlos"`. **REJECT**
    `"mit MagentaSport Abo"`, `"nur für Abonnenten"`, `"Login erforderlich"`.
-5. **Cross-reference**: the game in that section must be **this** game — a
-   `magenta.tv` URL for a game absent from it is REJECT.
+5. **Cross-reference**: the listed game must be **this** game — a `magenta.tv`
+   URL for a game absent from the listing is REJECTED.
 
 ### Step 2.5 — Validate Direct URLs
 
