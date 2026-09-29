@@ -25,6 +25,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The Phase 0 preflight reported a false negative about its own most
+  important source.** `--check-backends` had no `env:` block, so it printed
+  `NO backend render-arena: no rendering credential` and `NO backend tinyfish`
+  on runners where those secrets *were* registered. The job stayed green while
+  denying the existence of the only rung that can read `magenta.tv/sport` — a
+  quiet configuration reading exactly like a quiet day. All three credentials
+  now reach it. A new test asserts **parity**: any step that reports a rung's
+  configuration must be handed that rung's credential, so the reporting step and
+  the running step cannot disagree again.
+
 - **The free arena listed basketball that the agent could not classify.** The
   page never writes the word "basketball" — it writes the competition name — so
   a keyword filter finds no basketball, and reading "no BBL" as "no basketball"
