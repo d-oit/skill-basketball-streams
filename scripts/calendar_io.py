@@ -907,13 +907,40 @@ def main() -> None:
 
     if result["failed"]:
         sys.exit(1)
-    if result["dry_run"] and not result["actions"]:
+    # **A day with nothing to write is a result, not a fault.** This used to
+    # exit 1, and the first complete dry-run hit it: the agent found two real
+    # BBL games, both already on the calendar as `VERIFIED`, so the planner
+    # correctly emitted two skips and the step went red. A night with no free
+    # game is the *most common* legitimate outcome, so a workflow that reds on it
+    # is a workflow whose red is not information — and "no games tonight" reads
+    # exactly like "the planner never ran", which is the fault this must still
+    # catch.
+    #
+    # So the two are now told apart by **what the plan said**, not by whether
+    # anything was written. A plan the planner emitted — even one whose every row
+    # is a skip — is a decision, and it exits 0 with the reason on stderr. A plan
+    # that is *empty* means the planner produced no rows at all, which is a
+    # different thing: nothing decided, so nothing was reported.
+    decided = result["created"] + result["updated"] + result["skipped"]
+    if not decided:
         print(
-            "FAIL: calendar_io: the plan had nothing to create or update",
+            "FAIL: calendar_io: the plan contained no rows at all — the planner "
+            "produced nothing, which is not the same as 'nothing to write'",
             file=sys.stderr,
         )
         sys.exit(1)
+    if result["dry_run"] and not (result["created"] or result["updated"]):
+        # Reachable only when every planned row was a skip — the "nothing to
+        # write" case, which is a result and says so on stderr.
+        print(
+            "OK: calendar_io: nothing to create or update — every planned game is "
+            "already on the calendar, so this is a result rather than a failure",
+            file=sys.stderr,
+        )
     if not result["dry_run"] and not (result["created"] or result["updated"]):
+        # A *live* run that wrote nothing is different from a dry run that
+        # planned nothing: writes were permitted and none happened, so a skip
+        # reason is not an explanation.
         print("FAIL: calendar_io: no writes were performed", file=sys.stderr)
         sys.exit(1)
 

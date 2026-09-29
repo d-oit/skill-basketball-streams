@@ -550,6 +550,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   context, measured answering the contract) — `big-pickle` was never paid, it is
   simply the **oldest** model in the free catalogue, which is why it collapsed.
 
+- **A day with nothing to write was a failure, and the first complete dry-run
+  proved it.** The run reached `Apply the plan` and reported:
+
+  ```
+  FAIL: calendar_io: the plan had nothing to create or update
+  OK: calendar_io: dry_run=True created=0 updated=0 skipped=2 failed=0
+  ```
+
+  Nothing was wrong. The agent found two real BBL games on the Dyn free-games
+  list, correctly rejected the paid EuroLeague window and the all-paid BCL slate,
+  and both candidates came back as **skips** because the games are already on the
+  calendar as `VERIFIED`. That is the most common legitimate outcome a nightly
+  job can have, and a workflow that reds on it has a red carrying no information
+  — and "no games tonight" reads exactly like "the pipeline is broken".
+
+  The two are now told apart by **what the plan said**, not by whether anything
+  was written:
+
+  | plan | meaning | exit |
+  |---|---|---|
+  | rows, all skips | the planner decided: nothing to write | **0** |
+  | no rows at all | the planner produced nothing — a broken pipeline | **1** |
+  | rows, writes permitted, none happened | something is wrong with the write path | **1** |
+
+  The middle row is the one that keeps the exit code worth having: a plan the
+  planner *emitted* is a decision even when every row is a skip, and an empty plan
+  means nothing was decided and nothing was reported.
+
+  One detail worth recording, because the obvious implementation is wrong:
+  `result["actions"]` holds only create/update rows, so a skips-only plan looks
+  empty through it. The check counts `created + updated + skipped`.
+
 ### Notes
 
 - **The prompt was the last argument, and `--file` is an array.** The real cause,
