@@ -494,8 +494,22 @@ jobs:
       # Security control: the calendar-writing agent must NOT be able to edit
       # SKILL.md, references/ or the gate scripts mid-run. `edit` and `bash` are
       # omitted, and anything omitted is denied.
+      # `agent create` **generates** the agent with a model, so it needs the
+      # credentials too. It had no `env:` block, and a step that cannot reach a
+      # model fails with whatever the CLI's default provider says — which is how
+      # this job spent a week reporting a credential fault that was a missing
+      # `env:` three steps earlier.
       - name: Create the permission-restricted runtime agent
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
+          set -o pipefail
           opencode agent create \
             --path .opencode/agent \
             --description "Basketball streams runtime: read-only research, calendar writer" \
