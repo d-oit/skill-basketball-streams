@@ -136,6 +136,20 @@ Run `scripts/audit_events.py` over events that have **finished** since the last 
 
 Markdown table with columns `Status | League | Teams | Date/Time (CET) | Direct Link | Calendar Event`. Row formats: `created | BBL | ALBA Berlin vs Bayern | 2026-06-20 19:30 | [link] | [event link]` and `skipped | EuroLeague | Real Madrid vs Barcelona | 2026-06-21 20:00 | [link] | Event already exists: abc123`.
 
+**Then emit a fenced `json` block, and it is not optional.** The table is for the human; the block is the *only* channel the runtime has. The daily agent is denied `edit` and `bash`, so it cannot write a file, and `scripts/extract_candidates.py` reads its result out of the transcript. A table, prose, or a tool result are all invisible to it — a run that finds two valid games and omits the block is indistinguishable from a run that found nothing, and it fails the step.
+
+```json
+{"candidates": [
+  {"league": "BBL", "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+   "start": "2026-06-20T19:00:00+02:00", "state": "VERIFIED",
+   "summary": "BBL: ALBA Berlin vs FC Bayern Muenchen",
+   "url": "https://www.dyn.sport/deinsender/dyn-sport-mix/",
+   "evidence": {"free_confirmed": true, "live_confirmed": true}}
+]}
+```
+
+Refused rather than repaired, so get them right: exactly two teams, a `start` that parses as ISO-8601, and a `state` of `VERIFIED` or `UNVERIFIED` — `WRONG` is an audit verdict and is never a proposal (see Step 6.5). One entry per game you decided to store, **including the ones already on the calendar** — that is how the dedupe step sees them. If you found nothing, emit `{"candidates": []}` rather than leaving the block out.
+
 ## Important Constraints
 
 1. **Only approved sources** — no exceptions, even if a search result looks official.
