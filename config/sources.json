@@ -152,15 +152,17 @@
         "facebook.com/MagentaSport"
       ],
       "free_access": "selected",
-      "notes": "One free EuroLeague game per matchday, decided PER GAME. Since 2026-09-29 the free-access indication lives on magenta.tv itself, not magentasport.de - which is now corroboration only, and its silence is NOT evidence against free access. magenta.tv is the JS-rendered streaming platform (bot-blocked), so the free indication needs a rendered page. See references/magenta-tv.md.",
+      "notes": "One free EuroLeague game per matchday, decided PER GAME. Since 2026-09-29 the free game is listed in the SECOND section of magenta.tv/sport, headed 'KOSTENLOS & OHNE LOGIN' (live events of Magenta Sport). That page is in NO web-search index and a plain GET returns an 858-byte app shell, so the indication requires the render ladder - see references/magenta-tv.md. magentasport.de and the social accounts are corroboration only: their silence is NOT evidence against free access.",
       "free_access_evidence": [
-        "magenta.tv"
+        "magenta.tv/sport"
       ],
       "free_access_corroboration": [
         "magentasport.de",
         "x.com/MagentaSport",
         "facebook.com/MagentaSport"
-      ]
+      ],
+      "free_access_section": "KOSTENLOS & OHNE LOGIN",
+      "free_access_indexed": false
     },
     {
       "tier": 6,

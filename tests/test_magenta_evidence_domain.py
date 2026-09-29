@@ -92,21 +92,45 @@ def _history_stripped(text: str) -> str:
 class TestTheEvidenceDomainIsMagentaTv:
     def test_the_skill_contract_says_so(self):
         text = _text(SKILL)
-        assert re.search(
-            r"free.{0,40}(arena|access|indication).{0,80}only on `magenta\.tv`"
-            r"|only on `magenta\.tv`",
-            text,
-            re.I | re.S,
-        ), "SKILL.md must state that the free arena is magenta.tv only"
+        # The page AND its section: a reader told only "magenta.tv" would still
+        # have to guess which of its pages carries the free listing.
+        assert "magenta.tv/sport" in text, (
+            "SKILL.md must name the free arena page, not the bare domain"
+        )
+        assert "KOSTENLOS & OHNE LOGIN" in text, (
+            "SKILL.md must name the section heading that carries the free games"
+        )
 
     def test_the_validation_workflow_says_so(self):
         text = _text(WORKFLOW_REF)
-        assert "only on `magenta.tv`" in text or "now lives **only on" in text
+        assert "magenta.tv/sport" in text
+        assert "KOSTENLOS & OHNE LOGIN" in text
         assert re.search(
             r"silence is \*\*not\*\* evidence|not\*\* evidence against free access",
             text,
             re.I | re.S,
         ), "the workflow must state that magentasport.de silence is not evidence"
+
+    def test_the_arena_page_is_recorded_in_the_corpus(self):
+        """The page is in no search index, so the recorded page is the evidence.
+
+        Without it the corpus holds a `magenta.tv` shell for some *other* path,
+        and the render gate has never seen the arena that actually carries the
+        free games.
+        """
+        manifest = json.loads(
+            (REPO_ROOT / "tests" / "fixtures" / "pages" / "manifest.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        page = next(
+            p for p in manifest["pages"] if p["url"].rstrip("/") == "https://www.magenta.tv/sport"
+        )
+        stored = REPO_ROOT / "tests" / "fixtures" / "pages" / page["stored"]
+        assert stored.is_file()
+        # An app shell, deliberately: the point of the record is that a plain
+        # fetch yields no game and no media token.
+        assert page["expect"] == "no-evidence"
 
     def test_the_tv_reference_says_so(self):
         text = _text(TV_REF)
@@ -119,7 +143,7 @@ class TestTheEvidenceDomainIsMagentaTv:
         entry = next(
             s for s in registry["sources"] if "Magenta" in s.get("name", "")
         )
-        assert entry["free_access_evidence"] == ["magenta.tv"], (
+        assert entry["free_access_evidence"] == ["magenta.tv/sport"], (
             "magenta.tv carries the free-access evidence"
         )
         assert "magentasport.de" in entry["free_access_corroboration"]
@@ -136,10 +160,12 @@ class TestTheRuleStillRejects:
         for path in (SKILL, WORKFLOW_REF, TV_REF):
             text = _text(path)
             assert re.search(
-                r"no (free )?(access )?indication.{0,120}(REJECT|subscription-gated)|"
+                r"no (free )?(access )?indication.{0,140}(REJECT|subscription-gated)|"
                 r"REJECT.{0,40}no.{0,20}indication|"
                 r"without the indication.{0,60}never as `VERIFIED`|"
-                r"shows \*\*no\*\* free indication.{0,160}REJECTED",
+                r"shows \*\*no\*\* free indication.{0,160}REJECTED|"
+                r"absent from that section.{0,20}REJECTED|"
+                r"No indication for\s+that game.{0,20}REJECT",
                 text,
                 re.I | re.S,
             ), f"{path.name} must still reject a game with no free indication"

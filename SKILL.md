@@ -30,8 +30,6 @@ Search for FREE basketball live streams in Germany from official sources, valida
 
 Full list and YouTube URL rules: `references/approved-sources.md`; machine-readable mirror in `config/sources.json`. Summary: Dyn Sport Mix (free **per game** — the official free-games list lives on `dyn.sport`; streams on Joyn / Pluto TV / Zattoo free tier only), MagentaSport / MagentaTV (one free EuroLeague game per matchday), Sportschau / ARD (also streams selected BBL top games free), regional broadcasters (MDR, BR24, RBB24), **Basketball Champions League (`championsleague.basketball`, selected games only)**, official BBL club websites, and official YouTube channels only. **Accepted YouTube URL patterns:** `youtube.com/@handle/live`, `youtube.com/live/<id>`, `youtube.com/watch?v=<id>` (live/upcoming only), `youtube.com/@handle`, `youtube.com/user/TheDBBTV`. **Rejected:** `youtube.com/@FIBAWorld`, any `youtube.com/user/[*]` except `TheDBBTV`, any `youtube.com/channel/UC…`, `/playlist`, `/results`, `/shorts`.
 
-**Social media is validation evidence, never a source link.** `@BasketballCL` / `facebook.com/BasketballCL` (mandatory per BCL game), `@MagentaSport` / `facebook.com/MagentaSport`, `@EuroLeague`, `@easyCreditBBL` may confirm free access for Check 1; a social URL is never stored as the `directLink`.
-> **MAGENTA (changed 2026-09-29, operator):** the free ("kostenlos") game is **no longer announced on `magentasport.de`** — the free arena now lives **only on `magenta.tv`**, which is where the indication is read *and* where the stream plays. `magentasport.de` and official social accounts are **corroboration only**; their silence is **not** evidence against free access. `magenta.tv` is a JS-rendered SPA that blocks plain HTTP clients — a bare 200 returns an app shell, so Checks 6 and 7 need a browser-rendering backend. Procedure: Step 2.3 below.
 ## Process
 
 ### Step 1 — Determine Date Range
@@ -44,21 +42,23 @@ Run `webSearch` against each approved source with `limit: 20`, focusing on offic
 
 ### Step 2.3 — MagentaSport/MagentaTV Special Handling
 
-**CRITICAL:** the free-access evidence and the stream now live on the **same**
-domain, so the free indication is read off the `magenta.tv` page itself:
+**CRITICAL:** the free game is listed in the **second section of
+`magenta.tv/sport`**, headed **"KOSTENLOS & OHNE LOGIN"** (live events of Magenta
+Sport) — and that page is in **no web-search index**, so it is found by
+**rendering** it, never by searching:
 
-1. **Domains**: `magenta.tv` = free-access evidence **and** stream; the silence of
-   `magentasport.de` / social is corroboration only, **not** evidence against it.
-2. **Evidence Search on `magenta.tv`** — the matchday's free indication
-   (`kostenlos`, `kostenlos für alle`, `ohne Abo`, `für alle`, `gratis`). Needs the
-   Step 2.8 render ladder: a plain GET returns the app shell, not the text.
-3. **Stream URL** is `magenta.tv/tv/live-[game-slug]/[dynamic-id]` — dynamic and
-   often unindexed, so read it from the rendered page rather than searching.
+1. **Domains**: `magenta.tv/sport` = the free arena; `magentasport.de` / social =
+   corroboration only, their silence **not** evidence against free access.
+2. **Render the arena** via the Step 2.8 ladder and read the basketball games in
+   the "KOSTENLOS & OHNE LOGIN" section. **Required** — a plain GET returns 858
+   bytes of app shell with no game and no media token, and the page is unindexed.
+3. **Stream URL** is `magenta.tv/tv/live-[game-slug]/[dynamic-id]`, read from
+   the rendered page.
 4. **PASS** on `"kostenlos für alle"`, `"ohne Abo"`, `"ohne Login"`,
    `"für alle zugänglich"`, `"Jeden Spieltag eine Partie kostenlos"`. **REJECT**
    `"mit MagentaSport Abo"`, `"nur für Abonnenten"`, `"Login erforderlich"`.
-5. **Cross-reference**: the indication must name **this** game — no indication for
-   that game = REJECT.
+5. **Cross-reference**: the game in that section must be **this** game — a
+   `magenta.tv` URL for a game absent from it is REJECT.
 
 ### Step 2.5 — Validate Direct URLs
 
@@ -168,7 +168,7 @@ Refused rather than repaired, so get them right: exactly two teams, a `start` th
 8. **YouTube URL rules** — only `@handle`, `@handle/live`, and `/user/TheDBBTV` are accepted.
 9. **Include references** — every event description must contain `sourceReference` and validation timestamp.
 10. **No event without a live stream** — Check 7 must pass; if the live content itself is unverified there is no event. Free access that is merely *unconfirmed* is different: it is still created, but labelled `[UNVERIFIED]` (colour `5`) instead of being rejected.
-11. **Magenta per-game free rule** — a `magenta.tv` stream URL is free only if a free-access indication naming **that game** is found on `magenta.tv` itself (the free arena moved there from `magentasport.de` on 2026-09-29). `magentasport.de` and official social media are corroboration only — their silence is **not** evidence against free access. Without the indication the game may only be created as `UNVERIFIED`, never as `VERIFIED`.
+11. **Magenta per-game free rule (changed 2026-09-29)** — the free game is listed in the **second section of `magenta.tv/sport`** ("KOSTENLOS & OHNE LOGIN"), a page in **no search index**: render it, never search it. `magentasport.de` / social are corroboration only, and their silence is **not** evidence against free access. A `magenta.tv` game absent from that section is **REJECTED** — such a game may only be created `UNVERIFIED`, never `VERIFIED`.
 12. **Magenta render rule** — a `magenta.tv` URL only counts as *working* after a browser-rendering backend (Step 2.8) returns player + live markers. A plain GET returning 200 on the app shell fails Check 6/7 and creates no event.
 13. **BCL per-game rule** — Basketball Champions League free access is decided per game via site + `@BasketballCL` + BCL Facebook; silence is not consent.
 14. **YouTube live-only rule** — only real live broadcasts with `scheduled_start` strictly greater than now (or a live-now stream with no `actualEndTime`) may be promoted. VODs, recordings, replays and ended broadcasts never are.

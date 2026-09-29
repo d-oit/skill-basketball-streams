@@ -30,7 +30,7 @@
       "stored": "magentasport-home.html.gz",
       "stored_bytes": 46084,
       "stored_sha256": "bf3d60bdcd1f0e8562001e28e07b0d69f83fb64267729ba48f69f5a092a68558",
-      "note": "announce site; its bundle contains '.mpd' and 'l\u00e4uft', the page has no stream",
+      "note": "announce site; its bundle contains '.mpd' and 'läuft', the page has no stream",
       "evidence_now": false
     },
     {
@@ -60,7 +60,7 @@
       "stored": null,
       "stored_bytes": null,
       "stored_sha256": "4835be0f14f1684539aea53c08b837a0803427d6497ea8b0fad34d6a5eb35b42",
-      "note": "YouTube home: bundle carries 'dash', 'player', 'live', 'livestream'. Not stored \u2014 258 KB gz for a page with no media token anywhere; the same false-positive class is stored whole as magentasport-home",
+      "note": "YouTube home: bundle carries 'dash', 'player', 'live', 'livestream'. Not stored — 258 KB gz for a page with no media token anywhere; the same false-positive class is stored whole as magentasport-home",
       "evidence_now": false
     },
     {
@@ -90,7 +90,7 @@
       "stored": null,
       "stored_bytes": null,
       "stored_sha256": "2bf7136c20f4406dbdc970a79cf41e25df5baaa47fe0f887ca0d4047459c43b7",
-      "note": "the Live-filtered results page itself is not a stream. Not stored \u2014 256 KB gz of a results page; URL shape is rejected before rendering",
+      "note": "the Live-filtered results page itself is not a stream. Not stored — 256 KB gz of a results page; URL shape is rejected before rendering",
       "evidence_now": false
     },
     {
@@ -122,6 +122,21 @@
       "stored_sha256": "3fe8c7a3b52cc412f019db2e7e6984901bd48fee8bf47e1785852d8f1d68490c",
       "note": "channel live tab with a broadcast attached (URL shape is gated elsewhere)",
       "evidence_now": true
+    },
+    {
+      "name": "magenta-tv-sport-shell",
+      "url": "https://www.magenta.tv/sport",
+      "expect": "no-evidence",
+      "store": "full",
+      "fetched_at": "2026-09-29T16:58:00Z",
+      "status": 200,
+      "response_bytes": 858,
+      "response_sha256": "4633b81bf1d2217033d8ceabe29412d17ab0c931ae619c994f6883c6c551edc0",
+      "stored": "magenta-tv-sport-shell.html",
+      "stored_bytes": 858,
+      "stored_sha256": "4633b81bf1d2217033d8ceabe29412d17ab0c931ae619c994f6883c6c551edc0",
+      "note": "The FREE ARENA page (operator, 2026-09-29): it carries the second 'KOSTENLOS & OHNE LOGIN' live-events section, and it is unindexed - no web search finds it. A plain GET is an 858-byte app shell with no 'kostenlos', no game and no media token, so the free indication is only readable through the Step 2.8 render ladder. Recorded whole because the shell is the whole page.",
+      "evidence_now": false
     }
   ]
 }
