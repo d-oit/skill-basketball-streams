@@ -211,6 +211,7 @@ class TestBackendStatus:
             "exa-mcp": False,
             "exa-mcp-keyless": True,  # the free rung: nothing to configure
             "tinyfish": True,
+            "render-arena": False,  # no FIRECRAWL_API_KEY in this environment
         }
 
     def test_detail_names_the_env_var(self, monkeypatch):

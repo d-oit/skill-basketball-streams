@@ -201,6 +201,10 @@ jobs:
         env:
           EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
           TINYFISH_API_KEY: ${{ secrets.TINYFISH_API_KEY }}
+          # The `render-arena` rung is presence-gated on this, so without it the
+          # ladder silently loses the only rung that can read magenta.tv/sport
+          # — and a run with three healthy rungs still reports no free games.
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
         run: |
           python3 scripts/run_daily.py \
             --dest .tmp/telemetry \
@@ -514,6 +518,27 @@ jobs:
             --description "Basketball streams runtime: read-only research, calendar writer" \
             --mode primary \
             --permissions read,glob,grep,webfetch,websearch,skill
+
+      # A local rendering rung, because the hosted one cannot read this page.
+      #
+      # `magenta.tv/sport` is a dynamic app shell: a plain GET returns 858 bytes
+      # with no game, no media token and no free-access wording, and Firecrawl
+      # with a valid key returns `SCRAPE_ALL_ENGINES_FAILED` on it (measured
+      # 2026-09-29). So the ladder's *hosted* rungs return nothing while the
+      # answer looks exactly like "no free games today" — a false negative that
+      # reads as a quiet day. `patchright` renders the same URL (10,085 chars;
+      # `KOSTENLOS` ×11, `OHNE LOGIN` ×10), so the rung below is what makes the
+      # arena readable at all.
+      #
+      # Chromium is fetched, not assumed: the runner image does not ship the
+      # browser patchright drives, and a missing binary fails the *agent* step
+      # later with a message about the arena instead of about the install.
+      - name: Install the local render rung (patchright)
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet --disable-pip-version-check patchright
+          python3 -m patchright install --with-deps chromium
+          python3 -c "from patchright.sync_api import sync_playwright; print('render rung: patchright ready')"
 
       - name: Run the skill
         env:

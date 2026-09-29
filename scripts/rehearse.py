@@ -321,6 +321,29 @@ def _probe_search(backend_name: str) -> Probe:
     return run
 
 
+def _probe_render_arena() -> Probe:
+    """Render the free arena and assert the marker a bare GET cannot show.
+
+    This is the probe that can fail. `render:firecrawl` reports presence only,
+    but the local rung is the *only* path to the arena: if patchright is
+    missing or the page stops rendering, the run reports "no free streams today"
+    and nothing else in the report says why. The `KOSTENLOS` marker is what
+    separates a rendered page from the 858-byte shell.
+    """
+    def run() -> tuple[bool | None, str]:
+        import run_daily
+
+        backend = run_daily.ALL_BACKENDS["render-arena"]
+        if not backend.available():
+            return False, "render rung unavailable: patchright missing"
+        results = backend.search("basketball free arena", 1)
+        if backend.last_error:
+            return False, backend.last_error
+        return True, f"rendered the arena; {len(results)} candidate(s)"
+
+    return run
+
+
 def _probe_calendar(timeout: int) -> Probe:
     def run() -> tuple[bool | None, str]:
         import calendar_io
@@ -557,6 +580,18 @@ def build_checks(*, timeout: int = 60) -> list[Check]:
             env=("TINYFISH_API_KEY",),
             what="Phase 0's second search backend",
             probe=_probe_search("tinyfish"),
+        ),
+        Check(
+            name="search:render-arena",
+            env=("FIRECRAWL_API_KEY",),
+            what="Phase 0's only rung that can read magenta.tv/sport (renders it locally)",
+            # Probed, unlike `render:firecrawl`: this rung is the *only* path to
+            # the free arena, so "is it installed and does it read the page" is a
+            # question whose answer changes what a run finds. The probe renders
+            # the arena and asserts the `KOSTENLOS` marker, which the 858-byte
+            # app shell does not contain — so it fails on an empty result rather
+            # than reporting success. It costs no provider credit.
+            probe=_probe_render_arena(),
         ),
         Check(
             name="render:firecrawl",
