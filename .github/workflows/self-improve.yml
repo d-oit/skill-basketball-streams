@@ -213,10 +213,18 @@ jobs:
           # here — and this step is `continue-on-error`, which records the
           # outcome it is named for only if there is an outcome to record.
           set -o pipefail
-          npm install -g opencode-ai@latest || npm install -g opencode
+          # Pinned to the version that is published (`opencode-ai@latest` is
+          # 1.18.33; there is no 2.0.16 release — the `runtime-daily.yml` install
+          # step records how that mistake was made).
+          export OPENCODE_VERSION=1.18.33
+          npm install -g "opencode-ai@$OPENCODE_VERSION"
           opencode run --model "$LLM_MODEL" --format json \
-            --file SKILL.md --file references/ --file .tmp/audit.jsonl \
             "The appended audit verdicts describe real misjudgements. Propose the SMALLEST instruction edit to SKILL.md or references/ that would have prevented each one. Do not weaken any check; do not re-baseline any eval." \
+            --file SKILL.md \
+            --file references/validation-workflow.md \
+            --file references/calendar-setup.md \
+            --file references/self-learning.md \
+            --file .tmp/audit.jsonl \
             | tee .tmp/agent-edit.json
 
       - name: Push the branch
