@@ -29,6 +29,18 @@ rendered it (10,085 chars; `KOSTENLOS` ×11, `OHNE LOGIN` ×10). Firecrawl with 
 valid key returned `SCRAPE_ALL_ENGINES_FAILED` on the same URL — the page
 blocks it — so a local rung is the working path, not the hosted one.
 
+**Proven end to end, not just rendered.** Dispatch `36599529155` (2026-09-29)
+planned both games as `VERIFIED` — `Panathinaikos AKTOR Athen vs ASVEL
+Villeurbanne` (30.09. 20:00) and `FC Bayern München vs Partizan Mozzart Bet
+Belgrad` (02.10. 19:30) — with `Bayern - Partizan` having been rejected by the
+three previous runs as *"no per-game free indication found"*. The agent reached
+the page with `webfetch`, so the renderer must be present in the job for this
+to keep working: without it `webfetch` returns the 858-byte shell and the run
+reverts to reporting a quiet day. Independently corroborated — the Seawolves'
+own site states *"Das Spiel wird live auf MagentaSport übertragen"* for their
+EuroCup game, which is exactly the corroboration the rule treats as optional and
+never as a requirement.
+
 ## Why a plain fetch fails
 
 `https://www.magenta.tv/` is a JavaScript-rendered SPA. A plain HTTP GET returns
