@@ -12,14 +12,15 @@
     "dropped": 0,
     "duplicates": 0,
     "fixture_recall": 0.0,
-    "fixtures": 8,
-    "rows": 8,
+    "fixtures": 9,
+    "rows": 9,
     "surfaced": 0,
-    "unseen": 8,
+    "unseen": 9,
     "unseen_keys": [
       "Basketball Champions League|Asisa Joventut|Bnei Penlink Herzliya|2026-10-06T18:30Z",
       "Basketball Champions League|BK KVIS Pardubice|Pallacanestro Reggiana|2026-10-06T18:00Z",
       "Basketball Champions League|BMA365 Bamberg Baskets|Peristeri Betsson|2026-10-06T16:30Z",
+      "Basketball Champions League|Cholet Basket|Hapoel Maoz Daniel Holon|2026-10-06T15:45Z",
       "Basketball Champions League|Cholet Basket|Hapoel Maoz Daniel Holon|2026-10-06T16:30Z",
       "Basketball Champions League|Cibona|Galatasaray MCT Technic|2026-10-06T18:00Z",
       "Basketball Champions League|Igokea m:tel|Surne Bilbao|2026-10-06T18:00Z",
@@ -364,7 +365,7 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 4407,
+    "rows": 4613,
     "unique_games": 486,
     "unverifiable": 330,
     "unverifiable_keys": [
@@ -700,30 +701,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-09-29T12:00Z",
+  "run_id": "2026-09-29T12:21Z",
   "source": {
     "audit_rows": 0,
-    "candidates_rows": 4407,
-    "fixtures_rows": 8
+    "candidates_rows": 4613,
+    "fixtures_rows": 9
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 124,
-      "missed": 124,
-      "recall": 0.0,
-      "rows": 210,
-      "run_id": "2026-09-28T15:57Z",
-      "unique_games": 186
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -944,7 +928,24 @@
       "rows": 191,
       "run_id": "2026-09-29T11:59Z",
       "unique_games": 169
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 114,
+      "missed": 114,
+      "recall": 0.0,
+      "rows": 206,
+      "run_id": "2026-09-29T12:21Z",
+      "unique_games": 175
     }
   ],
-  "ts": "2026-09-29T12:00:31.038195+00:00"
+  "ts": "2026-09-29T12:21:51.868098+00:00"
 }
