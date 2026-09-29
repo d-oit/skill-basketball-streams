@@ -456,19 +456,27 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
-          # `disown` is load-bearing, and the step used to hang for **45
-          # minutes** — the job timeout — with every line of it correct. The
-          # health loop reached the server on its first iteration and printed
-          # nothing further, but the step never *returned*: Actions runs the
-          # script under `bash -e`, and bash waits for every job it started, so
-          # the step sat there holding the long-lived server open. Measured
-          # locally on 1.18.33: the same body exits in 67s without `disown` and
-          # in **2s** with it.
+          # The step must not inherit the server's **streams**. Actions runs a
+          # `run:` block under `bash -e`, and bash waits for every child whose
+          # stdio it still holds — so a backgrounded server that keeps stdout
+          # attached leaves the step *apparently finished* and never returned.
+          # The dispatch before this fix hung for 45 minutes on the job timeout
+          # with every line correct and two green steps above it.
           #
-          # The failure read as a hang, not as a bug, and nothing after this
-          # step ran — so a green preflight and a green CLI proof were followed
-          # by a cancelled job.
-          opencode serve --port 4096 --hostname 127.0.0.1 &
+          # `disown` alone was tried first, and is **not** sufficient. Measured
+          # five runs each on 1.18.33: the body with `disown` and no
+          # redirection blocked **2 in 5**; with all three streams redirected,
+          # **1 in 5**. That difference is inside the noise, and the honest
+          # reading is that **neither was verified to fix it** — the single-run
+          # measurement that made me confident about `disown` was one sample of a
+          # flaky behaviour read as a fact. This step therefore detaches the
+          # streams *and* the job, and the test refuses the form that has now
+          # failed twice. Whoever reads this next should re-measure rather than
+          # trust either number.
+          #
+          # A hang is the worst failure shape this repository has: nothing in the
+          # log says which step is wrong, and every step after it is skipped.
+          opencode serve --port 4096 --hostname 127.0.0.1 </dev/null >/dev/null 2>&1 &
           SERVER_PID=$!
           disown
           for i in $(seq 1 30); do
@@ -481,6 +489,9 @@ jobs:
           fi
           curl -fsS http://127.0.0.1:4096/ >/dev/null \
             || { echo "::error::the opencode server did not become ready in 30s"; exit 1; }
+          # The server outlives this step on purpose, so nothing may be written
+          # back to it: the log would keep filling for the rest of the job.
+          echo "opencode backend is ready on 127.0.0.1:4096 (pid $SERVER_PID)"
 
       # ONE decision, in tested Python, of which model the run below uses.
       #
