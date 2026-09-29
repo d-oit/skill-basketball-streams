@@ -355,6 +355,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   value to fix. Every gate in this repository answered "set", and the chain
   between the mistake and the report was four steps and seven minutes long.
 
+- **Nothing ever asked the agent for the candidates the planner reads.** The
+  first run to complete all seven steps then failed at the next one:
+
+  ```
+  FAIL: extract_candidates: no usable candidates (0 rejected)
+         — the agent must emit a fenced ```json block of candidate objects
+  ```
+
+  It had done the work correctly. It ran Steps 1–7, verified two real BBL games
+  against the Dyn free-games list, rejected a paid EuroLeague window and an
+  all-paid BCL slate, and produced the Step 7 table. `SKILL.md` Step 7 specified
+  **the table**, the workflow prompt said *"Emit the Step 7 table"*, and
+  `extract_candidates.FENCED_BLOCK` required a fenced JSON object **that no
+  instruction mentioned**. So the agent produced exactly what it was asked for
+  and the step reported "no usable candidates" — byte-identical to a day with no
+  free streams, which is the failure this repository records as its worst.
+
+  The agent is denied `edit` and `bash`, so it cannot write the file; the
+  transcript is the only channel it has. That is why the requirement is a
+  **consequence of the permission model** rather than a belt-and-braces ask,
+  and `test_the_agent_cannot_write_the_file_itself` now asserts the permission
+  model so the two cannot drift apart.
+
+  The contract now lives in `SKILL.md` — where it belongs, since that is what
+  every run is given — with a worked example, and the prompt states the same
+  requirement for the case where a caller reads only the prompt. The load-bearing
+  test is not that the words are present but that **the examples in both
+  documents are fed to the real parser**: an example the extractor would refuse
+  is a contract that teaches the agent to fail. Both cases were falsified by
+  restoring the pre-fix text.
+
+  A table for the human and a block for the machine is not redundancy; it is the
+  only way one channel serves a reader and a parser.
+
 ### Notes
 
 - **The prompt was the last argument, and `--file` is an array.** The real cause,

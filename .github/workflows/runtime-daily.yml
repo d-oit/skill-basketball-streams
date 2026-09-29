@@ -558,7 +558,17 @@ jobs:
           # removed it, having tested a 2.0.16 binary that is not published.
           opencode run --attach http://127.0.0.1:4096 \
             --model "$LLM_MODEL" --format json \
-            "Execute Steps 1-7 for today (Europe/Berlin). DRY_RUN=$DRY_RUN. Emit the Step 7 table." \
+            "Execute Steps 1-7 for today (Europe/Berlin). DRY_RUN=$DRY_RUN. Emit the Step 7 table.
+
+            You are also the ONLY channel the planner has. The runtime agent is denied 'edit' and 'bash', so it cannot write a file, and scripts/extract_candidates.py reads the final answer out of your transcript. It accepts a fenced \`\`\`json block and NOTHING else - a markdown table, prose, or a tool result are all invisible to it.
+
+            So end your reply with exactly this, after the table:
+
+            \`\`\`json
+            {\"candidates\": [{\"league\": \"BBL\", \"teams\": [\"ALBA BERLIN\", \"BMA365 Bamberg Baskets\"], \"start\": \"2026-10-03T18:30:00+02:00\", \"state\": \"VERIFIED\", \"summary\": \"BBL: ALBA BERLIN vs BMA365 Bamberg Baskets\", \"url\": \"<the directLink you stored>\", \"evidence\": {\"free_confirmed\": true, \"live_confirmed\": true}}]}
+            \`\`\`
+
+            Rules that are refused rather than repaired: exactly two teams, a start that parses as an ISO-8601 datetime, and a state of VERIFIED or UNVERIFIED - 'WRONG' is an audit verdict, never a proposal. One entry per game you decided to store, including the ones already on the calendar. If you found nothing, emit exactly {\"candidates\": []} - an empty array, not an omitted block, because a missing block is what a failed run looks like." \
             --file SKILL.md \
             --file references/validation-workflow.md \
             --file references/youtube-live-search.md \
