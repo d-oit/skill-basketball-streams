@@ -47,6 +47,68 @@ def _transcript(text: str) -> dict:
     return {"transcripts": [{"id": 1, "output": text}]}
 
 
+class TestTheRealTranscriptShape:
+    """The file the runtime actually produces, which no fixture covered.
+
+    `runtime-daily.yml` runs `opencode run --format json` and `tee`s its stdout
+    verbatim to `.tmp/transcript.json`. That is a **JSONL event stream** — one
+    JSON object per line — and every fixture in this file is a single JSON
+    *document*. So the only shape the pipeline ever hands the extractor was
+    untested, and it failed:
+
+    ```
+    FAIL: extract_candidates: no usable candidates (0 rejected)
+    ```
+
+    on a run whose agent emitted a perfect `{"candidates": [...]}`. The escapes
+    inside each event's `text` field survive into the fenced block, the block
+    reaches `json.loads` with literal backslashes, and it is dropped — a run that
+    did the whole job correctly reported *no games today*.
+    """
+
+    FIXTURE = REPO_ROOT / "tests" / "fixtures" / "agent_transcript_jsonl.txt"
+
+    def test_a_jsonl_event_stream_yields_its_candidates(self):
+        accepted, rejected = extract(self.FIXTURE.read_text(encoding="utf-8"))
+        assert rejected == [], f"the block was dropped: {rejected}"
+        assert len(accepted) == 1, accepted
+        assert accepted[0]["state"] == "VERIFIED"
+        assert accepted[0]["url"] == "https://pluto.tv/gsa/live-tv/abc"
+
+    def test_the_block_is_not_read_with_its_escapes_intact(self):
+        """The mechanism, so the fix is not mistaken for a formatting change.
+
+        Undecoded, the collector's text still *contains* the fence — so any test
+        that only asserted "```json is in the text" passed while the run failed.
+        """
+        text = transcript_text(self.FIXTURE.read_text(encoding="utf-8"))
+        assert "```json" in text
+        assert '"candidates"' in text, (
+            "the block's quotes must be unescaped; escaped quotes are what the "
+            "parser silently dropped"
+        )
+
+    def test_a_single_document_transcript_is_unaffected(self):
+        """The other shape, so the fix cannot trade one failure for another."""
+        accepted, _ = extract(json.dumps({"candidates": [CANDIDATE]}))
+        assert len(accepted) == 1
+
+    def test_plain_prose_is_still_read(self):
+        """Not JSON in either shape: the text path, unchanged."""
+        accepted, _ = extract("```json\n" + json.dumps([CANDIDATE]) + "\n```")
+        assert len(accepted) == 1
+
+    def test_a_partly_valid_stream_is_not_half_decoded(self):
+        """Every line must parse, or the file is a different document.
+
+        Half-decoding would yield a *shorter* candidate list that looks complete
+        — the quietest possible version of this bug.
+        """
+        lines = self.FIXTURE.read_text(encoding="utf-8").splitlines()
+        mixed = lines[0] + "\nnot json at all\n"
+        assert transcript_text(mixed) == mixed
+
+
 class TestTranscriptText:
     def test_rich_shape(self):
         assert "hello" in transcript_text(_transcript("hello"))
