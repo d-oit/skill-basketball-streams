@@ -29,8 +29,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 325,
-    "missed": 325,
+    "eligible": 329,
+    "missed": 329,
     "missed_keys": [
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
@@ -45,6 +45,7 @@
       "https://basketballimtv.de/live/2026/mhp-riesen-ludwigsburg-rostock-seawolves-64908.html",
       "https://basketballimtv.de/live/2026/sc-rasta-vechta-bamberg-baskets-64909.html",
       "https://basketballimtv.de/live/2026/telekom-baskets-bonn-syntainics-mbc-64927.html",
+      "https://basketballimtv.de/tv/magentasport.html",
       "https://basketballsphere.com/en/watch-euroleague-2026-27-live-for-free/",
       "https://basketballsphere.com/en/watch-euroleague-for-free/",
       "https://basketnews.com/news-254411-where-to-watch-wembanyama-jokic-live-in-fiba-basketball.html",
@@ -159,6 +160,7 @@
       "https://www.ardmediathek.de/video/sportschau/bbl-fc-bayern-muenchen-gegen-alba-berlin/das-erste/Y3JpZDovL3Nwb3J0c2NoYXUuZGUvMzZmNzk1ZjktMDgwZC00YWI2LWI1YzItNjBlMzk4YjgyMGY2",
       "https://www.ariva.de/aktien/deutsche-telekom-ag-aktie/news/magentasport-der-telekom-erhaelt-exklusivrechte-an-basketball-12148432",
       "https://www.basketball-bund.de/",
+      "https://www.basketball-bund.de/basketball-wm-alle-spiele-live-magentasport/",
       "https://www.basketball-bund.de/herren-laenderspiele-weiterhin-live-kostenfrei-magentasport/",
       "https://www.basketball-world.news/artikel/hier-laufen-die-euroleague-spiele-des-fc-bayern-im-tv-und-stream-1151087",
       "https://www.basketball-world.news/artikel/wer-zeigt-das-bcl-achtelfinale-mit-berlin-und-wuerzburg-live-1153261",
@@ -334,6 +336,7 @@
       "https://www.techradar.com/how-to-watch/basketball/fiba-womens-basketball-world-cup-2026-free",
       "https://www.telekom.com/de/newsroom/aktuelles/medieninformationen/2020/12/livesport-highlights-bei-magentasport-als-free-tv-angebot",
       "https://www.telekom.de/",
+      "https://www.telekom.de/magenta-tv/live-sport-stream",
       "https://www.telekom.de/sport/magenta-sport",
       "https://www.telekom.de/sport/magenta-sport?adfcd=1768474263.EZK18ZNavUGwSKPubYfMHQ.MTkzMjIyNSwxNzUyOTM1&wt_ref=https%3A%2F%2Fstatics.teams.cdn.office.net%2F%3Fsubid%3Dst_on_p_tvm_694138b1ba67575f498031b9",
       "https://www.teltarif.de/en/dyn-fastchannel-freetv-astra-streaming/news/99428.html",
@@ -351,6 +354,7 @@
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XBEK2Lix8FMK_xl4Xsr-2pmcod1J_QQCzkgZNcpItsndA30iZu",
       "https://www.welt.de/",
       "https://www.wettfreunde.net/sport-im-tv-live/basketball/",
+      "https://www.youtube.com/watch?v=3I83ko1eP9c",
       "https://www.youtube.com/watch?v=CQbozxkSjiI",
       "https://www.youtube.com/watch?v=FNmWY99kc8Y",
       "https://www.youtube.com/watch?v=ZuSRsofRXn8",
@@ -359,9 +363,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 4008,
-    "unique_games": 479,
-    "unverifiable": 325,
+    "rows": 4216,
+    "unique_games": 483,
+    "unverifiable": 329,
     "unverifiable_keys": [
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
@@ -376,6 +380,7 @@
       "https://basketballimtv.de/live/2026/mhp-riesen-ludwigsburg-rostock-seawolves-64908.html",
       "https://basketballimtv.de/live/2026/sc-rasta-vechta-bamberg-baskets-64909.html",
       "https://basketballimtv.de/live/2026/telekom-baskets-bonn-syntainics-mbc-64927.html",
+      "https://basketballimtv.de/tv/magentasport.html",
       "https://basketballsphere.com/en/watch-euroleague-2026-27-live-for-free/",
       "https://basketballsphere.com/en/watch-euroleague-for-free/",
       "https://basketnews.com/news-254411-where-to-watch-wembanyama-jokic-live-in-fiba-basketball.html",
@@ -490,6 +495,7 @@
       "https://www.ardmediathek.de/video/sportschau/bbl-fc-bayern-muenchen-gegen-alba-berlin/das-erste/Y3JpZDovL3Nwb3J0c2NoYXUuZGUvMzZmNzk1ZjktMDgwZC00YWI2LWI1YzItNjBlMzk4YjgyMGY2",
       "https://www.ariva.de/aktien/deutsche-telekom-ag-aktie/news/magentasport-der-telekom-erhaelt-exklusivrechte-an-basketball-12148432",
       "https://www.basketball-bund.de/",
+      "https://www.basketball-bund.de/basketball-wm-alle-spiele-live-magentasport/",
       "https://www.basketball-bund.de/herren-laenderspiele-weiterhin-live-kostenfrei-magentasport/",
       "https://www.basketball-world.news/artikel/hier-laufen-die-euroleague-spiele-des-fc-bayern-im-tv-und-stream-1151087",
       "https://www.basketball-world.news/artikel/wer-zeigt-das-bcl-achtelfinale-mit-berlin-und-wuerzburg-live-1153261",
@@ -665,6 +671,7 @@
       "https://www.techradar.com/how-to-watch/basketball/fiba-womens-basketball-world-cup-2026-free",
       "https://www.telekom.com/de/newsroom/aktuelles/medieninformationen/2020/12/livesport-highlights-bei-magentasport-als-free-tv-angebot",
       "https://www.telekom.de/",
+      "https://www.telekom.de/magenta-tv/live-sport-stream",
       "https://www.telekom.de/sport/magenta-sport",
       "https://www.telekom.de/sport/magenta-sport?adfcd=1768474263.EZK18ZNavUGwSKPubYfMHQ.MTkzMjIyNSwxNzUyOTM1&wt_ref=https%3A%2F%2Fstatics.teams.cdn.office.net%2F%3Fsubid%3Dst_on_p_tvm_694138b1ba67575f498031b9",
       "https://www.teltarif.de/en/dyn-fastchannel-freetv-astra-streaming/news/99428.html",
@@ -682,6 +689,7 @@
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XBEK2Lix8FMK_xl4Xsr-2pmcod1J_QQCzkgZNcpItsndA30iZu",
       "https://www.welt.de/",
       "https://www.wettfreunde.net/sport-im-tv-live/basketball/",
+      "https://www.youtube.com/watch?v=3I83ko1eP9c",
       "https://www.youtube.com/watch?v=CQbozxkSjiI",
       "https://www.youtube.com/watch?v=FNmWY99kc8Y",
       "https://www.youtube.com/watch?v=ZuSRsofRXn8",
@@ -690,30 +698,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-09-29T10:51Z",
+  "run_id": "2026-09-29T11:29Z",
   "source": {
     "audit_rows": 0,
-    "candidates_rows": 4008,
+    "candidates_rows": 4216,
     "fixtures_rows": 8
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 96,
-      "missed": 96,
-      "recall": 0.0,
-      "rows": 146,
-      "run_id": "2026-09-27T14:09Z",
-      "unique_games": 146
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -934,7 +925,24 @@
       "rows": 210,
       "run_id": "2026-09-29T10:50Z",
       "unique_games": 177
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 113,
+      "missed": 113,
+      "recall": 0.0,
+      "rows": 208,
+      "run_id": "2026-09-29T11:28Z",
+      "unique_games": 178
     }
   ],
-  "ts": "2026-09-29T10:51:01.786397+00:00"
+  "ts": "2026-09-29T11:29:09.005186+00:00"
 }
