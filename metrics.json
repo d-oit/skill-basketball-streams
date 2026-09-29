@@ -30,8 +30,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 331,
-    "missed": 331,
+    "eligible": 334,
+    "missed": 334,
     "missed_keys": [
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
@@ -133,6 +133,7 @@
       "https://sportdaten.nrz.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/",
       "https://sportdaten.wr.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/",
       "https://sporteurope.tv/",
+      "https://sporteurope.tv/alba-berlin",
       "https://sporteurope.tv/barmer-2-basketball-bundesliga",
       "https://sporteurope.tv/en/barmer-2-basketball-bundesliga",
       "https://sporteurope.tv/videos/basketball",
@@ -353,6 +354,7 @@
       "https://www.tvinfo.de/fernsehprogramm/2324037128-basketball-bundesliga-live-fc-bayern-muenchen-niners-chemnitz",
       "https://www.waipu.tv/",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/",
+      "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4UWvwbcbHjQjo-3efCu5IN0zo2514XV0yIiY_6gxn-DdQofe5pp",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4Vyb4AE_sT4A9Kx-cZaH55StqHuQSxIyOHQM8w5m5v0U0eBOBib",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XBEK2Lix8FMK_xl4Xsr-2pmcod1J_QQCzkgZNcpItsndA30iZu",
       "https://www.welt.de/",
@@ -362,13 +364,14 @@
       "https://www.youtube.com/watch?v=FNmWY99kc8Y",
       "https://www.youtube.com/watch?v=ZuSRsofRXn8",
       "https://www.youtube.com/watch?v=c3NuYGiqcrY",
+      "https://www.youtube.com/watch?v=kaCZh9gyy_c",
       "https://www.youtube.com/watch?v=nNVx-_qzLWE",
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 5015,
-    "unique_games": 487,
-    "unverifiable": 331,
+    "rows": 5223,
+    "unique_games": 491,
+    "unverifiable": 334,
     "unverifiable_keys": [
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
@@ -470,6 +473,7 @@
       "https://sportdaten.nrz.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/",
       "https://sportdaten.wr.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/",
       "https://sporteurope.tv/",
+      "https://sporteurope.tv/alba-berlin",
       "https://sporteurope.tv/barmer-2-basketball-bundesliga",
       "https://sporteurope.tv/en/barmer-2-basketball-bundesliga",
       "https://sporteurope.tv/videos/basketball",
@@ -690,6 +694,7 @@
       "https://www.tvinfo.de/fernsehprogramm/2324037128-basketball-bundesliga-live-fc-bayern-muenchen-niners-chemnitz",
       "https://www.waipu.tv/",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/",
+      "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4UWvwbcbHjQjo-3efCu5IN0zo2514XV0yIiY_6gxn-DdQofe5pp",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4Vyb4AE_sT4A9Kx-cZaH55StqHuQSxIyOHQM8w5m5v0U0eBOBib",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XBEK2Lix8FMK_xl4Xsr-2pmcod1J_QQCzkgZNcpItsndA30iZu",
       "https://www.welt.de/",
@@ -699,34 +704,18 @@
       "https://www.youtube.com/watch?v=FNmWY99kc8Y",
       "https://www.youtube.com/watch?v=ZuSRsofRXn8",
       "https://www.youtube.com/watch?v=c3NuYGiqcrY",
+      "https://www.youtube.com/watch?v=kaCZh9gyy_c",
       "https://www.youtube.com/watch?v=nNVx-_qzLWE",
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-09-29T12:57Z",
+  "run_id": "2026-09-29T15:36Z",
   "source": {
     "audit_rows": 0,
-    "candidates_rows": 5015,
+    "candidates_rows": 5223,
     "fixtures_rows": 9
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 111,
-      "missed": 111,
-      "recall": 0.0,
-      "rows": 209,
-      "run_id": "2026-09-28T17:20Z",
-      "unique_games": 173
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -947,7 +936,24 @@
       "rows": 210,
       "run_id": "2026-09-29T12:57Z",
       "unique_games": 175
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 110,
+      "missed": 110,
+      "recall": 0.0,
+      "rows": 208,
+      "run_id": "2026-09-29T15:36Z",
+      "unique_games": 174
     }
   ],
-  "ts": "2026-09-29T12:57:45.524459+00:00"
+  "ts": "2026-09-29T15:36:55.676049+00:00"
 }
