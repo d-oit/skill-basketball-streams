@@ -30,8 +30,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 335,
-    "missed": 335,
+    "eligible": 339,
+    "missed": 339,
     "missed_keys": [
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
@@ -252,6 +252,7 @@
       "https://www.hockeyweb.de/wetten/bayern-muenchen-vs-ratiopharm-ulm-kostenlos-im-live-stream-schauen/",
       "https://www.inbayreuth.de/basketball-proa-livestreams-werden-kuenftig-kostenpflichtig/cnt-id-ps-f1b82c65-0139-4c14-b0ad-73a6801d9413",
       "https://www.it-boltwise.de/basketball-bundesliga-playoffs-wfcrzburg-vs-bonn-live-auf-dyn-und-joyn.html",
+      "https://www.it-boltwise.de/bbl-saison-2025-26-fc-bayern-muenchen-auf-titeljagd-im-livestream.html",
       "https://www.kulturigo.de/magentasport-mit-exklusivem-basketball-angebot-mission-em-gewinn-startet-am-08-august-per-g-nther-und-marie-g-lich-als-experten-dabei-alle-76-spiele-und-alle-tests-live-deutsche-partien-kostenlos-2189882.html/",
       "https://www.kurierverlag.de/na-pressemitteilungen/magentasport-und-magentatv-zeigen-alle-spiele-der-eurobasket-2025-live-die-deutschen-spiele-kostenlos-telekom-vergibt-sublizenz-an-rtl-deutschland-zr-93650895.html",
       "https://www.livescorehunter.com/basketball-germany-livescore-live-streaming-links",
@@ -348,16 +349,19 @@
       "https://www.tomsguide.com/entertainment/sports/how-to-watch-germany-vs-turkiye-eurobasket-final-2025-live",
       "https://www.trendyone.de/news/bbl-finale-live-im-free-tv-fc-bayern-basketball-vs-ratiopharm-ulm",
       "https://www.ttbl.de/en/news/post/68a6ceb863c5160001e1e58b",
+      "https://www.ttbl.de/news/post/68a6ceb863c5160001e1e58b",
       "https://www.tvinfo.de/fernsehprogramm/2045174305-basketball-bundesliga-live-fc-bayern-mnchen-alba-berlin",
       "https://www.tvinfo.de/fernsehprogramm/2115529196-basketball-bundesliga-live-fc-bayern-muenchen-mhp-riesen-ludwigsburg",
       "https://www.tvinfo.de/fernsehprogramm/2115529203-basketball-bundesliga-live-fc-bayern-muenchen-mhp-riesen-ludwigsburg",
       "https://www.tvinfo.de/fernsehprogramm/2324037128-basketball-bundesliga-live-fc-bayern-muenchen-niners-chemnitz",
+      "https://www.tvinfo.de/fernsehprogramm/2324037132-basketball-bundesliga-live-fc-bayern-muenchen-niners-chemnitz",
       "https://www.waipu.tv/",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4UT5MR4E50eRzhEpzzML8ffax7DuJYCtH0T-Y5g4BdWCODdfBcA",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4UWvwbcbHjQjo-3efCu5IN0zo2514XV0yIiY_6gxn-DdQofe5pp",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4Vyb4AE_sT4A9Kx-cZaH55StqHuQSxIyOHQM8w5m5v0U0eBOBib",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XBEK2Lix8FMK_xl4Xsr-2pmcod1J_QQCzkgZNcpItsndA30iZu",
+      "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XKmED8HFkAEXKQ3wDxG2gxbGqyx46AdexhuCr4CKshPBdh2E3O",
       "https://www.welt.de/",
       "https://www.wettfreunde.net/sport-im-tv-live/basketball/",
       "https://www.youtube.com/watch?v=3I83ko1eP9c",
@@ -370,9 +374,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 5852,
-    "unique_games": 492,
-    "unverifiable": 335,
+    "rows": 6013,
+    "unique_games": 498,
+    "unverifiable": 339,
     "unverifiable_keys": [
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
@@ -593,6 +597,7 @@
       "https://www.hockeyweb.de/wetten/bayern-muenchen-vs-ratiopharm-ulm-kostenlos-im-live-stream-schauen/",
       "https://www.inbayreuth.de/basketball-proa-livestreams-werden-kuenftig-kostenpflichtig/cnt-id-ps-f1b82c65-0139-4c14-b0ad-73a6801d9413",
       "https://www.it-boltwise.de/basketball-bundesliga-playoffs-wfcrzburg-vs-bonn-live-auf-dyn-und-joyn.html",
+      "https://www.it-boltwise.de/bbl-saison-2025-26-fc-bayern-muenchen-auf-titeljagd-im-livestream.html",
       "https://www.kulturigo.de/magentasport-mit-exklusivem-basketball-angebot-mission-em-gewinn-startet-am-08-august-per-g-nther-und-marie-g-lich-als-experten-dabei-alle-76-spiele-und-alle-tests-live-deutsche-partien-kostenlos-2189882.html/",
       "https://www.kurierverlag.de/na-pressemitteilungen/magentasport-und-magentatv-zeigen-alle-spiele-der-eurobasket-2025-live-die-deutschen-spiele-kostenlos-telekom-vergibt-sublizenz-an-rtl-deutschland-zr-93650895.html",
       "https://www.livescorehunter.com/basketball-germany-livescore-live-streaming-links",
@@ -689,16 +694,19 @@
       "https://www.tomsguide.com/entertainment/sports/how-to-watch-germany-vs-turkiye-eurobasket-final-2025-live",
       "https://www.trendyone.de/news/bbl-finale-live-im-free-tv-fc-bayern-basketball-vs-ratiopharm-ulm",
       "https://www.ttbl.de/en/news/post/68a6ceb863c5160001e1e58b",
+      "https://www.ttbl.de/news/post/68a6ceb863c5160001e1e58b",
       "https://www.tvinfo.de/fernsehprogramm/2045174305-basketball-bundesliga-live-fc-bayern-mnchen-alba-berlin",
       "https://www.tvinfo.de/fernsehprogramm/2115529196-basketball-bundesliga-live-fc-bayern-muenchen-mhp-riesen-ludwigsburg",
       "https://www.tvinfo.de/fernsehprogramm/2115529203-basketball-bundesliga-live-fc-bayern-muenchen-mhp-riesen-ludwigsburg",
       "https://www.tvinfo.de/fernsehprogramm/2324037128-basketball-bundesliga-live-fc-bayern-muenchen-niners-chemnitz",
+      "https://www.tvinfo.de/fernsehprogramm/2324037132-basketball-bundesliga-live-fc-bayern-muenchen-niners-chemnitz",
       "https://www.waipu.tv/",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4UT5MR4E50eRzhEpzzML8ffax7DuJYCtH0T-Y5g4BdWCODdfBcA",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4UWvwbcbHjQjo-3efCu5IN0zo2514XV0yIiY_6gxn-DdQofe5pp",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4Vyb4AE_sT4A9Kx-cZaH55StqHuQSxIyOHQM8w5m5v0U0eBOBib",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XBEK2Lix8FMK_xl4Xsr-2pmcod1J_QQCzkgZNcpItsndA30iZu",
+      "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XKmED8HFkAEXKQ3wDxG2gxbGqyx46AdexhuCr4CKshPBdh2E3O",
       "https://www.welt.de/",
       "https://www.wettfreunde.net/sport-im-tv-live/basketball/",
       "https://www.youtube.com/watch?v=3I83ko1eP9c",
@@ -711,30 +719,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-09-29T17:38Z",
+  "run_id": "2026-09-29T18:02Z",
   "source": {
     "audit_rows": 0,
-    "candidates_rows": 5852,
+    "candidates_rows": 6013,
     "fixtures_rows": 9
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 111,
-      "missed": 111,
-      "recall": 0.0,
-      "rows": 209,
-      "run_id": "2026-09-29T07:44Z",
-      "unique_games": 179
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -955,7 +946,24 @@
       "rows": 209,
       "run_id": "2026-09-29T17:36Z",
       "unique_games": 173
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 96,
+      "missed": 96,
+      "recall": 0.0,
+      "rows": 161,
+      "run_id": "2026-09-29T18:00Z",
+      "unique_games": 151
     }
   ],
-  "ts": "2026-09-29T17:38:00.696764+00:00"
+  "ts": "2026-09-29T18:02:07.298238+00:00"
 }
