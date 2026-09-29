@@ -374,8 +374,8 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 6013,
-    "unique_games": 498,
+    "rows": 6015,
+    "unique_games": 500,
     "unverifiable": 339,
     "unverifiable_keys": [
       "https://apps.apple.com/",
@@ -719,30 +719,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-09-29T18:02Z",
+  "run_id": "",
   "source": {
     "audit_rows": 0,
-    "candidates_rows": 6013,
+    "candidates_rows": 6015,
     "fixtures_rows": 9
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 111,
-      "missed": 111,
-      "recall": 0.0,
-      "rows": 208,
-      "run_id": "2026-09-29T08:09Z",
-      "unique_games": 177
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -963,7 +946,24 @@
       "rows": 161,
       "run_id": "2026-09-29T18:00Z",
       "unique_games": 151
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 2,
+      "run_id": "2026-09-29T18:09Z",
+      "unique_games": 2
     }
   ],
-  "ts": "2026-09-29T18:02:07.298238+00:00"
+  "ts": "2026-09-29T18:09:22.476796+00:00"
 }
