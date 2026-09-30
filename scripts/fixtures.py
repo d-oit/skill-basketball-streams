@@ -61,6 +61,7 @@ import urllib.request
 from datetime import datetime, timedelta, timezone
 from html.parser import HTMLParser
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 try:  # direct CLI execution: `python3 scripts/fixtures.py`
     from candidates import unseen_keys
@@ -85,6 +86,10 @@ TEAM_SEPARATORS = re.compile(
 DEFAULT_SOURCES: dict[str, dict] = {
     "bbl": {
         "league": "BBL",
+        # `html` is the default and is stated explicitly only where it matters.
+        # `ics` sources declare a feed; see parse_source for why the format is
+        # declared rather than sniffed.
+        "kind": "html",
         # The league moved: `basketball-bundesliga.de` fails TLS SNI
         # (`tlsv1 unrecognized name`) while DNS still resolves, so a plain GET
         # never reaches a body. This is the current official schedule page.
@@ -108,10 +113,12 @@ DEFAULT_SOURCES: dict[str, dict] = {
     },
     "euroleague": {
         "league": "EuroLeague",
+        "kind": "html",
         "url": "https://www.euroleaguebasketball.net/euroleague/game-center/",
     },
     "bcl": {
         "league": "Basketball Champions League",
+        "kind": "html",
         # The game list, not the site root: the root redirects to `/en`, which is
         # a landing page carrying no fixtures at all — not in JSON-LD, not in
         # microdata, and not in the payload.
@@ -405,6 +412,271 @@ def game_to_fixture(
         "source": source,
         "source_url": source_url,
     }
+
+
+# ── iCalendar (RFC 5545) ────────────────────────────────────────────────────
+# A league that publishes an iCalendar feed hands us a *file*, not a page: no
+# JavaScript to render, no WAF to climb, and no markup for a redesign to break.
+# That is the most durable ground truth available, which is why this reader sits
+# alongside the three HTML rungs rather than after them.
+#
+# Everything here is stdlib, `zoneinfo` included — a feed states its own
+# timezone, and getting that wrong moves a tip-off by one or two hours, which
+# silently breaks both the `--days` window and the `game_key` join. A time read
+# as UTC when the feed said Europe/Berlin is a wrong fixture, not a formatting
+# nit.
+#
+# The refusals are the same shape as `game_to_fixture`, and for the same reason: a
+# phantom or misplaced fixture is reported as a game **no backend surfaced**,
+# which makes recall look worse than reality and sends someone hunting a game
+# that does not exist.
+FLOATING_TIMEZONE = "Europe/Berlin"
+"""A DTSTART with no `Z` and no `TZID` is a *floating* local time.
+
+Read as the calendar's timezone, not UTC. Every league in `DEFAULT_SOURCES` is
+European and `config/calendar.json` is Europe/Berlin, so UTC would be wrong by
+the DST offset — 1h in winter, 2h in summer — and the error would move with the
+seasons.
+"""
+
+# RFC 5545 §3.3.11 TEXT escaping, in the order the grammar requires: the
+# backslash is handled last so `\\n` is a literal backslash-n and not a newline.
+_ICS_UNESCAPE = re.compile(r"\\([\\;,nN])")
+_ICS_ESCAPES = {"n": "\n", "N": "\n", ",": ",", ";": ";", "\\": "\\"}
+
+# Properties inside a nested component (VALARM, VTIMEZONE) belong to that
+# component, not to the event. A VALARM has no DTSTART today, but a VTIMEZONE
+# does, and reading one as a tip-off would invent a fixture at 1970.
+_NESTED_COMPONENTS = frozenset({"VALARM", "VTIMEZONE", "VJOURNAL", "VTODO"})
+
+
+def unfold_ics(text: str) -> list[str]:
+    """Undo RFC 5545 line folding, returning logical lines.
+
+    A fold is a CRLF followed by a single space or tab, and the continuation
+    carries no separator of its own. A `SUMMARY` long enough to fold is common —
+    "ALBA BERLIN vs FC Bayern Muenchen - easyCredit BBL" plus a venue — so
+    skipping this silently truncates the team pair and `split_teams` returns
+    nothing.
+    """
+    if not text:
+        return []
+    # Normalise line endings first: a feed served with bare LF is still valid to
+    # every client, and a CRLF-only fold rule would then never fire.
+    normalised = text.replace("\r\n", "\n").replace("\r", "\n")
+    lines: list[str] = []
+    for raw in normalised.split("\n"):
+        if raw[:1] in (" ", "\t") and lines:
+            lines[-1] += raw[1:]
+        else:
+            lines.append(raw)
+    return lines
+
+
+def unescape_ics(value: str) -> str:
+    return _ICS_UNESCAPE.sub(lambda m: _ICS_ESCAPES[m.group(1)], value)
+
+
+def calendar_name(text: str) -> str:
+    """`X-WR-CALNAME` / `NAME` — which feed this is, for the fetch ledger.
+
+    The HTML fingerprint is a `<title>`; a feed has no HTML, so without this a
+    mis-pointed feed would be a 31 KB line of nothing in the ledger.
+    """
+    for line in unfold_ics(text)[:40]:
+        name, _, value = line.partition(":")
+        if name.split(";")[0].strip().upper() in {"X-WR-CALNAME", "NAME"}:
+            return unescape_ics(value.strip())[:120]
+    return ""
+
+
+def parse_ics_dt(value: str, params: str = "") -> datetime | None:
+    """A DTSTART into an aware datetime. None when it is not a tip-off time.
+
+    Handles the three forms a feed actually uses: `Z` (UTC), a `TZID` parameter,
+    and a bare floating local time. An all-day `VALUE=DATE` value is refused
+    rather than read as midnight: an all-day entry has no tip-off, and midnight
+    is a placeholder no stream ever matches, which is the same refusal
+    `game_to_fixture` makes for `hasTimeGameDateTime: false`.
+    """
+    if not isinstance(value, str) or not value.strip():
+        return None
+    raw = value.strip()
+    upper_params = params.upper()
+    if "VALUE=DATE" in upper_params and "TIME" not in upper_params:
+        return None  # all-day: no tip-off time to match a stream against
+    try:
+        if raw.endswith("Z"):
+            return datetime.strptime(raw, "%Y%m%dT%H%M%SZ").replace(
+                tzinfo=timezone.utc
+            )
+        naive = datetime.strptime(raw, "%Y%m%dT%H%M%S")
+    except ValueError:
+        return None
+    tzid = ""
+    for part in params.split(";"):
+        key, _, val = part.partition("=")
+        if key.strip().upper() == "TZID":
+            tzid = val.strip().strip('"')
+            break
+    if tzid:
+        try:
+            return naive.replace(tzinfo=ZoneInfo(tzid))
+        except Exception:  # noqa: BLE001 - an unknown TZID must not crash a run
+            # An unknown zone is not a reason to invent UTC: the local reading
+            # is closer to right than a two-hour error in the other direction.
+            return naive.replace(tzinfo=ZoneInfo(FLOATING_TIMEZONE))
+    return naive.replace(tzinfo=ZoneInfo(FLOATING_TIMEZONE))
+
+
+# The *unambiguous* match markers. A feed states the matchup with one of these and
+# then, very often, appends context after it — "ALBA BERLIN vs FC Bayern
+# Muenchen - easyCredit BBL" — so the pair has to be read around the trailing
+# text rather than by splitting the whole line.
+FEED_MATCH_MARKER = re.compile(r"\s+(?:vs\.?|gegen|v\.)\s+", re.IGNORECASE)
+
+
+def split_feed_teams(summary: str) -> list[str]:
+    """The two team names in a feed `SUMMARY`, or [] when there is no pair.
+
+    `split_teams` demands exactly two halves, which is the right rule for a page
+    that writes one pairing per cell and the wrong rule here: a feed line
+    routinely carries a second separator for the competition or the matchday, so
+    "A vs B - League" arrives as three parts and the naive split drops a real
+    game. That is not hypothetical — it is the shape the BBL subscription writes,
+    and the first version of this reader refused it.
+
+    So the match marker is tried first and everything after the pair is dropped.
+    A bare `-` is *not* treated as a match marker, because it is the one
+    separator a feed uses for trailing context; a pairing written "A - B" is
+    still handled, by the generic path.
+
+    **A comma after the pair is a refusal, not a cut.** "Real Madrid vs
+    Barcelona, EuroLeague" could mean a team called "Barcelona, EuroLeague" or a
+    team called "Barcelona" plus context, and no rule available here can tell the
+    difference — a club name may legitimately contain a comma. Cutting would
+    invent a team, and a fixture with a wrong team name is reported as a game no
+    backend surfaced, for ever. So the event is dropped and the limitation is
+    stated here rather than papered over. One real feed settles it: if the
+    provider's own `SUMMARY` format is measured, this becomes a cut rule with a
+    citation instead of a refusal.
+    """
+    if not isinstance(summary, str):
+        return []
+    match = FEED_MATCH_MARKER.search(summary)
+    if not match:
+        return split_teams(summary)
+    left = summary[: match.start()].strip()
+    right = summary[match.end() :].strip()
+    if "," in right or ";" in right:
+        return []
+    if TEAM_SEPARATORS.search(right):
+        right = TEAM_SEPARATORS.split(right)[0].strip()
+    return [left, right] if left and right else []
+
+
+def parse_ics(text: str, *, league: str, source: str, source_url: str = "") -> list[dict]:
+    """VEVENTs into the same fixture shape `parse_page` emits.
+
+    Deliberately the same dict and the same `game_key`: a fixture is only useful
+    if the ledger join can compare it against what search surfaced, and a second
+    key format would make recall read as zero for a league that is working
+    perfectly.
+    """
+    fixtures: list[dict] = []
+    event: dict[str, tuple[str, str]] | None = None
+    depth = 0
+
+    for line in unfold_ics(text):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        upper = stripped.upper()
+        if upper.startswith("BEGIN:"):
+            component = stripped.split(":", 1)[1].strip().upper()
+            if component == "VEVENT":
+                event, depth = {}, 0
+            elif event is not None:
+                depth += 1
+            continue
+        if upper.startswith("END:"):
+            component = stripped.split(":", 1)[1].strip().upper()
+            if component == "VEVENT" and event is not None:
+                fixture = _event_to_fixture(
+                    event, league=league, source=source, source_url=source_url
+                )
+                if fixture is not None:
+                    fixtures.append(fixture)
+                event = None
+                depth = 0
+            elif event is not None and depth:
+                depth -= 1
+            continue
+        if event is None or depth:
+            continue  # a property of a nested component, not of this event
+        name, sep, value = stripped.partition(":")
+        if not sep:
+            continue
+        key = name.split(";", 1)[0].strip().upper()
+        params = name.split(";", 1)[1] if ";" in name else ""
+        # Last value wins, matching how a repeated property overrides.
+        event[key] = (value.strip(), params)
+
+    return fixtures
+
+
+def _event_to_fixture(
+    event: dict, *, league: str, source: str, source_url: str = ""
+) -> dict | None:
+    """One VEVENT to one fixture, or None when it cannot be trusted.
+
+    Three refusals, each a case where a fixture would be wrong rather than
+    merely missing:
+
+    * **No usable start.** An all-day entry or a `DTSTART` in a format RFC 5545
+      does not define. A fixture with a guessed time joins nothing.
+    * **No team pair.** `SUMMARY` is the only place a feed states the matchup, and
+      it must yield exactly two names. `split_feed_teams` reads the pair around
+      any trailing context; a summary with no match marker at all is not a
+      pairing and is refused.
+    * **Cancelled.** `STATUS:CANCELLED` names a game that will not be played, so
+      no stream can ever exist for it, and counting it as ground truth would
+      report a miss for every run.
+    """
+    if event.get("STATUS", ("", ""))[0].strip().upper() == "CANCELLED":
+        return None
+    start_value, start_params = event.get("DTSTART", ("", ""))
+    start = parse_ics_dt(start_value, start_params)
+    if start is None:
+        return None
+    summary = unescape_ics(event.get("SUMMARY", ("", ""))[0]).strip()
+    teams = split_feed_teams(summary)
+    if not teams:
+        return None
+    return {
+        "league": league,
+        "teams": teams,
+        "start": start.isoformat(),
+        "game_key": build_game_key(league, teams, start.isoformat()),
+        "source": source,
+        "source_url": source_url,
+    }
+
+
+def parse_source(
+    body: str, *, kind: str, league: str, source: str, source_url: str = ""
+) -> list[dict]:
+    """Dispatch on the declared source format.
+
+    The format is declared in `config/sources.json` rather than sniffed from the
+    body, because sniffing is how a block page starts being parsed as a feed: an
+    HTML error page is not valid iCalendar, but "does it contain BEGIN:VEVENT"
+    is true of a challenge page that quotes the user's query. A declared kind
+    cannot be confused by the content of a response.
+    """
+    if kind == "ics":
+        return parse_ics(body, league=league, source=source, source_url=source_url)
+    return parse_page(body, league=league, source=source, source_url=source_url)
 
 
 def parse_page(
@@ -845,6 +1117,17 @@ def main() -> None:
     parser.add_argument("--now", help="ISO-8601 override (for tests)")
     parser.add_argument("--days", type=int, default=7, help="window size (default 7)")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--input-kind",
+        choices=("html", "ics"),
+        default=None,
+        help=(
+            "parse a saved --input page as this format, overriding the source's "
+            "declared kind. Exists so a candidate feed can be evaluated offline "
+            "before it is pinned into DEFAULT_SOURCES. A source's declared kind "
+            "always wins when it fetches for itself."
+        ),
+    )
     parser.add_argument("--json", action="store_true")
     parser.add_argument(
         "--root",
@@ -958,6 +1241,10 @@ def main() -> None:
         sys.exit(2)
 
     pages: list[tuple[str, str, str, str | None, int | None, str]] = []
+    # Per-source format overrides. A local map, never a mutation of
+    # DEFAULT_SOURCES: that dict is module-level, and editing it in place would
+    # leak the override into every later call in the same process.
+    kind_by_source: dict[str, str] = {}
     if args.input:
         path = Path(args.input)
         if not path.is_file():
@@ -966,6 +1253,9 @@ def main() -> None:
         config = DEFAULT_SOURCES[sources[0]]
         pages.append((sources[0], path.read_text(encoding="utf-8", errors="replace"),
                       config["url"], "ok", None, ""))
+        # An explicit --input-kind overrides the declared kind for this offline
+        # read only; the fetch path below always uses the registry's kind.
+        kind_by_source[sources[0]] = args.input_kind or config.get("kind", "html")
     else:
         # Opt-in only: see --fetch-ledger. `None` means do not write.
         ledger_path = None
@@ -1017,8 +1307,12 @@ def main() -> None:
                 f" [{why}]" if why else ""
             )
             continue
-        found = parse_page(
-            html, league=config["league"], source=name, source_url=url
+        found = parse_source(
+            html,
+            kind=kind_by_source.get(name, config.get("kind", "html")),
+            league=config["league"],
+            source=name,
+            source_url=url,
         )
         if not found:
             empty.append(name)
