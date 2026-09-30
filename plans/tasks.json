@@ -1,5 +1,5 @@
 {
-  "exported_at": 1790793848,
+  "exported_at": 1790795849,
   "tasks": [
     {
       "id": 1,
@@ -50,17 +50,17 @@
       "parent_id": null,
       "title": "Discover the official BBL iCalendar feed URL and pin it so BBL contributes fixtures",
       "method": "unblock-a-fixture-source",
-      "subtask_index": 0,
-      "status": "pending",
+      "subtask_index": 3,
+      "status": "done",
       "precondition": "One render of easycredit-bbl.de/saison/kalender-abos yields the per-team .ics URLs; the feed is then fetched with no browser on the daily path",
       "created_at": 1790793841,
-      "updated_at": 1790793841
+      "updated_at": 1790795849
     }
   ],
   "summary": {
-    "pending": 3,
+    "pending": 2,
     "in_progress": 0,
-    "done": 0,
+    "done": 1,
     "failed": 2
   }
 }
