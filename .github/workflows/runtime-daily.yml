@@ -259,7 +259,23 @@ jobs:
           python3 scripts/fixtures.py \
             --source bbl --source bcl --source euroleague \
             --out .tmp/telemetry/fixtures.jsonl \
+            --fetch-ledger .tmp/telemetry/fetch-attempts.jsonl \
             || echo "::warning::at least one league fixture source produced nothing (see the FAIL lines above) — fixture_recall is partial or n/a this run"
+
+      # A FAIL line naming a status code is a claim; this is the evidence. A
+      # blocked source is otherwise only ever one line in one morning's log,
+      # which is the failure `scripts/rung_health.py` exists to end. The ledger
+      # is read here rather than trusting the exit code, because a block and a
+      # redesign need different responses and the summary should say which.
+      - name: Report blocked fixture sources
+        if: always()
+        run: |
+          if [ -f .tmp/telemetry/fetch-attempts.jsonl ]; then
+            python3 scripts/fixtures.py --root . --fetch-log --limit 20 \
+              || echo "::warning::one or more league fixture sources failed to fetch — see the ledger for the cause (blocked vs gone vs server fault)"
+          else
+            echo "OK: no fetch ledger written this run"
+          fi
 
       - name: Recall report
         run: python3 scripts/candidates.py --ledger .tmp/telemetry/candidates.jsonl recall || true

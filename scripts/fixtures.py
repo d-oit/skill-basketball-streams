@@ -54,7 +54,9 @@ import argparse
 import json
 import re
 import sys
+import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
 from html.parser import HTMLParser
@@ -428,7 +430,60 @@ def parse_page(
         )
         if fixture is not None:
             embedded.append(fixture)
-    return embedded
+    return embedded# Response headers worth keeping when a fetch fails. Named explicitly, for the
+# same reason `rung_health.py` builds its rows from named fields only: a ledger
+# that stores whatever the response happened to contain becomes unloggable the
+# first time a provider echoes a request back.
+#
+# These are the headers that actually answer "why". The Vercel case, measured
+# 2026-09-30 against `euroleaguebasketball.net`: `server: Vercel` plus
+# `x-vercel-mitigated: challenge` identifies the 429 as an edge bot challenge in
+# one line, where the bare status code only said "something is wrong, retry
+# later" — and retrying later does not help, because a challenge is not a
+# throttle.
+DIAGNOSTIC_HEADERS = (
+    "server",
+    "content-type",
+    "content-length",
+    "retry-after",
+    "via",
+    "cf-ray",
+    "cf-mitigated",
+    "x-vercel-mitigated",
+    "x-vercel-id",
+    "x-amzn-cf-id",
+    "x-amzn-requestid",
+    "x-served-by",
+    "x-cache",
+)
+
+# A page's <title> is a fingerprint, not content: 200 bytes that identify which
+# interstitial was served ("Vercel Security Checkpoint" says the block is a
+# challenge; "Just a moment..." says Cloudflare; a German page title says the
+# block is regional). The body itself never goes anywhere near the ledger.
+_TITLE_RE = re.compile(r"<title[^>]*>(.*?)</title>", re.IGNORECASE | re.DOTALL)
+
+
+def page_title(body: str) -> str:
+    """The document title, whitespace-collapsed and length-capped."""
+    match = _TITLE_RE.search(body or "")
+    if not match:
+        return ""
+    text = re.sub(r"\s+", " ", match.group(1)).strip()
+    return text[:120]
+
+
+def diagnostic_headers(headers) -> dict:
+    """The whitelisted subset, lowercased keys, empty values dropped."""
+    out: dict[str, str] = {}
+    for name in DIAGNOSTIC_HEADERS:
+        try:
+            value = headers.get(name)
+        except AttributeError:
+            return out
+        if value:
+            out[name] = str(value)[:200]
+    return out
 
 
 class FetchResult(str):
@@ -440,8 +495,8 @@ class FetchResult(str):
     test. Anything that is a plain `str` still reads as a successful body.
 
     The distinction matters because the previous version collapsed every failure
-    into `""` and the caller then reported "the page fetched but no fixture
-    parsed (markup change?)". A rate-limited source and a redesigned site both
+    into `""` and the caller then reported "the page fetched but no fixture parsed
+    (markup change?)". A rate-limited source and a redesigned site both
     arrive as an empty string, so a 429 was diagnosed as a parser problem and
     sent someone to re-derive a parser that did not need changing. The measured
     case: `euroleaguebasketball.net` answers **429 to every user agent and every
@@ -452,13 +507,63 @@ class FetchResult(str):
     (5xx), `unreachable` (DNS, TLS, timeout).
     """
 
-    __slots__ = ("status", "code")
+    __slots__ = ("status", "code", "headers", "elapsed_ms", "body_bytes")
 
-    def __new__(cls, body: str, status: str = "ok", code: int | None = None):
+    def __new__(
+        cls,
+        body: str,
+        status: str = "ok",
+        code: int | None = None,
+        headers: dict | None = None,
+        elapsed_ms: int | None = None,
+    ):
         obj = super().__new__(cls, body)
         obj.status = status
         obj.code = code
+        obj.headers = headers or {}
+        obj.elapsed_ms = elapsed_ms
+        obj.body_bytes = len(body)
         return obj
+
+    def evidence(self) -> dict:
+        """The ledger row for this attempt. Named fields only, never the body."""
+        return {
+            "status": self.status,
+            "code": self.code,
+            "headers": self.headers,
+            "elapsed_ms": self.elapsed_ms,
+            "body_bytes": self.body_bytes,
+            "page_title": page_title(str(self)),
+        }
+
+    def why(self) -> str:
+        """A one-line, human-readable cause, or "" when the fetch succeeded.
+
+        This is what turns `BLOCKED (HTTP 429)` into something actionable. The
+        provider's own headers say what kind of block it is, and they routinely
+        contradict the obvious guess: a 429 carrying `x-vercel-mitigated:
+        challenge` is a bot challenge that a real browser passes and a retry
+        never does, which is the opposite of the "rate limited, try again later"
+        reading the status code alone suggests.
+        """
+        if self.status == "ok":
+            return ""
+        notes: list[str] = []
+        server = self.headers.get("server")
+        if server:
+            notes.append(f"server: {server}")
+        challenge = self.headers.get("x-vercel-mitigated") or self.headers.get("cf-mitigated")
+        if challenge:
+            notes.append(f"mitigation: {challenge}")
+        for name in ("retry-after", "cf-ray", "x-vercel-id", "x-amzn-requestid"):
+            if self.headers.get(name):
+                notes.append(f"{name}: {self.headers[name]}")
+        title = page_title(str(self))
+        if title:
+            notes.append(f'page: "{title}"')
+        if self.elapsed_ms is not None:
+            notes.append(f"elapsed: {self.elapsed_ms} ms")
+        return "; ".join(notes)
 
 
 # A block is not a break, and the two need different responses: a block is worth
@@ -478,6 +583,130 @@ def _classify(exc: BaseException) -> tuple[str, int | None]:
             return "server_error", code
         return "not_found", code
     return "unreachable", None
+
+
+FETCH_LEDGER_RELATIVE_PATH = "logs/fetch-attempts.jsonl"
+
+
+def default_run_id() -> str:
+    """The same shape the workflows pass: `2026-09-15T08:30Z`."""
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
+
+
+def append_fetch_row(
+    path: Path,
+    *,
+    source: str,
+    url: str,
+    result: FetchResult,
+    run_id: str = "",
+    ts: str = "",
+) -> dict:
+    """Append one fetch attempt to the ledger. Named fields only, never the body.
+
+    The shape follows `scripts/rung_health.py` deliberately — one append-only
+    JSONL row per attempt, built from named fields, so the ledger can be kept
+    forever. A blocked response is typically a 30 KB interstitial, and the rule
+    that keeps this affordable is the same one rung_health states: a page body
+    never reaches the ledger. The `<title>` fingerprint is the compromise — 120
+    bytes that identify *which* interstitial was served, which is the difference
+    between "blocked" and "blocked by a Vercel challenge, which a browser passes".
+
+    The ledger is best-effort: a telemetry write must never turn a run's verdict
+    into a different one, so every failure here is swallowed and the row is
+    simply lost. Losing the evidence is bad; changing the answer because
+    evidence could not be written is worse.
+    """
+    # A monkeypatched `fetch` may hand back a plain `str`; treat it as a
+    # successful body so the ledger row is still well-formed rather than
+    # crashing the run. Same reason `FetchResult` subclasses `str`.
+    if not isinstance(result, FetchResult):
+        result = FetchResult(str(result), "ok")
+    row = {
+        "ts": ts or datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "run_id": run_id,
+        "source": source,
+        "url": url,
+        "host": _host_of(url),
+        **result.evidence(),
+        "why": result.why(),
+    }
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+    except OSError:
+        pass
+    return row
+
+
+def read_fetch_ledger(path: Path) -> list[dict]:
+    """Every row in the ledger, oldest first. Unreadable lines are skipped."""
+    if not path.is_file():
+        return []
+    rows: list[dict] = []
+    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            parsed = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(parsed, dict):
+            rows.append(parsed)
+    return rows
+
+
+def failing_rows(rows: list[dict]) -> list[dict]:
+    return [row for row in rows if row.get("status") not in (None, "ok")]
+
+
+def report_fetch_log(
+    path: Path, *, limit: int = 0, only_failing: bool = True, as_json: bool = False
+) -> int:
+    """Print what failed and why. This is the "output the failing" half.
+
+    A FAIL line naming a status code is a claim; this is the evidence for it.
+    Without it, the only record of a blocked source is one line in one morning's
+    log, which is the failure `rung_health.py` was written to end.
+    """
+    rows = read_fetch_ledger(path)
+    if only_failing:
+        rows = failing_rows(rows)
+    if limit and len(rows) > limit:
+        rows = rows[-limit:]
+    if as_json:
+        print(json.dumps({"rows": rows, "total": len(rows)}, indent=2))
+        return 0 if rows else 1
+    if not rows:
+        print(
+            f"OK: fixtures: no fetch attempts recorded in {path}"
+            if only_failing
+            else f"OK: fixtures: no fetch attempts recorded in {path}"
+        )
+        return 0
+    for row in rows:
+        print(
+            "FAIL: fixtures: {source} {status}{code} {url}".format(
+                source=row.get("source", "?"),
+                status=row.get("status", "?"),
+                code=f" (HTTP {row['code']})" if row.get("code") else "",
+                url=row.get("url", "?"),
+            )
+        )
+        why = row.get("why") or ""
+        if why:
+            print(f"  why: {why}")
+    print(f"FAIL: fixtures: {len(rows)} failing fetch attempt(s) in {path}")
+    return 1
+
+
+def _host_of(url: str) -> str:
+    try:
+        return urllib.parse.urlsplit(url).hostname or ""
+    except ValueError:
+        return ""
 
 
 def _overall_advice(causes: dict[str, str]) -> str:
@@ -537,19 +766,48 @@ def _empty_cause(status: str, code: int | None) -> str:
 
 
 def fetch(url: str) -> FetchResult:
-    """Plain GET, with the reason kept for the caller to report.
+    """Plain GET, with the reason and the evidence kept for the caller.
 
     Returns the body on success and an empty `FetchResult` on any failure, so a
-    caller that ignores `.status` behaves exactly as before.
+    caller that ignores `.status` and `.headers` behaves exactly as before.
+
+    A failed `HTTPError` carries its own response, so the diagnostic headers and
+    the interstitial body are read off it rather than discarded. That is what
+    makes the difference between "429, retry later" and "a Vercel bot challenge,
+    which a browser passes and a retry does not".
     """
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    started = time.monotonic()
     try:
         with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as resp:
             charset = resp.headers.get_content_charset() or "utf-8"
-            return FetchResult(resp.read().decode(charset, "replace"), "ok")
+            body = resp.read().decode(charset, "replace")
+            return FetchResult(
+                body,
+                "ok",
+                getattr(resp, "status", 200),
+                diagnostic_headers(getattr(resp, "headers", None)),
+                int((time.monotonic() - started) * 1000),
+            )
     except (urllib.error.URLError, urllib.error.HTTPError, OSError, ValueError) as exc:
         status, code = _classify(exc)
-        return FetchResult("", status, code)
+        headers, body = {}, ""
+        response = getattr(exc, "headers", None)
+        if response is not None:
+            headers = diagnostic_headers(response)
+            try:
+                raw = exc.read()  # type: ignore[attr-defined]
+                charset = response.get_content_charset() or "utf-8"
+                body = raw.decode(charset, "replace")
+            except Exception:  # noqa: BLE001 - a body we cannot read is not a reason to fail
+                body = ""
+        return FetchResult(
+            body,
+            status,
+            code,
+            headers,
+            int((time.monotonic() - started) * 1000),
+        )
 
 
 def in_window(fixture: dict, *, now: datetime, days: int) -> bool:
@@ -588,7 +846,60 @@ def main() -> None:
     parser.add_argument("--days", type=int, default=7, help="window size (default 7)")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--json", action="store_true")
+    parser.add_argument(
+        "--root",
+        default=".",
+        help="workspace root, for resolving the fetch ledger (default: .)",
+    )
+    parser.add_argument(
+        "--fetch-ledger",
+        nargs="?",
+        const="",
+        default=None,
+        metavar="PATH",
+        help=(
+            "append one row per fetch attempt to the ledger, so a failure can be "
+            "diagnosed later. Opt-in, and the path defaults to "
+            f"{FETCH_LEDGER_RELATIVE_PATH} under --root. Off by default because a "
+            "parse command that silently writes telemetry is a side effect, and "
+            "because the suite drives main() with a patched fetch — which would "
+            "otherwise append its synthetic bodies to the real ledger."
+        ),
+    )
+    parser.add_argument(
+        "--fetch-log",
+        nargs="?",
+        const="",
+        default=None,
+        metavar="PATH",
+        help=(
+            "read the fetch-attempt ledger and print what failed and why, "
+            "instead of fetching anything. With no PATH, reads "
+            f"{FETCH_LEDGER_RELATIVE_PATH} under --root."
+        ),
+    )
+    parser.add_argument(
+        "--all", action="store_true", help="with --fetch-log, include successes"
+    )
+    parser.add_argument(
+        "--limit", type=int, default=0, help="with --fetch-log, show the last N rows"
+    )
     args = parser.parse_args()
+
+    if args.fetch_log is not None:
+        log_path = (
+            Path(args.fetch_log)
+            if args.fetch_log
+            else Path(args.root) / FETCH_LEDGER_RELATIVE_PATH
+        )
+        sys.exit(
+            report_fetch_log(
+                log_path,
+                limit=args.limit,
+                only_failing=not args.all,
+                as_json=args.json,
+            )
+        )
 
     if args.now:
         now = parse_dt(args.now)
@@ -646,7 +957,7 @@ def main() -> None:
         )
         sys.exit(2)
 
-    pages: list[tuple[str, str, str, str | None, int | None]] = []
+    pages: list[tuple[str, str, str, str | None, int | None, str]] = []
     if args.input:
         path = Path(args.input)
         if not path.is_file():
@@ -654,23 +965,57 @@ def main() -> None:
             sys.exit(2)
         config = DEFAULT_SOURCES[sources[0]]
         pages.append((sources[0], path.read_text(encoding="utf-8", errors="replace"),
-                      config["url"], "ok", None))
+                      config["url"], "ok", None, ""))
     else:
+        # Opt-in only: see --fetch-ledger. `None` means do not write.
+        ledger_path = None
+        if args.fetch_ledger is not None:
+            ledger_path = (
+                Path(args.fetch_ledger)
+                if args.fetch_ledger
+                else Path(args.root) / FETCH_LEDGER_RELATIVE_PATH
+            )
         for name in sources:
             config = DEFAULT_SOURCES[name]
             result = fetch(config["url"])
+            if ledger_path is not None:
+                append_fetch_row(
+                    ledger_path,
+                    source=name,
+                    url=config["url"],
+                    result=result,
+                    run_id=default_run_id(),
+                )
+            if not isinstance(result, FetchResult):
+                result = FetchResult(str(result), "ok")
             pages.append((name, result, config["url"],
                           getattr(result, "status", "ok"),
-                          getattr(result, "code", None)))
+                          getattr(result, "code", None),
+                          result.why()))
 
     fixtures: list[dict] = []
     empty: list[str] = []
     empty_cause: dict[str, str] = {}
-    for name, html, url, status, code in pages:
+    for name, html, url, status, code, why in pages:
         config = DEFAULT_SOURCES[name]
+        # Branch on `status`, never on body emptiness. A blocked response is
+        # *not* empty any more — `fetch` reads the interstitial body off the
+        # HTTPError precisely so the cause can be reported — so an `if not html`
+        # test would classify a Vercel challenge page as "the page fetched but no
+        # fixture parsed (markup change?)", which is the exact misdiagnosis this
+        # module was written to remove. The ledger is what surfaced it: the row
+        # said `blocked` while the FAIL line said "markup change?".
+        if status and status != "ok":
+            empty.append(name)
+            empty_cause[name] = _empty_cause(status, code) + (
+                f" [{why}]" if why else ""
+            )
+            continue
         if not html:
             empty.append(name)
-            empty_cause[name] = _empty_cause(status, code)
+            empty_cause[name] = _empty_cause(status, code) + (
+                f" [{why}]" if why else ""
+            )
             continue
         found = parse_page(
             html, league=config["league"], source=name, source_url=url
