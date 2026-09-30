@@ -1,6 +1,6 @@
 {
   "$comment": "Machine-readable mirror of references/approved-sources.md. Consumed by scripts/source_learning.py (approved_domains) so newly discovered domains can be quarantined instead of auto-trusted. Keep in sync with the reference doc.",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "sources": [
     {
       "tier": 1,
@@ -34,16 +34,16 @@
     {
       "tier": 1,
       "name": "Basketball Bundesliga",
-      "type": "league",
-      "domains": [
-        "easycredit-bbl.de"
-      ],
+      "type": "league","domains": [
+    "easycredit-bbl.de",
+    "api.basketball-bundesliga.de"
+   ],
       "social": [
         "x.com/easyCreditBBL",
         "facebook.com/BBLofficial"
       ],
       "free_access": "selected",
-      "notes": "Official easyCredit BBL site. The league renamed: `basketball-bundesliga.de` no longer serves this site (TLS SNI failure on both the bare and www host, while DNS still resolves) and `x.com/BBLofficial` is a 404 while the other four approved X accounts answer 200 — the current locators are `easycredit-bbl.de`, `x.com/easyCreditBBL` and `youtube.com/@basketballbundesliga`. Verified 2026-09-17 by `scripts/link_inventory.py` + `scripts/link_check.py`. The Facebook page is UNVERIFIED either way and deliberately left as it was: facebook.com answers HTTP 400 to every user agent this repo sends, for every handle including a known-good one, so a probe there cannot tell a dead page from a blocked one. Re-verified 2026-09-30: the schedule page `/saison/spielplaene_liga-pokalspiele/hauptrunde` answers 200 with ~285 KB of server-rendered markup but carries NO `application/ld+json` and NO microdata, and its server-rendered game list reads \u201eKeine Spiele f\u00fcr diese Saison gefunden\u201c \u2014 the fixtures are fetched client-side from `api.basketball-bundesliga.de`, which answers 401 without the credential the site itself holds. `scripts/fixtures.py` therefore needs a rendered capture fed through `--input` before BBL contributes any fixture; a plain GET legitimately yields none."
+      "notes": "Official easyCredit BBL site. The league renamed: `basketball-bundesliga.de` no longer serves this site (TLS SNI failure on both the bare and www host, while DNS still resolves) and `x.com/BBLofficial` is a 404 while the other four approved X accounts answer 200 — the current locators are `easycredit-bbl.de`, `x.com/easyCreditBBL` and `youtube.com/@basketballbundesliga`. Verified 2026-09-17 by `scripts/link_inventory.py` + `scripts/link_check.py`. The Facebook page is UNVERIFIED either way and deliberately left as it was: facebook.com answers HTTP 400 to every user agent this repo sends, for every handle including a known-good one, so a probe there cannot tell a dead page from a blocked one. Re-verified 2026-09-30: the schedule page `/saison/spielplaene_liga-pokalspiele/hauptrunde` answers 200 with ~285 KB of server-rendered markup but carries NO `application/ld+json` and NO microdata, and its server-rendered game list reads \u201eKeine Spiele f\u00fcr diese Saison gefunden\u201c \u2014 the fixtures are fetched client-side from `api.basketball-bundesliga.de`, which answers 401 without the credential the site itself holds. `scripts/fixtures.py` therefore needs a rendered capture fed through `--input` before BBL contributes any fixture; a plain GET legitimately yields none. That requirement is now met by a different route: the league's OWN iCalendar feed on the very host the page calls, `https://api.basketball-bundesliga.de/calendar/ical/all-games`, answers HTTP 200 with 90,568 bytes and 321 VEVENTs to any caller, no credential — verified 2026-09-30. `api.basketball-bundesliga.de` is listed here as the approved host for it. Its `SUMMARY` lines glue the competition onto the first club name (`easyCredit BBL Spiel ALBA BERLIN vs NINERS Chemnitz`), measured across all 321 events: exactly two prefixes, `easyCredit BBL Spiel` (306) and `BBL Pokal Spiel` (15), all left-hand side; `DTSTART` is floating and the zone is declared once at calendar level as `X-WR-TIMEZONE:Europe/Berlin`. A trimmed verbatim capture is in `tests/fixtures/feeds/`."
     },
     {
       "tier": 1,

@@ -211,6 +211,17 @@ argv = ["python3", "scripts/record_pages.py", "--check"]
 when-changed = ["scripts/record_pages.py", "scripts/render_ladder.py", "tests/fixtures/pages/**"]
 
 [[sensors]]
+name = "feed-corpus"
+# The recorded iCalendar corpus is what pins the BBL feed's SUMMARY format, and
+# that format is a provider's output: the league writes its competition onto the
+# first club name and leaves every DTSTART floating. `--check` re-derives the
+# bytes AND asks the reader to parse them, because a hash proves *unchanged* and
+# never proves *readable* — the first version of this corpus kept 7 events with
+# no BEGIN/END envelope and this gate was green.
+argv = ["python3", "scripts/record_feeds.py", "--check"]
+when-changed = ["scripts/record_feeds.py", "scripts/fixtures.py", "tests/fixtures/feeds/**"]
+
+[[sensors]]
 name = "invariants-shape"
 argv = ["python3", "-c", "import json; d=json.load(open('plans/invariants.json')); assert isinstance(d,list), 'invariants.json must be a bare array'"]
 when-changed = ["plans/invariants.json"]
@@ -227,6 +238,7 @@ verification = [
   "invariants-shape",
   "workflow-refs",
   "page-corpus",
+  "feed-corpus",
   "upsert-plan",
   "upsert-verdicts",
   "candidates-recall",
@@ -247,6 +259,7 @@ release = [
   "invariants-shape",
   "workflow-refs",
   "page-corpus",
+  "feed-corpus",
   "upsert-plan",
   "upsert-verdicts",
   "candidates-recall",

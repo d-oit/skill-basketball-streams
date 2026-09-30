@@ -286,5 +286,8 @@ class TestCli:
         assert result.returncode == 1
         payload = json.loads(report.read_text(encoding="utf-8"))
         assert payload["summary"]["INVALID"] == 1
-        # 41 approved-domain entries: registry grew by dyn.sport on 2026-09-26.
-        assert payload["summary"]["OK"] == 41
+        # 42 approved-domain entries: the registry grew by `api.
+        # basketball-bundesliga.de` on 2026-09-30 (before that, by dyn.sport on
+        # 2026-09-26). The count is the point — it is how a registry edit becomes
+        # visible here rather than silently changing what is probed.
+        assert payload["summary"]["OK"] == 42

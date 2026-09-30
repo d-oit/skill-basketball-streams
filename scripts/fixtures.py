@@ -89,27 +89,32 @@ DEFAULT_SOURCES: dict[str, dict] = {
         # `html` is the default and is stated explicitly only where it matters.
         # `ics` sources declare a feed; see parse_source for why the format is
         # declared rather than sniffed.
-        "kind": "html",
-        # The league moved: `basketball-bundesliga.de` fails TLS SNI
-        # (`tlsv1 unrecognized name`) while DNS still resolves, so a plain GET
-        # never reaches a body. This is the current official schedule page.
+        "kind": "ics",
+        # The league moved twice over, and only the second move was usable.
         #
-        # It is ALSO a page none of rungs 1-3 can read, and that is a property
-        # of the site rather than a bug in this file. Verified 2026-09-30
+        # `basketball-bundesliga.de` (the old host) fails TLS SNI
+        # (`tlsv1 unrecognized name`) while DNS still resolves, so a plain GET
+        # never reaches a body.
+        #
+        # The current official *schedule page*,
+        # `easycredit-bbl.de/saison/spielplaene_liga-pokalspiele/hauptrunde`, is
+        # reachable but unreadable by any rung here — verified 2026-09-30
         # against the live page: HTTP 200, ~285 KB of server-rendered markup,
         # zero `application/ld+json` blocks, zero `itemtype` microdata, and the
         # server-rendered game list reads "Keine Spiele für diese Saison
-        # gefunden" — the fixtures are fetched client-side from
+        # gefunden". The fixtures are fetched client-side from
         # `api.basketball-bundesliga.de`, which answers 401 to any caller
         # without the credential the site itself holds.
         #
-        # So this source yields `[]` from a plain GET, and per rule 4 below that
-        # is a FAIL, not a silent zero. Making it contribute needs a *rendered*
-        # capture fed through `--input`; see `tests/fixtures/README.md`. Until
-        # such a capture exists, BBL fixture recall is genuinely `n/a` and this
-        # source is the reason — which is why the URL is corrected here rather
-        # than left pointing at a host that cannot answer at all.
-        "url": "https://www.easycredit-bbl.de/saison/spielplaene_liga-pokalspiele/hauptrunde",
+        # So the league's own feed is fetched instead, and it is the same host
+        # the site calls: `https://api.basketball-bundesliga.de/calendar/ical/
+        # all-games`, HTTP 200, 90,568 bytes, 321 VEVENTs, no credential.
+        # Verified 2026-09-30; the trimmed capture and its manifest are in
+        # `tests/fixtures/feeds/`. This is what moved BBL fixture recall from
+        # `n/a` to a real denominator.
+        #
+        # The format is declared `ics`, never sniffed — see `parse_source`.
+        "url": "https://api.basketball-bundesliga.de/calendar/ical/all-games",
     },
     "euroleague": {
         "league": "EuroLeague",
@@ -490,7 +495,9 @@ def calendar_name(text: str) -> str:
     return ""
 
 
-def parse_ics_dt(value: str, params: str = "") -> datetime | None:
+def parse_ics_dt(
+    value: str, params: str = "", calendar_tz: str = FLOATING_TIMEZONE
+) -> datetime | None:
     """A DTSTART into an aware datetime. None when it is not a tip-off time.
 
     Handles the three forms a feed actually uses: `Z` (UTC), a `TZID` parameter,
@@ -498,6 +505,12 @@ def parse_ics_dt(value: str, params: str = "") -> datetime | None:
     rather than read as midnight: an all-day entry has no tip-off, and midnight
     is a placeholder no stream ever matches, which is the same refusal
     `game_to_fixture` makes for `hasTimeGameDateTime: false`.
+
+    `calendar_tz` is the calendar's own `X-WR-TIMEZONE`, used for floating values.
+    The official BBL feed declares `X-WR-TIMEZONE:Europe/Berlin` and then writes
+    every `DTSTART` *floating* (`DTSTART:20260910T183000`, no `Z`, no `TZID`) —
+    so the feed does state its zone, once, at the top, and reading the default
+    instead of the declaration would only be right by coincidence.
     """
     if not isinstance(value, str) or not value.strip():
         return None
@@ -519,14 +532,45 @@ def parse_ics_dt(value: str, params: str = "") -> datetime | None:
         if key.strip().upper() == "TZID":
             tzid = val.strip().strip('"')
             break
-    if tzid:
+    for candidate in (tzid, calendar_tz, FLOATING_TIMEZONE):
+        if not candidate:
+            continue
         try:
-            return naive.replace(tzinfo=ZoneInfo(tzid))
-        except Exception:  # noqa: BLE001 - an unknown TZID must not crash a run
-            # An unknown zone is not a reason to invent UTC: the local reading
-            # is closer to right than a two-hour error in the other direction.
-            return naive.replace(tzinfo=ZoneInfo(FLOATING_TIMEZONE))
-    return naive.replace(tzinfo=ZoneInfo(FLOATING_TIMEZONE))
+            return naive.replace(tzinfo=ZoneInfo(candidate))
+        except Exception:  # noqa: BLE001 - an unknown zone must not crash a run
+            # An unknown zone is not a reason to invent UTC: the local reading is
+            # closer to right than a two-hour error in the other direction.
+            continue
+    return None
+
+
+# Competition prefixes a feed glues onto the FIRST team name.
+#
+# Measured, not guessed. The official BBL feed
+# (`api.basketball-bundesliga.de/calendar/ical/all-games`, 321 events, fetched
+# 2026-09-30) writes every summary as
+# `easyCredit BBL Spiel ALBA BERLIN vs Telekom Baskets Bonn` — the competition is
+# part of the club name as far as the text is concerned. Left unstripped, the
+# team becomes `easyCredit BBL Spiel ALBA BERLIN`, the `game_key` stops matching
+# what search surfaces, and the league reports zero recall while looking healthy.
+#
+# The set is closed and small: across all 321 events there are exactly these two
+# (`easyCredit BBL Spiel` 306, `BBL Pokal Spiel` 15), 0 summaries lack a match
+# marker, and 0 right-hand sides carry trailing context. So an exact prefix match
+# is used and nothing else is stripped — a leading word that is not on this list
+# is assumed to be part of the club name, because guessing at it is how a real
+# team ends up renamed. A new competition shows up as a visibly odd team name in
+# a fixture review, which is the symptom that should prompt adding it here.
+FEED_SUMMARY_PREFIXES = ("easyCredit BBL Spiel", "BBL Pokal Spiel")
+_FEED_SUMMARY_PREFIX_RE = re.compile(
+    r"^(?:" + "|".join(re.escape(p) for p in FEED_SUMMARY_PREFIXES) + r")\s+",
+    re.IGNORECASE,
+)
+
+
+def strip_feed_prefix(name: str) -> str:
+    """Remove a measured competition prefix from a team name."""
+    return _FEED_SUMMARY_PREFIX_RE.sub("", name).strip() or name
 
 
 # The *unambiguous* match markers. A feed states the matchup with one of these and
@@ -566,7 +610,7 @@ def split_feed_teams(summary: str) -> list[str]:
     match = FEED_MATCH_MARKER.search(summary)
     if not match:
         return split_teams(summary)
-    left = summary[: match.start()].strip()
+    left = strip_feed_prefix(summary[: match.start()].strip())
     right = summary[match.end() :].strip()
     if "," in right or ";" in right:
         return []
@@ -586,6 +630,7 @@ def parse_ics(text: str, *, league: str, source: str, source_url: str = "") -> l
     fixtures: list[dict] = []
     event: dict[str, tuple[str, str]] | None = None
     depth = 0
+    calendar_tz = FLOATING_TIMEZONE
 
     for line in unfold_ics(text):
         stripped = line.strip()
@@ -603,7 +648,11 @@ def parse_ics(text: str, *, league: str, source: str, source_url: str = "") -> l
             component = stripped.split(":", 1)[1].strip().upper()
             if component == "VEVENT" and event is not None:
                 fixture = _event_to_fixture(
-                    event, league=league, source=source, source_url=source_url
+                    event,
+                    league=league,
+                    source=source,
+                    source_url=source_url,
+                    calendar_tz=calendar_tz,
                 )
                 if fixture is not None:
                     fixtures.append(fixture)
@@ -612,13 +661,21 @@ def parse_ics(text: str, *, league: str, source: str, source_url: str = "") -> l
             elif event is not None and depth:
                 depth -= 1
             continue
-        if event is None or depth:
-            continue  # a property of a nested component, not of this event
         name, sep, value = stripped.partition(":")
         if not sep:
             continue
         key = name.split(";", 1)[0].strip().upper()
         params = name.split(";", 1)[1] if ";" in name else ""
+        if event is None:
+            # Calendar level, read before the `event is not None` gate below —
+            # which is where this branch used to sit, where nothing could reach
+            # it, so every floating DTSTART was read as the default zone and the
+            # feed's own declaration was silently ignored.
+            if key in {"X-WR-TIMEZONE", "TIMEZONE-ID"}:
+                calendar_tz = unescape_ics(value.strip()) or FLOATING_TIMEZONE
+            continue
+        if depth:
+            continue  # a property of a nested component, not of this event
         # Last value wins, matching how a repeated property overrides.
         event[key] = (value.strip(), params)
 
@@ -626,7 +683,12 @@ def parse_ics(text: str, *, league: str, source: str, source_url: str = "") -> l
 
 
 def _event_to_fixture(
-    event: dict, *, league: str, source: str, source_url: str = ""
+    event: dict,
+    *,
+    league: str,
+    source: str,
+    source_url: str = "",
+    calendar_tz: str = FLOATING_TIMEZONE,
 ) -> dict | None:
     """One VEVENT to one fixture, or None when it cannot be trusted.
 
@@ -646,7 +708,7 @@ def _event_to_fixture(
     if event.get("STATUS", ("", ""))[0].strip().upper() == "CANCELLED":
         return None
     start_value, start_params = event.get("DTSTART", ("", ""))
-    start = parse_ics_dt(start_value, start_params)
+    start = parse_ics_dt(start_value, start_params, calendar_tz)
     if start is None:
         return None
     summary = unescape_ics(event.get("SUMMARY", ("", ""))[0]).strip()
