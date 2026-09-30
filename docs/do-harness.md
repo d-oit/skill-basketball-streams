@@ -485,6 +485,16 @@ does, and so does `verify --record`:
 $ rm -rf .do-harness && do-harness seed && do-harness eval   # seed 0, eval 139
 ```
 
+> **Correction (2026-09-30), and this is a different bug.** The sentence above
+> reads as "`verify --record` crashes the same way". It does not. Measured on
+> **0.1.1** and **0.1.2** in this working copy, `verify --record` succeeds for
+> `feedback` (2 sensors) and `verification` (18) and crashes only when the set
+> resolves the full 20 — a set-size boundary, not a first-vs-second-invocation
+> one. Filed upstream as [d-o-hub/do-harness#267](https://github.com/d-o-hub/do-harness/issues/267)
+> and described in full in section 3 below. Do not add `verify --record` to the
+> list of things that "trigger" this defect without measuring it first; the two
+> failures have different triggers and only one of them is size-related.
+
 It does **not** reproduce in this repository's working copy, where repeated
 `eval` runs return 0. The trees were verified byte-identical (`diff -rq`,
 excluding `.git`/ignored paths) between the crashing copy and the working one,
@@ -517,6 +527,68 @@ and prints a notice instead.
 `doctor` exits 1 outside a git repository (`error: no git repository found`).
 Harmless in CI, where `actions/checkout` always provides one, but it means
 `doctor` cannot be used as a smoke test in a plain directory.
+
+### 3. `verify --record` SIGSEGVs on the full 20-sensor set
+
+Distinct from section 1, and worse for this repository specifically. Filed
+upstream: [d-o-hub/do-harness#267](https://github.com/d-o-hub/do-harness/issues/267).
+Reproduces on 0.1.1 and 0.1.2, in a long-lived working copy (so unlike section 1
+it is *not* a fresh-checkout-only defect), 5/5 attempts.
+
+```console
+$ do-harness verify --set feedback     --strict --record; echo "exit=$?"   # exit 0,  2 sensors
+$ do-harness verify --set verification --strict --record; echo "exit=$?"   # exit 0, 18 sensors
+$ do-harness verify --set release      --strict --record; echo "exit=$?"   # exit 139
+$ do-harness verify                    --strict --record; echo "exit=$?"   # exit 139
+$ do-harness verify --set release      --strict;          echo "exit=$?"   # exit 0, 20 sensors
+```
+
+`--record` is the discriminator, and it is the *only* thing that breaks. The
+crash lands **before the first sensor runs** (zero `PASS`/`FAIL` lines on
+stdout) and leaves `evidence.release.json` **untouched** — mtime unchanged across
+crashes, so no partial or corrupt evidence is written.
+
+**`--record` is not what produces the evidence.** A plain run writes it anyway:
+
+```console
+$ stat -c '%y' .do-harness/evidence.release.json     # 15:29:13
+$ do-harness verify --set release --strict; echo "exit=$?"   # exit 0, 20 PASS
+$ stat -c '%y' .do-harness/evidence.release.json     # 15:30:22  <- refreshed
+```
+
+So dropping `--record` is a working workaround, not a loss of evidence, and
+`status --set release` **can** reach green on this repository. (Measured, because
+the first version of this note claimed the opposite and was wrong.)
+
+The boundary is the recorded set's size, not a limit on sensor count: a config
+holding the same 20 `[[sensors]]` blocks but **no** `[signal-sets]` table records
+cleanly. So it is the record path for a *resolved* set that fails, not sensor
+execution.
+
+**Why it matters here.** The documented bottom-up loop in `AGENTS.md`
+
+```bash
+for s in feedback verification release; do
+  do-harness verify --set "$s" --strict --record
+done
+```
+
+dies on its third iteration with exit 139 and no sensor output at all. That is
+loud — a CI step goes red — so the loop cannot pass unnoticed. The subtler trap
+is the *recovery*: because a later non-`--record` run silently refreshes the same
+evidence file, a green `status --set release` does **not** prove the recorded step
+ever succeeded. Re-establish the claim with:
+
+```bash
+for s in feedback verification release; do
+  do-harness verify --set "$s" --strict          # no --record while #267 is open
+done
+do-harness status --set release
+```
+
+Do not "fix" a red `--record` step by dropping the flag *without* saying so in the
+commit message: the evidence is still genuine, but the step now means something
+different from the one written down.
 
 ## Risks and escape hatches
 

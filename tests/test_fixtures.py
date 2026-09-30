@@ -19,6 +19,7 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlparse
 
 import pytest
 
@@ -35,6 +36,7 @@ from scripts.fixtures import (
     parse_page,
     split_teams,
 )
+from scripts.source_learning import approved_domains, load_sources
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCRIPT = REPO_ROOT / "scripts" / "fixtures.py"
@@ -48,6 +50,62 @@ BCL_GAME_DAY = "2026-10-06T08:30:00Z"
 
 BBL = DEFAULT_SOURCES["bbl"]
 BCL = DEFAULT_SOURCES["bcl"]
+
+
+def _host(value: str) -> str:
+    """A bare, lowercase, `www.`-stripped host from a URL *or* a bare host.
+
+    `config/sources.json` lists social accounts as host+path
+    (`x.com/FIBA`), so the same normaliser has to accept both shapes.
+    """
+    host = value.split("/")[0].strip().lower()
+    return host[4:] if host.startswith("www.") else host
+
+
+class TestFixtureSourcesAreApproved:
+    """Every league page live code fetches must sit on an approved host.
+
+    `config/sources.json` is the machine-readable mirror of the approved-source
+    list, and `DEFAULT_SOURCES` is what `fixtures.py` actually fetches. Nothing
+    connected the two, so when BBL moved to `easycredit-bbl.de` — recorded in
+    the registry's own note and re-verified 2026-09-17 — the registry was
+    migrated and the fetcher was not. `DEFAULT_SOURCES["bbl"]` kept
+    `https://www.basketball-bundesliga.de/spielplan/`, a host that fails TLS SNI
+    (`tlsv1 unrecognized name`) while DNS still resolves, so the BBL source
+    could never produce a fixture: its `fixture_recall` contribution was
+    permanently zero and the daily run had been reporting a TLS error where the
+    real problem was a stale URL.
+
+    This is the AGENTS.md trap "a rule that reads a field nothing writes" in its
+    other direction: the registry carried the correction and nothing asserted
+    the fetcher obeyed it, so the correction reached every document and no code
+    path. A test that asserts the *current* URL would pass again the day the
+    league moves; asserting the *relation* fails for every future move.
+    """
+
+    def test_every_fixture_source_is_on_an_approved_host(self):
+        approved = {_host(d) for d in approved_domains(load_sources(REPO_ROOT))}
+        offending = {
+            name: cfg["url"]
+            for name, cfg in DEFAULT_SOURCES.items()
+            if _host(urlparse(cfg["url"]).hostname or "") not in approved
+        }
+        assert not offending, (
+            "scripts/fixtures.py fetches a host that config/sources.json does "
+            f"not approve: {offending}. A league page must be approved before "
+            "it is fetched, or Check 3 is not being honoured by the tooling "
+            "that measures it."
+        )
+
+    def test_the_registry_approves_the_bbl_host_the_fetcher_uses(self):
+        """The specific correction, so a future rename is traceable.
+
+        Kept separately from the relation above on purpose: the relation says
+        "these agree", this says "and they agree on *this*", which is the fact
+        a reviewer of the 2026-09-30 change wants to see.
+        """
+        assert _host(urlparse(BBL["url"]).hostname or "") == "easycredit-bbl.de"
+        assert "basketball-bundesliga.de" not in BBL["url"]
 
 
 def _payload_page(payload: object, *, splits: int = 1) -> str:

@@ -262,7 +262,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [1.6.1] - 2026-09-30
+
+### Fixed
+
+- **The BBL fixture source could never produce a fixture, and the run blamed the
+  network for it.** `scripts/fixtures.py` still fetched
+  `https://www.basketball-bundesliga.de/spielplan/`, a host the league vacated
+  and which now fails TLS SNI (`tlsv1 unrecognized name`) while DNS keeps
+  resolving. `config/sources.json` had recorded that migration on 2026-09-17 and
+  `references/approved-sources.md` was updated with it — but nothing connected
+  the registry to the fetcher, so the correction reached every document and no
+  code path. This is the mirror image of the AGENTS.md trap *a rule that reads a
+  field nothing writes*: here a fact was written in one place and read in
+  another, and the reader was never asked. The daily run had been reporting a
+  TLS error, which reads like a transient network fault, while the real fault was
+  a URL that had been wrong for months.
+  The URL now points at the current official schedule page
+  (`easycredit-bbl.de/saison/spielplaene_liga-pokalspiele/hauptrunde`), and
+  `tests/test_fixtures.py::TestFixtureSourcesAreApproved` asserts the *relation*
+  rather than the URL: every source `fixtures.py` fetches must be hosted on a
+  domain `config/sources.json` approves. Asserting today's URL would pass again
+  the day the league moves; asserting the relation fails on every future move.
+  The test is verified to fail when the old URL is restored, so it is a guard and
+  not a description of the fix.
+
+- **The corrected BBL URL is documented as unreadable, rather than quietly
+  hoped for.** Verified 2026-09-30 against the live page: HTTP 200, ~285 KB of
+  server-rendered markup, **zero** `application/ld+json` blocks, **zero**
+  `itemtype` microdata, and the server-rendered game list reads *„Keine Spiele
+  für diese Saison gefunden"* — the fixtures are fetched client-side from
+  `api.basketball-bundesliga.de`, which answers 401 to any caller without the
+  credential the site itself holds. So none of `fixtures.py`'s three rungs can
+  read it from a plain GET, and BBL `fixture_recall` stays genuinely `n/a` until
+  a *rendered* capture is fed through `--input`. Per design rule 4 a source that
+  yields nothing is a `FAIL`, not a silent zero, so this source is honest about
+  being unmeasured instead of being wrong. The finding is recorded in
+  `config/sources.json` and `references/approved-sources.md` so the next person
+  does not re-derive it from scratch.
+
+### Verified (no change)
+
+- `magenta.tv/sport` still returns exactly **858 bytes** of app shell to a plain
+  GET, matching the figure recorded on 2026-09-29 — the Step 2.8 render gate is
+  still load-bearing and is not measuring a stale number.
+- The YouTube Data API `eventType=live` entry point is *still* correctly absent.
+  The official `search.list` reference documents `live` as "only include **active**
+  broadcasts", with `upcoming` as a separate value, so a scheduled game can never
+  appear in an `eventType=live` response. The reference doc had already removed
+  that path as unread rather than reachable, and the `SCHEDULED` decision is
+  instead produced by the keyless HTML `sp=EgJAAQ%3D%3D` filter, which does return
+  upcoming broadcasts. Re-checked against the docs; no change needed.
+
+
 ## [Unreleased]
+
 
 
 
