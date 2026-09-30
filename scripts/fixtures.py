@@ -83,7 +83,26 @@ TEAM_SEPARATORS = re.compile(
 DEFAULT_SOURCES: dict[str, dict] = {
     "bbl": {
         "league": "BBL",
-        "url": "https://www.basketball-bundesliga.de/spielplan/",
+        # The league moved: `basketball-bundesliga.de` fails TLS SNI
+        # (`tlsv1 unrecognized name`) while DNS still resolves, so a plain GET
+        # never reaches a body. This is the current official schedule page.
+        #
+        # It is ALSO a page none of rungs 1-3 can read, and that is a property
+        # of the site rather than a bug in this file. Verified 2026-09-30
+        # against the live page: HTTP 200, ~285 KB of server-rendered markup,
+        # zero `application/ld+json` blocks, zero `itemtype` microdata, and the
+        # server-rendered game list reads "Keine Spiele für diese Saison
+        # gefunden" — the fixtures are fetched client-side from
+        # `api.basketball-bundesliga.de`, which answers 401 to any caller
+        # without the credential the site itself holds.
+        #
+        # So this source yields `[]` from a plain GET, and per rule 4 below that
+        # is a FAIL, not a silent zero. Making it contribute needs a *rendered*
+        # capture fed through `--input`; see `tests/fixtures/README.md`. Until
+        # such a capture exists, BBL fixture recall is genuinely `n/a` and this
+        # source is the reason — which is why the URL is corrected here rather
+        # than left pointing at a host that cannot answer at all.
+        "url": "https://www.easycredit-bbl.de/saison/spielplaene_liga-pokalspiele/hauptrunde",
     },
     "euroleague": {
         "league": "EuroLeague",

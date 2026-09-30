@@ -210,6 +210,31 @@ last; it is the superset, and a green `release` is the strongest single claim.
       do-harness verify --set "$s" --strict --record
     done
 
+**Drop `--record` on `release` until [d-o-hub/do-harness#267] is fixed.** That
+loop above dies on its **third** iteration: `verify --set release --strict
+--record` exits **139 (SIGSEGV)** on 0.1.1 and 0.1.2, *before any sensor runs* —
+no `PASS`/`FAIL` output at all. `feedback` (2 sensors) and `verification` (18)
+record fine, so the trigger is the resolved set's size, not the flag in general;
+the same 20 `[[sensors]]` in a config with no `[signal-sets]` table records
+cleanly. See `docs/do-harness.md` → Known defects §3.
+
+`--record` is **not** what writes the evidence. A plain run stamps the same file,
+so the working loop is:
+
+    for s in feedback verification release; do
+      do-harness verify --set "$s" --strict          # no --record while #267 is open
+    done
+    do-harness status --set release                  # must read `green`
+
+Two consequences to state out loud rather than paper over:
+
+- The step now means something **different** from the one written above. Record
+  that in the commit message; do not let the drop read as incidental.
+- Because a plain run silently refreshes the same file, a green
+  `status --set release` does **not** prove the `--record` step ever succeeded.
+  A crash that recovers invisibly is easier to miss than one that stays red, which
+  is the actual reason to care about #267.
+
 ### Seeding is local, never in CI
 
 `do-harness seed` writes `plans/invariants.json` into the state database. Run it
