@@ -53,6 +53,94 @@ class TestApprovedHandles:
         assert from_config, "config/sources.json declares no YouTube handles"
         assert set(from_config) == set(DEFAULT_ALLOWED_HANDLES)
 
+    def test_the_config_is_actually_read_not_merely_fallback(self, tmp_path):
+        """The test above cannot fail on its own, so this one carries the weight.
+
+        `test_the_module_default_matches_config_sources` compares
+        `load_allowed_handles(REPO_ROOT)` against `DEFAULT_ALLOWED_HANDLES` — and
+        when the registry did not parse, that was DEFAULT compared with itself.
+        It passed for the whole time the documented promotion path was a no-op:
+        adding a `handles` entry to `config/sources.json` could not change the
+        gate, so a new official channel could only be admitted by editing the
+        tuple in code.
+
+        So the guard asserts the *mechanism*, not the coincidence: a distinctive
+        handle declared in a temporary registry must come back out. It fails if
+        the scheme goes back to being required, if the fallback starts winning,
+        or if a future refactor returns a constant again.
+        """
+        (tmp_path / "config").mkdir()
+        (tmp_path / "config" / "sources.json").write_text(
+            json.dumps(
+                {
+                    "sources": [
+                        {
+                            "name": "sentinel",
+                            "tier": 6,
+                            "handles": ["youtube.com/@sentinelchannel"],
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        assert load_allowed_handles(tmp_path) == ("sentinelchannel",)
+
+    def test_a_registry_handle_replaces_the_fallback_entirely(self, tmp_path):
+        """A declared registry is authoritative, not additive.
+
+        Merging the fallback in would make revoking a channel impossible: the
+        constant would keep admitting whatever the registry removed. This is why
+        the two lists agreeing, in the real repo, is a *result* worth asserting
+        rather than something to enforce by union.
+        """
+        (tmp_path / "config").mkdir()
+        (tmp_path / "config" / "sources.json").write_text(
+            json.dumps(
+                {
+                    "sources": [
+                        {"name": "s", "tier": 6, "handles": ["youtube.com/@fiba"]}
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        assert load_allowed_handles(tmp_path) == ("fiba",)
+        assert "basketballcl" not in load_allowed_handles(tmp_path)
+
+    def test_a_promoted_channel_becomes_allowed_end_to_end(self, tmp_path):
+        """The documented promotion path, exercised: registry in, gate out.
+
+        A unit test with a hand-built input proves the reader works; this proves
+        the *pair* — that a handle promoted in the registry is actually accepted
+        by `is_allowed_handle` afterwards. That is the claim
+        `references/self-learning.md` makes about promotion, and it is the one
+        that was silently false.
+        """
+        (tmp_path / "config").mkdir()
+        (tmp_path / "config" / "sources.json").write_text(
+            json.dumps(
+                {
+                    "sources": [
+                        {
+                            "name": "s",
+                            "tier": 6,
+                            "handles": ["youtube.com/@basketballbundesliga"],
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        allowed = load_allowed_handles(tmp_path)
+        assert is_allowed_handle(
+            "https://www.youtube.com/@basketballbundesliga/live", allowed
+        )
+        # And a channel that was never promoted is still refused.
+        assert not is_allowed_handle(
+            "https://www.youtube.com/@FIBAWorld/live", allowed
+        )
+
     def test_missing_config_falls_back_to_the_default(self, tmp_path):
         assert load_allowed_handles(tmp_path) == DEFAULT_ALLOWED_HANDLES
 
