@@ -12,26 +12,34 @@
     "dropped": 0,
     "duplicates": 0,
     "fixture_recall": 0.0,
-    "fixtures": 9,
-    "rows": 9,
+    "fixtures": 17,
+    "rows": 17,
     "surfaced": 0,
-    "unseen": 9,
+    "unseen": 17,
     "unseen_keys": [
+      "Basketball Champions League|AEK BC|Salon Vilpas|2026-10-07T16:00Z",
+      "Basketball Champions League|ALBA BERLIN|SK Slavia Praha ERA NBK|2026-10-07T16:00Z",
       "Basketball Champions League|Asisa Joventut|Bnei Penlink Herzliya|2026-10-06T18:30Z",
+      "Basketball Champions League|BC Juventus Utena|Unicaja|2026-10-07T17:00Z",
       "Basketball Champions League|BK KVIS Pardubice|Pallacanestro Reggiana|2026-10-06T18:00Z",
       "Basketball Champions League|BMA365 Bamberg Baskets|Peristeri Betsson|2026-10-06T16:30Z",
       "Basketball Champions League|Cholet Basket|Hapoel Maoz Daniel Holon|2026-10-06T15:45Z",
       "Basketball Champions League|Cholet Basket|Hapoel Maoz Daniel Holon|2026-10-06T16:30Z",
       "Basketball Champions League|Cibona|Galatasaray MCT Technic|2026-10-06T18:00Z",
+      "Basketball Champions League|FC Porto|Telekom Baskets Bonn|2026-10-07T18:00Z",
+      "Basketball Champions League|Falco KC Szombathely|Windrose Giants Antwerp|2026-10-07T18:00Z",
       "Basketball Champions League|Igokea m:tel|Surne Bilbao|2026-10-06T18:00Z",
       "Basketball Champions League|Legia Warszawa|SIG Strasbourg|2026-10-06T18:00Z",
+      "Basketball Champions League|Nanterre 92|Trabzonspor|2026-10-07T16:00Z",
+      "Basketball Champions League|Pallacanestro Varese|UCAM Murcia|2026-10-07T18:30Z",
+      "Basketball Champions League|RASTA Vechta|Spartak Office Shoes|2026-10-07T18:00Z",
       "Basketball Champions League|Rytas Vilnius|Sabah BC|2026-10-06T16:30Z"
     ]
   },
   "recall": {
     "captured": 0,
-    "eligible": 339,
-    "missed": 339,
+    "eligible": 347,
+    "missed": 347,
     "missed_keys": [
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
@@ -76,6 +84,7 @@
       "https://freestreams-live1h.pk/euroleague-stream95/",
       "https://ga.de/sport/telekom-baskets-bonn/livestream-telekom-baskets-bonn-gegen-hapoel-jerusalem_aid-90349947",
       "https://go3.lt/",
+      "https://go3.lt/en/sports",
       "https://hakro-merlins.com/news/barmer-proa/alle-spiele-der-barmer-2-basketball-bundesliga-proa-live-und-kostenlos-auf-sportdeutschlandtv/",
       "https://hom-sistaxon-int.ibama.gov.br/base/store.php/free-basketball-tv-live-streaming-euroleague/tl",
       "https://khelnow.com/basketball/where-to-watch-fiba-basketball-world-cup-2027-asian-qualifiers-india-vs-lebanon-202606",
@@ -104,6 +113,7 @@
       "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
       "https://production360.media/dyn-media-powers-live-sports-fast-channel-with-frequency-studio-live/",
       "https://punditfeed.com/sports-news/basketball/euroleague-tv-live-stream/",
+      "https://ran.joyn.de/live",
       "https://ran.joyn.de/sports/basketball/wm-frauen/deutschland-vs-mali-heute-live-basketball-wm-der-frauen2026-in-berlin-im-free-tv-und-im-joyn-stream-181456",
       "https://ran.joyn.de/sports/basketball/wm-frauen/deutschland-vs-suedkorea-heute-live-basketball-wm-der-frauen-im-free-tv-und-im-kostenlosen-joyn-livestream-182798",
       "https://ran.joyn.de/sports/ticker/ma11487707-fc-bayern-muenchen-fitness-first-wuerzburg-baskets",
@@ -131,6 +141,7 @@
       "https://sportdaten.ikz-online.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/",
       "https://sportdaten.nrz.de/basketball/bbl/ma11487974/fc-bayern-muenchen_alba-berlin/liveticker/",
       "https://sportdaten.nrz.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/",
+      "https://sportdaten.waz.de/basketball/bbl/live-konferenz/dn2026-09-18/",
       "https://sportdaten.wr.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/",
       "https://sporteurope.tv/",
       "https://sporteurope.tv/alba-berlin",
@@ -275,6 +286,7 @@
       "https://www.netzwelt.de/",
       "https://www.netzwelt.de/news/229026-chemnitz-99ers-gegen-alba-berlin-so-top-partie-bbl-gratis-tv-live-stream-sehen.html",
       "https://www.netzwelt.de/news/230561-bayern-muenchen-gegen-alba-berlin-so-seht-top-spiel-bbl-gratis-tv-live-stream.html",
+      "https://www.netzwelt.de/news/231417-alba-berlin-gegen-chemnitz-99ers-so-seht-halbfinale-bbl-play-offs-gratis-tv-live-stream.html",
       "https://www.netzwelt.de/news/232097-ohne-teure-abos-sport-kostenlos-live-stream-tv.html",
       "https://www.netzwelt.de/news/235158-alba-berlin-gegen-chemnitz-99ers-so-empfangt-bbl-partie-gratis-tv-live-stream.html",
       "https://www.netzwelt.de/news/235929-sc-rasta-vechta-gegen-alba-berlin-so-schaut-bbl-partie-kostenlos-tv-live-stream.html",
@@ -282,6 +294,7 @@
       "https://www.netzwelt.de/news/238047-bb-loewen-braunschweig-gegen-ratiopharm-ulm-so-seht-bbl-partie-gratis-tv-live-stream.html",
       "https://www.netzwelt.de/tv-sender/magentasport.html",
       "https://www.netzwelt.de/tv-show/215006-bbl-so-seht-deutsche-basketball-bundesliga-live-stream-tv.html",
+      "https://www.news.de/sport/859448653/bbl-live-spielplan-aktuell-2026-2027-naechste-spiele-und-uebertragung-basketball-bundesliga-naechste-spiele-im-stream/1/",
       "https://www.news.de/sport/859955828/alba-berlin-niners-chemnitz-bbl-livestream-basketball-bundesliga-am-18-09-2026-in-berlin-anfahrt-und-tickets/1/",
       "https://www.news.de/sport/860002805/alba-berlin-niners-chemnitz-bbl-livestream-kostenlos-basketball-bundesliga-am-18-09-2026-in-berlin-anfahrt-und-tickets/1/",
       "https://www.news.de/sport/860014214/fitness-first-wuerzburg-baskets-ewe-baskets-oldenburg-bbl-livestream-basketball-bundesliga-am-25-09-2026-in-wuerzburg-anfahrt-und-tickets/1/",
@@ -293,6 +306,7 @@
       "https://www.ran.de/sports/basketball/europameisterschaft/news/deutschland-vs-finnland-live-basketball-em2025-uebertragung-des-halbfinals-im-tv-livestream-und-ticker-588049",
       "https://www.rbb24.de/",
       "https://www.rbb24.de/sport/hintergrund/livestream/livestream-basketball-bbl-playoffs-finale-spiel-4-alba-berlin-bayern-muenchen.html",
+      "https://www.rbb24.de/sport/hintergrund/livestream/livestream-basketball-bbl-playoffs-halbfinale-spiel-5-alba-berlin-bamberg.html",
       "https://www.rbb24.de/sport/hintergrund/livestream/livestream-basketball-bundesliga-bayern-muenchen-alba-berlin.html",
       "https://www.rbb24.de/sport/hintergrund/livestream/livestream-basketball-bundesliga-bbl-alba-berlin-bayern-muenchen.html",
       "https://www.rnd.de/sport/deutschland-litauen-live-basketball-em-im-free-tv-und-stream-sehen-VWZKAORLUBC2VKTFRE75QXRG2M.html",
@@ -336,6 +350,7 @@
       "https://www.squawka.com/",
       "https://www.squawka.com/en/other-sport/bayern-munich-alba-berlin-live-stream-watch-online-basketball-bundesliga/",
       "https://www.stream2watch.me/league/euroleague-basketball/",
+      "https://www.swp.de/sport/sport-mix/bayern-muenchen-gegen-alba-berlin-heute-live-wer-uebertraegt-gratis-im-tv-und-stream-79502317.html",
       "https://www.swp.de/sport/sport-mix/bayern-muenchen-gegen-alba-berlin-live-wer-uebertraegt-gratis-im-tv-und-stream-79502348.html",
       "https://www.techradar.com/how-to-watch/basketball/fiba-womens-basketball-world-cup-2026-free",
       "https://www.telekom.com/de/newsroom/aktuelles/medieninformationen/2020/12/livesport-highlights-bei-magentasport-als-free-tv-angebot",
@@ -355,6 +370,7 @@
       "https://www.tvinfo.de/fernsehprogramm/2115529203-basketball-bundesliga-live-fc-bayern-muenchen-mhp-riesen-ludwigsburg",
       "https://www.tvinfo.de/fernsehprogramm/2324037128-basketball-bundesliga-live-fc-bayern-muenchen-niners-chemnitz",
       "https://www.tvinfo.de/fernsehprogramm/2324037132-basketball-bundesliga-live-fc-bayern-muenchen-niners-chemnitz",
+      "https://www.twitch.tv/directory/all/tags/euroleague",
       "https://www.waipu.tv/",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4UT5MR4E50eRzhEpzzML8ffax7DuJYCtH0T-Y5g4BdWCODdfBcA",
@@ -374,9 +390,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 6015,
-    "unique_games": 500,
-    "unverifiable": 339,
+    "rows": 6188,
+    "unique_games": 507,
+    "unverifiable": 347,
     "unverifiable_keys": [
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
@@ -421,6 +437,7 @@
       "https://freestreams-live1h.pk/euroleague-stream95/",
       "https://ga.de/sport/telekom-baskets-bonn/livestream-telekom-baskets-bonn-gegen-hapoel-jerusalem_aid-90349947",
       "https://go3.lt/",
+      "https://go3.lt/en/sports",
       "https://hakro-merlins.com/news/barmer-proa/alle-spiele-der-barmer-2-basketball-bundesliga-proa-live-und-kostenlos-auf-sportdeutschlandtv/",
       "https://hom-sistaxon-int.ibama.gov.br/base/store.php/free-basketball-tv-live-streaming-euroleague/tl",
       "https://khelnow.com/basketball/where-to-watch-fiba-basketball-world-cup-2027-asian-qualifiers-india-vs-lebanon-202606",
@@ -449,6 +466,7 @@
       "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
       "https://production360.media/dyn-media-powers-live-sports-fast-channel-with-frequency-studio-live/",
       "https://punditfeed.com/sports-news/basketball/euroleague-tv-live-stream/",
+      "https://ran.joyn.de/live",
       "https://ran.joyn.de/sports/basketball/wm-frauen/deutschland-vs-mali-heute-live-basketball-wm-der-frauen2026-in-berlin-im-free-tv-und-im-joyn-stream-181456",
       "https://ran.joyn.de/sports/basketball/wm-frauen/deutschland-vs-suedkorea-heute-live-basketball-wm-der-frauen-im-free-tv-und-im-kostenlosen-joyn-livestream-182798",
       "https://ran.joyn.de/sports/ticker/ma11487707-fc-bayern-muenchen-fitness-first-wuerzburg-baskets",
@@ -476,6 +494,7 @@
       "https://sportdaten.ikz-online.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/",
       "https://sportdaten.nrz.de/basketball/bbl/ma11487974/fc-bayern-muenchen_alba-berlin/liveticker/",
       "https://sportdaten.nrz.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/",
+      "https://sportdaten.waz.de/basketball/bbl/live-konferenz/dn2026-09-18/",
       "https://sportdaten.wr.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/",
       "https://sporteurope.tv/",
       "https://sporteurope.tv/alba-berlin",
@@ -620,6 +639,7 @@
       "https://www.netzwelt.de/",
       "https://www.netzwelt.de/news/229026-chemnitz-99ers-gegen-alba-berlin-so-top-partie-bbl-gratis-tv-live-stream-sehen.html",
       "https://www.netzwelt.de/news/230561-bayern-muenchen-gegen-alba-berlin-so-seht-top-spiel-bbl-gratis-tv-live-stream.html",
+      "https://www.netzwelt.de/news/231417-alba-berlin-gegen-chemnitz-99ers-so-seht-halbfinale-bbl-play-offs-gratis-tv-live-stream.html",
       "https://www.netzwelt.de/news/232097-ohne-teure-abos-sport-kostenlos-live-stream-tv.html",
       "https://www.netzwelt.de/news/235158-alba-berlin-gegen-chemnitz-99ers-so-empfangt-bbl-partie-gratis-tv-live-stream.html",
       "https://www.netzwelt.de/news/235929-sc-rasta-vechta-gegen-alba-berlin-so-schaut-bbl-partie-kostenlos-tv-live-stream.html",
@@ -627,6 +647,7 @@
       "https://www.netzwelt.de/news/238047-bb-loewen-braunschweig-gegen-ratiopharm-ulm-so-seht-bbl-partie-gratis-tv-live-stream.html",
       "https://www.netzwelt.de/tv-sender/magentasport.html",
       "https://www.netzwelt.de/tv-show/215006-bbl-so-seht-deutsche-basketball-bundesliga-live-stream-tv.html",
+      "https://www.news.de/sport/859448653/bbl-live-spielplan-aktuell-2026-2027-naechste-spiele-und-uebertragung-basketball-bundesliga-naechste-spiele-im-stream/1/",
       "https://www.news.de/sport/859955828/alba-berlin-niners-chemnitz-bbl-livestream-basketball-bundesliga-am-18-09-2026-in-berlin-anfahrt-und-tickets/1/",
       "https://www.news.de/sport/860002805/alba-berlin-niners-chemnitz-bbl-livestream-kostenlos-basketball-bundesliga-am-18-09-2026-in-berlin-anfahrt-und-tickets/1/",
       "https://www.news.de/sport/860014214/fitness-first-wuerzburg-baskets-ewe-baskets-oldenburg-bbl-livestream-basketball-bundesliga-am-25-09-2026-in-wuerzburg-anfahrt-und-tickets/1/",
@@ -638,6 +659,7 @@
       "https://www.ran.de/sports/basketball/europameisterschaft/news/deutschland-vs-finnland-live-basketball-em2025-uebertragung-des-halbfinals-im-tv-livestream-und-ticker-588049",
       "https://www.rbb24.de/",
       "https://www.rbb24.de/sport/hintergrund/livestream/livestream-basketball-bbl-playoffs-finale-spiel-4-alba-berlin-bayern-muenchen.html",
+      "https://www.rbb24.de/sport/hintergrund/livestream/livestream-basketball-bbl-playoffs-halbfinale-spiel-5-alba-berlin-bamberg.html",
       "https://www.rbb24.de/sport/hintergrund/livestream/livestream-basketball-bundesliga-bayern-muenchen-alba-berlin.html",
       "https://www.rbb24.de/sport/hintergrund/livestream/livestream-basketball-bundesliga-bbl-alba-berlin-bayern-muenchen.html",
       "https://www.rnd.de/sport/deutschland-litauen-live-basketball-em-im-free-tv-und-stream-sehen-VWZKAORLUBC2VKTFRE75QXRG2M.html",
@@ -681,6 +703,7 @@
       "https://www.squawka.com/",
       "https://www.squawka.com/en/other-sport/bayern-munich-alba-berlin-live-stream-watch-online-basketball-bundesliga/",
       "https://www.stream2watch.me/league/euroleague-basketball/",
+      "https://www.swp.de/sport/sport-mix/bayern-muenchen-gegen-alba-berlin-heute-live-wer-uebertraegt-gratis-im-tv-und-stream-79502317.html",
       "https://www.swp.de/sport/sport-mix/bayern-muenchen-gegen-alba-berlin-live-wer-uebertraegt-gratis-im-tv-und-stream-79502348.html",
       "https://www.techradar.com/how-to-watch/basketball/fiba-womens-basketball-world-cup-2026-free",
       "https://www.telekom.com/de/newsroom/aktuelles/medieninformationen/2020/12/livesport-highlights-bei-magentasport-als-free-tv-angebot",
@@ -700,6 +723,7 @@
       "https://www.tvinfo.de/fernsehprogramm/2115529203-basketball-bundesliga-live-fc-bayern-muenchen-mhp-riesen-ludwigsburg",
       "https://www.tvinfo.de/fernsehprogramm/2324037128-basketball-bundesliga-live-fc-bayern-muenchen-niners-chemnitz",
       "https://www.tvinfo.de/fernsehprogramm/2324037132-basketball-bundesliga-live-fc-bayern-muenchen-niners-chemnitz",
+      "https://www.twitch.tv/directory/all/tags/euroleague",
       "https://www.waipu.tv/",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4UT5MR4E50eRzhEpzzML8ffax7DuJYCtH0T-Y5g4BdWCODdfBcA",
@@ -719,30 +743,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "",
+  "run_id": "2026-09-30T15:04Z",
   "source": {
     "audit_rows": 0,
-    "candidates_rows": 6015,
-    "fixtures_rows": 9
+    "candidates_rows": 6188,
+    "fixtures_rows": 17
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 112,
-      "missed": 112,
-      "recall": 0.0,
-      "rows": 208,
-      "run_id": "2026-09-29T08:37Z",
-      "unique_games": 178
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -963,7 +970,24 @@
       "rows": 2,
       "run_id": "2026-09-29T18:09Z",
       "unique_games": 2
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 95,
+      "missed": 95,
+      "recall": 0.0,
+      "rows": 173,
+      "run_id": "2026-09-30T15:02Z",
+      "unique_games": 147
     }
   ],
-  "ts": "2026-09-29T18:09:22.476796+00:00"
+  "ts": "2026-09-30T15:04:13.951231+00:00"
 }
