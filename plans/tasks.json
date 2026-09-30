@@ -1,0 +1,66 @@
+{
+  "exported_at": 1790793848,
+  "tasks": [
+    {
+      "id": 1,
+      "parent_id": null,
+      "title": "Phase 5 fixture parsing",
+      "method": null,
+      "subtask_index": 0,
+      "status": "pending",
+      "precondition": null,
+      "created_at": 1789402377,
+      "updated_at": 1789402377
+    },
+    {
+      "id": 2,
+      "parent_id": null,
+      "title": "Add an iCalendar (RFC 5545) parser so fixture ground truth can come from a feed instead of a page",
+      "method": null,
+      "subtask_index": 0,
+      "status": "pending",
+      "precondition": "parse_ics emits the same fixture/game_key shape as parse_page, so a feed row joins the ledger; a VEVENT with no usable DTSTART or no team pair is dropped, never guessed",
+      "created_at": 1790793252,
+      "updated_at": 1790793252
+    },
+    {
+      "id": 3,
+      "parent_id": null,
+      "title": "schema probe",
+      "method": "probe",
+      "subtask_index": 0,
+      "status": "failed",
+      "precondition": null,
+      "created_at": 1790793791,
+      "updated_at": 1790793841
+    },
+    {
+      "id": 4,
+      "parent_id": null,
+      "title": "schema probe",
+      "method": "probe",
+      "subtask_index": 0,
+      "status": "failed",
+      "precondition": null,
+      "created_at": 1790793804,
+      "updated_at": 1790793841
+    },
+    {
+      "id": 5,
+      "parent_id": null,
+      "title": "Discover the official BBL iCalendar feed URL and pin it so BBL contributes fixtures",
+      "method": "unblock-a-fixture-source",
+      "subtask_index": 0,
+      "status": "pending",
+      "precondition": "One render of easycredit-bbl.de/saison/kalender-abos yields the per-team .ics URLs; the feed is then fetched with no browser on the daily path",
+      "created_at": 1790793841,
+      "updated_at": 1790793841
+    }
+  ],
+  "summary": {
+    "pending": 3,
+    "in_progress": 0,
+    "done": 0,
+    "failed": 2
+  }
+}

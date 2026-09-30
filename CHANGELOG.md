@@ -497,6 +497,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   by `TestFixtureSourcesAreApproved` — the same relation that would have caught
   the BBL URL sitting wrong for months.
 
+- **`plans/methods.json` — the HTN method catalog this workspace was missing.**
+  `do-harness task done` refuses a task with no method (*"task 2 has no method;
+  cannot mark done"*), so the coding workflow could be started but not closed.
+  The schema was mapped from the validator's own diagnostics rather than guessed
+  at: `Method {name, preconditions, subtasks}`, `Precondition {description}`,
+  `Subtask {name, sensor, spike_candidate}` — and the struct is strict, so a
+  `description` on a subtask is rejected by name. Three methods, each expressing
+  a rule this repository learned the hard way: `add-source-reader` (parse into
+  the existing shape, pin the source with a date, declare the format rather than
+  sniff it, and *prove the guard fails when the fix is reverted*),
+  `unblock-a-fixture-source` (classify the failure before attempting anything, and
+  read the diagnosis from the response rather than the status code), and
+  `prove-a-guard-can-fail`. Task 5 carries `unblock-a-fixture-source` and is the
+  real open item: discovering and pinning the BBL feed URL.
+  The two schema-probe tasks are closed as `failed` rather than deleted — the
+  harness refuses to remove a task that has workflow events, because the event
+  log is the audit trail, and that refusal is correct.
+
 ### Fixed
 
 - **`SUMMARY` trailing context no longer defeats the feed pairing.** The BBL

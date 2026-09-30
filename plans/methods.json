@@ -1,0 +1,90 @@
+{
+  "methods": [
+    {
+      "name": "add-source-reader",
+      "preconditions": [
+        {
+          "description": "The host is already approved in config/sources.json, or the change is quarantined and cannot be promoted in the same change."
+        },
+        {
+          "description": "The real provider output has been captured, or the fixture is a synthetic input and is labelled as one per tests/fixtures/README.md."
+        }
+      ],
+      "subtasks": [
+        {
+          "name": "parse one provider unit into the existing shape, refusing rather than guessing",
+          "sensor": "pytest",
+          "spike_candidate": false
+        },
+        {
+          "name": "pin the source with the date and the evidence it was verified against",
+          "sensor": "source-registry",
+          "spike_candidate": false
+        },
+        {
+          "name": "declare the format or relation in the registry, never sniff it from the body",
+          "sensor": "pytest",
+          "spike_candidate": false
+        },
+        {
+          "name": "prove the guard fails when the fix is reverted",
+          "sensor": "pytest",
+          "spike_candidate": false
+        },
+        {
+          "name": "the product graders and the contract agree on what changed",
+          "sensor": "skill-contract",
+          "spike_candidate": false
+        }
+      ]
+    },
+    {
+      "name": "unblock-a-fixture-source",
+      "preconditions": [
+        {
+          "description": "The failure is classified before anything is attempted: blocked, gone, server fault or unreachable. A block is not a markup change."
+        },
+        {
+          "description": "The diagnosis is read from the response, not guessed from the status code; a challenge is not a throttle."
+        }
+      ],
+      "subtasks": [
+        {
+          "name": "record the failing fetch with the evidence that identifies the block",
+          "sensor": "pytest",
+          "spike_candidate": false
+        },
+        {
+          "name": "prefer a durable format over a render, and say why in the reference",
+          "sensor": "skill-contract",
+          "spike_candidate": false
+        },
+        {
+          "name": "the recall denominator is widened, or the remaining gap is written down",
+          "sensor": "candidates-recall",
+          "spike_candidate": true
+        }
+      ]
+    },
+    {
+      "name": "prove-a-guard-can-fail",
+      "preconditions": [
+        {
+          "description": "The behaviour under test is a claim about the system, not a description of the current code."
+        }
+      ],
+      "subtasks": [
+        {
+          "name": "reintroduce the defect and confirm the guard goes red",
+          "sensor": "pytest",
+          "spike_candidate": false
+        },
+        {
+          "name": "assert the guard reads its real source, not a constant that mirrors it",
+          "sensor": "pytest",
+          "spike_candidate": false
+        }
+      ]
+    }
+  ]
+}
