@@ -98,14 +98,41 @@ class TestFixtureSourcesAreApproved:
         )
 
     def test_the_registry_approves_the_bbl_host_the_fetcher_uses(self):
-        """The specific correction, so a future rename is traceable.
+        """The specific correction, so a future move is traceable.
 
         Kept separately from the relation above on purpose: the relation says
         "these agree", this says "and they agree on *this*", which is the fact
         a reviewer of the 2026-09-30 change wants to see.
+
+        BBL moved twice, and only the second move made the source usable. The
+        first (`basketball-bundesliga.de` → `easycredit-bbl.de`) fixed a host
+        that could not answer; the second was to the league's own iCalendar feed
+        on `api.basketball-bundesliga.de`, because the current schedule *page*
+        is reachable but publishes its fixtures client-side and answers 401 to
+        any caller without the site's credential. The old dead host stays named
+        so a rename back to it cannot pass unnoticed.
         """
-        assert _host(urlparse(BBL["url"]).hostname or "") == "easycredit-bbl.de"
-        assert "basketball-bundesliga.de" not in BBL["url"]
+        assert _host(urlparse(BBL["url"]).hostname or "") == (
+            "api.basketball-bundesliga.de"
+        )
+        assert BBL["url"].endswith("/calendar/ical/all-games")
+        assert BBL["kind"] == "ics"
+        assert "www.basketball-bundesliga.de/" not in BBL["url"]
+
+    def test_the_bbl_source_is_the_official_feed_not_the_schedule_page(self):
+        """The page the registry documents as unreadable must not be fetched.
+
+        `easycredit-bbl.de/saison/…/hauptrunde` answers 200 with ~285 KB and no
+        machine-readable game list, so it is registered for provenance and not
+        fetched. Asserting the *negative* is the point: an unwary "fix" that
+        points the fetcher back at the readable-looking page would restore a
+        source that yields `[]` forever, and the relation test above would still
+        pass because that host is approved too.
+        """
+        assert "easycredit-bbl.de" not in BBL["url"]
+        assert approved_domains(load_sources(REPO_ROOT)) >= {
+            _host(urlparse(BBL["url"]).hostname or "")
+        }
 
 
 def _payload_page(payload: object, *, splits: int = 1) -> str:
@@ -508,7 +535,7 @@ def _run(args: list[str]) -> subprocess.CompletedProcess:
 class TestCli:
     def test_json_ld_input(self):
         result = _run(
-            ["--input", str(JSONLD_PAGE), "--source", "bbl",
+            ["--input", str(JSONLD_PAGE), "--source", "bcl",
              "--now", "2026-09-14T08:30:00Z", "--json"]
         )
         assert result.returncode == 0, result.stderr
@@ -518,7 +545,7 @@ class TestCli:
 
     def test_microdata_input(self):
         result = _run(
-            ["--input", str(MICRODATA_PAGE), "--source", "bbl",
+            ["--input", str(MICRODATA_PAGE), "--source", "bcl",
              "--now", "2026-09-14T08:30:00Z"]
         )
         assert result.returncode == 0
@@ -528,7 +555,7 @@ class TestCli:
         # `--days 2` means today plus the next two days inclusive, so of the
         # fixture page's games (16th, 17th, 18th) only the 16th qualifies.
         result = _run(
-            ["--input", str(JSONLD_PAGE), "--source", "bbl",
+            ["--input", str(JSONLD_PAGE), "--source", "bcl",
              "--now", "2026-09-14T08:30:00Z", "--days", "2", "--json"]
         )
         assert result.returncode == 0, result.stderr
@@ -538,7 +565,7 @@ class TestCli:
 
     def test_out_writes_jsonl_and_dry_run_does_not(self, tmp_path):
         out = tmp_path / "fixtures.jsonl"
-        args = ["--input", str(JSONLD_PAGE), "--source", "bbl",
+        args = ["--input", str(JSONLD_PAGE), "--source", "bcl",
                 "--now", "2026-09-14T08:30:00Z", "--out", str(out)]
         assert _run([*args, "--dry-run"]).returncode == 0
         assert not out.exists()
@@ -551,7 +578,7 @@ class TestCli:
         # grow without bound and fixture_recall would end up measuring file
         # length instead of coverage.
         out = tmp_path / "fixtures.jsonl"
-        args = ["--input", str(JSONLD_PAGE), "--source", "bbl",
+        args = ["--input", str(JSONLD_PAGE), "--source", "bcl",
                 "--now", "2026-09-14T08:30:00Z", "--out", str(out)]
         for _ in range(3):
             assert _run(args).returncode == 0
@@ -559,7 +586,7 @@ class TestCli:
 
     def test_out_reports_how_many_were_already_present(self, tmp_path):
         out = tmp_path / "fixtures.jsonl"
-        args = ["--input", str(JSONLD_PAGE), "--source", "bbl",
+        args = ["--input", str(JSONLD_PAGE), "--source", "bcl",
                 "--now", "2026-09-14T08:30:00Z", "--out", str(out)]
         assert _run(args).returncode == 0
         second = _run(args)
@@ -569,11 +596,11 @@ class TestCli:
     def test_out_appends_only_new_games(self, tmp_path):
         """A later run must still be able to add a game the first run missed."""
         out = tmp_path / "fixtures.jsonl"
-        first = ["--input", str(JSONLD_PAGE), "--source", "bbl",
+        first = ["--input", str(JSONLD_PAGE), "--source", "bcl",
                  "--now", "2026-09-16T08:30:00Z", "--days", "1", "--out", str(out)]
         assert _run(first).returncode == 0
         before = len(out.read_text(encoding="utf-8").strip().splitlines())
-        wider = ["--input", str(JSONLD_PAGE), "--source", "bbl",
+        wider = ["--input", str(JSONLD_PAGE), "--source", "bcl",
                  "--now", "2026-09-14T08:30:00Z", "--days", "7", "--out", str(out)]
         assert _run(wider).returncode == 0
         after = len(out.read_text(encoding="utf-8").strip().splitlines())
@@ -586,16 +613,16 @@ class TestCli:
 
     def test_input_with_multiple_sources_is_a_usage_error(self):
         result = _run(
-            ["--input", str(JSONLD_PAGE), "--source", "bbl", "--source", "bcl"]
+            ["--input", str(JSONLD_PAGE), "--source", "bcl", "--source", "bcl"]
         )
         assert result.returncode == 2
 
     def test_missing_input_file_is_a_usage_error(self, tmp_path):
-        result = _run(["--input", str(tmp_path / "nope.html"), "--source", "bbl"])
+        result = _run(["--input", str(tmp_path / "nope.html"), "--source", "bcl"])
         assert result.returncode == 2
 
     def test_bad_now_is_a_usage_error(self):
-        result = _run(["--input", str(JSONLD_PAGE), "--source", "bbl", "--now", "soon"])
+        result = _run(["--input", str(JSONLD_PAGE), "--source", "bcl", "--now", "soon"])
         assert result.returncode == 2
 
     def test_embedded_payload_input(self):
@@ -611,7 +638,7 @@ class TestCli:
     def test_unparsable_page_exits_one(self, tmp_path):
         page = tmp_path / "empty.html"
         page.write_text("<html><body>nothing here</body></html>", encoding="utf-8")
-        result = _run(["--input", str(page), "--source", "bbl"])
+        result = _run(["--input", str(page), "--source", "bcl"])
         assert result.returncode == 1
         assert "capture a page and add a parser fixture" in result.stderr
 
@@ -685,7 +712,7 @@ class TestPartialSourceFailure:
             sys,
             "argv",
             self._argv(
-                "--source", "bbl", "--source", "euroleague",
+                "--source", "bcl", "--source", "euroleague",
                 "--now", "2026-09-14T08:30:00Z", "--out", str(out),
             ),
         )
@@ -716,7 +743,7 @@ class TestPartialSourceFailure:
             sys,
             "argv",
             self._argv(
-                "--source", "bbl", "--source", "euroleague",
+                "--source", "bcl", "--source", "euroleague",
                 "--now", "2026-09-14T08:30:00Z",
             ),
         )
@@ -738,7 +765,7 @@ class TestPartialSourceFailure:
             sys,
             "argv",
             self._argv(
-                "--source", "bbl", "--source", "euroleague",
+                "--source", "bcl", "--source", "euroleague",
                 "--now", "2026-09-14T08:30:00Z",
             ),
         )

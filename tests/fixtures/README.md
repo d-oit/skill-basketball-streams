@@ -8,6 +8,8 @@
 > - **`composio/`** — the real argument schema of every Google Calendar tool
 >   `scripts/calendar_io.py` calls, pinning what the transport may send. See
 >   [`composio/README.md`](composio/README.md).
+> - **`feeds/`** — real iCalendar responses, pinning the format the BBL feed
+>   actually publishes. See [`feeds/README.md`](feeds/README.md).
 >
 > Everything else in this directory is hand-authored. The distinction is the one
 > stated below: **inputs may be authored, outputs must be captured.** A provider's
@@ -92,6 +94,8 @@ python3 -m pytest tests/test_transcripts.py
 | `audit_runs.jsonl` | hand-written (safe) | Audit rows for two runs, one of which has **no** candidate rows — pins that a run present only in the audit stream still appears in the trend |
 | `fixtures_page_bbl.html` | hand-written (safe) | A league page carrying JSON-LD `SportsEvent` nodes, a microdata block the JSON-LD path must ignore, one event with no `startDate`, and one node that is not an event |
 | `fixtures_page_microdata.html` | hand-written (safe) | The same idea with **no** JSON-LD, so the microdata fallback is exercised |
+| `feeds/bbl_all_games.ics` | **recorded, then trimmed** — real `api.basketball-bundesliga.de/calendar/ical/all-games` response, 2026-09-30 | The feed format the league actually publishes: the competition glued onto the first club name, `DTSTART` floating with the zone declared once at calendar level, CRLF and folded `SUMMARY` lines. Trimmed to 7 of 321 events by the declared selection rule in [`feeds/manifest.json`](feeds/manifest.json); recorded and gated by `scripts/record_feeds.py`. The sibling `fixtures_feed_bbl.ics` stays hand-authored, because it is an *input* that covers cases the live feed happens not to contain (all-day, cancelled, a comma after the pair) |
+| `fixtures_feed_bbl.ics` | hand-written (safe) | A synthetic feed covering the **refusals**: `VALUE=DATE`, `STATUS:CANCELLED`, a comma after the pair, a `VTIMEZONE` carrying a 1970 `DTSTART`. The real feed contains none of these, so a fixture claiming to be a capture of it would be false |
 | `fixtures_page_bcl_payload.html` | **recorded, then trimmed** — real `/en/games` response, 2026-09-18 | The third parser rung in `scripts/fixtures.py`: `championsleague.basketball` publishes neither JSON-LD nor microdata (a game page's only `ld+json` node is a `BreadcrumbList`), and its game list is a Next.js flight payload. Three of that list's 136 games are kept verbatim — two scheduled, and one season placeholder (`hasTimeGameDateTime: false`, `teamA: null`) that must **not** become a fixture — plus the empty `"games": []` array the real page sends first. Its own header records source, date and reduction |
 | `link_inventory_events.json` | hand-written (safe) | A three-event `calendar_io list` export (the shape that CLI writes, `{"events": […]}`): one event carrying the full documented description block — two links, a source reference, a validation timestamp — one legacy event carrying **no** block, and one whose stored link is a rejected `/channel/` YouTube shape. Pins the producer's round trip and its registry coverage, and that "the calendar has no dead links" cannot be confused with "no event had a link to check" |
 | `agent_transcript_sample.json` | hand-written (safe) | An **envelope sample** for `extract_candidates.py` — not a captured run. It is an input to the extractor, not a grading fixture, and must never be used to grade the skill |

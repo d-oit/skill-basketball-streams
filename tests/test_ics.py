@@ -18,6 +18,7 @@ surfaced, for ever, which is worse than having no fixture at all.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 import sys
@@ -29,18 +30,32 @@ import pytest
 
 from scripts.fixtures import (
     DEFAULT_SOURCES,
+    FEED_SUMMARY_PREFIXES,
     calendar_name,
     parse_ics,
     parse_ics_dt,
     parse_source,
     split_feed_teams,
+    strip_feed_prefix,
     unfold_ics,
     unescape_ics,
 )
 from scripts.fixtures import event_to_fixture  # noqa: F401 - shape parity reference
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+
+# The two competition prefixes **measured across all 321 VEVENTs of the real
+# feed on 2026-09-30**: `easyCredit BBL Spiel` 306, `BBL Pokal Spiel` 15, all on
+# the left-hand side. Spelled out here rather than imported from
+# `scripts.fixtures` on purpose — a test that asserts `team.startswith(
+# FEED_SUMMARY_PREFIXES)` against the same tuple the reader strips with passes
+# for any value of that tuple, including the empty one. That was measured, not
+# assumed: shortening the tuple to one entry left the suite green. A guard that
+# cannot fail is not a guard.
+MEASURED_PREFIXES = ("easyCredit BBL Spiel", "BBL Pokal Spiel")
+
 FEED = REPO_ROOT / "tests" / "fixtures" / "fixtures_feed_bbl.ics"
+FEEDS = REPO_ROOT / "tests" / "fixtures" / "feeds"
 SCRIPT = REPO_ROOT / "scripts" / "fixtures.py"
 
 
@@ -54,6 +69,16 @@ def _parse(feed: str | None = None) -> list[dict]:
         league="BBL",
         source="bbl",
         source_url="https://www.easycredit-bbl.de/bbl.ics",
+    )
+
+
+def _parse_captured() -> list[dict]:
+    """The real captured feed, read the way `DEFAULT_SOURCES` reads it."""
+    return parse_ics(
+        (FEEDS / "bbl_all_games.ics").read_bytes().decode("utf-8"),
+        league="BBL",
+        source="bbl",
+        source_url=DEFAULT_SOURCES["bbl"]["url"],
     )
 
 
@@ -246,6 +271,155 @@ class TestCalendarName:
         assert calendar_name("BEGIN:VCALENDAR\nEND:VCALENDAR\n") == ""
 
 
+class TestRecordedOfficialFeed:
+    """The *captured* BBL feed, not a synthetic stand-in.
+
+    `tests/fixtures/feeds/bbl_all_games.ics` is a trimmed verbatim capture of
+    `https://api.basketball-bundesliga.de/calendar/ical/all-games` (HTTP 200,
+    90,568 bytes, 321 VEVENTs, recorded 2026-09-30). It is trimmed, not invented:
+    the synthetic feed above authors the *refusals* (all-day, cancelled, a comma
+    after the pair), and this one carries the *format* — which is the part a
+    hand-written fixture would have had to guess, and which the reader already
+    guessed wrong twice.
+
+    Two measured facts are asserted here rather than documented in a comment,
+    because each is a silent two-hour error if the reader regresses:
+
+    * every `SUMMARY` glues its competition onto the first club name, and
+    * `DTSTART` is **floating** — the zone is declared once, at calendar level.
+    """
+
+    def test_the_capture_is_the_recorded_bytes(self):
+        manifest = json.loads((FEEDS / "manifest.json").read_text(encoding="utf-8"))
+        stored = (FEEDS / manifest["stored_file"]).read_bytes()
+        assert len(stored) == manifest["stored_bytes"]
+        assert hashlib.sha256(stored).hexdigest() == manifest["stored_sha256"]
+        # And it really is the response the manifest names.
+        assert manifest["source_url"] == DEFAULT_SOURCES["bbl"]["url"]
+        assert manifest["http_status"] == 200
+        assert manifest["events_in_response"] == 321
+        assert len(manifest["kept"]) < manifest["events_in_response"]
+
+    def test_the_capture_serves_crlf_and_folded_lines(self):
+        raw = (FEEDS / "bbl_all_games.ics").read_bytes()
+        assert b"\r\n" in raw
+        assert any(line.startswith(b" ") for line in raw.split(b"\r\n"))
+
+    def test_every_kept_event_yields_a_fixture(self):
+        rows = _parse_captured()
+        assert len(rows) == len(json.loads(
+            (FEEDS / "manifest.json").read_text(encoding="utf-8")
+        )["kept"])
+
+    def test_no_club_name_retains_a_competition_prefix(self):
+        """The failure this reader had, asserted as its symptom.
+
+        Unstripped, every team became `easyCredit BBL Spiel ALBA BERLIN`: the
+        `game_key` stopped matching what search surfaces, and the league reported
+        *zero recall while looking healthy*. So the assertion is on the names
+        themselves, not on a count.
+        """
+        for row in _parse_captured():
+            for team in row["teams"]:
+                assert not team.lower().startswith(MEASURED_PREFIXES)
+
+    def test_both_measured_competitions_are_stripped(self):
+        # 306 `easyCredit BBL Spiel` + 15 `BBL Pokal Spiel`, left side only.
+        # Both appear in the capture; dropping either from the reader re-adds a
+        # prefix to every one of that competition's fixtures. The literals are
+        # the assertion (see `MEASURED_PREFIXES`), so this fails on a shortened
+        # tuple rather than following it.
+        kept = " ".join(
+            k["summary"] for k in json.loads(
+                (FEEDS / "manifest.json").read_text(encoding="utf-8")
+            )["kept"]
+        )
+        for prefix in MEASURED_PREFIXES:
+            assert prefix in kept
+            assert strip_feed_prefix(f"{prefix} ALBA BERLIN") == "ALBA BERLIN"
+        # And the reader carries every measured prefix, no fewer.
+        assert set(MEASURED_PREFIXES) <= set(FEED_SUMMARY_PREFIXES)
+
+    def test_a_leading_word_not_on_the_list_is_kept_as_a_club_name(self):
+        """The refusal that keeps the list safe to extend.
+
+        Stripping "any leading words" would eventually eat a real club. A
+        competition nobody has declared must therefore surface as a visibly odd
+        team name, which is the symptom that prompts adding it here — not as a
+        silently renamed club.
+        """
+        assert strip_feed_prefix("DELO BBL Spiel Hamburg") == "DELO BBL Spiel Hamburg"
+        assert split_feed_teams("DELO BBL Spiel Hamburg vs Berlin") == [
+            "DELO BBL Spiel Hamburg",
+            "Berlin",
+        ]
+
+    def test_floating_dtstarts_read_the_calendars_declared_zone(self):
+        """`X-WR-TIMEZONE:Europe/Berlin`, not the reader's default.
+
+        The feed writes every `DTSTART` floating and declares the zone once at
+        the top. The `calendar_tz` branch in `parse_ics` first sat *after* the
+        `if event is None or depth: continue` gate, so nothing could ever reach
+        it and every timestamp silently took the default — which happened to be
+        the same zone, so the bug was invisible here and wrong anywhere else.
+        That is why the declaration is asserted rather than assumed: only a
+        feed with a *different* zone proves the wiring, so that half is checked
+        directly below.
+        """
+        raw = (FEEDS / "bbl_all_games.ics").read_bytes().decode("utf-8")
+        assert "X-WR-TIMEZONE:Europe/Berlin" in raw
+        assert "DTSTART;TZID" not in raw and "DTSTART:2026" in raw
+        rows = _parse_captured()
+        assert rows
+        assert all(r["start"].endswith("+02:00") for r in rows), rows[0]["start"]
+
+    def test_a_calendar_declaring_another_zone_moves_the_timestamps(self):
+        """The wiring, proven by a zone that is *not* the default.
+
+        A feed that declares `Europe/London` must read 18:30 as 18:30 London
+        (17:30Z), not as 18:30 Berlin. If `calendar_tz` were never passed,
+        this returns the Berlin reading and the test fails — which is the
+        "unit test with a hand-built input" trap avoided by asserting the
+        *difference*, not the presence of a plausible value.
+        """
+        feed = (
+            "BEGIN:VCALENDAR\r\nX-WR-TIMEZONE:Europe/London\r\n"
+            "BEGIN:VEVENT\r\nUID:a\r\nDTSTART:20260910T183000\r\n"
+            "SUMMARY:A vs B\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+        )
+        rows = parse_ics(feed, league="BBL", source="s")
+        assert rows[0]["start"] == "2026-09-10T18:30:00+01:00"
+        assert rows[0]["game_key"] == "BBL|A|B|2026-09-10T17:30Z"
+
+    def test_a_sponsor_and_an_umlaut_survive_unfolding(self):
+        rows = _parse_captured()
+        names = {team for row in rows for team in row["teams"]}
+        assert "VET-CONCEPT Gladiators Trier" in names
+        assert "Basketball Löwen Braunschweig" in names
+
+    def test_the_capture_reads_through_the_real_cli(self):
+        manifest = json.loads((FEEDS / "manifest.json").read_text(encoding="utf-8"))
+        result = subprocess.run(
+            [
+                sys.executable, str(SCRIPT),
+                "--input", str(FEEDS / manifest["stored_file"]),
+                "--source", "bbl",
+                "--now", "2026-09-01T12:00:00Z",
+                "--days", "400",
+                "--json",
+            ],
+            capture_output=True, text=True,
+        )
+        assert result.returncode == 0, result.stderr
+        payload = json.loads(result.stdout)
+        assert payload["fixtures"]
+        assert payload["fixtures"][0]["source_url"] == DEFAULT_SOURCES["bbl"]["url"]
+        # Every club name is a club name, from end to end of the real pipeline.
+        for row in payload["fixtures"]:
+            for team in row["teams"]:
+                assert not team.lower().startswith(MEASURED_PREFIXES)
+
+
 class TestFormatIsDeclaredNotSniffed:
     def test_a_declared_ics_source_is_read_as_a_feed(self):
         body = _feed()
@@ -273,10 +447,10 @@ class TestFormatIsDeclaredNotSniffed:
 
 class TestCliReadsAFeed:
     def test_the_fixture_runs_through_the_real_cli(self):
-        # `--input-kind` exists so a feed can be tried *before* it is pinned to a
-        # source. The BBL source is declared `html`, and reading an .ics file as
-        # html must genuinely yield nothing — otherwise `--input-kind` would be
-        # decoration and the format would be decided by sniffing.
+        # `--input-kind` exists so a feed can be read *before* it is pinned to a
+        # source, and `bbl` is now pinned to `ics`; the same bytes read as html
+        # must genuinely yield nothing — otherwise the kind would be decided by
+        # sniffing and `--input-kind` would be decoration.
         result = subprocess.run(
             [
                 sys.executable, str(SCRIPT),
@@ -300,15 +474,40 @@ class TestCliReadsAFeed:
         ]
         assert payload["fixtures"][0]["source_url"] == DEFAULT_SOURCES["bbl"]["url"]
 
-    def test_a_feed_read_under_the_declared_html_kind_yields_nothing(self):
+    def test_the_declared_kind_wins_over_the_bytes(self):
+        """`bbl` declares `ics`, so an HTML page fed under it parses to nothing.
+
+        This is the same assertion as the pair above, pointed the other way now
+        that the source is pinned: the declared kind is what decides, so feeding
+        the JSON-LD page fixture to `bbl` fails loudly instead of quietly
+        succeeding. It is also what makes `--input-kind` meaningful — the flag
+        exists for the period *before* a feed is pinned, and after pinning the
+        override is the only way to read the bytes the other way.
+        """
+        page = REPO_ROOT / "tests" / "fixtures" / "fixtures_page_bbl.html"
         result = subprocess.run(
             [
                 sys.executable, str(SCRIPT),
-                "--input", str(FEED),
+                "--input", str(page),
                 "--source", "bbl",
-                "--now", "2026-10-01T08:30:00Z",
+                "--now", "2026-09-14T08:30:00Z",
             ],
             capture_output=True, text=True,
         )
         assert result.returncode == 1
+        assert "capture a page and add a parser fixture" in result.stderr
+        # And the override still reads it.
+        forced = subprocess.run(
+            [
+                sys.executable, str(SCRIPT),
+                "--input", str(page),
+                "--source", "bbl",
+                "--input-kind", "html",
+                "--now", "2026-09-14T08:30:00Z",
+                "--json",
+            ],
+            capture_output=True, text=True,
+        )
+        assert forced.returncode == 0, forced.stderr
+        assert len(json.loads(forced.stdout)["fixtures"]) == 3
         assert "no fixture parsed" in result.stderr

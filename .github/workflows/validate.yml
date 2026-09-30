@@ -239,5 +239,15 @@ jobs:
       - name: Run record_pages (corpus gate)
         run: python3 scripts/record_pages.py --check
 
+      # The recorded iCalendar corpus is what pins the BBL feed's SUMMARY
+      # format, which is a provider's output: the league writes its competition
+      # onto the first club name and leaves every DTSTART floating. The gate
+      # re-derives the stored bytes AND asks the reader to parse them, because a
+      # hash proves *unchanged* and never proves *readable* — the first version
+      # of this corpus kept 7 events with no BEGIN/END envelope and was green.
+      # Offline — the corpus is on disk.
+      - name: Run record_feeds (feed corpus gate)
+        run: python3 scripts/record_feeds.py --check
+
       - name: Run pytest
         run: python3 -m pytest tests/ -v --tb=short

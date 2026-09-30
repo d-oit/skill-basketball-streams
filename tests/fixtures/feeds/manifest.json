@@ -1,0 +1,50 @@
+{
+  "recorded": "2026-09-30T19:09:14+00:00",
+  "source": "bbl",
+  "source_url": "https://api.basketball-bundesliga.de/calendar/ical/all-games",
+  "http_status": 200,
+  "response_bytes": 90568,
+  "response_sha256": "27c88fd1aefb4b55effa26e397f1a6798edd14478ff9f1d52378d6f0049a66da",
+  "events_in_response": 321,
+  "selection_rule": "first event of every (competition prefix x folded SUMMARY x non-ASCII) combination the response contains",
+  "stored_file": "bbl_all_games.ics",
+  "stored_bytes": 2237,
+  "stored_sha256": "b79ec4bd1cb33a99c74fa3c7baa5e6e047c09c30466f0f9fa3623b7424e7c7ce",
+  "kept": [
+    {
+      "uid": "9a6bb5ff-e522-45b1-9fd9-c545b9cbaaba",
+      "summary": "BBL Pokal Spiel HAKRO Merlins Crailsheim vs Phoenix Hagen",
+      "combination": "BBL Pokal Spiel x folded=False x non-ascii=False"
+    },
+    {
+      "uid": "c1bfee7d-c063-4e5b-8599-97402fec07ae",
+      "summary": "BBL Pokal Spiel Eisbären Bremerhaven vs Basketball Löwen Braunschweig",
+      "combination": "BBL Pokal Spiel x folded=True x non-ascii=True"
+    },
+    {
+      "uid": "d157f7b4-fa00-44b8-a602-17ad58b646d5",
+      "summary": "BBL Pokal Spiel GIESSEN 46ers vs NINERS Chemnitz",
+      "combination": "BBL Pokal Spiel x folded=False x non-ascii=True"
+    },
+    {
+      "uid": "6844e4f1-41e3-460f-844f-4c83258ef0ed",
+      "summary": "easyCredit BBL Spiel ALBA BERLIN vs NINERS Chemnitz",
+      "combination": "easyCredit BBL Spiel x folded=False x non-ascii=False"
+    },
+    {
+      "uid": "c3a28ba2-a0cc-42a8-94b3-90515abdd9fd",
+      "summary": "easyCredit BBL Spiel Basketball Löwen Braunschweig vs VET-CONCEPT Gladiators Trier",
+      "combination": "easyCredit BBL Spiel x folded=True x non-ascii=True"
+    },
+    {
+      "uid": "56af7580-8a7d-4be3-8b24-56a1b69b08a1",
+      "summary": "easyCredit BBL Spiel EWE Baskets Oldenburg vs SYNTAINICS MBC",
+      "combination": "easyCredit BBL Spiel x folded=False x non-ascii=True"
+    },
+    {
+      "uid": "4582031b-7090-424b-b188-6303eb46c2d6",
+      "summary": "easyCredit BBL Spiel VET-CONCEPT Gladiators Trier vs Telekom Baskets Bonn",
+      "combination": "easyCredit BBL Spiel x folded=True x non-ascii=False"
+    }
+  ]
+}

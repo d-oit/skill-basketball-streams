@@ -445,6 +445,90 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that reverts to a truthiness check.
 
 
+## [1.9.0] - 2026-09-30
+
+### Added
+
+- **The BBL source reads a real feed, so fixture recall has two leagues instead
+  of one.** `DEFAULT_SOURCES["bbl"]` pointed at the schedule *page*, which is
+  reachable and unreadable: HTTP 200, ~285 KB of server-rendered markup, zero
+  `application/ld+json`, zero `itemtype` microdata, and a game list that renders
+  “Keine Spiele für diese Saison gefunden”, because the fixtures come
+  client-side from `api.basketball-bundesliga.de`, which answers 401 without
+  the credential the site holds. A plain GET of it can never yield a fixture, so
+  BBL’s `fixture_recall` contribution was permanently `n/a` and
+  `fixture_recall` quietly meant *BCL only*.
+
+  The same host serves the league’s **own iCalendar feed** to any caller:
+  `https://api.basketball-bundesliga.de/calendar/ical/all-games` answers HTTP
+  200, 90,568 bytes, **321 VEVENTs**, no credential. `api.basketball-bundesliga.de`
+  is now an approved domain in `config/sources.json`, and the source is declared
+  `kind = "ics"`. 321/321 events parse.
+
+- **`scripts/record_feeds.py` + `tests/fixtures/feeds/`** — the recorded feed
+  corpus, and its writer. A feed’s `SUMMARY` format is a **provider’s output**,
+  so a hand-written fixture would encode this repository’s guess at it and prove
+  the guess. Seven of the 321 events are kept, verbatim, covering every
+  (competition prefix × folded `SUMMARY` × non-ASCII) cell the response
+  contains. `--check` is the offline gate (`validate.yml` step + a new
+  `feed-corpus` sensor).
+
+- **Competition prefixes are stripped from club names, measured not guessed.**
+  The feed writes every summary as `easyCredit BBL Spiel ALBA BERLIN vs NINERS
+  Chemnitz`. Left alone, every club name becomes the competition plus the club,
+  the `game_key` stops matching what search surfaces, and the league reports
+  **zero recall while looking healthy** — a fixture set that is entirely wrong
+  and entirely green. Across all 321 events there are exactly two prefixes, all
+  left-hand side (`easyCredit BBL Spiel` 306, `BBL Pokal Spiel` 15), so the list
+  is closed and exact. A leading word that is *not* on it is assumed to be part
+  of the club name: guessing at it is how a real team ends up renamed, so a new
+  competition surfaces as a visibly odd team name, which is the symptom that
+  should prompt extending the list.
+
+- **`feed-corpus` sensor** (verification + release sets).
+
+### Fixed
+
+- **`parse_ics` never read the calendar’s declared timezone.** The
+  `X-WR-TIMEZONE` branch sat *after* the `if event is None or depth: continue`
+  gate, so no calendar-level property could ever reach it and every floating
+  `DTSTART` silently took the reader’s default. The official feed writes all 321
+  of its `DTSTART`s floating and declares `Europe/Berlin` once at the top, so
+  the bug was invisible on this feed and wrong on any other. The declaration is
+  now read before the gate, and a feed declaring a *different* zone is asserted
+  to move the timestamps — a fixture on the same zone as the default could not
+  have caught it.
+
+- **A guard that could not fail.** The prefix test asserted
+  `team.startswith(FEED_SUMMARY_PREFIXES)` against the tuple the reader strips
+  with, so it passed for *any* value of that tuple, including a one-entry one.
+  Verified: shortening `FEED_SUMMARY_PREFIXES` to a single competition left the
+  suite green. The assertion is now the **measured literals**, plus a check that
+  the reader carries every one of them.
+
+- **`--check` on the feed corpus proved *unchanged*, never *readable*.** The
+  first recorder stripped `BEGIN:VEVENT`/`END:VEVENT` while selecting events, so
+  the corpus held seven events with no envelope; it parsed to nothing, and the
+  hash check passed, because the bytes it had recorded were exactly the wrong
+  bytes. The gate now also asks `parse_ics` to read the payload, refuses a
+  manifest naming a URL `DEFAULT_SOURCES` no longer declares, and refuses a
+  corpus that is no longer a strict trim. Both mutations are kept as tests.
+
+- **The recorder guessed readability instead of asking for it.** Its selection
+  accepted any event carrying a `DTSTART`, including `DTSTART;VALUE=DATE:` —
+  which the reader refuses on purpose, since an all-day entry has no tip-off.
+  The corpus would then hold an event that parses to nothing while passing every
+  other check. Selection now asks the reader.
+
+### Changed
+
+- `config/sources.json` → 1.3.0; `api.basketball-bundesliga.de` added to the BBL
+  entry, with the measured feed format recorded in its notes.
+- `tests/test_fixtures.py` CLI cases moved from `--source bbl` to `--source bcl`:
+  they feed **HTML** page fixtures, and `bbl` now declares `ics`, so the declared
+  kind correctly makes those bytes unparsable. `--input-kind html` is asserted to
+  override it, which is the flag’s whole purpose.
+
 ## [1.8.0] - 2026-09-30
 
 ### Added
