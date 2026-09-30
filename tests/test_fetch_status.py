@@ -18,6 +18,7 @@ exact exception `fetch` is meant to classify.
 from __future__ import annotations
 
 import io
+import json
 import sys
 import urllib.error
 from pathlib import Path
@@ -169,6 +170,8 @@ class TestOverallAdviceAgreesWithTheCauses:
 class TestEndToEndMessage:
     """The message the daily run actually prints, via `main()`."""
 
+    page = "<html><body>no structured data here</body></html>"
+
     def _argv(self, *args):
         return ["fixtures.py", *args]
 
@@ -202,3 +205,189 @@ class TestEndToEndMessage:
         err = capsys.readouterr().err
         assert "no fixture parsed" in err
         assert "BLOCKED" not in err
+
+    def test_a_blocked_response_with_a_body_is_still_reported_as_blocked(
+        self, monkeypatch, capsys
+    ):
+        """The regression this module was written for, found by its own ledger.
+
+        `fetch` reads the interstitial body off the `HTTPError` so the cause can
+        be reported — which means a **blocked** response is no longer an empty
+        string. The caller then branched on `if not html`, never reached the
+        blocked branch, and classified a 31 KB Vercel challenge page as "the page
+        fetched but no fixture parsed (markup change?)" — reintroducing the exact
+        misdiagnosis by a different route. The ledger row said `blocked` while
+        the FAIL line said "markup change?", which is how it was caught.
+
+        So the branch is on `status`, not on body emptiness, and this test fails
+        if that ever reverts to a truthiness check on the body.
+        """
+        challenge = (
+            "<html><head><title>Vercel Security Checkpoint</title></head>"
+            "<body>checking your browser</body></html>"
+        )
+        monkeypatch.setattr(
+            mod,
+            "fetch",
+            lambda url: FetchResult(
+                challenge, "blocked", 429, {"server": "Vercel", "x-vercel-mitigated": "challenge"}
+            ),
+        )
+        monkeypatch.setattr(
+            sys, "argv", self._argv("--source", "euroleague", "--now", "2026-10-06T08:30:00Z")
+        )
+        with pytest.raises(SystemExit) as exc:
+            mod.main()
+        assert exc.value.code == 1
+        err = capsys.readouterr().err
+        assert "BLOCKED (HTTP 429)" in err
+        assert "not a markup change" in err
+        assert "markup change?)" not in err
+        # And the evidence that identifies the block travels with the message.
+        assert "Vercel" in err
+        assert "Vercel Security Checkpoint" in err
+
+
+class TestFetchLedger:
+    """Append-only diagnostics, in the shape `rung_health.py` already uses."""
+
+    page = "<html><body>no structured data here</body></html>"
+
+    def _argv(self, *args):
+        return ["fixtures.py", *args]
+
+    def test_nothing_is_written_unless_asked(self, monkeypatch, capsys, tmp_path):
+        """Opt-in, because the suite drives main() with a patched `fetch`.
+
+        Writing by default appended synthetic test bodies to the real ledger:
+        8 of 13 rows were fixtures, mixed in with real attempts, which is a
+        ledger that cannot be trusted to describe anything. A test that writes
+        real telemetry is not hermetic, so the guard lives in the code rather
+        than in each test.
+        """
+        monkeypatch.setattr(
+            mod, "fetch", lambda url: FetchResult(self.page, "ok")
+        )
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            self._argv(
+                "--source", "bbl", "--root", str(tmp_path),
+                "--now", "2026-10-06T08:30:00Z",
+            ),
+        )
+        with pytest.raises(SystemExit):
+            mod.main()
+        assert not (tmp_path / mod.FETCH_LEDGER_RELATIVE_PATH).exists()
+
+    def test_a_row_is_appended_when_asked(self, monkeypatch, capsys, tmp_path):
+        ledger = tmp_path / "fetch.jsonl"
+        monkeypatch.setattr(
+            mod,
+            "fetch",
+            lambda url: FetchResult(
+                "<html><title>Vercel Security Checkpoint</title></html>",
+                "blocked", 429, {"server": "Vercel", "x-vercel-mitigated": "challenge"},
+            ),
+        )
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            self._argv(
+                "--source", "euroleague", "--fetch-ledger", str(ledger),
+                "--now", "2026-10-06T08:30:00Z",
+            ),
+        )
+        with pytest.raises(SystemExit):
+            mod.main()
+        rows = mod.read_fetch_ledger(ledger)
+        assert len(rows) == 1
+        row = rows[0]
+        assert row["source"] == "euroleague"
+        assert row["status"] == "blocked"
+        assert row["code"] == 429
+        assert row["page_title"] == "Vercel Security Checkpoint"
+        assert "challenge" in row["why"]
+        assert row["ts"] and row["run_id"]
+
+    def test_a_body_never_reaches_the_ledger(self, monkeypatch, tmp_path):
+        """The rung_health rule: named fields only, so the ledger stays small.
+
+        A blocked response here is a 31 KB interstitial; storing it would make
+        the ledger unkeepable, and storing arbitrary response content is how a
+        telemetry file starts echoing requests back.
+        """
+        big = "<html><title>T</title><body>" + ("x" * 50_000) + "</body></html>"
+        row = mod.append_fetch_row(
+            tmp_path / "l.jsonl",
+            source="s",
+            url="https://example.invalid/x",
+            result=FetchResult(big, "blocked", 429),
+        )
+        assert "body" not in row
+        assert "x" * 1000 not in json.dumps(row)
+        # The size is recorded as a number, and the title as a fingerprint.
+        assert row["body_bytes"] > 50_000
+        assert row["page_title"] == "T"
+
+    def test_a_ledger_write_failure_does_not_change_the_verdict(self, tmp_path):
+        """Losing evidence is bad; changing the answer over it is worse."""
+        blocked_dir = tmp_path / "a_file_not_a_dir"
+        blocked_dir.write_text("not a directory")
+        # `append_fetch_row` must not raise even though mkdir will fail.
+        row = mod.append_fetch_row(
+            blocked_dir / "sub" / "l.jsonl",
+            source="s",
+            url="https://example.invalid/",
+            result=FetchResult("", "blocked", 429),
+        )
+        assert row["status"] == "blocked"
+
+    def test_the_reader_outputs_the_failing_and_its_cause(self, capsys, tmp_path):
+        ledger = tmp_path / "l.jsonl"
+        ledger.write_text(
+            "\n".join(
+                json.dumps(r)
+                for r in [
+                    {"source": "bcl", "url": "https://b/", "status": "ok", "code": 200},
+                    {
+                        "source": "euroleague",
+                        "url": "https://e/",
+                        "status": "blocked",
+                        "code": 429,
+                        "why": "server: Vercel; mitigation: challenge",
+                    },
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        assert mod.report_fetch_log(ledger) == 1
+        out = capsys.readouterr().out
+        assert "euroleague" in out
+        assert "HTTP 429" in out
+        assert "mitigation: challenge" in out
+        # The success is not in the default view.
+        assert "bcl" not in out
+
+    def test_the_reader_can_include_successes(self, capsys, tmp_path):
+        ledger = tmp_path / "l.jsonl"
+        ledger.write_text(
+            json.dumps({"source": "bcl", "url": "https://b/", "status": "ok", "code": 200}),
+            encoding="utf-8",
+        )
+        mod.report_fetch_log(ledger, only_failing=False)
+        assert "bcl" in capsys.readouterr().out
+
+    def test_a_corrupt_line_is_skipped_not_fatal(self, tmp_path):
+        ledger = tmp_path / "l.jsonl"
+        ledger.write_text(
+            '{"source": "a", "status": "blocked", "code": 429}\nnot json\n\n',
+            encoding="utf-8",
+        )
+        rows = mod.read_fetch_ledger(ledger)
+        assert [r["source"] for r in rows] == ["a"]
+
+    def test_a_missing_ledger_is_not_a_failure(self, capsys, tmp_path):
+        assert mod.report_fetch_log(tmp_path / "nope.jsonl") == 0
+        assert "no fetch attempts recorded" in capsys.readouterr().out

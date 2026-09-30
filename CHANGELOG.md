@@ -396,12 +396,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Verified (no change)
 
-- `euroleaguebasketball.net` cannot be captured from this environment (uniform
-  429 across four URL/UA combinations), so `fixture_recall` still has a
-  denominator of one league. **No capture was fabricated**: `tests/fixtures/README.md`
-  requires outputs to be captured, and a hand-written page presented as a
-  recording would be invented evidence. Closing this needs either a rendered BBL
-  capture or a non-blocked EuroLeague fetch.
+- `euroleaguebasketball.net` cannot be captured from this environment, so
+  `fixture_recall` still has a denominator of one league. **No capture was
+  fabricated**: `tests/fixtures/README.md` requires outputs to be captured, and a
+  hand-written page presented as a recording would be invented evidence.
+  Closing this needs either a rendered BBL capture or an unblocked EuroLeague
+  fetch. What the 429 *is*, and the logging that now records it, is under
+  **Fixture fetch diagnostics** below.
+
+### Added
+
+- **Fetch-attempt ledger, so a blocked source can be diagnosed after the fact.**
+  A `FAIL` line naming a status code is a claim; this is the evidence for it.
+  `fetch()` now keeps the response headers it used to discard and returns them
+  on `FetchResult`, together with `elapsed_ms`, `body_bytes` and a `<title>`
+  fingerprint. `--fetch-ledger [PATH]` appends one row per attempt in the shape
+  `rung_health.py` already uses — append-only JSONL, **named fields only, never
+  the body** — and `--fetch-log [PATH]` prints what failed and why. A blocked
+  response is typically a 31 KB interstitial, and the rule that keeps the ledger
+  affordable is the one `rung_health.py` states: a page body never reaches the
+  ledger. The `<title>` is the compromise, and it is the whole diagnosis:
+  `Vercel Security Checkpoint` and `Just a moment…` are different blocks with
+  different answers.
+
+  Writing is **opt-in** (`--fetch-ledger`), deliberately. The suite drives
+  `main()` with a patched `fetch`, and the first version wrote by default: 8 of
+  the first 13 ledger rows were synthetic test bodies mixed in with real
+  attempts, which is a ledger that cannot be trusted to describe anything. A
+  test that writes real telemetry is not hermetic, so the guard belongs in the
+  code rather than in each of the call sites that would otherwise need it.
+
+  `runtime-daily.yml` passes `--fetch-ledger .tmp/telemetry/fetch-attempts.jsonl`
+  and gained a `Report blocked fixture sources` step that reads the ledger back
+  into the run summary, so a block is diagnosed in the morning it happens rather
+  than reconstructed weeks later.
+
+### Fixed
+
+- **A blocked source with a body was misreported as a redesigned site.** Reading
+  the interstitial body off the `HTTPError` — the change that made the cause
+  reportable at all — meant a blocked response was no longer an empty string, so
+  the caller's `if not html` branch stopped firing and a 31 KB Vercel challenge
+  page was classified as *"the page fetched but no fixture parsed (markup
+  change?)"*. The exact misdiagnosis re-entered by a different route. The ledger
+  is what caught it: the row said `blocked` while the FAIL line said "markup
+  change?". The branch is now on `status`, never on body emptiness, and
+  `test_a_blocked_response_with_a_body_is_still_reported_as_blocked` fails if
+  that reverts to a truthiness check.
 
 
 ## [Unreleased]
