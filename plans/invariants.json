@@ -136,5 +136,11 @@
     "rationale": "live-stream-runtime-spec.md §17 calls this a 100% hard requirement, and upsert_events' policy table enforced it by reading a stored WRONG off the calendar — and the calendar recovers that state from a '[WRONG] ' title prefix. audit_events computes that relabelled title and puts it in audit.jsonl, and no component applied it, so the rule was unreachable on the real path: a condemned event stayed on the subscriber's calendar looking like a game awaiting confirmation, and the next run's fresh guess could promote it to VERIFIED. The planner now honours the newest WRONG verdict from the audit ledger itself, joined by event_id, using audit_events.latest_per_event so the two cannot disagree about which row is current.",
     "sensor": "upsert-verdicts",
     "category": "correctness"
+  },
+  {
+    "invariant": "Every fixture source scripts/fixtures.py fetches is hosted on a domain approved in config/sources.json, in any format the parser supports",
+    "rationale": "Adding an iCalendar reader for the same ground truth opens a second format, and a second format is a second way around Check 3. The registry is the only thing that decides which hosts are official, and a fixture read from an unapproved domain would quietly become recall measured against a source the skill would refuse as a stream. The URL was wrong for months while the registry had been correct since 2026-09-17, because nothing asserted that the fetcher obeyed the registry; the relation is asserted now, per format, by TestFixtureSourcesAreApproved.",
+    "sensor": "pytest",
+    "category": "security"
   }
 ]

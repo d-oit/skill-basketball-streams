@@ -445,7 +445,83 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that reverts to a truthiness check.
 
 
+## [1.8.0] - 2026-09-30
+
+### Added
+
+- **`scripts/fixtures.py` can read an iCalendar feed.** A league that publishes
+  a `.ics` hands us a *file*, not a page: no JavaScript to render, no WAF to
+  climb, and no markup for a redesign to break. That is the most durable ground
+  truth available, and it is the answer to both dead recall sources. Researched
+  2026-09-30: the BBL publishes per-team calendar subscriptions at
+  `easycredit-bbl.de/saison/kalender-abos` (the `.ics` URLs are client-rendered,
+  so one render discovers them), and EuroLeague's data API lives on a **separate
+  host**, `live.euroleague.net`, which is not behind the `www` site's bot
+  challenge — though `/api/Points` is currently answering 503 on every attempt,
+  so it is down rather than blocked.
+
+  The format is **declared per source** (`kind = "html" | "ics"`) rather than
+  sniffed from the body, because sniffing is how a block page starts being
+  parsed as a feed: an HTML error page is not valid iCalendar, but "does this
+  text mention `VEVENT`" is true of a challenge page that quotes what it was
+  asked for. `--input-kind` overrides the declared kind for one offline read, so
+  a candidate feed can be evaluated before it is pinned into the registry.
+
+  `zoneinfo` is used for `TZID`, and that is load-bearing rather than tidy: a
+  feed states its own timezone, and reading `DTSTART;TZID=Europe/Berlin:19:00`
+  as UTC is wrong by two hours in summer and one in winter — an error that moves
+  with the seasons and silently breaks both the `--days` window and the
+  `game_key` join. A *floating* time (no `Z`, no `TZID`) is read as the calendar's
+  timezone for the same reason. An unknown `TZID` falls back to that local
+  reading rather than to UTC, because being two hours out in the other
+  direction is no better.
+
+  Four refusals, each a case where a fixture would be **wrong** rather than
+  missing — and a wrong fixture is reported as a game no backend surfaced, for
+  ever: no usable `DTSTART` (including `VALUE=DATE`, since an all-day entry has
+  no tip-off), no team pair, `STATUS:CANCELLED`, and a property read out of a
+  nested `VTIMEZONE` (which carries a `DTSTART` of 1970, so a naive reader
+  invents a half-century-old game).
+
+  A comma after the pairing is a **refusal, not a cut**: "Real Madrid vs
+  Barcelona, EuroLeague" could be a club with a comma in its name, and cutting
+  would invent a team. One real feed settles whether that becomes a cut rule
+  with a citation; until then the event is dropped and the limitation is written
+  down rather than guessed at.
+
+- **New invariant, seeded.** *"Every fixture source `scripts/fixtures.py` fetches
+  is hosted on a domain approved in `config/sources.json`, in any format the
+  parser supports."* A second format is a second way around Check 3: a fixture
+  read from an unapproved domain would quietly become recall measured against a
+  source the skill would refuse as a stream. It is already enforced, per format,
+  by `TestFixtureSourcesAreApproved` — the same relation that would have caught
+  the BBL URL sitting wrong for months.
+
+### Fixed
+
+- **`SUMMARY` trailing context no longer defeats the feed pairing.** The BBL
+  subscription writes `ALBA BERLIN vs FC Bayern Muenchen - easyCredit BBL`, which
+  has two separators, and `split_teams` requires exactly two halves — so the
+  first version of this reader **refused a real game**. `split_feed_teams` now
+  reads the pair around the match marker (`vs` / `gegen` / `v`) and discards
+  what follows. A bare `-` is not treated as a match marker, because it is the
+  separator a feed uses for trailing context; `A - B` still works via the generic
+  path. The false claim that the naive split "splits on the first separator" was
+  caught by running the parser against a feed, not by reading the code.
+
+### Verified (no change)
+
+- No official feed URL is pinned yet, so **no league is switched over to iCal**.
+  `tests/fixtures/fixtures_feed_bbl.ics` is a synthetic *input*, which
+  `tests/fixtures/README.md` permits; it is not presented as a captured provider
+  response, and it is served with CRLF and folded lines so unfolding is exercised
+  rather than assumed. Discovering the real URL needs one render, which
+  `runtime-daily.yml` can already do — `patchright` is not importable locally, so
+  it is not done here.
+
+
 ## [Unreleased]
+
 
 
 
