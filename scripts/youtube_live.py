@@ -61,6 +61,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import quote_plus
 
+try:  # package-relative when imported as `scripts.youtube_live`
+    from .relevance import relevance_reason
+except ImportError:  # direct execution, where the repo root is on sys.path
+    from relevance import relevance_reason
+
 # YouTube's "Live" search filter (sp parameter). Decodes to a type=video +
 # features=live filter, i.e. only live/upcoming broadcasts.
 LIVE_SEARCH_SP = "EgJAAQ%3D%3D"
@@ -83,12 +88,23 @@ REJECTED_URL_RE = re.compile(
 )
 # `@handle` extraction, used for the approved-channel check.
 HANDLE_RE = re.compile(
-    r"^https?://(?:www\.|m\.)?youtube\.com/@([\w.\-]+)", re.IGNORECASE
+    r"^(?:https?://)?(?:www\.|m\.)?youtube\.com/@([\w.\-]+)", re.IGNORECASE
 )
 
 # Approved YouTube handles for this skill. `config/sources.json` carries the
 # same list, and `tests/test_youtube_live.py` asserts the two agree, so they
 # cannot drift apart.
+#
+# The scheme in `HANDLE_RE` is **optional** because `config/sources.json` stores
+# its handles scheme-less (`youtube.com/@fiba`, not `https://youtube.com/@fiba`).
+# It used to be required, which meant the registry parsed to nothing, every read
+# took the `or DEFAULT_ALLOWED_HANDLES` fallback below, and the "the two agree"
+# comment was true only in the sense that a constant was being compared with
+# itself. The practical cost was that the documented promotion path — add a tier
+# row and a `handles` entry, open a PR — changed nothing for YouTube, so a new
+# official channel could only be admitted by editing this tuple. `HANDLE_RE` is
+# the single place that knows the handle shape, and both the URL check and the
+# registry read go through it so they cannot diverge again.
 #
 # This check exists because a gate that only validates the URL *shape* promotes
 # `@FIBAWorld/live` — a channel-shaped URL for a handle that does not exist.
@@ -113,9 +129,15 @@ def handle_of(url: str) -> str:
 def load_allowed_handles(root: Path | str | None = None) -> tuple[str, ...]:
     """Approved handles as declared in `config/sources.json`.
 
-    Falls back to `DEFAULT_ALLOWED_HANDLES` when the config is absent or
-    unreadable, so the gate keeps working from a bare checkout. The equivalence
-    test is what keeps the fallback honest.
+    Falls back to `DEFAULT_ALLOWED_HANDLES` only when the config is absent,
+    unreadable, or declares no `@handle` at all — so the gate keeps working from
+    a bare checkout. A config that *does* declare handles is authoritative: the
+    fallback is not merged in, because merging would make a removed channel
+    impossible to revoke.
+
+    Registry entries that are not `@handle` URLs (for example
+    `youtube.com/user/TheDBBTV`) carry no handle and are skipped here; that path
+    is allowed separately, by exact URL shape, in the live-only gate.
     """
     config = Path(root or ".") / "config" / "sources.json"
     try:
@@ -221,6 +243,20 @@ def classify_stream(
             "channel @%s is not on the approved YouTube allow-list (%s)"
             % (handle_of(url), approved)
         )
+
+    # 0b. Relevance, for the URLs the allow-list cannot judge. `/live/<id>` and
+    #     `/watch?v=<id>` carry no handle, so step 0 waved them through and they
+    #     reached the payload gates and the 7-check pipeline with nothing
+    #     upstream asking whether they were basketball at all. One recorded run
+    #     spent a full pass each on `Pop The Balloon` and `Acerting Art`.
+    #     Fail-open by construction (`scripts/relevance.py`), and unreachable for
+    #     an approved channel because step 0 already returned.
+    _irrelevant = relevance_reason(
+        candidate.get("title"),
+        candidate.get("channel") or candidate.get("channelTitle"),
+    )
+    if _irrelevant:
+        return DECISION_REJECT, _irrelevant
 
     lbc = str(
         candidate.get("live_broadcast_content")

@@ -431,15 +431,125 @@ def parse_page(
     return embedded
 
 
-def fetch(url: str) -> str:
-    """Plain GET. Returns "" on any failure — the caller decides what that means."""
+class FetchResult(str):
+    """The page body, carrying *why* it is empty when it is.
+
+    A `str` subclass on purpose. `fetch` is monkeypatched throughout the suite
+    with `lambda url: "<html>"`, and returning a different type would turn every
+    one of those into a failure that has nothing to do with the behaviour under
+    test. Anything that is a plain `str` still reads as a successful body.
+
+    The distinction matters because the previous version collapsed every failure
+    into `""` and the caller then reported "the page fetched but no fixture
+    parsed (markup change?)". A rate-limited source and a redesigned site both
+    arrive as an empty string, so a 429 was diagnosed as a parser problem and
+    sent someone to re-derive a parser that did not need changing. The measured
+    case: `euroleaguebasketball.net` answers **429 to every user agent and every
+    path** from a datacenter IP, and that is a block, not a markup change.
+
+    Statuses mirror `scripts/link_check.py`, which already draws this line:
+    `ok`, `blocked` (401/403/429/451), `not_found` (404/410), `server_error`
+    (5xx), `unreachable` (DNS, TLS, timeout).
+    """
+
+    __slots__ = ("status", "code")
+
+    def __new__(cls, body: str, status: str = "ok", code: int | None = None):
+        obj = super().__new__(cls, body)
+        obj.status = status
+        obj.code = code
+        return obj
+
+
+# A block is not a break, and the two need different responses: a block is worth
+# retrying later or climbing the fetch ladder, a 404 is worth deleting the URL.
+BLOCKED_CODES = frozenset({401, 403, 429, 451})
+GONE_CODES = frozenset({404, 410})
+
+
+def _classify(exc: BaseException) -> tuple[str, int | None]:
+    code = getattr(exc, "code", None)
+    if isinstance(code, int):
+        if code in BLOCKED_CODES:
+            return "blocked", code
+        if code in GONE_CODES:
+            return "not_found", code
+        if code >= 500:
+            return "server_error", code
+        return "not_found", code
+    return "unreachable", None
+
+
+def _overall_advice(causes: dict[str, str]) -> str:
+    """The closing line must not contradict the per-source lines above it.
+
+    A summary that always says "the sites may have changed their markup" undoes
+    the diagnosis it is summarising: when every source was blocked, the advice
+    to go and write a parser is exactly wrong. So it reports the dominant cause.
+    """
+    if causes and all("BLOCKED" in text for text in causes.values()):
+        return (
+            "every source was blocked rather than unparsable, so no parser work "
+            "is warranted: retry later or climb the fetch ladder"
+        )
+    if causes and any("BLOCKED" in text for text in causes.values()):
+        blocked = sorted(n for n, t in causes.items() if "BLOCKED" in t)
+        return (
+            f"blocked source(s) {blocked} need no parser work; the rest may have "
+            "changed their markup — capture those pages and add parser fixtures"
+        )
+    return (
+        "the sites may have changed their markup; capture a page and add a "
+        "parser fixture"
+    )
+
+
+def _empty_cause(status: str, code: int | None) -> str:
+    """Why a source produced nothing — the cause, not a guess at the cause.
+
+    `blocked` is the case worth naming. A 429 is not a redesigned site, and the
+    old single message told the reader it was: the run log for 2026-09-29 says
+    "markup change?" about a host that answers 429 to every user agent. Telling
+    a reader to add a parser fixture for a block sends them to write a parser
+    that will still be correct and still be blocked.
+    """
+    if status == "blocked":
+        return (
+            f"the source is BLOCKED (HTTP {code}) — not a markup change: this is "
+            "anti-bot or rate limiting, so retry later or climb the fetch ladder "
+            "rather than changing a parser"
+        )
+    if status == "not_found":
+        return (
+            f"the source is GONE (HTTP {code}) — the URL itself is wrong, so fix "
+            "the source rather than the parser"
+        )
+    if status == "server_error":
+        return (
+            f"the source returned HTTP {code} — a server fault, so retry rather "
+            "than changing a parser"
+        )
+    if status == "unreachable":
+        return "the source could not be reached (DNS, TLS or timeout)"
+    return (
+        "the fetch returned nothing (network failure, bot block or TLS error)"
+    )
+
+
+def fetch(url: str) -> FetchResult:
+    """Plain GET, with the reason kept for the caller to report.
+
+    Returns the body on success and an empty `FetchResult` on any failure, so a
+    caller that ignores `.status` behaves exactly as before.
+    """
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     try:
         with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as resp:
             charset = resp.headers.get_content_charset() or "utf-8"
-            return resp.read().decode(charset, "replace")
-    except (urllib.error.URLError, urllib.error.HTTPError, OSError, ValueError):
-        return ""
+            return FetchResult(resp.read().decode(charset, "replace"), "ok")
+    except (urllib.error.URLError, urllib.error.HTTPError, OSError, ValueError) as exc:
+        status, code = _classify(exc)
+        return FetchResult("", status, code)
 
 
 def in_window(fixture: dict, *, now: datetime, days: int) -> bool:
@@ -536,30 +646,31 @@ def main() -> None:
         )
         sys.exit(2)
 
-    pages: list[tuple[str, str, str]] = []
+    pages: list[tuple[str, str, str, str | None, int | None]] = []
     if args.input:
         path = Path(args.input)
         if not path.is_file():
             print(f"FAIL: fixtures: {path}: file not found", file=sys.stderr)
             sys.exit(2)
         config = DEFAULT_SOURCES[sources[0]]
-        pages.append((sources[0], path.read_text(encoding="utf-8", errors="replace"), config["url"]))
+        pages.append((sources[0], path.read_text(encoding="utf-8", errors="replace"),
+                      config["url"], "ok", None))
     else:
         for name in sources:
             config = DEFAULT_SOURCES[name]
-            pages.append((name, fetch(config["url"]), config["url"]))
+            result = fetch(config["url"])
+            pages.append((name, result, config["url"],
+                          getattr(result, "status", "ok"),
+                          getattr(result, "code", None)))
 
     fixtures: list[dict] = []
     empty: list[str] = []
     empty_cause: dict[str, str] = {}
-    for name, html, url in pages:
+    for name, html, url, status, code in pages:
         config = DEFAULT_SOURCES[name]
         if not html:
             empty.append(name)
-            empty_cause[name] = (
-                "the fetch returned nothing (network failure, bot block or "
-                "TLS error)"
-            )
+            empty_cause[name] = _empty_cause(status, code)
             continue
         found = parse_page(
             html, league=config["league"], source=name, source_url=url
@@ -605,8 +716,8 @@ def main() -> None:
         else:
             print(
                 f"FAIL: fixtures: no parsable fixtures from {sources} "
-                f"(empty or unparsable: {empty or 'none'}) — the sites may have "
-                "changed their markup; capture a page and add a parser fixture",
+                f"(empty or unparsable: {empty or 'none'}) — "
+                + _overall_advice(empty_cause),
                 file=sys.stderr,
             )
         sys.exit(1)

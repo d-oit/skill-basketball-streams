@@ -315,7 +315,97 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   upcoming broadcasts. Re-checked against the docs; no change needed.
 
 
+## [1.7.0] - 2026-09-30
+
+### Fixed
+
+- **The documented way to approve a YouTube channel did nothing.** Check 3's
+  channel allow-list is read by `load_allowed_handles()`, whose `HANDLE_RE`
+  required a `https?://` scheme — but `config/sources.json` stores its handles
+  scheme-less (`youtube.com/@fiba`). The registry therefore parsed to *nothing*,
+  every read took the `or DEFAULT_ALLOWED_HANDLES` fallback, and the allow-list
+  was the hardcoded tuple. Demonstrated: adding `youtube.com/@newlyapprovedchannel`
+  to the registry left the gate returning the same four handles and
+  `is_allowed_handle` returning `False` for the new channel.
+
+  The code comment claimed *"`config/sources.json` carries the same list, and
+  `tests/test_youtube_live.py` asserts the two agree, so they cannot drift
+  apart."* They could not drift apart **because the config was never read**, and
+  the test asserting agreement compared the constant with itself — so it passed
+  for as long as the promotion path was a no-op. This is the AGENTS.md trap *a
+  rule that reads a field nothing writes is not enforced*, with the reader and
+  the writer being the same repository. The scheme is now optional, one
+  `HANDLE_RE` serves both the URL check and the registry read so they cannot
+  diverge again, and a declared registry **replaces** the fallback rather than
+  merging with it — unioning would make revoking a channel impossible, since the
+  constant would keep admitting whatever the registry removed.
+
+  Two new tests carry the weight, because the old one could not: one asserts a
+  sentinel handle declared in a temporary registry comes back out (so the
+  fallback can no longer win silently), and one exercises the promotion path
+  end to end — registry in, `is_allowed_handle` out. Both were verified to fail
+  when the strict regex is restored.
+
+- **A rate-limited source was being diagnosed as a redesigned site.**
+  `fixtures.py` `fetch()` returned `""` for every failure — 404, 429, 5xx, DNS,
+  TLS — and the caller then reported *"the page fetched but no fixture parsed
+  (markup change?)"*, telling the reader to capture a page and add a parser
+  fixture. Measured 2026-09-30: `euroleaguebasketball.net` answers **HTTP 429 to
+  every user agent and every path** from this network, so the run log has been
+  carrying a parser instruction for a block. Acting on it means writing a parser
+  that is already correct and is still blocked.
+
+  `fetch()` now returns a `FetchResult` — a `str` subclass carrying `status` and
+  `code`, so the suite-wide `lambda url: "<html>"` monkeypatches keep working —
+  and the status vocabulary mirrors `scripts/link_check.py`, which already drew
+  this line: `ok` / `blocked` (401, 403, 429, 451) / `not_found` (404, 410) /
+  `server_error` (5xx) / `unreachable`. The same live run now reports
+  *"the source is BLOCKED (HTTP 429) — not a markup change"*, and the closing
+  summary no longer contradicts the per-source lines above it by advising a
+  parser capture when every source was blocked. A page that genuinely arrives
+  and parses to nothing still gets the original capture advice.
+
+### Added
+
+- **`scripts/relevance.py` — a fail-open pre-filter for obvious off-topic
+  results.** YouTube's live filter returns *live broadcasts* matching loose
+  terms, not basketball: the 2026-09-28 run spent a full 7-check pass each on
+  `Pop The Balloon`, `Acerting Art` and `Melbourne Luxury Accommodation`. The
+  rejections were correct; the spend was not.
+
+  It is wired into `classify_stream` **after** the allow-list gate, so it only
+  ever sees URLs that carry no `@handle` (`/live/<id>`, `/watch?v=`) — the
+  shapes the allow-list structurally cannot judge, and the real gap, since every
+  off-topic channel *with* a handle was already refused cheaply at step 0.
+
+  The property that matters is that it **fails open**: no text, or no recognised
+  term, means relevant. A pre-filter that guesses rejects a real game silently,
+  and a rejected game is not an error — it is a stream nobody gets. It also never
+  overrides an approved channel (the BBL channel is basketball by definition,
+  whatever it is streaming), and it is not Check 3 or Check 4, which remain the
+  authoritative answers.
+
+  Writing the tests caught the exact bug the design was meant to prevent: the
+  first vocabulary was missing `regionalliga`, and `tests/test_relevance.py`
+  failed on *"Regionalliga Nord Spieltag 12 LIVE"* — a real German league fixture
+  refused as off-topic noise. The vocabulary is now broad over the German pyramid
+  and the major European competitions, and the residual incompleteness is
+  documented in the module rather than left implicit, because a fixed list can
+  only be kept safe by adding to it. The off-topic strings in the test are taken
+  verbatim from `logs/run-log.jsonl`, not invented.
+
+### Verified (no change)
+
+- `euroleaguebasketball.net` cannot be captured from this environment (uniform
+  429 across four URL/UA combinations), so `fixture_recall` still has a
+  denominator of one league. **No capture was fabricated**: `tests/fixtures/README.md`
+  requires outputs to be captured, and a hand-written page presented as a
+  recording would be invented evidence. Closing this needs either a rendered BBL
+  capture or a non-blocked EuroLeague fetch.
+
+
 ## [Unreleased]
+
 
 
 
