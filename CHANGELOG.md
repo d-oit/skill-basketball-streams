@@ -445,6 +445,92 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that reverts to a truthiness check.
 
 
+## [1.10.0] - 2026-09-30
+
+### Added
+
+- **`config/retired-sources.json` + `scripts/check_retired_sources.py` — the
+  negative registry, and the `retired-sources` sensor that replaces
+  `source-registry`.** `config/sources.json` can say which hosts are approved;
+  it cannot say which ones **failed**, and that is the half that mattered. The
+  BBL's old host stopped serving, the correction was written into the registry
+  and into a prose note, and `fixtures.py` kept fetching the dead URL for
+  months — reporting a TLS error whose real cause was a stale string. A failure
+  and an absent entry look identical from the positive registry's side.
+
+  The gate reads the three places a source can be *declared*:
+  `config/sources.json` (domains, social hosts, handles), `DEFAULT_SOURCES`, and
+  the **Domains column** of `references/approved-sources.md`. That last one is
+  the interesting constraint: the document *must* be able to name a retired
+  domain in its Notes column, because that is where a human is told why it was
+  retired, so a check over the whole file would forbid the explanation and force
+  the retirement to go undocumented — which is how the next person re-adds the
+  host. An **empty or missing** negative list is refused rather than passed: a
+  gate with nothing to check passes on anything.
+
+  Verified failing on all three real mutations: the dead URL restored in
+  `DEFAULT_SOURCES` (the exact 2026-09-30 defect), the dead host appended to the
+  BBL registry entry, and the dead host restored to the doc's Domains column.
+
+### Removed
+
+- **The `source-registry` sensor.** It could not fail and it read an input CI
+  does not have — two requirements, both met by nothing. `source_learning.py
+  candidates` **returns 0 on every branch**, so candidates found and none found
+  are both a pass; and its input `logs/run-log.jsonl` is **gitignored**, so on a
+  CI runner the file was absent, `read_log` returned `[]`, and the sensor
+  printed `OK: source_learning: no new source candidates found` and passed. A
+  green that asserted nothing about anything, in a set whose whole purpose is
+  to be evidence. Locally it printed its findings **prefixed `OK:`** — a
+  quarantined domain read as a success, which is the `SKIP:` trap inverted.
+
+  `source_learning.py candidates` is unchanged and still useful: as a *report*
+  over the local run log, for a human deciding whether to approve a domain. It
+  was never a gate.
+
+### Fixed
+
+- **A rule that was obviously right and forbade the fix.** The new gate first
+  matched a retired domain's **subdomains** too, on the reasonable argument that
+  retiring `example.com` while leaving `api.example.com` approved retires
+  nothing. It failed immediately on this repository's own committed state:
+  `api.basketball-bundesliga.de` is a subdomain of the retired web host, and it
+  is where the league serves the feed that *fixed* the defect the gate was
+  written to prevent. A host failure is about that host, so matching is exact by
+  default and the stricter rule is opt-in per entry
+  (`"takes_subdomains": true`). Two smaller gaps came out of the same tests: a
+  port was not stripped from a host (`example.de:443` never matched
+  `example.de`), and `_matches` trusted its caller to have normalised — which
+  turns a retirement into a no-op, silently. It normalises now.
+
+- **`do-harness` pinned to `v0.1.2`**, up from `v0.1.0`, in `verify.yml`,
+  `AGENTS.md` and `docs/do-harness.md`. The divergence had been left standing
+  because `tests/test_harness_boundary.py::test_documented_pin_matches_the_workflow`
+  enforces the CI value, so the docs could not be moved alone — correct, and the
+  right resolution was to move the pin, not the test.
+
+  Every defect claim in `docs/do-harness.md` was then **re-measured on 0.1.2**,
+  because the document asserted them as "observed, not inferred" and one of them
+  no longer holds:
+
+  - §1, "`do-harness eval` SIGSEGVs on its second invocation" — **does not
+    reproduce.** Three consecutive `do-harness eval` runs on a *fresh*
+    `git archive` checkout (no `.do-harness`, no `logs/`, no `.tmp` — the shape
+    CI gets) all exited **0**, and the third printed real per-skill output
+    rather than dying silently. The old framing — "invisible in a long-lived
+    working copy, appears only on a fresh checkout" — described 0.1.0. The
+    workflow's mitigations are **kept**, on a different and still-valid
+    argument: `eval` grades only `.agents/skills` and never the root skill, so
+    per Step 6 it is supplemental by construction, and a supplemental step
+    should not be able to red the build. The SIGSEGV argument is gone and
+    should not be cited again without measuring it.
+  - §3, `verify --record` segfaulting on the full set — **confirmed still
+    present**: `feedback` (2) and `verification` (19) record cleanly, `release`
+    (21) exits 139 before any sensor runs. The file is upstream as
+    [d-o-hub/do-harness#267](https://github.com/d-o-hub/do-harness/issues/267).
+    Sensor counts throughout the two files are corrected for the new
+    `feed-corpus` sensor (20 → 21).
+
 ## [1.9.0] - 2026-09-30
 
 ### Added
