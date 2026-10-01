@@ -263,6 +263,56 @@ class TestCliCandidates:
         assert result.returncode == 0
         assert "no new source candidates" in result.stdout
 
+    def test_discovery_never_widens_the_approved_registry(self, tmp_path):
+        """The trust boundary, asserted as a behaviour rather than a design.
+
+        This is the whole content of the `security` invariant *"a newly
+        discovered source domain stays quarantined until a human promotes it"*,
+        and until now nothing asserted it: no script writes
+        `config/sources.json`, but that is a fact about the code as written, and
+        the sensor that used to be attached to this invariant
+        (`source-registry`) **could not fail** — it returned 0 whether or not
+        candidates were found, so it never once checked the thing.
+
+        A run log full of unapproved domains is therefore the interesting input:
+        it is exactly the case where promoting would be tempting and wrong. The
+        approved registry must come out byte-identical, and the discoveries must
+        land in the quarantine file instead.
+        """
+        before = (REPO_ROOT / "config" / "sources.json").read_bytes()
+        log = tmp_path / "run-log.jsonl"
+        log.write_text(
+            "\n".join(
+                json.dumps(_entry("x", "hit", url))
+                for url in (
+                    "https://new-basketball.tv/live/1",
+                    "https://hoops.example/live/2",
+                    "https://new-basketball.tv/live/3",
+                )
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        out = tmp_path / "quarantine.json"
+        result = _run(
+            ["candidates", "--root", str(REPO_ROOT), "--log", str(log),
+             "--out", str(out)]
+        )
+        assert result.returncode == 0, result.stderr
+        assert (REPO_ROOT / "config" / "sources.json").read_bytes() == before, (
+            "discovery promoted a domain into the approved registry; quarantine "
+            "means a human decides, in a PR"
+        )
+        payload = json.loads(out.read_text(encoding="utf-8"))
+        assert {c["domain"] for c in payload["candidates"]} == {
+            "new-basketball.tv",
+            "hoops.example",
+        }
+        assert all(c["status"] == "quarantined" for c in payload["candidates"])
+        # And the same holds on the real run log, not only a fabricated one.
+        _run(["candidates", "--root", str(REPO_ROOT)])
+        assert (REPO_ROOT / "config" / "sources.json").read_bytes() == before
+
     def test_quarantine_write_and_dry_run(self, tmp_path):
         log = tmp_path / "run-log.jsonl"
         log.write_text(

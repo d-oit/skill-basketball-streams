@@ -1,0 +1,18 @@
+{
+  "$comment": "Domains this repository has PROVEN cannot serve a source, and the evidence. The positive registry is config/sources.json; this is its negative, and `scripts/check_retired_sources.py` fails if a retired domain is declared as a source again. It exists because the positive list cannot record a failure: a domain that stopped working looked identical to one that never did, so the correction lived only in a note and in whichever file happened to be edited that day. `references/approved-sources.md` MUST still be able to name a retired domain in its Notes column -- that is where the retirement is explained to a human -- so only the Domains column is checked there.",
+  "version": "1.0.0",
+  "retired": [
+    {
+      "domain": "basketball-bundesliga.de",
+      "retired_on": "2026-09-17",
+      "verified_on": "2026-09-30",
+      "failure": "tls-sni",
+      "reason": "The league's former primary host. DNS still resolves, but every TLS handshake fails with `tlsv1 unrecognized name` on both the bare and the `www` host, so no request ever reaches a body. A plain GET returns nothing at all, which is why the BBL source could not produce a fixture and its `fixture_recall` contribution was permanently zero while the daily run reported a TLS error whose real cause was a stale URL.",
+      "evidence": "Measured on the bare and `www` hosts, 2026-09-17 and re-verified 2026-09-30. `scripts/fixtures.py` kept this URL long after the registry had been corrected, because nothing connected the registry to the fetcher -- that gap is now closed by `tests/test_fixtures.py::TestFixtureSourcesAreApproved`.",
+      "replaced_by": [
+        "easycredit-bbl.de",
+        "api.basketball-bundesliga.de"
+      ]
+    }
+  ]
+}

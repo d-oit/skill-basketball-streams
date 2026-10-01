@@ -8,7 +8,7 @@ The `do-harness` CLI must be on `PATH`, or `DO_HARNESS_BIN` must point at it.
 Pin the version this repository was initialized with:
 
     curl -fsSL https://raw.githubusercontent.com/d-o-hub/do-harness/main/scripts/install.sh \
-      | sh -s -- --version v0.1.0
+      | sh -s -- --version v0.1.2
 
 Rust developers can instead build from a checkout with
 `cargo install --path <do-harness>/crates/do-harness`.
@@ -158,6 +158,25 @@ Seven traps, each learned the hard way:
   A sensor is deliberately *not* added for it: `parked` cannot assert an exit
   code, and a sensor that cannot fail is the vacuous pass this list exists to
   prevent. `pytest` is the gate, and `pytest` already watches `scripts/**`.
+- **A sensor that cannot fail, or that reads an input CI does not have, is not
+  a sensor — it is decoration that a future reader will trust.** Two
+  requirements, both learned the hard way. `source-registry` met neither:
+  `source_learning.py candidates` **returns 0 on every branch** (candidates
+  found and none found are both a pass), *and* its input
+  `logs/run-log.jsonl` is gitignored, so on a CI runner the file was absent,
+  `read_log` returned `[]`, and it printed `OK: source_learning: no new source
+  candidates found` and passed — a green that asserted nothing about anything.
+  Locally it printed its findings **prefixed `OK:`**, so a quarantined domain
+  read as a success; that is the `SKIP:` trap inverted, where a real finding is
+  dressed as a pass. Replaced by `retired-sources`
+  (`scripts/check_retired_sources.py` + `config/retired-sources.json`), which
+  reads committed evidence, can fail, and covers the half the positive registry
+  structurally cannot: **a domain that is approved and no longer works**. Before
+  adding any sensor, ask what its *worst* outcome is and where the input comes
+  from; if the answer is “it exits 0” or “the file is gitignored”, it is not a
+  gate. And when a rule needs a **stricter** variant, make the strictness
+  explicit and per-entry — the subdomain rule in that gate looked obviously right
+  and fired on the repository's own fix for the defect it was written to prevent.
 - **A rule that reads a field nothing writes is not enforced.** Two instances in
   one week, both about a fact that existed everywhere except where the rule
   looked. `upsert_events.events_match` compares the `Teams:` line of the event
@@ -206,6 +225,15 @@ recording a subset after its superset leaves the superset `stale`
 (`policy_changed`) even though nothing regressed. If in doubt, run `release`
 last; it is the superset, and a green `release` is the strongest single claim.
 
+**`--record` on a single sensor does work**, scoped to a task, which is how
+`do-harness task advance` gates a subtask:
+
+    do-harness verify --only pytest --strict --record --task 5
+    do-harness task advance 5
+
+The size boundary in the next paragraph is about *resolved sets*, not about
+recording one sensor.
+
     for s in feedback verification release; do
       do-harness verify --set "$s" --strict --record
     done
@@ -213,10 +241,11 @@ last; it is the superset, and a green `release` is the strongest single claim.
 **Drop `--record` on `release` until [d-o-hub/do-harness#267] is fixed.** That
 loop above dies on its **third** iteration: `verify --set release --strict
 --record` exits **139 (SIGSEGV)** on 0.1.1 and 0.1.2, *before any sensor runs* —
-no `PASS`/`FAIL` output at all. `feedback` (2 sensors) and `verification` (18)
-record fine, so the trigger is the resolved set's size, not the flag in general;
-the same 20 `[[sensors]]` in a config with no `[signal-sets]` table records
-cleanly. See `docs/do-harness.md` → Known defects §3.
+no `PASS`/`FAIL` output at all. Re-confirmed on the pinned 0.1.2: `feedback`
+(2 sensors) and `verification` (19) record fine, so the trigger is the resolved
+set's size, not the flag in general; the same 21 `[[sensors]]` in a config with
+no `[signal-sets]` table records cleanly. See `docs/do-harness.md` → Known
+defects §3.
 
 `--record` is **not** what writes the evidence. A plain run stamps the same file,
 so the working loop is:

@@ -43,8 +43,8 @@
   },
   {
     "invariant": "A newly discovered source domain stays quarantined until a human promotes it in a PR that also adds an accept and a reject eval case",
-    "rationale": "The runtime is allowed to learn, but it may not widen its own trust boundary. Quarantine keeps recall improvements from becoming an unreviewed allow-list change.",
-    "sensor": "source-registry",
+    "rationale": "The runtime is allowed to learn, but it may not widen its own trust boundary. Quarantine keeps recall improvements from becoming an unreviewed allow-list change. Enforced on both sides of the boundary: `tests/test_source_learning.py` asserts a discovery run leaves `config/sources.json` byte-identical and writes the quarantine file instead, and the `retired-sources` gate holds the other half -- a host that was proven dead cannot come back. The two halves used to share one sensor that checked neither: `source-registry` returned 0 on every branch and read a gitignored log, so in CI it passed having asserted nothing.",
+    "sensor": "retired-sources",
     "category": "security"
   },
   {

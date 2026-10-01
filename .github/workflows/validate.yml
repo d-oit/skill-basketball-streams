@@ -249,5 +249,12 @@ jobs:
       - name: Run record_feeds (feed corpus gate)
         run: python3 scripts/record_feeds.py --check
 
+      # A domain that is approved and no longer works. `config/sources.json` can
+      # say what is allowed; only the negative list can say what was proven
+      # dead, which is the half that was missing when the BBL fetcher kept a
+      # TLS-failing URL for months while the registry had been corrected.
+      - name: Run check_retired_sources (negative registry gate)
+        run: python3 scripts/check_retired_sources.py --root .
+
       - name: Run pytest
         run: python3 -m pytest tests/ -v --tb=short
