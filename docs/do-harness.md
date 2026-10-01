@@ -27,7 +27,7 @@ agents and CI must pass.
 | Decision | Choice |
 |---|---|
 | Adoption depth | **Executed** — config, sensors, invariants, contract, hooks and CI. |
-| Binary acquisition | **Pinned prebuilt installer**, `--version v0.1.0`, checksum-verified into `$HOME/.local/bin`. |
+| Binary acquisition | **Pinned prebuilt installer**, `--version v0.1.2`, checksum-verified into `$HOME/.local/bin`. |
 | Grading authority | **The four product graders stay** (withdrawn from "`do-harness eval` only" — `eval` never sees the root skill). `do-harness eval` runs *in addition*, for the tooling skills. |
 
 ## Relationship to the runtime that now exists
@@ -78,7 +78,7 @@ described in `references/self-learning.md`.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/d-o-hub/do-harness/main/scripts/install.sh \
-  | sh -s -- --version v0.1.0
+  | sh -s -- --version v0.1.2
 export PATH="$HOME/.local/bin:$PATH"
 do-harness --version
 ```
@@ -86,7 +86,7 @@ do-harness --version
 The installer verifies the artifact against the release `checksums.txt` before
 installing. Those checksums share the release origin, so they detect corruption
 and truncated downloads — **not** a compromised origin. Record the pin in CI as
-a literal `v0.1.0`; do not track `latest`.
+a literal `v0.1.2`; do not track `latest`.
 
 Do **not** vendor the Rust source, and never build it into this repo's shared
 `target/` directory if the decision ever changes — `cargo clean` in this
@@ -192,10 +192,10 @@ argv = ["python3", "scripts/youtube_live.py", "--input",
 when-changed = ["scripts/youtube_live.py", "tests/fixtures/**"]
 
 [[sensors]]
-name = "source-registry"
-argv = ["python3", "scripts/source_learning.py", "candidates", "--root", ".",
-        "--dry-run"]
-when-changed = ["config/sources.json", "scripts/source_learning.py"]
+name = "retired-sources"
+argv = ["python3", "scripts/check_retired_sources.py", "--root", "."]
+when-changed = ["config/retired-sources.json", "config/sources.json",
+        "scripts/fixtures.py", "references/approved-sources.md"]
 
 [[sensors]]
 name = "link-gate"
@@ -211,9 +211,9 @@ when-changed = ["SKILL.md", "CHANGELOG.md"]
 [signal-sets]
 feedback     = ["skill-contract", "validate-smoke"]
 verification = ["skill-contract", "validate-smoke", "runtime-eval", "pytest",
-                "live-gate", "source-registry"]
+                "live-gate", "retired-sources"]
 release      = ["skill-contract", "validate-smoke", "runtime-eval", "pytest",
-                "live-gate", "source-registry", "link-gate", "version-sync"]
+                "live-gate", "retired-sources", "link-gate", "version-sync"]
 ```
 
 Two prerequisites this table assumes:
@@ -347,7 +347,7 @@ or harness regression cannot red the existing Python 3.9/3.12 matrix.
 ```yaml
 - run: |
     curl -fsSL https://raw.githubusercontent.com/d-o-hub/do-harness/main/scripts/install.sh \
-      | sh -s -- --version v0.1.0
+      | sh -s -- --version v0.1.2
     echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 - run: do-harness doctor
 - run: do-harness verify --set verification --format json --strict --evidence .do-harness/evidence.json
@@ -430,11 +430,11 @@ permanent, unexplained failure. `do-harness errors list` and
 `errors clear --sensor <name>` are the escape hatch; both `AGENTS.md` and
 `.github/workflows/verify.yml` surface this.
 
-## Known defects in `do-harness` v0.1.0 (observed, not inferred)
+## Known defects in `do-harness` v0.1.2 (observed, not inferred)
 
-Both of these are invisible in a long-lived working copy and appear only on a
-fresh checkout — which is to say, only in CI. They were found by replaying the
-workflow against a fresh tree rather than by trusting a green local run.
+These were found by replaying the workflow against a fresh tree rather than by
+trusting a green local run, and every claim below was **re-measured on 0.1.2**
+when the pin moved from 0.1.0 (see §1 for the one that no longer reproduces).
 
 The replay is now a script rather than a recipe, because it was re-derived by
 hand three times and has two traps that fail *misleadingly*:
@@ -470,7 +470,9 @@ consequences worth knowing before you read a red replay:
   looks *configured* to a backend and can start real network calls with a bogus
   key — strictly worse than an obviously empty value.
 
-### 1. `do-harness eval` SIGSEGVs on its second invocation
+### 1. `do-harness eval` SIGSEGVs on its second invocation — **does not reproduce on 0.1.2**
+
+Originally observed on 0.1.0:
 
 ```console
 $ rm -rf .do-harness
@@ -478,39 +480,47 @@ $ do-harness eval   # exit 0, and it creates .do-harness/agent_state.db
 $ do-harness eval   # exit 139 (SIGSEGV), no stdout, no stderr
 ```
 
-Any command that creates the state database first triggers it too — `seed`
+Any command that creates the state database first triggered it too — `seed`
 does, and so does `verify --record`:
 
 ```console
 $ rm -rf .do-harness && do-harness seed && do-harness eval   # seed 0, eval 139
 ```
 
-> **Correction (2026-09-30), and this is a different bug.** The sentence above
-> reads as "`verify --record` crashes the same way". It does not. Measured on
-> **0.1.1** and **0.1.2** in this working copy, `verify --record` succeeds for
-> `feedback` (2 sensors) and `verification` (18) and crashes only when the set
-> resolves the full 20 — a set-size boundary, not a first-vs-second-invocation
-> one. Filed upstream as [d-o-hub/do-harness#267](https://github.com/d-o-hub/do-harness/issues/267)
-> and described in full in section 3 below. Do not add `verify --record` to the
-> list of things that "trigger" this defect without measuring it first; the two
-> failures have different triggers and only one of them is size-related.
+> **Re-measured on 0.1.2, 2026-09-30: not reproduced.** Three consecutive
+> `do-harness eval` runs on a **fresh `git archive` checkout** (the shape CI
+> gets: no `.do-harness`, no `logs/`, no `.tmp`) all exited **0**, and the third
+> printed real per-skill output rather than dying silently. The old claim that
+> the defect "appears only on a fresh checkout — which is to say, only in CI"
+> was therefore describing 0.1.0 and no longer holds for the pinned version.
+>
+> The mitigations below are **kept anyway**, and the reason is not the crash:
+> `eval` grades only `.agents/skills/{harness,skill-creator}` and never the root
+> skill (see `AGENTS.md`), so per Step 6 it is supplemental by construction, and
+> a supplemental step should not be able to red the build. That argument holds
+> whatever upstream does next; the SIGSEGV argument does not, and should not be
+> cited again without measuring it.
 
-It does **not** reproduce in this repository's working copy, where repeated
-`eval` runs return 0. The trees were verified byte-identical (`diff -rq`,
-excluding `.git`/ignored paths) between the crashing copy and the working one,
-and a minimal tree (`do-harness.toml` + `.agents/`) does not crash at all, so the
-trigger is not simply "outside the original directory" or "a copy". What is
-established is the reproduction, which is what the workflow is designed around.
+> **Correction (2026-09-30), and this is a different bug.** The `verify --record`
+> sentence above reads as "it crashes the same way". It does not. Measured on
+> **0.1.1** and **0.1.2**, `verify --record` succeeds for `feedback` (2 sensors)
+> and `verification` (19) and crashes only when the set resolves the full 21 — a
+> set-size boundary, not a first-vs-second-invocation one. Filed upstream as
+> [d-o-hub/do-harness#267](https://github.com/d-o-hub/do-harness/issues/267) and
+> described in full in section 3 below. Do not add `verify --record` to the list
+> of things that "trigger" this defect without measuring it first; the two
+> failures have different triggers and only one of them is size-related.
 
 **Mitigations, both deliberate** (`.github/workflows/verify.yml`):
 
 - `eval` runs **first**, before anything creates the database.
 - `eval` is `continue-on-error: true`. It grades only `.agents/skills`, so per
-  Step 6 it is supplemental; an upstream crash must not red the build, and the
+  Step 6 it is supplemental; an upstream failure must not red the build, and the
   step must stay visible rather than be deleted.
 - `seed` is **not** run in CI at all. On an ephemeral runner it proves nothing
   the `invariants-shape` sensor and `tests/test_harness_boundary.py` do not
-  already prove, and it is one of the ways to trigger the crash.
+  already prove, and it is one of the documented ways to create the database
+  that §3 shows to be the crashing input.
 
 `tests/test_harness_boundary.py` pins the ordering (`eval` before `verify`) and
 the tolerance, so a later reordering cannot silently reintroduce this.
@@ -528,19 +538,21 @@ and prints a notice instead.
 Harmless in CI, where `actions/checkout` always provides one, but it means
 `doctor` cannot be used as a smoke test in a plain directory.
 
-### 3. `verify --record` SIGSEGVs on the full 20-sensor set
+### 3. `verify --record` SIGSEGVs on the full 21-sensor set
 
 Distinct from section 1, and worse for this repository specifically. Filed
 upstream: [d-o-hub/do-harness#267](https://github.com/d-o-hub/do-harness/issues/267).
 Reproduces on 0.1.1 and 0.1.2, in a long-lived working copy (so unlike section 1
-it is *not* a fresh-checkout-only defect), 5/5 attempts.
+it is *not* a fresh-checkout-only defect), 5/5 attempts. **Re-confirmed on 0.1.2**
+when the pin moved, on a fresh checkout: `feedback` (2) and `verification` (19)
+recorded cleanly, `release` (21) exited 139 with no sensor output at all.
 
 ```console
 $ do-harness verify --set feedback     --strict --record; echo "exit=$?"   # exit 0,  2 sensors
-$ do-harness verify --set verification --strict --record; echo "exit=$?"   # exit 0, 18 sensors
+$ do-harness verify --set verification --strict --record; echo "exit=$?"   # exit 0, 19 sensors
 $ do-harness verify --set release      --strict --record; echo "exit=$?"   # exit 139
 $ do-harness verify                    --strict --record; echo "exit=$?"   # exit 139
-$ do-harness verify --set release      --strict;          echo "exit=$?"   # exit 0, 20 sensors
+$ do-harness verify --set release      --strict;          echo "exit=$?"   # exit 0, 21 sensors
 ```
 
 `--record` is the discriminator, and it is the *only* thing that breaks. The
@@ -561,7 +573,7 @@ So dropping `--record` is a working workaround, not a loss of evidence, and
 the first version of this note claimed the opposite and was wrong.)
 
 The boundary is the recorded set's size, not a limit on sensor count: a config
-holding the same 20 `[[sensors]]` blocks but **no** `[signal-sets]` table records
+holding the same 21 `[[sensors]]` blocks but **no** `[signal-sets]` table records
 cleanly. So it is the record path for a *resolved* set that fails, not sensor
 execution.
 
