@@ -48,9 +48,21 @@ argv = [
 when-changed = ["scripts/youtube_live.py", "tests/fixtures/**"]
 
 [[sensors]]
-name = "source-registry"
-argv = ["python3", "scripts/source_learning.py", "candidates", "--root", ".", "--dry-run"]
-when-changed = ["config/sources.json", "scripts/source_learning.py"]
+name = "retired-sources"
+# Replaces `source-registry`, which could not fail and read an input CI does not
+# have: `source_learning.py candidates` returns 0 on every branch, and its input
+# `logs/run-log.jsonl` is gitignored, so in CI the file was absent and the
+# sensor reported "no new source candidates found" and passed -- asserting
+# nothing about anything. Locally it printed its findings prefixed `OK:`, so a
+# quarantined domain read as a pass.
+#
+# This gate reads committed evidence, can fail, and covers the half the positive
+# registry structurally cannot: a domain that is approved and no longer works.
+# `config/sources.json` can say what is allowed; only this can say what was
+# proven dead. The BBL's old host is the case -- corrected in the registry and in
+# a prose note, and fetched anyway for months.
+argv = ["python3", "scripts/check_retired_sources.py", "--root", "."]
+when-changed = ["config/retired-sources.json", "config/sources.json", "scripts/fixtures.py", "references/approved-sources.md", "scripts/check_retired_sources.py"]
 
 [[sensors]]
 name = "link-gate"
@@ -234,7 +246,7 @@ verification = [
   "runtime-eval",
   "pytest",
   "live-gate",
-  "source-registry",
+  "retired-sources",
   "invariants-shape",
   "workflow-refs",
   "page-corpus",
@@ -255,7 +267,7 @@ release = [
   "runtime-eval",
   "pytest",
   "live-gate",
-  "source-registry",
+  "retired-sources",
   "invariants-shape",
   "workflow-refs",
   "page-corpus",
