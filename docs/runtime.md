@@ -107,6 +107,30 @@ The audit job renders it into its summary (`Funnel report`, recomputed with
 `--dry-run` so the step cannot drift from the snapshot the branch holds; pinned
 by `tests/test_funnel_wiring.py`). `metrics.py --funnel` prints it locally.
 
+## The runtime agent's permission restriction, enforced
+
+A live verification (2026-10-02) found the documented security control — "the
+runtime agent is denied `edit` and `bash`" — **was not in force in production**.
+The workflow created a permission-restricted agent and then ran the CLI without
+`--agent`, so every run was served by the default agent (`*: allow`). The
+2026-10-01 production transcript shows the agent running `env | grep -i
+composio`, listing for secret files, and calling `scripts/calendar_io.py list`
+directly — the exact behaviour the workflow's own comment claimed was
+impossible. Two CLI facts (verified on the pinned 1.18.33 binary) shape the fix:
+
+* `--agent <wrong-name>` does **not** error — it silently falls back to the
+  default agent, so the generated agent's name is verified discoverable via
+  `opencode agent list` before the run, and read from the create step rather
+  than hardcoded (the name is LLM-chosen);
+* a malformed permission frontmatter key is silently ignored — so the claim is
+  additionally **asserted against the transcript after the run**: any
+  `"tool":"bash"` or `"tool":"edit"` event reds the job. The security invariant
+  is enforced evidence, not documentation.
+
+Pinned by `tests/test_agent_permission_wiring.py`. The transcript the
+assertion reads is the same one the audit grades and files, so a violation
+leaves its evidence on the telemetry branch.
+
 ## Verification states
 
 Every event carries one of three states (`scripts/verification.py`). The state,

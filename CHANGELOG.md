@@ -97,6 +97,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The permission-restricted runtime agent was never actually used.** A live
+  verification (2026-10-02) found the documented security control — "the runtime
+  agent is denied `edit` and `bash`" — was not in force: the workflow created
+  a restricted agent and then ran the CLI without `--agent`, so every
+  production run was served by the default agent, whose permission set is
+  `*: allow`. The 2026-10-01 production transcript shows the agent running
+  `env | grep -i composio`, listing for secret files, and calling
+  `scripts/calendar_io.py list` directly. Two CLI facts (verified on the
+  pinned 1.18.33 binary) shape the fix: a wrong `--agent` name silently falls
+  back (so the LLM-chosen name is read from the create step and verified
+  discoverable via `opencode agent list` before the run), and a malformed
+  permission frontmatter key is silently ignored (so the claim is asserted
+  against the transcript after the run — any `bash`/`edit` tool event reds
+  the job). Pinned by `tests/test_agent_permission_wiring.py`.
+
 - **A transcript preflight that could never succeed, removed.** The
   `Extract the candidates the agent found` step "preflighted" its transcript
   with `capture_transcripts.py --runner replay --from .tmp/transcript.json
