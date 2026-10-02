@@ -236,7 +236,17 @@ def _execute_tool(
         with urllib.request.urlopen(request, timeout=timeout) as response:
             payload = response.read().decode("utf-8", "replace")
     except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", "replace") if exc.fp else ""
+        # `read()` is bytes when the error carries a real response body, but not
+        # every HTTPError does: one raised without a `fp` (a stub in a test, a
+        # different Python minor version, a transport that never opened the
+        # body) can return a str or raise instead — and `.decode()` on a str is
+        # an AttributeError that masks the HTTP error it was reporting. The
+        # caller still gets the status and Composio's reason either way.
+        raw = exc.read() if exc.fp else b""
+        if isinstance(raw, bytes):
+            detail = raw.decode("utf-8", "replace")
+        else:
+            detail = str(raw or "")
         # Composio's error body carries its own reason and a request id; the API
         # key never appears in it.
         raise CalendarError(exc.code, detail[:500] or exc.reason) from exc

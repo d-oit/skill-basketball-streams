@@ -455,6 +455,11 @@ telemetry/                      # orphan branch, never merged to main
   candidates.jsonl              the recall denominator (§8 item 1) — every surfaced candidate
   audit.jsonl                   post-hoc audit verdicts (§7 item 5)
   events.jsonl                  created/updated/quarantined calendar events, keyed by event_id
+  transcripts/                  one file per daily skill run (§9.1): the raw agent transcript,
+                                graded on arrival by scripts/extract_candidates.py and kept
+                                append-only, because the transcript a run leaves behind is the
+                                evidence the self-improvement loop (§9.2) and a human operator
+                                both read after a misjudgement
   metrics.json                  rolling aggregates (rewritten each run, current-state snapshot)
   sources.json                  per-source score snapshot from source_learning.py
   rung-attempts.jsonl           one row per rung per host per run (append-only)

@@ -11,7 +11,7 @@ Operator guide for the daily streams runtime. Design rationale lives in
 | 0 — candidate ledger | `runtime-daily.yml` → `telemetry` | **never** | implemented |
 | 1 — skill run, dry-run | `runtime-daily.yml` → `runtime` | gated off by default | implemented |
 | 2 — writes with honest labelling | `runtime-daily.yml` → `runtime` | via `ENABLE_CALENDAR_WRITES` + `write_mode.py` | implemented |
-| 3 — post-hoc audit | `runtime-daily.yml` → `audit` | read + relabel | implemented |
+| 3 — post-hoc audit | `runtime-daily.yml` → `audit` | read + relabel, grades and files the run's transcript | implemented |
 | 4 — self-improvement branch | `self-improve.yml` | none | implemented |
 | 5 — official-fixture ground truth | manual / cron | none | implemented |
 | 6 — evidence corpus stays true | `corpus-refresh.yml` | none | implemented |
@@ -22,6 +22,20 @@ not code but **inputs**: real transcripts have never been captured
 (`tests/fixtures/runtime_transcripts.json` is absent by design), so the grader has
 never graded a real run, and the pre-fix-red property of a synthesised eval case is
 asserted rather than demonstrated.
+
+That statement had two halves, and one is now closed. The **per-case** capture
+(`tests/fixtures/runtime_transcripts.json`) remains absent by design — it needs a
+credential and one transcript per eval case, so it stays a local, deliberate act
+(`tests/fixtures/README.md`). But the **daily** transcript no longer dies with the
+30-day artifact retention: the `audit` job downloads the `runtime` job's
+`runtime-transcript` artifact, grades it with the same seam-grader the planner uses
+(`scripts/extract_candidates.py` — exit 1 is reported as an honest quiet day or a
+failed emission, never red), and files it append-only on the telemetry branch under
+`transcripts/<run-id>-runtime.json`. From that change on, every real run is graded,
+every day, in dry-run too, and the transcript a misjudgement came from is on the
+branch for the self-improvement loop to read. The wiring is pinned by
+`tests/test_transcript_ledger_wiring.py`, so removing the writer fails the suite
+rather than producing another quiet-looking gap.
 
 ## Verification states
 

@@ -5,6 +5,52 @@ All notable changes to `skill-basketball-streams` will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-10-02
+
+### Added
+
+- **Every daily run's transcript is now graded, every day, and kept.** The
+  `runtime` job produced a real agent transcript on every run and uploaded it
+  as the `runtime-transcript` artifact — where it died with the 30-day
+  retention while every consumer of the telemetry branch found nothing to read.
+  `docs/runtime.md`'s honest gap ("the grader has never graded a real run") had
+  two halves; the daily half is now closed. The `audit` job (the same
+  producer/filer split as `run-ledger`: the `runtime` job holds the calendar
+  credential and no `contents: write`, the audit job holds the write and no
+  calendar credential) downloads the transcript, files it append-only on the
+  telemetry branch as `transcripts/<run-id>-runtime.json`, and grades it with
+  the same seam-grader the planner uses (`scripts/extract_candidates.py`). The
+  grade is a report, not a gate, for one reason: exit 1 is also what an honest
+  quiet day grades as, and a quiet day must never red a run — the filed
+  transcript is what tells a quiet day from a failed emission after the fact.
+  Exit 2 (unreadable input) still reds. The grade lands in the job summary
+  (`Transcript filed` / `Transcript graded`), and the wiring — producer,
+  artifact-name match across the handoff, file-before-grade ordering, filing
+  before the commit — is pinned by
+  `tests/test_transcript_ledger_wiring.py`, so removing the writer fails the
+  suite rather than producing another quiet-looking gap.
+
+### Fixed
+
+- **A transcript preflight that could never succeed, removed.** The
+  `Extract the candidates the agent found` step "preflighted" its transcript
+  with `capture_transcripts.py --runner replay --from .tmp/transcript.json
+  --check >/dev/null 2>&1 || true` — a call whose contract is one usable
+  transcript per *eval case*; the raw run stream is none of them, so it exited
+  non-zero on every run and the `|| true` hid exactly that. The documented
+  anti-pattern (a step that tolerates a failure without saying why is a step
+  that has never run), in the exact step that reads the transcript. Removed
+  rather than repaired: `extract_candidates.py` in the same step is the real
+  contract enforcement, and the audit job now grades the filed copy too.
+
+- **`calendar_io` could crash reporting an HTTP error.** `_execute_tool` read
+  the error body with `exc.read().decode(...)` — bytes when the `HTTPError`
+  carries a real response body, but an `HTTPError` raised without one (a stub
+  in a test, a different Python minor version) makes `read()` return `str`, and
+  `.decode()` on a `str` is an `AttributeError` that masks the HTTP error it
+  was reporting. Now type-checked; the caller still gets the status and
+  Composio's reason either way.
+
 ## [1.6.0] - 2026-09-29
 
 ### Added

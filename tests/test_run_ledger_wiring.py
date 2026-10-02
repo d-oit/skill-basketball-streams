@@ -81,6 +81,26 @@ def _without_comments(text: str) -> str:
     )
 
 
+def _ledger_download() -> str:
+    """The `run-ledger` download specifically.
+
+    The audit job now has two `download-artifact` steps — this one and the
+    transcript filer (pinned in `tests/test_transcript_ledger_wiring.py`) — so
+    a needle of just `actions/download-artifact` is ambiguous, and a pin
+    satisfied by either download is a pin that passes while the run-ledger
+    handoff is broken. Matched on the indented `name:` key because the step's
+    own comment mentions the other artifact too.
+    """
+    matches = [
+        s
+        for s in _steps(_jobs()["audit"])
+        if "actions/download-artifact" in s
+        and re.search(r"^\s+name: run-ledger\s*$", s, re.M)
+    ]
+    assert len(matches) == 1, "expected exactly one run-ledger download"
+    return matches[0]
+
+
 LEDGER_STEP = "Record what was written (Phase 3 input)"
 PLAN_STEP = "Plan the calendar writes (no API calls)"
 VERDICTS_STEP = "Read the audit verdict ledger"
@@ -156,21 +176,20 @@ class TestTheArtifactHandoff:
         assert EVIDENCE_NAME in step
 
     def test_the_audit_job_downloads_the_same_artifact(self):
-        step = _find(_jobs()["audit"], "actions/download-artifact")
+        step = _ledger_download()
+        assert "actions/download-artifact" in step
         assert "name: run-ledger" in _find(_jobs()["runtime"], "name: run-ledger")
 
     def test_the_artifact_name_matches_on_both_sides(self):
         upload = re.search(
             r"name: (run-ledger)", _find(_jobs()["runtime"], "name: run-ledger")
         )
-        download = re.search(
-            r"name: (run-ledger)", _find(_jobs()["audit"], "actions/download-artifact")
-        )
+        download = re.search(r"name: (run-ledger)", _ledger_download())
         assert upload and download
         assert upload.group(1) == download.group(1)
 
     def test_it_lands_where_the_audit_looks_for_it(self):
-        step = _find(_jobs()["audit"], "actions/download-artifact")
+        step = _ledger_download()
         assert "path: .tmp/telemetry" in step, (
             "the audit checks .tmp/telemetry, and the commit there is what puts "
             "these files on the telemetry branch"
@@ -179,7 +198,7 @@ class TestTheArtifactHandoff:
     def test_an_absent_artifact_is_tolerated(self):
         """A skipped or failed run produces none, and the branch may still have
         events worth auditing."""
-        step = _find(_jobs()["audit"], "actions/download-artifact")
+        step = _ledger_download()
         assert "continue-on-error: true" in step
 
     def test_the_download_precedes_the_inputs_check(self):
