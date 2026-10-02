@@ -437,7 +437,205 @@ def test_cli_rejects_an_invalid_now(tmp_path: Path) -> None:
     assert "ISO-8601" in proc.stderr
 
 
-@pytest.mark.parametrize("flag", ["--candidates", "--fixtures", "--audit"])
+@pytest.mark.parametrize("flag", ["--candidates", "--fixtures", "--audit", "--events"])
 def test_cli_accepts_each_path_override(tmp_path: Path, flag: str) -> None:
     proc = run("--dest", str(tmp_path), flag, str(LEDGER), "--dry-run")
     assert proc.returncode == 0, proc.stderr
+
+
+# ---------------------------------------------------------------------------
+# The funnel: per daily update, how many games moved from surfaced to decided
+# to written to judged. The pins are the ones that make the number answerable:
+# a day merges the Phase 0 run's surfacing with the runtime run's decisions,
+# `skip` does not count as written, verdicts land on the WRITING day, and an
+# empty denominator is `None`, never `0.0`.
+# ---------------------------------------------------------------------------
+
+CANDIDATE = dict(url="u", backend="b")
+
+
+def _cand(run_id: str, game_key: str, disposition: str) -> dict:
+    return {
+        **CANDIDATE,
+        "run_id": run_id,
+        "game_key": game_key,
+        "disposition": disposition,
+    }
+
+
+def _event(event_id: str, run_id: str, action: str) -> dict:
+    return {"event_id": event_id, "run_id": run_id, "action": action}
+
+
+def _verdict(event_id: str, verdict: str) -> dict:
+    return {"event_id": event_id, "verdict": verdict}
+
+
+class TestFunnel:
+    def test_one_daily_update_merges_the_two_jobs_run_ids(self):
+        """Phase 0 surfaces with its run id; the runtime decides with another
+        run id the same day. Per-run-id buckets would split one daily update
+        in two and answer nothing."""
+        rows = metrics.funnel(
+            [
+                _cand("2026-10-01T0800Z", "g1", "unverifiable"),
+                _cand("2026-10-01T0930Z", "g1", "created"),
+            ],
+            [],
+            [],
+        )
+        assert len(rows) == 1
+        assert rows[0]["day"] == "2026-10-01"
+        assert rows[0]["surfaced"] == 1
+        assert rows[0]["decided"] == 1
+
+    def test_surfaced_counts_unique_games_not_rows(self):
+        rows = metrics.funnel(
+            [
+                _cand("2026-10-01T0800Z", "g1", "unverifiable"),
+                _cand("2026-10-01T0930Z", "g1", "created"),
+                _cand("2026-10-01T0930Z", "g1", "skipped_duplicate"),
+            ],
+            [],
+            [],
+        )
+        assert rows[0]["surfaced"] == 1
+        assert rows[0]["decided"] == 1
+
+    def test_a_decision_is_any_disposition_but_unverifiable(self):
+        """A refusal (`rejected_<check>`) reached a decision just as a
+        `created` did — the funnel measures movement, not success."""
+        rows = metrics.funnel(
+            [
+                _cand("2026-10-01T0800Z", "g1", "unverifiable"),
+                _cand("2026-10-01T0800Z", "g2", "unverifiable"),
+                _cand("2026-10-01T0930Z", "g1", "created"),
+                _cand("2026-10-01T0930Z", "g2", "rejected_freeAccess"),
+            ],
+            [],
+            [],
+        )
+        assert rows[0]["surfaced"] == 2
+        assert rows[0]["decided"] == 2
+
+    def test_skip_is_not_written(self):
+        rows = metrics.funnel(
+            [_cand("2026-10-01T0930Z", "g1", "created")],
+            [
+                _event("e1", "2026-10-01T0930Z", "create"),
+                _event("e2", "2026-10-01T0930Z", "skip"),
+            ],
+            [],
+        )
+        assert rows[0]["written"] == 1
+
+    def test_verdicts_land_on_the_day_that_wrote_the_event(self):
+        """A verdict can arrive days later; it belongs to the day that wrote
+        the event, because the day's funnel is the day's responsibility."""
+        rows = metrics.funnel(
+            [
+                _cand("2026-10-01T0930Z", "g1", "created"),
+                _cand("2026-10-03T0930Z", "g3", "created"),
+            ],
+            [_event("e1", "2026-10-01T0930Z", "create")],
+            [_verdict("e1", "WRONG")],
+        )
+        by_day = {row["day"]: row for row in rows}
+        assert by_day["2026-10-01"]["wrong"] == 1
+        assert by_day["2026-10-03"]["wrong"] == 0
+
+    def test_a_replanned_event_is_judged_by_its_newest_recording(self):
+        """Same last-wins rule as the audit and prefix_red: the newest events
+        row names the writing run of record."""
+        rows = metrics.funnel(
+            [_cand("2026-10-01T0930Z", "g1", "created")],
+            [
+                _event("e1", "2026-10-01T0930Z", "create"),
+                _event("e1", "2026-10-02T0930Z", "update"),
+            ],
+            [_verdict("e1", "VERIFIED")],
+        )
+        by_day = {row["day"]: row for row in rows}
+        assert by_day["2026-10-01"]["verified"] == 0
+        assert by_day["2026-10-02"]["verified"] == 1
+
+    def test_a_verdict_for_an_unknown_event_is_dropped(self):
+        """No events row, no writing day — the verdict belongs to no funnel
+        rather than to a guessed one."""
+        rows = metrics.funnel([], [], [_verdict("ghost", "WRONG")])
+        assert rows == []
+
+    def test_rates_are_honest_about_which_denominator_was_empty(self):
+        """1 surfaced, 0 decided: the decision rate is a *measured* zero, not
+        `n/a` — the run did look at games and decided none. Only a rate whose
+        own denominator is empty is `None`."""
+        rows = metrics.funnel(
+            [_cand("2026-10-01T0800Z", "g1", "unverifiable")],
+            [],
+            [],
+        )
+        assert rows[0]["surfaced"] == 1
+        assert rows[0]["decision_rate"] == 0.0
+        assert rows[0]["write_rate"] is None
+
+    def test_the_limit_is_honoured_oldest_first(self):
+        rows = metrics.funnel(
+            [
+                _cand(f"2026-10-{day:02d}T0800Z", f"g{day}", "unverifiable")
+                for day in range(1, 6)
+            ],
+            [],
+            [],
+            limit=3,
+        )
+        assert [row["day"] for row in rows] == [
+            "2026-10-03",
+            "2026-10-04",
+            "2026-10-05",
+        ]
+
+    def test_rows_without_a_date_prefix_belong_to_no_day(self):
+        """A pre-stamp run id must be excluded, not guessed into a bucket."""
+        rows = metrics.funnel([_cand("legacy-run", "g1", "created")], [], [])
+        assert rows == []
+
+    def test_the_snapshot_carries_the_funnel_and_its_source_count(self):
+        snapshot = metrics.build_snapshot(
+            [_cand("2026-10-01T0800Z", "g1", "unverifiable")],
+            [],
+            [],
+            run_id="r",
+            events=[_event("e1", "2026-10-01T0930Z", "create")],
+        )
+        assert snapshot["funnel"][0]["day"] == "2026-10-01"
+        assert snapshot["source"]["events_rows"] == 1
+
+    def test_callers_that_predate_the_funnel_still_work(self):
+        """`events` is optional: a caller from before the funnel must keep
+        producing snapshots, with the empty input recorded, not invented."""
+        snapshot = metrics.build_snapshot([], [], [], run_id="r")
+        assert snapshot["funnel"] == []
+        assert snapshot["source"]["events_rows"] == 0
+
+    def test_cli_funnel_prints_the_table_and_writes_nothing(self, tmp_path):
+        (tmp_path / "candidates.jsonl").write_text(
+            json.dumps(_cand("2026-10-01T0800Z", "g1", "created")) + "\n",
+            encoding="utf-8",
+        )
+        proc = run("--dest", str(tmp_path), "--funnel", "--dry-run")
+        assert proc.returncode == 0, proc.stderr
+        assert "2026-10-01" in proc.stdout
+        assert not (tmp_path / "metrics.json").exists()
+
+    def test_cli_funnel_writes_the_snapshot_when_not_a_dry_run(self, tmp_path):
+        (tmp_path / "candidates.jsonl").write_text(
+            json.dumps(_cand("2026-10-01T0800Z", "g1", "created")) + "\n",
+            encoding="utf-8",
+        )
+        proc = run("--dest", str(tmp_path), "--funnel")
+        assert proc.returncode == 0, proc.stderr
+        snapshot = json.loads((tmp_path / "metrics.json").read_text())
+        assert snapshot["funnel"][0]["day"] == "2026-10-01"
+
+    def test_render_funnel_of_nothing_says_so(self):
+        assert "no days" in metrics.render_funnel([])

@@ -19,6 +19,14 @@ deliberately not collapsed into one score:
 * **precision** — of the events the post-hoc audit could actually judge, how
   many were right? `INCONCLUSIVE` is excluded from the denominator: it is not
   evidence either way, and folding it in would let a quiet day look accurate.
+* **the funnel** — per day, how many games moved from `surfaced` (a search hit)
+  to `decided` (the run made a call), to `written` (an event exists), to
+  `verified` or `wrong` (the audit had its say)? The three metrics above are
+  each a ratio at one stage; the funnel is the stages, per daily update, and it
+  is the only view that answers "is each daily update actually getting better
+  at finding streams?" — the question a green run and a quiet day are equally
+  unable to answer. Verdicts land on the day that *wrote* the event, because
+  the day's funnel is the day's responsibility.
 
 Usage:
     python3 scripts/metrics.py --dest . --json
@@ -31,6 +39,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -61,10 +70,151 @@ SNAPSHOT_NAME = "metrics.json"
 CANDIDATES_NAME = "candidates.jsonl"
 FIXTURES_NAME = "fixtures.jsonl"
 AUDIT_NAME = "audit.jsonl"
+EVENTS_NAME = "events.jsonl"
+
+# An event row counts as "written" only for these plan actions. `skip` wrote
+# nothing, so it must not inflate the stage it did not reach.
+WRITE_ACTIONS = ("create", "update")
+
+# A run id's date prefix, `YYYY-MM-DD`. The anchor for the funnel's day buckets;
+# anything else belongs to no day.
+DATE_PREFIX = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 
 def utc_now() -> datetime:
     return datetime.now(timezone.utc)
+
+
+def day_of(run_id: object) -> str:
+    """The calendar day of a run id — its date prefix.
+
+    Run ids are ISO-8601 UTC stamps, so the prefix is the day and lexical order
+    is chronological. Anything that is not date-shaped (a legacy run id, an
+    unstampable value) belongs to no day, which keeps pre-stamp rows out of the
+    funnel rather than guessing them into a bucket named after garbage.
+    """
+    rid = str(run_id or "")
+    return rid[:10] if DATE_PREFIX.fullmatch(rid[:10]) else ""
+
+
+def funnel(
+    candidates: list[dict],
+    events: list[dict],
+    audit: list[dict],
+    *,
+    limit: int = 14,
+) -> list[dict]:
+    """Per-day funnel: surfaced -> decided -> written -> verified/wrong.
+
+    Everything is derived from ledgers that already exist; there is no funnel
+    writer, because a funnel that had one would be a second source of truth for
+    numbers the append-only streams already carry. Days are the unit — a day's
+    candidates come from the Phase 0 job's run id and its decisions from the
+    runtime job's, so per-run-id buckets would split one daily update in two.
+
+    * `surfaced` — unique games a candidate row names for the day
+      (`disposition` may still be `unverifiable`: a search hit is not a
+      decision).
+    * `decided` — the subset where the run made a call: `created`,
+      `skipped_duplicate`, or `rejected_<check>`. Any disposition that is not
+      `unverifiable` is a decision, including the refusals.
+    * `written` — unique event ids with a create/update action that day.
+    * `verified` / `wrong` — the audit's verdicts, landed on the day that
+      WROTE the event (the last events row names the writing run; a re-planned
+      event is judged by its newest recording, the same last-wins rule
+      `audit_events` and `prefix_red.py` apply). A verdict arriving days later
+      is not late — it is the stage's whole meaning.
+
+    The rates are `None`, never `0.0`, when their denominator is empty: "no
+    games that day" and "every game refused" are different facts.
+    """
+    buckets: dict[str, dict[str, set[str]]] = {}
+
+    def bucket_for(day: str) -> dict[str, set[str]]:
+        return buckets.setdefault(
+            day,
+            {
+                "surfaced": set(),
+                "decided": set(),
+                "written": set(),
+                "verified": set(),
+                "wrong": set(),
+            },
+        )
+
+    # The last events row per event — the writing run of record.
+    last_event: dict[str, dict] = {}
+    for row in events:
+        if not isinstance(row, dict):
+            continue
+        event_id = str(row.get("event_id") or "")
+        if event_id:
+            last_event[event_id] = row
+
+    for row in candidates:
+        if not isinstance(row, dict):
+            continue
+        day = day_of(row.get("run_id"))
+        if not day:
+            continue
+        # `game_key` is the identity recall uses; a row without one falls back
+        # to its url so it still counts at the stage it reached.
+        key = str(row.get("game_key") or row.get("url") or "")
+        if not key:
+            continue
+        bucket = bucket_for(day)
+        bucket["surfaced"].add(key)
+        if str(row.get("disposition") or "") != "unverifiable":
+            bucket["decided"].add(key)
+
+    for row in events:
+        if not isinstance(row, dict):
+            continue
+        day = day_of(row.get("run_id"))
+        if not day:
+            continue
+        if str(row.get("action") or "").lower() not in WRITE_ACTIONS:
+            continue
+        event_id = str(row.get("event_id") or "")
+        if event_id:
+            bucket_for(day)["written"].add(event_id)
+
+    for row in audit:
+        if not isinstance(row, dict):
+            continue
+        event_id = str(row.get("event_id") or "")
+        event_row = last_event.get(event_id)
+        if event_row is None:
+            continue
+        day = day_of(event_row.get("run_id"))
+        if not day:
+            continue
+        verdict = str(row.get("verdict") or "").strip().upper()
+        if verdict == VERDICT_VERIFIED:
+            bucket_for(day)["verified"].add(event_id)
+        elif verdict == VERDICT_WRONG:
+            bucket_for(day)["wrong"].add(event_id)
+
+    rows: list[dict] = []
+    for day in sorted(buckets)[-limit:]:
+        b = buckets[day]
+        surfaced = len(b["surfaced"])
+        decided = len(b["decided"])
+        rows.append(
+            {
+                "day": day,
+                "surfaced": surfaced,
+                "decided": decided,
+                "written": len(b["written"]),
+                "verified": len(b["verified"]),
+                "wrong": len(b["wrong"]),
+                "decision_rate": round(decided / surfaced, 3) if surfaced else None,
+                "write_rate": (
+                    round(len(b["written"]) / decided, 3) if decided else None
+                ),
+            }
+        )
+    return rows
 
 
 def audit_metrics(rows: list[dict]) -> dict:
@@ -209,6 +359,36 @@ def render_trend(rows: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def render_funnel(rows: list[dict]) -> str:
+    """Aligned table, one line per day, oldest first."""
+    if not rows:
+        return "funnel: no days recorded yet"
+    header = (
+        f"{'day':<12}{'surfaced':>9}{'decided':>9}{'written':>9}"
+        f"{'verified':>10}{'wrong':>7}{'decision':>10}{'write':>8}"
+    )
+    lines = [f"funnel ({len(rows)} day(s), oldest first):", header]
+    for row in rows:
+        decision = (
+            "n/a".rjust(10)
+            if row["decision_rate"] is None
+            else fmt(row["decision_rate"]).rjust(10)
+        )
+        write = (
+            "n/a".rjust(8)
+            if row["write_rate"] is None
+            else fmt(row["write_rate"]).rjust(8)
+        )
+        lines.append(
+            f"{row['day']:<12}"
+            f"{row['surfaced']:>9}{row['decided']:>9}{row['written']:>9}"
+            f"{row['verified']:>10}{row['wrong']:>7}"
+            f"{decision}{write}"
+        )
+    lines.append("'n/a' means the denominator was empty, not zero")
+    return "\n".join(lines)
+
+
 def build_snapshot(
     candidates: list[dict],
     fixtures: list[dict],
@@ -217,16 +397,20 @@ def build_snapshot(
     run_id: str = "",
     now: datetime | None = None,
     trend_limit: int = 14,
+    events: list[dict] | None = None,
 ) -> dict:
     """Assemble the derived snapshot.
 
-    Any of the three inputs may be empty; the corresponding metric is then
+    Any of the inputs may be empty; the corresponding metric is then
     `None` rather than `0.0`. A zero would read as "we measured this and it was
-    bad", which is a different claim from "we have no data".
+    bad", which is a different claim from "we have no data". `events` is the
+    newest input and is optional for exactly as long as a caller predates the
+    funnel — the snapshot records what it had.
     """
     stamp = (now or utc_now()).astimezone(timezone.utc).isoformat()
     recall = recall_metrics(candidates)
     fixture = fixture_recall(candidates, fixtures) if fixtures else None
+    events = events if events is not None else []
     return {
         "ts": stamp,
         "run_id": run_id,
@@ -235,6 +419,7 @@ def build_snapshot(
             "candidates_rows": len(candidates),
             "fixtures_rows": len(fixtures),
             "audit_rows": len(audit),
+            "events_rows": len(events),
         },
         "recall": recall,
         "fixture_recall": fixture,
@@ -242,6 +427,10 @@ def build_snapshot(
         # Bounded history, so the snapshot is self-describing: an operator can
         # read the direction of travel without replaying the JSONL streams.
         "trend": trend(candidates, audit, limit=trend_limit),
+        # The same bounded history for the funnel: per daily update, the stages
+        # a game can reach. Derived like everything else in this file, so the
+        # snapshot stays regenerable from the streams alone.
+        "funnel": funnel(candidates, events, audit, limit=trend_limit),
     }
 
 
@@ -299,12 +488,21 @@ def main() -> None:
     parser.add_argument("--candidates", help="override the candidates JSONL path")
     parser.add_argument("--fixtures", help="override the fixtures JSONL path")
     parser.add_argument("--audit", help="override the audit JSONL path")
+    parser.add_argument(
+        "--events",
+        help="override the events JSONL path (the funnel's third input)",
+    )
     parser.add_argument("--run-id", default="", help="run identifier to record")
     parser.add_argument("--now", help="ISO-8601 override (for tests)")
     parser.add_argument(
         "--trend",
         action="store_true",
         help="print the per-run trend instead of the one-line summary",
+    )
+    parser.add_argument(
+        "--funnel",
+        action="store_true",
+        help="print the per-day funnel instead of the one-line summary",
     )
     parser.add_argument(
         "--limit",
@@ -340,6 +538,9 @@ def main() -> None:
     candidates = read_ledger(Path(args.candidates or dest / CANDIDATES_NAME))
     fixtures = read_ledger(Path(args.fixtures or dest / FIXTURES_NAME))
     audit = read_ledger(Path(args.audit or dest / AUDIT_NAME))
+    # Optional for callers that predate the funnel: a missing file reads as an
+    # empty list, and the snapshot records that in `source.events_rows`.
+    events = read_ledger(Path(args.events or dest / EVENTS_NAME))
 
     if args.limit < 1:
         print(f"FAIL: metrics: --limit must be >= 1, got {args.limit}", file=sys.stderr)
@@ -352,6 +553,7 @@ def main() -> None:
         run_id=args.run_id,
         now=now,
         trend_limit=args.limit,
+        events=events,
     )
 
     if args.dry_run:
@@ -359,6 +561,9 @@ def main() -> None:
             print(json.dumps(snapshot, ensure_ascii=False, indent=2, sort_keys=True))
         elif args.trend:
             print(render_trend(snapshot["trend"]))
+            print("OK: metrics: dry-run, nothing written")
+        elif args.funnel:
+            print(render_funnel(snapshot["funnel"]))
             print("OK: metrics: dry-run, nothing written")
         else:
             print(f"OK: {render(snapshot)} (dry-run, nothing written)")
@@ -372,6 +577,9 @@ def main() -> None:
         print(f"OK: metrics: wrote {path}", file=sys.stderr)
     elif args.trend:
         print(render_trend(snapshot["trend"]))
+        print(f"OK: metrics: wrote {path}")
+    elif args.funnel:
+        print(render_funnel(snapshot["funnel"]))
         print(f"OK: metrics: wrote {path}")
     else:
         print(f"OK: {render(snapshot)}")

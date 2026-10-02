@@ -77,6 +77,36 @@ reader-without-a-writer trap inverted: a writer without a reader. If the eval se
 ever grows a case whose assertions genuinely depend on the date's distance from
 today, that is the moment to build rotation, and not before.
 
+## The daily funnel
+
+`metrics.json` now carries a per-day funnel — `surfaced → decided → written →
+verified/wrong` — derived from the three append-only streams (`candidates.jsonl`,
+`events.jsonl`, `audit.jsonl`); there is deliberately no funnel writer, because
+a funnel that had one would be a second source of truth for numbers the streams
+already carry. It is the only view that answers "is each daily update actually
+getting better at finding streams?", the question recall, fixture recall and
+precision each answer only one stage of.
+
+The stages' semantics, each pinned by `tests/test_metrics.py`:
+
+* the unit is the **day**, not the run id — a day's candidates come from the
+  Phase 0 job's run id and its decisions from the runtime job's, so per-run-id
+  buckets would split one daily update in two;
+* `surfaced` counts unique games (a search hit is not a decision);
+* `decided` counts any disposition but `unverifiable` — a refusal
+  (`rejected_<check>`) reached a decision just as a `created` did, because the
+  funnel measures movement, not success;
+* `written` counts create/update only — `skip` wrote nothing and must not
+  inflate the stage it did not reach;
+* verdicts land on the day that **wrote** the event (the last events row names
+  the writing run, the same last-wins rule as the audit and `prefix_red.py`);
+* a rate whose denominator is empty is `n/a`, never `0.0` — but a measured zero
+  (one game surfaced, none decided) stays `0.000`, because it was measured.
+
+The audit job renders it into its summary (`Funnel report`, recomputed with
+`--dry-run` so the step cannot drift from the snapshot the branch holds; pinned
+by `tests/test_funnel_wiring.py`). `metrics.py --funnel` prints it locally.
+
 ## Verification states
 
 Every event carries one of three states (`scripts/verification.py`). The state,

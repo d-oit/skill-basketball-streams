@@ -76,6 +76,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   they are prompt data the graders never compute a today-relative range over,
   so a rotation producer would have no consumer (a writer without a reader).
 
+- **The daily funnel: is each daily update actually getting better at finding
+  streams?** The three metrics `metrics.json` already carried each answer one
+  stage (recall, fixture recall, precision); the funnel is the stages, per day:
+  `surfaced → decided → written → verified/wrong`. It is derived from the three
+  append-only streams — there is deliberately no funnel writer, because a
+  funnel that had one would be a second source of truth for numbers the streams
+  already carry. The unit is the day, not the run id (a day's candidates come
+  from the Phase 0 job's run id and its decisions from the runtime job's, so
+  per-run-id buckets would split one daily update in two); a refusal
+  (`rejected_<check>`) counts as decided, because the funnel measures movement,
+  not success; `skip` does not count as written; verdicts land on the day that
+  wrote the event (the same last-wins rule as the audit and `prefix_red.py`);
+  a rate whose denominator is empty is `n/a`, never `0.0` — but a measured
+  zero stays `0.000`. The audit job renders it into its summary
+  (`Funnel report`, recomputed with `--dry-run` so the step cannot drift from
+  the snapshot the branch holds). Pinned by `tests/test_metrics.py` (16 tests)
+  and `tests/test_funnel_wiring.py` (the consumer: one reporter, guarded,
+  nothing tolerated).
+
 ### Fixed
 
 - **A transcript preflight that could never succeed, removed.** The
