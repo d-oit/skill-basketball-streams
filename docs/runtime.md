@@ -9,7 +9,7 @@ Operator guide for the daily streams runtime. Design rationale lives in
 | Phase | Workflow job | Calendar writes | Status |
 |---|---|---|---|
 | 0 — candidate ledger | `runtime-daily.yml` → `telemetry` | **never** | implemented |
-| 1 — skill run, dry-run | `runtime-daily.yml` → `runtime` | gated off by default | implemented |
+| 1 — skill run, dry-run | `runtime-daily.yml` → `runtime` | gated off by default | implemented, behind a pre-run product gate |
 | 2 — writes with honest labelling | `runtime-daily.yml` → `runtime` | via `ENABLE_CALENDAR_WRITES` + `write_mode.py` | implemented |
 | 3 — post-hoc audit | `runtime-daily.yml` → `audit` | read + relabel, grades and files the run's transcript | implemented |
 | 4 — self-improvement branch | `self-improve.yml` | none | implemented |
@@ -54,6 +54,28 @@ candidate cannot satisfy the needle (that false "not red" is pinned by
 "asserted, not demonstrated" with the reason — history, not a fault. The per-case
 capture with a credential additionally grades the **post-fix** answer; that gap
 remains and is the only one left.
+
+## The pre-run product gate
+
+The `runtime` job's first steps (after checkout) are the repo's own graders —
+`validate.py --check all`, `runtime_eval.py`, `synthesise_eval_case.py --verify`
+and `pytest` — and the job stops at the first red one. A red product gate means
+the contract is broken, and a broken contract must not run the agent that reads
+and writes a subscriber's calendar. The gate is unconditional on the write mode
+(a dry run of a broken contract spends the free-tier quota and files a
+misleading transcript too), precedes every expensive step so a red gate costs
+nothing, and is deliberately the product graders rather than `do-harness eval`,
+which never grades the root skill (`tests/test_harness_boundary.py`). It is
+pinned by `tests/test_pre_run_gate_wiring.py`: presence, order, no tolerated
+failure.
+
+A deliberate non-change, recorded so it is not re-proposed: **eval dates are not
+rotated**. The fixed dates in `evals/evals.json` are prompt *data* — the graders
+assert needles in outputs (`freeAccess=PASS`) and never compute a today-relative
+range — so a date-rotation producer would have no consumer. That is the
+reader-without-a-writer trap inverted: a writer without a reader. If the eval set
+ever grows a case whose assertions genuinely depend on the date's distance from
+today, that is the moment to build rotation, and not before.
 
 ## Verification states
 

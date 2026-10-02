@@ -60,6 +60,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `tests/test_prefix_red_wiring.py` (one run id per run, stamped filing name,
   bounded fetch, exit-1-tolerated-with-reason).
 
+- **The calendar-writing path is gated on the product suite.** Before this,
+  a bad merge to `main` sailed through the daily cron: the workflow only ran
+  the skill, and nothing in the job ever asked whether the skill's own graders
+  were green. The `runtime` job's first steps are now `validate.py --check
+  all`, `runtime_eval.py`, `synthesise_eval_case.py --verify` and `pytest`,
+  and the job stops at the first red one — before the CLI install, before the
+  agent run, before any calendar read or write. Unconditional on the write
+  mode (a dry run of a broken contract spends the free-tier quota and files a
+  misleading transcript too), tolerant of nothing, and deliberately the
+  product graders rather than `do-harness eval` (the boundary
+  `tests/test_harness_boundary.py` pins). Pinned by
+  `tests/test_pre_run_gate_wiring.py`: presence, order, no tolerated failure.
+  A deliberate non-change recorded alongside it: eval dates are NOT rotated —
+  they are prompt data the graders never compute a today-relative range over,
+  so a rotation producer would have no consumer (a writer without a reader).
+
 ### Fixed
 
 - **A transcript preflight that could never succeed, removed.** The
