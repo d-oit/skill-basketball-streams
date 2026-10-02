@@ -31,11 +31,29 @@ credential and one transcript per eval case, so it stays a local, deliberate act
 `runtime-transcript` artifact, grades it with the same seam-grader the planner uses
 (`scripts/extract_candidates.py` — exit 1 is reported as an honest quiet day or a
 failed emission, never red), and files it append-only on the telemetry branch under
-`transcripts/<run-id>-runtime.json`. From that change on, every real run is graded,
-every day, in dry-run too, and the transcript a misjudgement came from is on the
-branch for the self-improvement loop to read. The wiring is pinned by
-`tests/test_transcript_ledger_wiring.py`, so removing the writer fails the suite
-rather than producing another quiet-looking gap.
+`transcripts/<run_id>.json` — the run id the event ledger records, so the chain
+`verdict -> event_id -> run_id -> transcripts/<run_id>.json` can be walked. From that
+change on, every real run is graded, every day, in dry-run too. The wiring is pinned by
+`tests/test_transcript_ledger_wiring.py` and `tests/test_prefix_red_wiring.py`, so
+removing the writer fails the suite rather than producing another quiet-looking gap.
+
+## Pre-fix-red, demonstrated
+
+The other half of the old gap — "the pre-fix-red property of a synthesised eval case
+is asserted rather than demonstrated" — closes with the same chain.
+`self-improve.yml` pulls `events.jsonl`, fetches **only** the transcripts the new
+cases join to, and runs `scripts/prefix_red.py`: the case's first assertion names
+the check that should have failed (`freeAccess expected FAIL`), the misjudged run's
+own answer carries the opposite claim for exactly that game, so the needle is absent
+from reality — the case is red against the run that made the misjudgement, red for
+the right reason. No credential, no model call. The game's lines are scoped out of
+the transcript by the event's summary, so a different game's correctly-rejected
+candidate cannot satisfy the needle (that false "not red" is pinned by
+`tests/test_prefix_red.py`). The result lands in the job summary as
+`Pre-fix-red demonstrated`. Runs whose transcript predates the filing report
+"asserted, not demonstrated" with the reason — history, not a fault. The per-case
+capture with a credential additionally grades the **post-fix** answer; that gap
+remains and is the only one left.
 
 ## Verification states
 
@@ -849,7 +867,7 @@ Confirm with `opencode models` before relying on it.
 | Job says "the per-case grader did not run" | Correct and not a failure: this job makes one run for today, not one per eval case, so per-case grading needs a captured set (`--runner ladder`, see above). The step grades — and fails hard — the moment that file exists |
 | A workflow step no-ops with no error | It may be naming a file that does not exist. `python3 scripts/check_workflow_refs.py --root .` names the path and the workflow |
 | `self-improve` gate red | Working as intended — the system refused its own fix. Fix the gate; never re-baseline the eval set to clear it |
-| `self-improve` warns "the new case(s) were NOT graded against real output" | The per-id capture found no working rung. Set `GEMINI_API_KEY` (free AI Studio); until then the synthesised case's pre-fix-red property is asserted, not demonstrated |
+| `self-improve` warns "the new case(s) were NOT graded against a fresh model answer" | The per-id capture found no working rung — that capture grades the **post-fix** answer and needs a credential (`GEMINI_API_KEY`, free AI Studio). The **pre-fix** side needs none: `prefix_red.py` grades the new case against the misjudged run's own filed transcript (see `Pre-fix-red demonstrated` above), and if that row reads `no` too, each case's reason is in the log |
 | `runtime_eval` says `names case ids not in evals.json` | The transcript file is stale — it covers a case that has since been renumbered or removed. Re-capture; do not hand-edit it |
 | `corpus-refresh` opened a `[corpus] page verdict flip` issue | Not noise by construction — a byte change files nothing, so a verdict moved. Read the direction: `lost-evidence` is missed streams, `gained-evidence` is the false positives the corpus exists for. Decide whether the source or the gate moved; the issue lists both routes and the commands |
 | `corpus-refresh` warns it could not re-fetch every page | The log names the page. A URL that has gone (an aged VOD, a moved channel tab) is a corpus problem, not a gate finding, and nothing was filed. Update `PAGES` with a replacement page rather than deleting the fixture |

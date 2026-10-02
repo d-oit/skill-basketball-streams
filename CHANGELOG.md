@@ -30,6 +30,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `tests/test_transcript_ledger_wiring.py`, so removing the writer fails the
   suite rather than producing another quiet-looking gap.
 
+- **Pre-fix-red, demonstrated rather than asserted.** `docs/runtime.md`'s other
+  honest gap — "the pre-fix-red property of a synthesised eval case is
+  asserted rather than demonstrated" — closes with the same transcript. The
+  `runtime` job now computes ONE run id per run (`Stamp this run's id`) and
+  every writer reads it — before, each ledger writer called `date` itself, so
+  the rows and the filed transcript could differ by a minute, and the join
+  "which transcript produced this verdict" could never be made; a join that
+  cannot be made is a reader without a producer, one level up. The transcript
+  is filed as `transcripts/<run_id>.json` — the name the event ledger records
+  — and `self-improve.yml` walks verdict -> event_id -> run_id -> transcript
+  via the new `scripts/prefix_red.py`: the case's first assertion names the
+  check that should have failed, the misjudged run's own answer carries the
+  opposite claim for exactly that game (scoped out of the transcript by the
+  event's summary, so another game's correctly-rejected candidate cannot
+  satisfy the needle), so the needle is absent from reality — the case is red
+  against the run that made the misjudgement, red for the right reason. No
+  credential, no model call. Deliberately NOT routed through
+  `runtime_eval --transcripts`: a synthesised case carries needles no real
+  transcript contains (`eventCreated=FAIL`, `regression=PASS`), so grading the
+  raw transcript against the full assertion list would be red for reasons that
+  have nothing to do with the bug, and a red that cannot be wrong proves
+  nothing. The demonstration lands in the job summary
+  (`Pre-fix-red demonstrated`); runs whose transcript predates the filing
+  report "asserted, not demonstrated" with the reason — history, not a fault.
+  The chain is pinned end to end by `tests/test_prefix_red.py` (including the
+  scoping-is-not-decoration trap: a whole-text grade finds the needle in
+  another game's refusal and reads the case as satisfied) and
+  `tests/test_prefix_red_wiring.py` (one run id per run, stamped filing name,
+  bounded fetch, exit-1-tolerated-with-reason).
+
 ### Fixed
 
 - **A transcript preflight that could never succeed, removed.** The

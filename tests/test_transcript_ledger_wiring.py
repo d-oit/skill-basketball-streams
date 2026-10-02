@@ -154,8 +154,8 @@ class TestTheArtifactHandoff:
         step = self._download()
         assert "continue-on-error: true" in step
         grade = _named(_jobs()["audit"], GRADE_STEP)
-        assert "[ ! -f .tmp/incoming/transcript.json ]" in grade
-        assert "::notice::" in grade
+        assert "::notice::No transcript this run" in grade
+        assert "ready=false" in grade
 
     def test_the_download_precedes_the_grade_step(self):
         steps = _steps(_jobs()["audit"])
@@ -179,7 +179,7 @@ class TestTheGradeAndFiling:
         """A transcript the grader rejects is exactly the one a human needs to
         read, so the copy is filed before the grade is computed."""
         code = _code(self._step())
-        filed = code.index("cp .tmp/incoming/transcript.json")
+        filed = code.index('cp "$src" "$dest"')
         graded = code.index("scripts/extract_candidates.py")
         assert filed < graded
 
