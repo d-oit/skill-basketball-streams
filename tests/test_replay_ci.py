@@ -110,6 +110,11 @@ class TestDenylist:
             # only denying the *capability* keeps it out of a replay — and this
             # step would otherwise open a real issue on the public repository.
             "python3 scripts/rung_health.py parked \\\n  --dest .tmp/telemetry --days 3 \\\n  --file",
+            # Third filer, same shape: the red-run report. The `gh` call lives
+            # inside the script, so the flag is the only thing a replay can
+            # key on — without the denial a replay would open a real issue
+            # about a run that never happened.
+            "python3 scripts/report_run_failure.py \\\n  --jobs .tmp/jobs.json \\\n  --run-url https://example.invalid/runs/1 \\\n  --file",
         ],
     )
     def test_dangerous_steps_are_denied(self, script):

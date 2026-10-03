@@ -102,14 +102,16 @@ DENYLIST = (
         "writes to GitHub (an issue, PR or release) via gh",
     ),
     # The issue-filing half of the scheduled reporting loops (corpus verdict
-    # flips, parked render rungs). `--file` is the whole capability, exactly
-    # like `--live`: without it the scripts only print. The report half stays
-    # replayable so the summary renderers are still exercised, and DOTALL is
-    # required because the flag usually sits on the next line of a continued
-    # command — the same continuation a naive line-anchored regex steps over.
+    # flips, parked render rungs, red daily runs). `--file` is the whole
+    # capability, exactly like `--live`: without it the scripts only print.
+    # The report half stays replayable so the summary renderers are still
+    # exercised, and DOTALL is required because the flag usually sits on the
+    # next line of a continued command — the same continuation a naive
+    # line-anchored regex steps over.
     (
         re.compile(
-            r"(?:corpus_flip_issue|rung_health)\.py.*?--file\b", re.DOTALL
+            r"(?:corpus_flip_issue|rung_health|report_run_failure)\.py.*?--file\b",
+            re.DOTALL,
         ),
         "files a public GitHub issue (--file)",
     ),

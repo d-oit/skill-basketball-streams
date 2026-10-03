@@ -131,6 +131,30 @@ Pinned by `tests/test_agent_permission_wiring.py`. The transcript the
 assertion reads is the same one the audit grades and files, so a violation
 leaves its evidence on the telemetry branch.
 
+## A red run reports itself
+
+The feedback loop's missing half, found by reading live Actions history: the
+2026-09-30 daily run failed after 24 minutes and **left no trace** — no issue,
+no notification, only a red mark in a tab nobody schedules time to read. The
+rung loop files its findings (issue #46 came from that mechanism); a red RUN
+is a bigger finding than a parked rung and was the one thing not reported.
+
+The `report-failure` job (`if: failure()`, the last job in the workflow — it
+reads the run's own completed job table) gathers the failed jobs via
+`gh run view --json jobs` and files the report through the shared deduper
+(`gh_issue.py`): **one open `[runtime] daily run red` issue at a time**; a
+repeat failure comments on it rather than opening another, because "the daily
+run is red" is one ongoing finding and the operator action is the same every
+time. The body names the failed jobs and points at the three places to read
+(the failed log, the job summaries, `transcripts/` on the telemetry branch).
+Green files nothing; skipped/cancelled is not red. The job holds only
+`issues: write` — no calendar credential, no search key — the same
+authority split as `rung-issues`. `scripts/report_run_failure.py` is offline
+and fully tested (`tests/test_report_run_failure.py`); the wiring is pinned
+by `tests/test_failure_report_wiring.py`, and its `--file` flag is on
+`replay_ci.py`'s denylist with the other filers, so a replay can never open
+a real issue about a run that never happened.
+
 ## Verification states
 
 Every event carries one of three states (`scripts/verification.py`). The state,

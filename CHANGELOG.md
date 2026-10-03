@@ -97,6 +97,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **A red daily run left no trace.** The 2026-09-30 run failed after 24 minutes
+  and nothing was filed — the only way to notice was to read the Actions
+  history by hand. The rung loop files its findings; a red RUN is a bigger
+  finding than a parked rung and was the one thing not reported. The new
+  `report-failure` job (`if: failure()`, the last job — it reads the run's own
+  completed job table) gathers the failed jobs via `gh run view --json jobs`
+  and files the report through the shared deduper (`gh_issue.py`): one open
+  `[runtime] daily run red` issue at a time; a repeat failure comments on it
+  rather than opening another. Green files nothing; skipped/cancelled is not
+  red. The job holds only `issues: write` — no calendar credential, no search
+  key. `scripts/report_run_failure.py` is offline and fully tested; its
+  `--file` flag joined `replay_ci.py`'s denylist with the other filers, so a
+  replay can never open a real issue about a run that never happened.
+
 - **The permission-restricted runtime agent was never actually used.** A live
   verification (2026-10-02) found the documented security control — "the runtime
   agent is denied `edit` and `bash`" — was not in force: the workflow created
