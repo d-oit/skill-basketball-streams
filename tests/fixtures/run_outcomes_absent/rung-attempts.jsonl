@@ -1,0 +1,2 @@
+{"ts": "2026-10-04T08:32:00+00:00", "run_id": "2026-10-04T08:30Z", "url": "https://www.magentasport.de/", "host": "magentasport.de", "rung": "urllib", "kind": "local", "state": "ok-no-evidence", "status": 200, "elapsed_ms": 456, "error": "", "strikes": 0, "parked": false}
+{"ts": "2026-10-04T08:32:10+00:00", "run_id": "2026-10-04T08:30Z", "url": "https://www.magenta.tv/", "host": "magenta.tv", "rung": "tinyfish", "kind": "hosted", "state": "failed", "status": 403, "elapsed_ms": 120, "error": "TinyFish rejected the API key (HTTP 403)", "strikes": 3, "parked": true}

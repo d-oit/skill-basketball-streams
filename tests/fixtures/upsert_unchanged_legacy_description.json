@@ -1,0 +1,27 @@
+{
+  "_comment": "A legacy stored event with an EMPTY description and nothing else different. Everything comparable matches except the description we would write — so it must be `update`, not `unchanged`: a blank stored field is never a wildcard for a non-blank planned one, and the event needs the identity block that events_match and link_inventory both read. This is the fixture that would fail if 'identical' were decided by comparing only the fields the old planner knew about.",
+  "events": [
+    {
+      "event_id": "evt-unchanged-legacy",
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-10-05T18:00:00Z",
+      "end": "2026-10-05T20:30:00Z",
+      "summary": "[UNVERIFIED] BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "state": "UNVERIFIED",
+      "league_color_id": "5",
+      "description": ""
+    }
+  ],
+  "candidates": [
+    {
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-10-05T18:00:00Z",
+      "end": "2026-10-05T20:30:00Z",
+      "state": "UNVERIFIED",
+      "summary": "BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "league_color_id": "6"
+    }
+  ]
+}

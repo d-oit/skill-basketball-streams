@@ -293,6 +293,38 @@ jobs:
             python3 -c "import json;d=json.load(open('.tmp/telemetry/metrics.json'));r=d['recall'];f=d['fixture_recall'];a=d['audit'];print('recall', r['recall'], 'fixture_recall', (f or {}).get('fixture_recall'), 'precision', a['precision'])"
           fi
 
+      # ── The self-learning loop's missing caller. ──────────────────────────
+      # `references/self-learning.md` says `source_learning.py record` appends a
+      # row after every run; nothing in `.github/` called it, so `run-log.jsonl`
+      # was never created by CI, `score` exited 1 on the empty file and
+      # `candidates` read nothing. This derives rows from the ledgers already in
+      # this worktree — candidates (search hits), fetch-attempts (blocked/gone/
+      # 5xx fixture sources: an issue during the run), rung-attempts (a failed or
+      # parked render rung) and events — and hands them to that same writer.
+      #
+      # `--dest .tmp/telemetry` is deliberate. `logs/` is gitignored, so a run
+      # log written there would be invisible to every CI job — the vacuous pass
+      # the retired `source-registry` sensor died of. This file is committed to
+      # the telemetry branch by the step below.
+      #
+      # The readers run too, because a log nobody reads is the same defect one
+      # step later: `score` aggregates it, and `candidates` quarantines any
+      # unapproved domain it surfaced.
+      - name: Record the run's outcomes into the learning log
+        if: always()
+        run: |
+          python3 scripts/record_run_outcomes.py record \
+            --dest .tmp/telemetry \
+            --run-id "$(date -u +%Y-%m-%dT%H:%MZ)"
+          if [ -s .tmp/telemetry/run-log.jsonl ]; then
+            python3 scripts/source_learning.py score --dest .tmp/telemetry --json \
+              > .tmp/telemetry/source-scores.json
+            python3 scripts/source_learning.py candidates --root . \
+              --dest .tmp/telemetry --out .tmp/telemetry/source-candidates.json
+          else
+            echo "::notice::No run-log rows yet, so there is nothing to score or quarantine this run."
+          fi
+
       - name: Commit telemetry (one commit per run, never per row)
         run: |
           cd .tmp/telemetry
@@ -769,6 +801,8 @@ jobs:
           print()
           print("`skip` rows send nothing: a verified event is never modified, and")
           print("an audit `WRONG` verdict is never overwritten by a fresh guess.")
+          print("`unchanged` rows send nothing either: the stored event already")
+          print("carries exactly what a patch would send, so no write is issued.")
           held = [row for row in plan["plan"] if "audit verdict WRONG" in row.get("reason", "")]
           print()
           if held:
@@ -842,6 +876,39 @@ jobs:
             --dest .tmp \
             --run-id "$(date -u +%Y-%m-%dT%H:%MZ)"
 
+      # ── Every decision, including the ones nothing is sent for. ───────────
+      # `events.jsonl` records only the `create`/`update` rows that reached the
+      # calendar, so a `skip` or an `unchanged` row was recorded nowhere and the
+      # planner's own `reason` for it ("verified event exists", "audit verdict
+      # WRONG stands") died with `.tmp/plan.json`. This is that producer: one row
+      # per game in the plan, from the plan (the authority for the games
+      # considered) plus the apply result (the event id, and whether this was a
+      # dry run). `--existing` is added only when the `calendar_io list` snapshot
+      # exists, so `fields_changed` is a real diff or `null` — never an invented
+      # empty list that would read as "nothing changed".
+      #
+      # Same producer/filer split as `events.jsonl`: this job holds no
+      # `contents: write` (it holds the calendar credential), so the rows travel
+      # in the `run-ledger` artifact and the `audit` job appends them to the
+      # branch.
+      - name: Record the run's decisions (calendar log)
+        if: always()
+        run: |
+          if [ ! -f .tmp/plan.json ] || [ ! -f .tmp/applied.json ]; then
+            echo "::notice::No plan or apply result this run, so no calendar decision was taken — nothing to log."
+            exit 0
+          fi
+          set -- --existing .tmp/existing.json
+          if [ ! -f .tmp/existing.json ]; then
+            set --
+          fi
+          python3 scripts/calendar_log.py record \
+            --plan .tmp/plan.json \
+            --applied .tmp/applied.json \
+            --dest .tmp \
+            "$@" \
+            --run-id "$(date -u +%Y-%m-%dT%H:%MZ)"
+
       # ── Phase 1/2's answer, joined back into the candidate ledger. ────────
       # `candidates.jsonl` is written by ONE job — Phase 0 — and Phase 0 only
       # searches: it labels every row `unverifiable` because a search hit is not
@@ -895,6 +962,20 @@ jobs:
             echo "The audit can only judge events the ledger names: a missing"
             echo "event id would be a verdict nothing could ever act on, so it is"
             echo "refused rather than written with an empty key."
+            echo ""
+            echo "## Calendar decisions (including skips)"
+            echo ""
+            if [ -f .tmp/calendar-log.jsonl ]; then
+              set -- --existing .tmp/existing.json
+              if [ ! -f .tmp/existing.json ]; then
+                set --
+              fi
+              python3 scripts/calendar_log.py record \
+                --plan .tmp/plan.json --applied .tmp/applied.json \
+                --dest .tmp --markdown "$@"
+            else
+              echo "No decision log this run."
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
 
       # The per-case grader needs ONE transcript per eval case. This job makes a
@@ -956,6 +1037,7 @@ jobs:
             .tmp/events.jsonl
             .tmp/evidence.json
             .tmp/outcomes.jsonl
+            .tmp/calendar-log.jsonl
           if-no-files-found: ignore
           retention-days: 30
 
@@ -1056,6 +1138,37 @@ jobs:
         with:
           name: run-ledger
           path: .tmp/telemetry
+
+      # `calendar-log.jsonl` is append-only across runs, and the download above
+      # **overwrites** a file that already exists — so on its own it would
+      # replace the branch copy with the newest run's rows and the "never
+      # pruned" promise in `references/calendar-log.md` would be false the first
+      # time a second run landed. The pre-download copy is still at HEAD, so the
+      # merge reads it from git rather than from the working tree that was just
+      # overwritten; `awk` drops byte-identical repeats so a re-run of the same
+      # rows cannot double them.
+      #
+      # The `cat-file` probe is silent on purpose: a log absent from HEAD is the
+      # expected first-run state, not a fault, and the branch file is already
+      # the right answer then.
+      - name: Append this run's decisions to the branch calendar log
+        id: calendar-log
+        if: always()
+        run: |
+          cd .tmp/telemetry
+          if [ ! -f calendar-log.jsonl ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No calendar log in this run's artifact, so the branch copy is unchanged."
+            exit 0
+          fi
+          if git cat-file -e HEAD:calendar-log.jsonl 2>/dev/null; then
+            git show HEAD:calendar-log.jsonl > .calendar-log.base
+            awk '!seen[$0]++' .calendar-log.base calendar-log.jsonl > .calendar-log.merged
+            mv .calendar-log.merged calendar-log.jsonl
+            rm -f .calendar-log.base
+          fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+          echo "Calendar log rows: $(wc -l < calendar-log.jsonl)"
 
       - name: Check for audit inputs
         id: inputs

@@ -88,7 +88,12 @@ try:  # direct CLI execution: `python3 scripts/calendar_io.py`
         validated_at_from_description,
         validation_notes_from_description,
     )
-    from verification import STATE_PREFIXES, STATE_VERIFIED, state_from_title
+    from verification import (
+        STATE_PREFIXES,
+        STATE_VERIFIED,
+        state_from_title,
+        title_for,
+    )
 except ImportError:  # imported as a package module, e.g. scripts.calendar_io
     from scripts.calendar_config import (  # type: ignore[no-redef]
         VISIBILITY_VALUES,
@@ -105,6 +110,7 @@ except ImportError:  # imported as a package module, e.g. scripts.calendar_io
         STATE_PREFIXES,
         STATE_VERIFIED,
         state_from_title,
+        title_for,
     )
 
 COMPOSIO_ROOT = "https://backend.composio.dev/api/v3.1"
@@ -127,6 +133,13 @@ DEFAULT_TIMEZONE = "Europe/Berlin"
 ACTION_CREATE = "create"
 ACTION_UPDATE = "update"
 ACTION_SKIP = "skip"
+# A fourth planner outcome, and the only one that is a *non-write* for a matched
+# event: `update` when any field the calendar holds would change, `unchanged`
+# when the stored event already carries exactly what a PATCH would send. It
+# exists because the old planner re-PATCHed every unverified match on every run
+# — a real HTTP write and an `action: "update"` ledger row claiming a change —
+# even when nothing about the game had changed. See `upsert_events.plan_upsert`.
+ACTION_UNCHANGED = "unchanged"
 
 
 class CalendarError(RuntimeError):
@@ -473,6 +486,79 @@ def build_event_body(
     }
 
 
+def _same_instant(left: object, right: object) -> bool:
+    """Whether two date-times name the same moment.
+
+    Compared as *instants*, not as strings. The planner takes the stored event's
+    own start on an update, but Google may echo a `dateTime` with an offset the
+    source did not spell (`…T19:00:00+02:00` vs `…T17:00:00Z`), and a byte
+    comparison would then report a change on every run — re-introducing exactly
+    the pointless PATCH this comparison exists to remove.
+
+    A blank on either side is never a match. A stored event with no usable time
+    is a legacy or half-written one, and it needs the update that fills it in;
+    treating "missing" as "equal to anything" is the trap `events_match` already
+    documents for the teams line.
+    """
+    left_text, right_text = str(left or ""), str(right or "")
+    if not left_text or not right_text:
+        return False
+    left_dt, right_dt = _parse_dt(left_text), _parse_dt(right_text)
+    if left_dt is None or right_dt is None:
+        return left_text == right_text
+    return left_dt == right_dt
+
+
+def body_matches_event(body: dict, stored: dict) -> bool:
+    """Whether PATCHing `stored` with `body` would change the event at all.
+
+    The planner asks this before emitting an `update`, so a quiet day sends
+    nothing instead of re-writing every unverified event. It compares the **full
+    payload the calendar would end up holding** — the same `body` `apply_plan`
+    sends — against what the stored (already-`parse_event`-ed) event holds:
+
+    * **summary** — normalised through `title_for` with the state read off the
+      planned title, so the comparison is about the *game's name* rather than the
+      exact prefix characters. A promotion changes the state, so the planned
+      summary carries a different prefix and this differs (and so does the
+      colour), which is what makes a promotion an `update`.
+    * **start**/**end** — as instants, via `_same_instant`.
+    * **description** — compared verbatim, because `description_for` is
+      deterministic from the row and the round trip is exact. A stored event with
+      an empty description simply is not equal to the non-empty one we would
+      write, so it fails here and gets the update that fills it in. Blankness is
+      never a wildcard.
+    * **colour** — `colorId` as `parse_event` records it (`league_color_id`).
+
+    `visibility` is deliberately not compared: `parse_event` does not read it
+    back, so the stored side has no field to compare against, and inventing one
+    here would be a rule reading a field nothing writes.
+    """
+    if not isinstance(body, dict) or not isinstance(stored, dict):
+        return False
+
+    planned_summary = str(body.get("summary") or "")
+    # The state is read off the planned title the planner already built, so this
+    # needs no second state argument and cannot drift from `title_for`.
+    if title_for(state_from_title(planned_summary), str(stored.get("summary") or "")) != planned_summary:
+        return False
+
+    if not _same_instant(_day_of(body.get("start")), stored.get("start")):
+        return False
+    if not _same_instant(_day_of(body.get("end")), stored.get("end")):
+        return False
+
+    if str(body.get("description") or "") != str(stored.get("description") or ""):
+        return False
+
+    stored_colour = stored.get("league_color_id")
+    if stored_colour is None:
+        stored_colour = stored.get("colorId")
+    if str(body.get("colorId") or "") != str(stored_colour or ""):
+        return False
+    return True
+
+
 def create_arguments(body: dict, calendar_id: str, timezone: str) -> dict:
     """`build_event_body`'s output, addressed the way `CREATE_EVENT` wants it.
 
@@ -567,6 +653,13 @@ def apply_plan(
         "dry_run": not live,
         "created": 0,
         "updated": 0,
+        # Additive: `.tmp/applied.json` is read by `event_ledger.py` and by
+        # `candidates.py record --applied` on the real path, so nothing existing
+        # is renamed or removed. An `unchanged` row sends **nothing**, exactly
+        # like a skip, but it is a different fact — the event is on the calendar
+        # and already carries exactly what we would have sent — so it gets its
+        # own counter rather than being folded into `skipped`.
+        "unchanged": 0,
         "skipped": 0,
         "failed": [],
         "actions": [],
@@ -575,8 +668,12 @@ def apply_plan(
         if not isinstance(row, dict):
             continue
         action = str(row.get("action") or "")
-        if action == ACTION_SKIP:
-            result["skipped"] += 1
+        # Both of these send nothing and appear nowhere in `actions`. A skip is
+        # "do not touch this at all"; an unchanged row is "a PATCH would change
+        # nothing", which is only ever true because the planner compared the full
+        # payload against the stored event through `body_matches_event`.
+        if action in (ACTION_SKIP, ACTION_UNCHANGED):
+            result["skipped" if action == ACTION_SKIP else "unchanged"] += 1
             continue
         if action not in (ACTION_CREATE, ACTION_UPDATE):
             result["failed"].append(
@@ -895,11 +992,12 @@ def main() -> None:
         # Formatted positionally: `result` carries a `failed` list, so unpacking
         # it into .format() would collide with the count.
         print(
-            "OK: calendar_io: dry_run={} created={} updated={} skipped={} "
-            "failed={}".format(
+            "OK: calendar_io: dry_run={} created={} updated={} unchanged={} "
+            "skipped={} failed={}".format(
                 result["dry_run"],
                 result["created"],
                 result["updated"],
+                result["unchanged"],
                 result["skipped"],
                 len(result["failed"]),
             )
@@ -918,10 +1016,13 @@ def main() -> None:
     #
     # So the two are now told apart by **what the plan said**, not by whether
     # anything was written. A plan the planner emitted — even one whose every row
-    # is a skip — is a decision, and it exits 0 with the reason on stderr. A plan
-    # that is *empty* means the planner produced no rows at all, which is a
-    # different thing: nothing decided, so nothing was reported.
-    decided = result["created"] + result["updated"] + result["skipped"]
+    # is a skip or an `unchanged` — is a decision, and it exits 0 with the reason
+    # on stderr. A plan that is *empty* means the planner produced no rows at all,
+    # which is a different thing: nothing decided, so nothing was reported.
+    decided = (
+        result["created"] + result["updated"] + result["unchanged"]
+        + result["skipped"]
+    )
     if not decided:
         print(
             "FAIL: calendar_io: the plan contained no rows at all — the planner "

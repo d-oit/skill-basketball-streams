@@ -1,7 +1,7 @@
 ---
 name: skill-basketball-streams
 description: Search for FREE basketball live streams in Germany from approved official sources (BBL, EuroLeague, FIBA, Basketball Champions League, MagentaSport/MagentaTV, public broadcasters, clubs, YouTube channels), validate them with a 7-check pipeline (URL, page content, source allow-list, basketball-specific, date range, live proof, source reference), then add confirmed streams to Google Calendar. Renders the JS-rendered, bot-blocked magenta.tv via a fetch ladder, searches YouTube live-only under a strict start-datetime-greater-than-now gate, and revalidates stored links while discovering new sources through an append-only run log. Use when the user wants free basketball streams in Germany on a calendar, needs a stream URL validated, or reports broken links in past events. Triggers - "find basketball streams", "free BBL stream", "any free EuroLeague game today?", "validate this basketball URL", "add stream to basketball calendar". Not for paid broadcasters (Sky/DAZN/Prime), highlight reels, or non-basketball sports.
-version: "1.10.0"
+version: "1.11.0"
 category: workflow
 license: MIT
 allowed-tools: webSearch openUrl webFetch firecrawlScrape tinyfishFetch youtubeLiveSearch linkCheck GOOGLECALENDAR_EVENTS_LIST GOOGLECALENDAR_CREATE_EVENT GOOGLECALENDAR_PATCH_EVENT
@@ -113,7 +113,7 @@ For each surviving stream: league, teams, ISO 8601 date/time in CET, direct link
 
 ### Step 5 — Check Google Calendar for Duplicates
 
-**Dedupe before any write.** Call `GOOGLECALENDAR_EVENTS_LIST` on calendarId from `config/calendar.json` (or `BASKETBALL_CALENDAR_ID` env var) over the **whole window** `today 00:00 … today+7d 23:59`, then match in memory: same ±30-min slot **and** the team pair **and** a compatible league. Short and long club names are the same club (`ALBA` = `ALBA Berlin`, `Telekom Baskets Bonn` = `Bonn`); `scripts/upsert_events.py` implements this planner and prints `create`/`update`/`skip` rows **without touching the calendar**.
+**Dedupe before any write.** Call `GOOGLECALENDAR_EVENTS_LIST` on calendarId from `config/calendar.json` (or `BASKETBALL_CALENDAR_ID` env var) over the **whole window** `today 00:00 … today+7d 23:59`, then match in memory: same ±30-min slot **and** the team pair **and** a compatible league. Short and long club names are the same club (`ALBA` = `ALBA Berlin`, `Telekom Baskets Bonn` = `Bonn`); `scripts/upsert_events.py` implements this planner and prints `create`/`update`/`unchanged`/`skip` rows **without touching the calendar**. `unchanged` means the matched event already holds exactly what this run would send — title, times, description and colour all compare equal — so send **no request at all**; `skip` means do not touch it. Any real difference, or a state change, is an `update`.
 
 ### Step 6 — Create or Update Event (Only If No Duplicate AND All 7 Checks Passed)
 
@@ -255,4 +255,4 @@ All scripts are stdlib-only on Python 3.8+ and share the same exit codes: `0` PA
 - `docs/runtime.md` — daily runtime operations: cadence, secrets, telemetry schema, rung health, recovery runbook, AGPL notice
 - `references/lessons-learned.md` — incident post-mortem (broken `/user/FIBA` events), root causes, prevention checklist, validation log template and worked examples
 - `config/sources.json` — machine-readable approved-source registry + excluded sources
-- `evals/evals.json` — 38 eval cases (driving the `skill-evaluator` rubric; see `README.md` → Self-Validation)
+- `evals/evals.json` — 39 eval cases (driving the `skill-evaluator` rubric; see `README.md` → Self-Validation)

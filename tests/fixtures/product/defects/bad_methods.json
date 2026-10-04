@@ -1,0 +1,19 @@
+{
+  "methods": [
+    {
+      "name": "add-source-reader",
+      "preconditions": [
+        {
+          "description": "Fixture entry: only the subtask sensors matter to the checker."
+        }
+      ],
+      "subtasks": [
+        {
+          "name": "pin the source with the date and the evidence it was verified against",
+          "sensor": "source-registry",
+          "spike_candidate": false
+        }
+      ]
+    }
+  ]
+}

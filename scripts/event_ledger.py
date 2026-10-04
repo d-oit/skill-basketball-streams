@@ -79,6 +79,19 @@ LEDGER_NAME = "events.jsonl"
 EVIDENCE_NAME = "evidence.json"
 ACTION_CREATE = "create"
 ACTION_UPDATE = "update"
+# The ledger records **writes**, so only these two actions produce a row.
+#
+# The planner's two other outcomes are non-writes and neither gets one, for the
+# same reason: there is no new fact to record. `skip` means "do not touch this
+# event"; `unchanged` means "the stored event already carries exactly what a
+# PATCH would send, so no write was issued". An unchanged event *already holds a
+# row* from the run that created or promoted it — `events.jsonl` is append-only
+# and keyed by `event_id`, and Phase 3 audits the latest row per event — so the
+# audit can still resolve a verdict for it without a fresh row. Adding one every
+# quiet day would add no fact, would inflate "Events recorded" in the job summary
+# for a run that wrote nothing, and would be a second place to get `action`
+# right. The evidence map is the same shape: nothing changed, so there is nothing
+# new to say about it.
 WRITTEN_ACTIONS = (ACTION_CREATE, ACTION_UPDATE)
 
 
@@ -173,6 +186,15 @@ def build_rows(
             continue
         rows.append(row)
     if not rows and not refusals:
+        # A run whose only matched events were unchanged wrote nothing, which is
+        # the most common quiet day — say so rather than leaving a reader to
+        # guess why the plan looked busy and the ledger is empty.
+        if applied.get("unchanged"):
+            return [], [], (
+                f"{applied['unchanged']} event(s) unchanged — the stored events "
+                "already matched, so nothing was written and there is nothing new "
+                "to audit (their existing rows still name them)"
+            )
         return [], [], "no create/update action was applied"
     return rows, refusals, ""
 

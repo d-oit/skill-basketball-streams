@@ -1,0 +1,43 @@
+{
+  "events": [
+    {
+      "event_id": "evt-bcl-1",
+      "summary": "[UNVERIFIED] BCL: Real Madrid vs Panathinaikos",
+      "description": "League: BCL\nTeams: Real Madrid vs Panathinaikos\n",
+      "start": "2026-10-04T20:00:00+02:00",
+      "end": "2026-10-04T22:00:00+02:00",
+      "teams": ["Real Madrid", "Panathinaikos"],
+      "league": "BCL",
+      "state": "UNVERIFIED",
+      "league_color_id": "5",
+      "status": "confirmed",
+      "links": []
+    },
+    {
+      "event_id": "evt-acb-1",
+      "summary": "[VERIFIED] ACB: Barcelona vs Real Madrid",
+      "description": "League: ACB\nTeams: Barcelona vs Real Madrid\n",
+      "start": "2026-10-04T20:00:00+02:00",
+      "end": "2026-10-04T22:00:00+02:00",
+      "teams": ["Barcelona", "Real Madrid"],
+      "league": "ACB",
+      "state": "VERIFIED",
+      "league_color_id": "6",
+      "status": "confirmed",
+      "links": []
+    },
+    {
+      "event_id": "evt-bbl-2",
+      "summary": "[UNVERIFIED] BBL: Ulm vs Bonn",
+      "description": "League: BBL\nTeams: Ulm vs Bonn\n",
+      "start": "2026-10-04T17:00:00+02:00",
+      "end": "2026-10-04T19:30:00+02:00",
+      "teams": ["Ulm", "Bonn"],
+      "league": "BBL",
+      "state": "UNVERIFIED",
+      "league_color_id": "5",
+      "status": "confirmed",
+      "links": []
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "invariant": "No calendar event is created unless all 7 validation checks pass",
+    "rationale": "Fixture entry: the checker needs one invariant per sensor it has to cover in PRODUCT.md.",
+    "sensor": "pytest",
+    "category": "correctness"
+  },
+  {
+    "invariant": "The committed task board matches the harness task database export",
+    "rationale": "Fixture entry: exercises the coverage rule that PRODUCT.md must name every invariant sensor.",
+    "sensor": "product-contract",
+    "category": "integrity"
+  }
+]

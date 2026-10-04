@@ -1,0 +1,15 @@
+{
+  "skill_name": "product-contract-fixture",
+  "evals": [
+    {
+      "id": "fixture-case-a",
+      "prompt": "Fixture entry: the checker only needs the count.",
+      "expected_output": "fixture=PASS"
+    },
+    {
+      "id": "fixture-case-b",
+      "prompt": "Fixture entry: the checker only needs the count.",
+      "expected_output": "fixture=PASS"
+    }
+  ]
+}

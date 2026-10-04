@@ -73,8 +73,21 @@ python3 scripts/event_ledger.py record --plan .tmp/plan.json \
 
 Dedupe happens over the **whole window** before any write, and a `VERIFIED` event
 is never modified. A re-run therefore creates zero duplicates and leaves verified
-events byte-identical. `skip` rows send nothing at all — no request, not a no-op
-request.
+events byte-identical. `skip` and `unchanged` rows send nothing at all — no
+request, not a no-op request.
+
+**`unchanged` is the fourth action, and it is the difference between identity and
+equality.** `events_match` decides *is this the same game*; `unchanged` is the
+planner additionally asking *does anything about it differ*. On a matched,
+unpromoted event the planner builds the exact payload `apply_plan` would send,
+through the same `build_event_body` + `description_for`, and compares summary,
+start, end, description and colour against what the stored event already holds.
+Identical means no request is made at all — previously every matched
+`UNVERIFIED` event was re-PATCHed each run, a real HTTP write plus an
+`events.jsonl` row claiming the calendar changed. Any difference, or a state
+transition, stays an `update`. A stored event missing a field we compare (a
+legacy event with an empty description) is never `unchanged`: it needs the write
+that fills it in.
 
 **Every event carries a `League:`/`Teams:` description.** `list_events` reads the
 `Teams:` line back out and `upsert_events.events_match` matches on it, so it is

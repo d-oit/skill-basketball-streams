@@ -142,5 +142,17 @@
     "rationale": "Adding an iCalendar reader for the same ground truth opens a second format, and a second format is a second way around Check 3. The registry is the only thing that decides which hosts are official, and a fixture read from an unapproved domain would quietly become recall measured against a source the skill would refuse as a stream. The URL was wrong for months while the registry had been correct since 2026-09-17, because nothing asserted that the fetcher obeyed the registry; the relation is asserted now, per format, by TestFixtureSourcesAreApproved.",
     "sensor": "pytest",
     "category": "security"
+  },
+  {
+    "invariant": "The committed task board matches the harness task database export",
+    "rationale": "Task state is authoritative in `.do-harness/agent_state.db` (harness-owned and gitignored); `plans/tasks.json` is its committed export and `tasks.md` is the readable mirror of that export. A board that disagrees with the export is a stale claim someone will act on, which is worse than no board. `scripts/check_product_contract.py` fails on any id, title, status or Totals mismatch, and on an export whose own summary disagrees with its tasks, so the board cannot silently rot.",
+    "sensor": "product-contract",
+    "category": "integrity"
+  },
+  {
+    "invariant": "No committed configuration or contract declares a sensor that do-harness.toml does not define",
+    "rationale": "A sensor name that no `[[sensors]]` entry declares is a rule that has never run -- the same class as a rule that reads a field nothing writes. `plans/methods.json` subtask 2 of `add-source-reader` named `source-registry` for months after commit 01f8e77 deleted it and replaced it with `retired-sources`, so that method's own gate could not run and nothing noticed. The check reads declarations only: the `sensor` fields in `plans/methods.json` and `plans/invariants.json`, and the `Sensor` table in `PRODUCT.md`. Prose may still name a retired sensor in order to explain it, exactly as `references/approved-sources.md`'s Notes column names a retired domain.",
+    "sensor": "product-contract",
+    "category": "integrity"
   }
 ]

@@ -47,7 +47,12 @@ class TestUpsertFixture:
         )
         assert result.returncode == 0, result.stderr
         payload = json.loads(result.stdout)
-        assert payload["summary"] == {"create": 1, "update": 0, "skip": 1}
+        assert payload["summary"] == {
+            "create": 1,
+            "update": 0,
+            "unchanged": 0,
+            "skip": 1,
+        }
 
     def test_the_short_name_candidate_skips_the_verified_event(self):
         # The fixture deliberately writes ["ALBA", "Bayern"] against a stored
@@ -120,14 +125,24 @@ class TestVerdictFixture:
 
     def test_without_the_ledger_both_events_would_be_promoted(self):
         """The control. This is what the guarantee is protecting against."""
-        assert self._plan()["summary"] == {"create": 0, "update": 2, "skip": 0}
+        assert self._plan()["summary"] == {
+            "create": 0,
+            "update": 2,
+            "unchanged": 0,
+            "skip": 0,
+        }
         assert {
             row["state"] for row in self._plan()["plan"]
         } == {"VERIFIED"}
 
     def test_the_ledger_holds_the_condemned_event(self):
         plan = self._plan("--verdicts", str(FIXTURES / "upsert_verdicts.jsonl"))
-        assert plan["summary"] == {"create": 0, "update": 1, "skip": 1}
+        assert plan["summary"] == {
+            "create": 0,
+            "update": 1,
+            "unchanged": 0,
+            "skip": 1,
+        }
         held = [row for row in plan["plan"] if row["action"] == "skip"]
         assert held[0]["event_id"] == "evt-paid-bonn"
         assert held[0]["state"] == "WRONG"

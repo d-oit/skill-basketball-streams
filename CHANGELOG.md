@@ -445,6 +445,196 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that reverts to a truthiness check.
 
 
+## [1.11.0] - 2026-10-04
+
+### Added
+
+- **`unchanged`: the calendar is checked before every write, and an event that
+  needs no change is not rewritten.** "Check if it already exists and change it
+  if anything changed" was half true. `events_match` decided *is this the same
+  game* — the 30-minute window, the team pair, the league — and every match
+  that was not `VERIFIED` and not held by an audit `WRONG` then became an
+  `update`. So a quiet day re-`PATCH`ed every unverified event over HTTP and
+  appended an `action: "update"` row to `events.jsonl` claiming the calendar had
+  changed, when nothing about it had. Identity was being answered; equality was
+  never asked.
+
+  The planner now asks both. On a matched, unpromoted event it builds the exact
+  payload `apply_plan` would send — through the same `build_event_body` and
+  `description_for`, so there is no second opinion about what that payload is —
+  and compares `summary`, `start`, `end`, `description` and `colorId` against
+  what the stored event already holds (`calendar_io.body_matches_event`). Equal
+  is `unchanged`: **no request is sent at all**, in the live path, with no
+  credentials. Any difference, or a state transition, stays an `update`.
+
+  Three properties are deliberate rather than incidental:
+
+  - **A promotion is never `unchanged`.** The `UNVERIFIED -> VERIFIED` gate is
+    explicit, not a side effect of the colour table changing, because the state
+    is the event's label on a public calendar.
+  - **A blank is never a wildcard.** A legacy event with an empty description,
+    or no usable start, does not match a non-blank planned value; it gets the
+    update that fills it in. "Missing" must not mean "equal to anything", which
+    is the same rule `events_match` documents for an absent `Teams:` line.
+  - **`visibility` is not compared.** `parse_event` does not read it back, so
+    the stored side has no field for it. Comparing it would be a rule reading a
+    field nothing writes.
+
+  Proven on the real path, not on a hand-built event: a first run plans
+  `create`, and feeding its own output back through `parse_event` plans
+  `unchanged` with **zero** HTTP calls; changing the stored link, the colour or
+  the end time, or promoting the game, plans `update`. `unchanged` is handled
+  everywhere the three old actions were — `apply_plan` counts it separately and
+  keeps the result shape additive, because `.tmp/applied.json` is read by
+  `event_ledger.py` and `candidates.py` on the real path; the planner's
+  `summarise` seeds it at zero so a reader can tell "none unchanged" from "this
+  plan does not speak about unchanged".
+
+- **`scripts/calendar_log.py` + `references/calendar-log.md` — every calendar
+  decision, including the ones nothing is sent for.** `events.jsonl` records
+  only `create`/`update` rows that reached the calendar, so a `skip` was recorded
+  nowhere, and the planner's own reason for it (`"verified event exists"`,
+  `"audit verdict WRONG stands"`) lived only in `.tmp/plan.json` — runner
+  scratch that is never uploaded and never committed. The decision a subscriber
+  would ask about was unobservable.
+
+  One `calendar-log.jsonl` row per game in the plan, in plan order, carrying the
+  action, the planner's verbatim `reason`, the state, league, teams, times,
+  `dry_run`, and the stream links — because the links are what a later
+  revalidation reads. `event_id` is never invented (the applied id, else the
+  plan's); a dry run carries `dry_run: true` and no invented id. `fields_changed`
+  is a **real diff** against the runtime's own `calendar_io list` snapshot when
+  one was supplied, `[]` when compared-and-identical, and `null` when no
+  comparison happened — never an empty list, which would read as "nothing
+  changed" about an event nobody compared.
+
+  Append-only JSONL on the `telemetry` branch, alongside `events.jsonl`. Not
+  `.do-harness/agent_state.db`: that store is harness-owned and gitignored, and
+  `trace add` records agent interaction traces, not product telemetry — putting
+  this there would give one file a second meaning. `actions/download-artifact`
+  overwrites an existing path, so the publishing job re-reads the branch copy
+  from `git show HEAD:calendar-log.jsonl` and merges, making a re-run idempotent
+  rather than replacing history with the newest run's rows.
+
+- **`PRODUCT.md` and `tasks.md`, and the `product-contract` sensor that makes
+  them real.** Neither file existed, and do-harness has no concept of either —
+  its full source tree has zero hits for `PRODUCT.md` or `tasks.md`, so the
+  convention is defined here and is machine-checked rather than decorative.
+  `PRODUCT.md` states the product, its audience, and a **sensor table**; the
+  checker requires every sensor named in that table to be declared in
+  `do-harness.toml`, so a promise guarded by a sensor that does not exist is a
+  gate failure. `tasks.md` mirrors the committed `plans/tasks.json` export, and
+  a stale board — any id, title, status or total disagreeing — fails.
+
+  Two checks were chosen for what they *cannot* do. The invariants are not
+  duplicated into `PRODUCT.md` as prose: 26 hand-copied strings would be a
+  second hand-edited copy of `plans/invariants.json`, the exact drift the
+  document refuses to create elsewhere, so adding an invariant with a new
+  sensor is what forces a doc update, not adding an invariant at all. And the
+  eval-case count is checked against `evals/evals.json` rather than asserted —
+  the doc says 39, the file holds 39, and adding a case now reds the gate instead
+  of quietly making the doc false.
+
+  The checker fails on all six real defects: a stale `tasks.md`, a
+  `PRODUCT.md` naming a deleted sensor, a contents list promising a section
+  that does not exist, `plans/methods.json` naming a deleted sensor, a stale
+  eval count, and `PRODUCT.md` removed entirely.
+
+- **`scripts/record_run_outcomes.py` + the `run-outcomes` sensor — the caller
+  `source_learning.py record` never had.** `references/self-learning.md`
+  documents five loops; three had a producer with a caller, but the run-log had
+  a *writer* and **no caller at all**. Nothing in `.github/` invoked
+  `source_learning.py record`, so `logs/run-log.jsonl` was never created by CI,
+  `score` exited 1 on the empty file, and `candidates` had nothing to read. The
+  loop was documented, implemented, and inert — the "reader is not a producer"
+  trap one level down, since the writer existed and the caller did not.
+
+  The new step derives rows from the ledgers **already in the telemetry
+  worktree** — `candidates.jsonl` (search hits), `fetch-attempts.jsonl` (a
+  blocked, gone or 5xx fixture source: an issue during the run),
+  `rung-attempts.jsonl` (a failing or parked render rung) and `events.jsonl` —
+  and hands them to `source_learning`'s own `mode_record`, importing it rather
+  than forking it. It then runs the readers too (`score`, `candidates`),
+  because a log nobody reads is the same defect one step later. Newly surfaced
+  domains stay **quarantined**; nothing is promoted automatically.
+
+  **The log goes on the `telemetry` branch, not `logs/`.** `logs/` is gitignored
+  (`.gitignore:12`), so a run log written there would be invisible to every CI
+  job — which is precisely how the retired `source-registry` sensor passed
+  vacuously. The telemetry worktree is a checkout of the orphan `telemetry`
+  branch, whose tree carries no `.gitignore`, so `git add -A` there commits the
+  file. The `run-outcomes` sensor re-derives from **committed** ledgers and
+  exits 1 on each of three real defects: a dropped blocked-source row, a dropped
+  dying-rung row, and a missing `run-log.jsonl`.
+
+### Fixed
+
+- **`validate.yml` could not be parsed by YAML, so that workflow could not run.**
+  `- name: Run rehearse (offline half: registry + issue grant)` contains an
+  unquoted `: ` inside a plain scalar, which is the exact construct YAML reserves
+  for a mapping key. `yaml.safe_load` failed at line 229, so every consumer of
+  the file failed with it — including `scripts/replay_ci.py`, which reported
+  `unparseable YAML` and stopped. Present in the committed tree, not introduced
+  here; confirmed by parsing the `HEAD` copy of the file. Quoting the value fixes
+  it, and all six workflows now parse.
+
+- **A method catalog subtask named a sensor deleted a month earlier.**
+  `plans/methods.json`'s `add-source-reader` pinned subtask 2 to `source-registry`,
+  the sensor removed in `01f8e77` and replaced by `retired-sources`. It parses
+  (`Subtask.sensor` is optional upstream), so nothing failed: the subtask simply
+  pointed at nothing, and the sibling fix had already remapped
+  `plans/invariants.json:47`. Repointed at `retired-sources`, and
+  `check_product_contract.py` now refuses any method or invariant that names an
+  undeclared sensor, so the next deletion cannot leave one behind.
+
+- **`references/search-backends.md` promised a search ladder that does not
+  exist.** The "Recommended default ladder" read `TinyFish -> Firecrawl -> Exa
+  -> Tavily`. The implemented `LADDER` is `(exa-mcp, exa-mcp-keyless, tinyfish,
+  render-arena)` — Exa first, and Firecrawl is a *render* rung in
+  `render_ladder.py`, not a Phase 0 search rung. **Tavily has no code at all**:
+  grep for it across `*.py`/`*.yml`/`*.json`/`*.toml` finds zero hits, and
+  `.env.example` carries no `TAVILY_API_KEY`; it exists only in prose. The same
+  document stated the implemented order correctly two paragraphs later, so it
+  contradicted itself. Corrected to the code, which is the truth.
+
+- **Every count of the eval cases was one behind.** `evals/evals.json` holds
+  **39** cases with 39 unique ids; `README.md` (×3) and `SKILL.md` all said 38.
+  A stale count in a product document is a claim nobody checks, so the number is
+  now asserted against the file by `check_product_contract.py` instead of merely
+  corrected.
+
+- **`do-harness` pinned to `v0.2.0`**, up from `v0.1.2`, in `verify.yml`,
+  `AGENTS.md` and `docs/do-harness.md`, and two defect claims re-measured rather
+  than carried forward:
+
+  - **§3, `verify --record` segfaulting on the full set — FIXED.**
+    [d-o-hub/do-harness#267](https://github.com/d-o-hub/do-harness/issues/267)
+    is resolved. Re-measured on the pinned v0.2.0 in this working copy:
+    `feedback` (2), `verification` (21) and `release` (23) all record with
+    exit 0, and `status --set release` reads `green`. The `--record`-free
+    workaround this repository had to run since v0.1.2 — and had to caveat in
+    every commit in that window — is **withdrawn**, and the documented
+    bottom-up loop is back to `--record`. The 0.1.2 behaviour is kept on
+    record in the defect register, because the note re-measured before it wrote
+    anything.
+
+  - **§1, `do-harness eval` SIGSEGVing on its second invocation — still does not
+    reproduce**, measured separately and on purpose: `eval` is what the
+    `continue-on-error` mitigation exists for, so the fix to §3 was never
+    evidence about §1.
+
+  The upstream repository is **`d-o-hub/do-harness`**. There is no
+  `d-o-it/do-harness` — that URL 404s. `d-o-it` is a real account and authored
+  the last two v0.2.0 release commits, which is the likely origin of the
+  confusion; recorded in `docs/do-harness.md` so the next instruction naming
+  it can be recognised rather than followed literally.
+
+### Changed
+
+- `docs/runtime.md`, `SKILL.md` (Step 5), `references/calendar-setup.md` and
+  `README.md` now state the four-action planner outcome set and say what
+  `unchanged` means, instead of listing `create`/`update`/`skip`.
+
 ## [1.10.0] - 2026-09-30
 
 ### Added

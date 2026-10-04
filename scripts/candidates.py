@@ -493,6 +493,13 @@ def outcome_rows(
     * `skip` -> `skipped_duplicate`: it was already there, or an audit `WRONG`
       held it. A skip is **not** a miss, and it is not `unverifiable` either, so
       the game leaves the retry queue instead of being chased again.
+    * `unchanged` -> `skipped_duplicate`: the game is on the calendar and the
+      stored event already carries exactly what the planner would have sent, so
+      no write was issued. That is the *same fact* as a duplicate — it is there
+      and it is right — and mapping it to `unverifiable` (which the `else` used
+      to do) would put an on-calendar game back in the retry queue and score it
+      as unreached, which is the error this docstring's `rejected_auditWrong`
+      rule exists to prevent in the other direction.
     * anything else -> `unverifiable`: unreached, and still retryable.
 
     A dry run records nothing: no event was written, so a `created` row would be
@@ -522,6 +529,11 @@ def outcome_rows(
                 if "WRONG" in reason
                 else "skipped_duplicate"
             )
+        elif action == "unchanged":
+            # Already on the calendar, and the stored event already matches — the
+            # same "it is there" fact as `skipped_duplicate`, and explicitly not
+            # a fall-through to `unverifiable`, which is the retry queue.
+            disposition = "skipped_duplicate"
         else:
             disposition = "unverifiable"
         rows.append(

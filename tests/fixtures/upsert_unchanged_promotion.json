@@ -1,0 +1,28 @@
+{
+  "_comment": "Everything about the stored event already matches — but this run has CONFIRMED free access, so the state moves UNVERIFIED -> VERIFIED. That is a promotion: the prefix drops, the colour leaves Banana for the league colour, and subscribers see a confirmed game. It must be `update` even though no other field changed, which is why the state comparison is explicit rather than left to the colour table.",
+  "events": [
+    {
+      "event_id": "evt-unchanged-promotion",
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-10-05T18:00:00Z",
+      "end": "2026-10-05T20:30:00Z",
+      "summary": "[UNVERIFIED] BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "state": "UNVERIFIED",
+      "league_color_id": "5",
+      "description": "League: BBL\nTeams: ALBA Berlin vs FC Bayern Muenchen\nDate/Time: 2026-10-05T18:00:00Z\n"
+    }
+  ],
+  "candidates": [
+    {
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-10-05T18:00:00Z",
+      "end": "2026-10-05T20:30:00Z",
+      "state": "VERIFIED",
+      "summary": "BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "league_color_id": "6",
+      "evidence": {"live_confirmed": true, "free_confirmed": true}
+    }
+  ]
+}

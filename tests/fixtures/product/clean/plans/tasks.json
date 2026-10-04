@@ -1,0 +1,33 @@
+{
+  "exported_at": 1790795849,
+  "tasks": [
+    {
+      "id": 1,
+      "parent_id": null,
+      "title": "Phase 5 fixture parsing",
+      "method": null,
+      "subtask_index": 0,
+      "status": "pending",
+      "precondition": null,
+      "created_at": 1789402377,
+      "updated_at": 1789402377
+    },
+    {
+      "id": 2,
+      "parent_id": null,
+      "title": "Add an iCalendar (RFC 5545) parser so fixture ground truth can come from a feed instead of a page",
+      "method": null,
+      "subtask_index": 0,
+      "status": "done",
+      "precondition": "parse_ics emits the same fixture/game_key shape as parse_page",
+      "created_at": 1790793252,
+      "updated_at": 1790793252
+    }
+  ],
+  "summary": {
+    "pending": 1,
+    "in_progress": 0,
+    "done": 1,
+    "failed": 0
+  }
+}

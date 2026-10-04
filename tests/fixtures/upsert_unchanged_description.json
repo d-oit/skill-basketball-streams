@@ -1,0 +1,28 @@
+{
+  "_comment": "The stored event carries only the identity block; the candidate now has a `directLinks` entry, so `description_for` would add a FREE STREAM LINKS section. A newly fetched link is a change and must be written — the stored description is a field we compare, and it differs.",
+  "events": [
+    {
+      "event_id": "evt-unchanged-description",
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-10-05T18:00:00Z",
+      "end": "2026-10-05T20:30:00Z",
+      "summary": "[UNVERIFIED] BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "state": "UNVERIFIED",
+      "league_color_id": "5",
+      "description": "League: BBL\nTeams: ALBA Berlin vs FC Bayern Muenchen\nDate/Time: 2026-10-05T18:00:00Z\n"
+    }
+  ],
+  "candidates": [
+    {
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-10-05T18:00:00Z",
+      "end": "2026-10-05T20:30:00Z",
+      "state": "UNVERIFIED",
+      "summary": "BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "league_color_id": "6",
+      "directLinks": [{"source": "bbl", "url": "https://www.basketball-bundesliga.de/live"}]
+    }
+  ]
+}

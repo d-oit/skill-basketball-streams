@@ -18,7 +18,7 @@
         },
         {
           "name": "pin the source with the date and the evidence it was verified against",
-          "sensor": "source-registry",
+          "sensor": "retired-sources",
           "spike_candidate": false
         },
         {

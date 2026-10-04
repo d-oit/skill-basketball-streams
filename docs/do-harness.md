@@ -27,7 +27,7 @@ agents and CI must pass.
 | Decision | Choice |
 |---|---|
 | Adoption depth | **Executed** — config, sensors, invariants, contract, hooks and CI. |
-| Binary acquisition | **Pinned prebuilt installer**, `--version v0.1.2`, checksum-verified into `$HOME/.local/bin`. |
+| Binary acquisition | **Pinned prebuilt installer**, `--version v0.2.0`, checksum-verified into `$HOME/.local/bin`. |
 | Grading authority | **The four product graders stay** (withdrawn from "`do-harness eval` only" — `eval` never sees the root skill). `do-harness eval` runs *in addition*, for the tooling skills. |
 
 ## Relationship to the runtime that now exists
@@ -78,7 +78,7 @@ described in `references/self-learning.md`.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/d-o-hub/do-harness/main/scripts/install.sh \
-  | sh -s -- --version v0.1.2
+  | sh -s -- --version v0.2.0
 export PATH="$HOME/.local/bin:$PATH"
 do-harness --version
 ```
@@ -86,7 +86,14 @@ do-harness --version
 The installer verifies the artifact against the release `checksums.txt` before
 installing. Those checksums share the release origin, so they detect corruption
 and truncated downloads — **not** a compromised origin. Record the pin in CI as
-a literal `v0.1.2`; do not track `latest`.
+a literal `v0.2.0`; do not track `latest`.
+
+**Which repository is upstream.** `d-o-hub/do-harness`. There is no
+`d-o-it/do-harness` — that URL returns 404, so an instruction naming it cannot
+be followed literally. The `d-o-it` account is real and is the author of the
+most recent release commits (e.g. PR #274 and #278 in the v0.2.0 notes), which
+is the likely origin of the confusion. Release notes, the installer and CI all
+resolve `d-o-hub`; use that.
 
 Do **not** vendor the Rust source, and never build it into this repo's shared
 `target/` directory if the decision ever changes — `cargo clean` in this
@@ -347,7 +354,7 @@ or harness regression cannot red the existing Python 3.9/3.12 matrix.
 ```yaml
 - run: |
     curl -fsSL https://raw.githubusercontent.com/d-o-hub/do-harness/main/scripts/install.sh \
-      | sh -s -- --version v0.1.2
+      | sh -s -- --version v0.2.0
     echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 - run: do-harness doctor
 - run: do-harness verify --set verification --format json --strict --evidence .do-harness/evidence.json
@@ -430,11 +437,13 @@ permanent, unexplained failure. `do-harness errors list` and
 `errors clear --sensor <name>` are the escape hatch; both `AGENTS.md` and
 `.github/workflows/verify.yml` surface this.
 
-## Known defects in `do-harness` v0.1.2 (observed, not inferred)
+## Known defects in `do-harness` (observed, not inferred)
 
 These were found by replaying the workflow against a fresh tree rather than by
-trusting a green local run, and every claim below was **re-measured on 0.1.2**
-when the pin moved from 0.1.0 (see §1 for the one that no longer reproduces).
+trusting a green local run. §1 and §3 were re-measured on **v0.2.0** on
+2026-10-04, when the pin moved from v0.1.2: **§3 no longer reproduces** and is
+kept below because the measurement is the record, not because the workaround is
+still needed.
 
 The replay is now a script rather than a recipe, because it was re-derived by
 hand three times and has two traps that fail *misleadingly*:
@@ -470,7 +479,14 @@ consequences worth knowing before you read a red replay:
   looks *configured* to a backend and can start real network calls with a bogus
   key — strictly worse than an obviously empty value.
 
-### 1. `do-harness eval` SIGSEGVs on its second invocation — **does not reproduce on 0.1.2**
+### 1. `do-harness eval` SIGSEGVs on its second invocation — **does not reproduce on 0.1.2 or v0.2.0**
+
+> **Re-measured again on v0.2.0, 2026-10-04: still not reproduced.** Four
+> consecutive `do-harness eval` runs in a freshly `init`-ed workspace — no
+> `.do-harness` state carried over — all exited **0**. This is a separate
+> measurement from §3's, deliberately: `eval` is what the `continue-on-error`
+> mitigation exists for, and the SIGSEGV was its original justification, so a
+> fix to the other defect was never evidence about this one.
 
 Originally observed on 0.1.0:
 
@@ -538,22 +554,28 @@ and prints a notice instead.
 Harmless in CI, where `actions/checkout` always provides one, but it means
 `doctor` cannot be used as a smoke test in a plain directory.
 
-### 3. `verify --record` SIGSEGVs on the full 21-sensor set
+### 3. `verify --record` SIGSEGVs on the full 21-sensor set — **fixed in v0.2.0**
 
-Distinct from section 1, and worse for this repository specifically. Filed
-upstream: [d-o-hub/do-harness#267](https://github.com/d-o-hub/do-harness/issues/267).
-Reproduces on 0.1.1 and 0.1.2, in a long-lived working copy (so unlike section 1
-it is *not* a fresh-checkout-only defect), 5/5 attempts. **Re-confirmed on 0.1.2**
-when the pin moved, on a fresh checkout: `feedback` (2) and `verification` (19)
-recorded cleanly, `release` (21) exited 139 with no sensor output at all.
+Filed upstream: [d-o-hub/do-harness#267](https://github.com/d-o-hub/do-harness/issues/267).
+On **0.1.1 and 0.1.2** this reproduced 5/5 attempts in a long-lived working copy
+(so unlike §1 it was *not* a fresh-checkout-only defect): `feedback` (2) and
+`verification` (19) recorded cleanly, `release` (21) exited 139 with no sensor
+output at all.
+
+**Re-measured on the pinned v0.2.0 on 2026-10-04**: all three sets record with
+exit 0, `release` included, and `do-harness status --set release` reads `green`
+afterwards.
 
 ```console
-$ do-harness verify --set feedback     --strict --record; echo "exit=$?"   # exit 0,  2 sensors
-$ do-harness verify --set verification --strict --record; echo "exit=$?"   # exit 0, 19 sensors
-$ do-harness verify --set release      --strict --record; echo "exit=$?"   # exit 139
-$ do-harness verify                    --strict --record; echo "exit=$?"   # exit 139
-$ do-harness verify --set release      --strict;          echo "exit=$?"   # exit 0, 21 sensors
+$ do-harness verify --set feedback     --strict --record; echo "exit=$?"   # 0.2.0: exit 0,   2 sensors
+$ do-harness verify --set verification --strict --record; echo "exit=$?"   # 0.2.0: exit 0,  20 sensors
+$ do-harness verify --set release      --strict --record; echo "exit=$?"   # 0.2.0: exit 0,  22 sensors
+$ do-harness verify                    --strict --record; echo "exit=$?"   # 0.1.2: exit 139 (SIGSEGV)
 ```
+
+`--record` is therefore restored to the documented bottom-up loop in `AGENTS.md`.
+The 0.1.2 behaviour is kept on record below because the note re-measured before
+it wrote anything: on 0.1.2,
 
 `--record` is the discriminator, and it is the *only* thing that breaks. The
 crash lands **before the first sensor runs** (zero `PASS`/`FAIL` lines on
@@ -577,30 +599,28 @@ holding the same 21 `[[sensors]]` blocks but **no** `[signal-sets]` table record
 cleanly. So it is the record path for a *resolved* set that fails, not sensor
 execution.
 
-**Why it matters here.** The documented bottom-up loop in `AGENTS.md`
+**Why it mattered here, and what it cost.** The documented bottom-up loop in
+`AGENTS.md` died on its third iteration with exit 139 and no sensor output at
+all. That is loud — a CI step goes red — so the loop could not pass unnoticed.
+The subtler trap was the *recovery*: because a later non-`--record` run silently
+refreshed the same evidence file, a green `status --set release` did **not**
+prove the recorded step ever succeeded. Between v0.1.2 and v0.2.0 this
+repository therefore ran a `--record`-free loop that meant something different
+from the one written down, and every commit in that window had to say so.
+
+That workaround is **withdrawn**: the loop is back to
 
 ```bash
 for s in feedback verification release; do
   do-harness verify --set "$s" --strict --record
 done
-```
-
-dies on its third iteration with exit 139 and no sensor output at all. That is
-loud — a CI step goes red — so the loop cannot pass unnoticed. The subtler trap
-is the *recovery*: because a later non-`--record` run silently refreshes the same
-evidence file, a green `status --set release` does **not** prove the recorded step
-ever succeeded. Re-establish the claim with:
-
-```bash
-for s in feedback verification release; do
-  do-harness verify --set "$s" --strict          # no --record while #267 is open
-done
 do-harness status --set release
 ```
 
-Do not "fix" a red `--record` step by dropping the flag *without* saying so in the
-commit message: the evidence is still genuine, but the step now means something
-different from the one written down.
+If a future install segfaults again, the plain run is still a valid fallback
+(it stamps the same evidence file) — but say so in the commit message rather
+than dropping the flag silently, which is exactly the ambiguity this defect
+created.
 
 ## Risks and escape hatches
 
