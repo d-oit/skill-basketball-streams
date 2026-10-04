@@ -156,3 +156,26 @@ class TestTheWorkflowWiresItUp:
         """`--agent` is on the published 1.18.33 `run --help`."""
         assert re.search(r"opencode run\b[\s\S]*?--agent ", self._step("Run the skill"))
 
+    def test_the_restriction_is_asserted_against_the_transcript(self):
+        """`--agent <wrong-name>` silently falls back, so the flag is not proof.
+
+        The run is checked against its own evidence: a `bash`/`edit` tool event
+        means the restriction is not in effect. This is the difference between
+        writing a config and verifying the run obeyed it.
+        """
+        step = self._step("Assert the agent used no forbidden tool")
+        assert "if: always()" in step
+        assert "for tool in bash edit" in step
+        assert 'grep -q "\\"tool\\":\\"$tool\\"" .tmp/transcript.json' in step
+        assert "::error::" in step
+        assert "exit 1" in step
+        # Tolerant only of the *absent* transcript — never a bare `|| true`.
+        assert "[ ! -f .tmp/transcript.json ]" in step
+        assert "::notice::" in step
+        assert "|| true" not in step
+
+    def test_the_assertion_runs_after_the_run(self):
+        names = [s.split("- name: ", 1)[-1].splitlines()[0] for s in self._steps()]
+        run = names.index("Run the skill")
+        assertion = names.index("Assert the agent used no forbidden tool")
+        assert run < assertion, "the transcript has to exist before it is asserted on"

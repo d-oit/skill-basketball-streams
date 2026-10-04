@@ -39,6 +39,39 @@ An uncertain state **overrides** the league colour, so an unconfirmed final neve
 looks like a confirmed one. `WRONG` is terminal, set only by
 `scripts/audit_events.py`, and relabels rather than deletes.
 
+## The runtime agent's permission restriction
+
+The runtime runs as a **restricted agent**, and both halves of that are load
+bearing — the file that defines it, and the flag that selects it.
+
+```bash
+# 1. write the agent. Deterministic: no model call, so a provider outage or an
+#    exhausted free tier cannot stop the job.
+python3 scripts/runtime_agent.py --path .opencode/agent >> "$GITHUB_OUTPUT"
+
+# 2. select it. `opencode run` without `--agent` uses the built-in `build`
+#    agent, whose permission set is `*: allow`.
+opencode run --agent "$AGENT" --model "$LLM_MODEL" --format json ... | tee .tmp/transcript.json
+
+# 3. assert it. `--agent <wrong-name>` does NOT error -- the CLI silently falls
+#    back -- so a `bash` or `edit` tool event in the transcript reds the job.
+```
+
+`scripts/runtime_agent.py` writes `.opencode/agent/runtime.md` with `edit`,
+`bash`, `task`, `todowrite` and `lsp` denied. It replaced `opencode agent
+create`, which generated the same static file with an **LLM call** and failed
+the whole runtime job on 2026-10-04 with a provider's balance error. A security
+control must not depend on a live model, and a generator also picks the agent's
+*name* — which is why the deterministic writer is what makes `--agent` safe to
+read from a step output rather than retype.
+
+Two production runs proved why the selection and the assertion are not
+optional. Without `--agent` the restriction was dead config: the 2026-10-02 log
+shows the agent invoking `bash` and the step spending 21 minutes until
+`timeout` killed it. A malformed permission key is silently ignored too, so the
+claim is checked against the transcript rather than documented. The three
+halves are pinned by `tests/test_runtime_agent.py`.
+
 ## Writing to the calendar
 
 The write path is four modules, each independently inspectable. Nothing writes
