@@ -249,7 +249,13 @@ def _execute_tool(
         with urllib.request.urlopen(request, timeout=timeout) as response:
             payload = response.read().decode("utf-8", "replace")
     except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", "replace") if exc.fp else ""
+        # `exc.read()` is `bytes` for a real HTTP response, but a *synthetic*
+        # `HTTPError` — one constructed with `fp=None`, which the test suite
+        # raises and some stdlib builds back with a `StringIO` — returns `str`.
+        # `.decode` on that is an `AttributeError` that replaces the calendar
+        # error with a crash, which is the failure the caller can least act on.
+        raw = exc.read() if exc.fp else b""
+        detail = raw.decode("utf-8", "replace") if isinstance(raw, bytes) else raw
         # Composio's error body carries its own reason and a request id; the API
         # key never appears in it.
         raise CalendarError(exc.code, detail[:500] or exc.reason) from exc
