@@ -107,13 +107,28 @@ jobs:
       - name: Run synthesise_eval_case (needle invariant)
         run: python3 scripts/synthesise_eval_case.py --verify
 
+      # `--input-kind html` on all three is load-bearing, and it is here because
+      # the sources' *declared* kind is not the kind of the page being fed.
+      # `DEFAULT_SOURCES["bbl"]` is `kind: "ics"` (its live URL is the league's
+      # own iCalendar feed), but this step parses **saved HTML** fixtures to
+      # exercise the HTML parser — so `parse_source` read JSON-LD as an iCalendar
+      # file, found nothing, and reported "the page fetched but no fixture
+      # parsed (markup change?)". The parser was fine and the fixture was fine;
+      # the step was asserting a misdiagnosis.
+      #
+      # This step was already red on `main` before the workflow file could even be
+      # parsed, so it had never run in CI. The flag has existed for exactly this
+      # ("parse a saved --input page as this format, overriding the source's
+      # declared kind"); it was simply never passed when BBL moved to a feed.
       - name: Run fixtures (JSON-LD, microdata and embedded-payload pages)
         run: |
           python3 scripts/fixtures.py \
             --input tests/fixtures/fixtures_page_bbl.html --source bbl \
+            --input-kind html \
             --now 2026-09-14T08:30:00Z
           python3 scripts/fixtures.py \
             --input tests/fixtures/fixtures_page_microdata.html --source bbl \
+            --input-kind html \
             --now 2026-09-14T08:30:00Z
           # The BCL page carries neither shape the two rungs above read: its game
           # list is a Next.js flight payload. `--now` is the first day of that

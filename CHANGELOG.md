@@ -587,6 +587,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `check_product_contract.py` now refuses any method or invariant that names an
   undeclared sensor, so the next deletion cannot leave one behind.
 
+- **`validate.yml`'s fixtures step asserted a misdiagnosis, and had never run.**
+  It parses three **saved HTML** fixtures, but `DEFAULT_SOURCES["bbl"]` declares
+  `kind: "ics"` (its live URL is the league's own iCalendar feed, added in
+  1.9.0). `parse_source` therefore read JSON-LD as an iCalendar file, found
+  nothing, and printed *"the page fetched but no fixture parsed (markup
+  change?)"* — naming a markup change when the parser was fine, the fixture was
+  fine, and the step was feeding the wrong format to the reader. `--input-kind
+  html` existed for exactly this (*"parse a saved `--input` page as this format,
+  overriding the source's declared kind"*) and was simply never passed when BBL
+  moved to a feed.
+
+  It went unnoticed because the step **had never run in CI**: the unparseable
+  YAML above failed every `validate.yml` invocation at 0s, so the last three
+  `main` runs reported *"This run likely failed because of a workflow file
+  issue"* and no step executed at all. Fixing the YAML exposed this one directly
+  underneath. All three fixture pages now parse (`replay_ci`: 27 passed, 0
+  failed), so a green step exercises the HTML parser again.
+
 - **`references/search-backends.md` promised a search ladder that does not
   exist.** The "Recommended default ladder" read `TinyFish -> Firecrawl -> Exa
   -> Tavily`. The implemented `LADDER` is `(exa-mcp, exa-mcp-keyless, tinyfish,
