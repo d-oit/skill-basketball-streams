@@ -916,7 +916,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   it is not done here.
 
 
+## [1.11.1] - 2026-10-04
+
+### Fixed
+
+- **The runtime job could not start, because a security control depended on a
+  live model.** `opencode agent create` *generates* the agent with an LLM, and
+  on 2026-10-04 it failed the whole `runtime` job with a provider's balance
+  error — "This request requires at least $1.00 in balance for image or video
+  output" — while the agent it produces is static: a fixed description and a
+  fixed tool allow-list. `scripts/runtime_agent.py` writes
+  `.opencode/agent/runtime.md` deterministically now, and the workflow reads
+  the agent name from its output.
+
+- **The permission restriction was never in effect.** `opencode run` without
+  `--agent` selects the built-in `build` agent, whose permission set is
+  `*: allow`; the generated agent was dead config. The 2026-10-02 production
+  log shows the consequence — the agent invoked `bash` and the step spent 21
+  minutes exploring the runner until `timeout` killed it. So `PRODUCT.md`'s
+  "denied `edit` and `bash`" was a promise nothing kept. The run now passes
+  `--agent runtime`, and a new step asserts the claim against the transcript:
+  a `"tool":"bash"` or `"tool":"edit"` event reds the job, because `--agent`
+  with a name that does not resolve silently falls back rather than erroring
+  (verified on the pinned 1.18.33 binary).
+
+- **`calendar_io.py` crashed instead of raising `CalendarError` on a synthetic
+  `HTTPError`.** `HTTPError.read()` returns `bytes` from a real response but
+  `str` when the error was constructed with `fp=None` (some stdlib builds back
+  that with a `StringIO`), so `.decode` was an `AttributeError` that replaced
+  the calendar error with a crash the caller could not act on.
+
+
 ## [Unreleased]
+
 
 
 
