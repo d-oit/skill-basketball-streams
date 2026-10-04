@@ -5,10 +5,10 @@ This repository uses do-harness for computational verification.
 ## Prerequisites
 
 The `do-harness` CLI must be on `PATH`, or `DO_HARNESS_BIN` must point at it.
-Pin the version this repository was initialized with:
+Pin the version this repository is verified against — **v0.2.0**:
 
     curl -fsSL https://raw.githubusercontent.com/d-o-hub/do-harness/main/scripts/install.sh \
-      | sh -s -- --version v0.1.2
+      | sh -s -- --version v0.2.0
 
 Rust developers can instead build from a checkout with
 `cargo install --path <do-harness>/crates/do-harness`.
@@ -68,6 +68,26 @@ The **product** is the root skill:
 belong to do-harness itself, not to this skill. Editing them is never a change
 to the product, and a green `do-harness eval` says nothing about SKILL.md.
 
+### PRODUCT.md and tasks.md
+
+`PRODUCT.md` is the product contract: what the repository is, who it is for,
+and the `Sensor` table naming which sensor enforces each promise. Every sensor
+it names must be declared in `do-harness.toml`; every sensor an invariant in
+`plans/invariants.json` relies on must be named in that table.
+
+`tasks.md` is the human/agent-readable task board. It is **derived**, not
+authored: task state lives in `.do-harness/agent_state.db` (harness-owned and
+gitignored), which is authoritative, and `plans/tasks.json` is the committed
+export written by `do-harness task export`. To refresh the board, run
+`do-harness task export`, then update `tasks.md` to match; `do-harness task
+import` validates the export back against the database.
+
+Both documents are inputs to the `product-contract` sensor
+(`scripts/check_product_contract.py`), which fails if the board drifts from the
+export, if either document declares a sensor that does not exist, if a count
+`PRODUCT.md` states disagrees with `evals/evals.json`, or if `PRODUCT.md`'s
+contents list and its sections disagree.
+
 ### Grading authority: the product graders stay
 
 `do-harness eval` resolves skills **only** under `.agents/skills` (the path is
@@ -112,7 +132,7 @@ responses and asserts against those (`tests/fixtures/pages/`,
 `scripts/record_pages.py`), so a free provider having a bad day cannot red the
 build.
 
-Seven traps, each learned the hard way:
+Eight traps, each learned the hard way:
 
 - **A `SKIP:`-prefixed output line makes a sensor `warned`, and under `--strict`
   a warned sensor is "weak evidence"** — `verify --set verification --strict`
@@ -201,6 +221,21 @@ Seven traps, each learned the hard way:
   the capability (`--live`, `--file`), the way `calendar_io` is handled — and
   match it across line continuations (`re.DOTALL`), since the flag is almost
   always on the next line of a wrapped command.
+- **A document or method that names a deleted sensor is an unenforced rule, and
+  nothing notices until something reads the name.** `plans/methods.json`
+  subtask 2 of `add-source-reader` still said `"sensor": "source-registry"`
+  months after commit 01f8e77 deleted that sensor and replaced it with
+  `retired-sources`, so the method's own gate named a check that could never
+  run. It is the same trap as a rule that reads a field nothing writes —
+  applied to configuration instead of code — and prose made it invisible,
+  because a sensor name in a document reads as a fact. `product-contract`
+  (`scripts/check_product_contract.py`) now fails whenever `PRODUCT.md`'s
+  `Sensor` table, `plans/methods.json` or `plans/invariants.json` declares a
+  name `do-harness.toml` does not define. Declarations are read where they are
+  made (a table cell or a `sensor` field); prose may still name a retired
+  sensor to explain it, exactly as `references/approved-sources.md`'s Notes
+  column may name a retired domain. When you delete a sensor, grep for its name
+  in `plans/` and `PRODUCT.md` — not only in the code it ran.
 
 ### Never hide a failure behind `|| true`
 
@@ -238,31 +273,30 @@ recording one sensor.
       do-harness verify --set "$s" --strict --record
     done
 
-**Drop `--record` on `release` until [d-o-hub/do-harness#267] is fixed.** That
-loop above dies on its **third** iteration: `verify --set release --strict
---record` exits **139 (SIGSEGV)** on 0.1.1 and 0.1.2, *before any sensor runs* —
-no `PASS`/`FAIL` output at all. Re-confirmed on the pinned 0.1.2: `feedback`
-(2 sensors) and `verification` (19) record fine, so the trigger is the resolved
-set's size, not the flag in general; the same 21 `[[sensors]]` in a config with
-no `[signal-sets]` table records cleanly. See `docs/do-harness.md` → Known
-defects §3.
+**`--record` on `release` works again as of v0.2.0 — [d-o-hub/do-harness#267] is
+fixed.** On 0.1.1 and 0.1.2 the loop above died on its **third** iteration:
+`verify --set release --strict --record` exited **139 (SIGSEGV)** *before any
+sensor ran* — no `PASS`/`FAIL` output at all — on any resolved set of 20+
+sensors, while `feedback` (2) and `verification` (19) recorded fine. Re-measured
+on the pinned v0.2.0 on 2026-10-04, in this working copy:
 
-`--record` is **not** what writes the evidence. A plain run stamps the same file,
-so the working loop is:
+    feedback      (2 sensors)  exit 0
+    verification  (20 sensors) exit 0
+    release       (22 sensors) exit 0
+
+so the loop above is now correct as written and `--record` is restored to it.
+`do-harness status --set release` reads `green` after it. The caveat that used
+to live here is gone with the defect: a recorded run and a plain run now write
+the same evidence, and there is no longer a crash that recovers invisibly.
+
+**Re-measure before trusting this note.** The defect was "observed, not
+inferred" when written and so is this one; if a future install segfaults again,
+the fallback is the plain run (it stamps the same evidence file):
 
     for s in feedback verification release; do
-      do-harness verify --set "$s" --strict          # no --record while #267 is open
+      do-harness verify --set "$s" --strict          # no --record
     done
-    do-harness status --set release                  # must read `green`
-
-Two consequences to state out loud rather than paper over:
-
-- The step now means something **different** from the one written above. Record
-  that in the commit message; do not let the drop read as incidental.
-- Because a plain run silently refreshes the same file, a green
-  `status --set release` does **not** prove the `--record` step ever succeeded.
-  A crash that recovers invisibly is easier to miss than one that stays red, which
-  is the actual reason to care about #267.
+    do-harness status --set release
 
 ### Seeding is local, never in CI
 

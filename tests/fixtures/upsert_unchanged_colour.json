@@ -1,0 +1,27 @@
+{
+  "_comment": "The stored event sits in the WRONG colour (`3`, Grape) for an UNVERIFIED game — something repainted it, or it predates the colour contract. The state colour for UNVERIFIED is Banana (`5`), so planning must emit `update` and repaint it even though nothing else differs. A colour mismatch is a visible lie about the event, which is why it is compared.",
+  "events": [
+    {
+      "event_id": "evt-unchanged-colour",
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-10-05T18:00:00Z",
+      "end": "2026-10-05T20:30:00Z",
+      "summary": "[UNVERIFIED] BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "state": "UNVERIFIED",
+      "league_color_id": "3",
+      "description": "League: BBL\nTeams: ALBA Berlin vs FC Bayern Muenchen\nDate/Time: 2026-10-05T18:00:00Z\n"
+    }
+  ],
+  "candidates": [
+    {
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-10-05T18:00:00Z",
+      "end": "2026-10-05T20:30:00Z",
+      "state": "UNVERIFIED",
+      "summary": "BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "league_color_id": "6"
+    }
+  ]
+}

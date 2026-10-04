@@ -1,0 +1,27 @@
+{
+  "_comment": "The point of the `unchanged` action: a stored UNVERIFIED event already holding exactly what this run would send must plan `unchanged`, not `update`, so apply_plan issues no HTTP. The stored `description`/`end` are byte-for-byte what `build_event_body` + `description_for` produced on the run that wrote it. Asserted by tests/test_calendar_idempotency.py.",
+  "events": [
+    {
+      "event_id": "evt-unchanged-identical",
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-10-05T18:00:00Z",
+      "end": "2026-10-05T20:30:00Z",
+      "summary": "[UNVERIFIED] BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "state": "UNVERIFIED",
+      "league_color_id": "5",
+      "description": "League: BBL\nTeams: ALBA Berlin vs FC Bayern Muenchen\nDate/Time: 2026-10-05T18:00:00Z\n"
+    }
+  ],
+  "candidates": [
+    {
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-10-05T18:00:00Z",
+      "end": "2026-10-05T20:30:00Z",
+      "state": "UNVERIFIED",
+      "summary": "BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "league_color_id": "6"
+    }
+  ]
+}

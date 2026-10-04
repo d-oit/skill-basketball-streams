@@ -1,0 +1,12 @@
+# Minimal root for scripts/check_product_contract.py. Only the [[sensors]]
+# names matter to the checker, so this fixture is a data root, not a runnable
+# pack: `do-harness verify` is never pointed at it.
+language = "generic"
+
+[[sensors]]
+name = "pytest"
+argv = ["python3", "-m", "pytest", "tests/", "-q"]
+
+[[sensors]]
+name = "product-contract"
+argv = ["python3", "scripts/check_product_contract.py", "--root", "."]

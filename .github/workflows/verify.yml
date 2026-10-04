@@ -61,7 +61,7 @@ permissions:
 env:
   # Keep this identical to the pin in AGENTS.md and docs/do-harness.md. Never
   # `latest`: a floating pin lets a harness release change the gate silently.
-  DO_HARNESS_VERSION: v0.1.2
+  DO_HARNESS_VERSION: v0.2.0
 
 jobs:
   # ── The harness gate: sensors + invariants + skill eval ───────────────────

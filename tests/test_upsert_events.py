@@ -25,6 +25,7 @@ import pytest
 from scripts.upsert_events import (
     ACTION_CREATE,
     ACTION_SKIP,
+    ACTION_UNCHANGED,
     ACTION_UPDATE,
     MATCH_WINDOW,
     STATE_WRONG,
@@ -615,10 +616,20 @@ class TestSummarise:
             {"action": ACTION_SKIP},
             {"action": ACTION_SKIP},
         ]
-        assert summarise(plan) == {ACTION_CREATE: 1, ACTION_UPDATE: 1, ACTION_SKIP: 2}
+        assert summarise(plan) == {
+            ACTION_CREATE: 1,
+            ACTION_UPDATE: 1,
+            ACTION_UNCHANGED: 0,
+            ACTION_SKIP: 2,
+        }
 
     def test_empty_plan_is_all_zero(self):
-        assert summarise([]) == {ACTION_CREATE: 0, ACTION_UPDATE: 0, ACTION_SKIP: 0}
+        assert summarise([]) == {
+            ACTION_CREATE: 0,
+            ACTION_UPDATE: 0,
+            ACTION_UNCHANGED: 0,
+            ACTION_SKIP: 0,
+        }
 
 
 def _run(args: list[str]) -> subprocess.CompletedProcess:

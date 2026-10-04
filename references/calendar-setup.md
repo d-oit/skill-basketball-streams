@@ -168,8 +168,11 @@ that fails if any module reintroduces a local copy.
 
 **Dedupe before any write.** List the **whole window** in one call, then match in
 memory *before* creating anything. `scripts/upsert_events.py` implements the
-planner and prints `create`/`update`/`skip` rows without touching the calendar,
-so the rule is testable offline.
+planner and prints `create`/`update`/`unchanged`/`skip` rows without touching the
+calendar, so the rule is testable offline. A matched event whose stored title,
+times, description and colour already equal what the run would send is
+`unchanged`, and sends no request; any difference or a state change is an
+`update`.
 
 ### Check Parameters
 

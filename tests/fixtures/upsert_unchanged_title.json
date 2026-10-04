@@ -1,0 +1,27 @@
+{
+  "_comment": "Only the game's NAME differs: the stored title says `ALBA Berlin vs Muenchen`, the candidate says `ALBA Berlin vs FC Bayern Muenchen`. Same slot, same recorded teams, so events_match still calls it the same game — and the title comparison must still turn that into `update`, or a corrected name would never reach the calendar.",
+  "events": [
+    {
+      "event_id": "evt-unchanged-title",
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-10-05T18:00:00Z",
+      "end": "2026-10-05T20:30:00Z",
+      "summary": "[UNVERIFIED] BBL: ALBA Berlin vs Muenchen",
+      "state": "UNVERIFIED",
+      "league_color_id": "5",
+      "description": "League: BBL\nTeams: ALBA Berlin vs FC Bayern Muenchen\nDate/Time: 2026-10-05T18:00:00Z\n"
+    }
+  ],
+  "candidates": [
+    {
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-10-05T18:00:00Z",
+      "end": "2026-10-05T20:30:00Z",
+      "state": "UNVERIFIED",
+      "summary": "BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "league_color_id": "6"
+    }
+  ]
+}

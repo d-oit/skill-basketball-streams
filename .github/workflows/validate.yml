@@ -226,7 +226,7 @@ jobs:
       # every workflow that files an issue must declare `issues: write`, or the
       # run reads fine and the issue never appears. The live half deliberately
       # does not run here — see scripts/rehearse.py's docstring.
-      - name: Run rehearse (offline half: registry + issue grant)
+      - name: "Run rehearse (offline half: registry + issue grant)"
         run: |
           python3 scripts/rehearse.py --list
           python3 scripts/rehearse.py --offline

@@ -22,10 +22,26 @@ come from the backends below.
 | **YouTube Data API v3** | 10,000 units/day; `search.list` = 100 units (~100 live searches/day) | n/a | — | `eventType=live` live-only search (see `references/youtube-live-search.md`) |
 | **Composio (Google Calendar toolkit)** | Free Hobby tier, 100K tool calls/month | n/a | Composio's own MCP server | Reading and writing the events — no Google Cloud project, no service account |
 
-Recommended default ladder: **TinyFish** (search) → **Firecrawl** (render) →
-**Exa** (semantic fallback) → **Tavily** (extract fallback). If the agent runtime
-already exposes `webSearch` + `openUrl`, use those first and treat the backends
-above as the fallback rungs for dynamic/blocked pages.
+The implemented search ladder is `run_daily.py`'s `LADDER`, and it is the truth:
+
+    ("exa-mcp", "exa-mcp-keyless", "tinyfish", "render-arena")
+
+i.e. paid Exa → keyless Exa → TinyFish → headless render. The table above lists
+the backends an *agent runtime* may also call, which is a different list: it
+includes YouTube Data API and Composio (neither is a search rung) and Firecrawl,
+which `run_daily.py` has no backend for — `render_ladder.py` uses Firecrawl as a
+**fetch/render** rung (`firecrawl`, `tinyfish`, `curl_cffi`, `patchright`,
+`urllib`), not as a Phase 0 search step.
+
+**Tavily is not in the implemented ladder.** `run_daily.py`'s `ALL_BACKENDS`
+declares no Tavily backend and `LADDER` names none, and nothing in this
+repository reads `TAVILY_API_KEY` — the only reference is the `tavily-mcp` entry
+in the runtime MCP configuration further down this file. It is a free `extract`
+fallback available to an agent that wires that MCP itself, not a Phase 0 rung; a
+ladder step a reader cannot run is worse than an admitted omission.
+
+If the agent runtime already exposes `webSearch` + `openUrl`, use those first and
+treat the backends above as the fallback rungs for dynamic/blocked pages.
 
 ### The keyless Exa MCP rung (Phase 0's zero-secret default)
 

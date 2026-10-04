@@ -1,0 +1,59 @@
+{
+  "summary": {"create": 1, "update": 1, "skip": 1, "unchanged": 1},
+  "plan": [
+    {
+      "action": "create",
+      "reason": "no existing event for this slot",
+      "game_key": "BBL|ALBA Berlin|FC Bayern|2026-10-04T17:00Z",
+      "event_id": "",
+      "state": "UNVERIFIED",
+      "title": "[UNVERIFIED] BBL: ALBA Berlin vs FC Bayern",
+      "color_id": "5",
+      "start": "2026-10-04T19:00:00+02:00",
+      "end": "",
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern"],
+      "league_color_id": "6",
+      "directLink": "https://www.magentasport.de/live/1"
+    },
+    {
+      "action": "update",
+      "reason": "promoted UNVERIFIED -> VERIFIED (free access confirmed)",
+      "game_key": "BCL|Real Madrid|Panathinaikos|2026-10-04T19:30Z",
+      "event_id": "evt-bcl-1",
+      "state": "VERIFIED",
+      "title": "BCL: Real Madrid vs Panathinaikos",
+      "color_id": "6",
+      "start": "2026-10-04T20:00:00+02:00",
+      "end": "2026-10-04T22:00:00+02:00",
+      "league": "BCL",
+      "teams": ["Real Madrid", "Panathinaikos"],
+      "league_color_id": "6",
+      "direct_links": [{"source": "YouTube", "url": "https://www.youtube.com/live/abc"}]
+    },
+    {
+      "action": "skip",
+      "reason": "verified event exists — never modified",
+      "game_key": "ACB|Barcelona|Real Madrid|2026-10-04T18:00Z",
+      "event_id": "evt-acb-1",
+      "state": "VERIFIED",
+      "title": "",
+      "color_id": ""
+    },
+    {
+      "action": "unchanged",
+      "reason": "event already holds the decided payload — nothing was sent",
+      "game_key": "BBL|Ulm|Bonn|2026-10-04T15:00Z",
+      "event_id": "evt-bbl-2",
+      "state": "UNVERIFIED",
+      "title": "[UNVERIFIED] BBL: Ulm vs Bonn",
+      "color_id": "5",
+      "start": "2026-10-04T17:00:00+02:00",
+      "end": "2026-10-04T19:30:00+02:00",
+      "league": "BBL",
+      "teams": ["Ulm", "Bonn"],
+      "league_color_id": "6",
+      "direct_links": []
+    }
+  ]
+}

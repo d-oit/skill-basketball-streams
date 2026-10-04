@@ -5,21 +5,35 @@ loops, all backed by append-only files:
 
 | Loop | Command | Artifact | Auto-applied? |
 |---|---|---|---|
-| Run log | `scripts/source_learning.py record …` | `logs/run-log.jsonl` | yes (append only) |
+| Run log | `scripts/record_run_outcomes.py record --dest .tmp/telemetry` (runtime) / `scripts/source_learning.py record …` (local) | `telemetry/run-log.jsonl` on the `telemetry` branch | yes (append only) |
 | Post-hoc audit | `scripts/audit_events.py --events … --evidence …` | `logs/audit.jsonl` | yes — relabels events (§6) |
 | Source scoring | `scripts/source_learning.py score --root .` | stdout / `--json` | no — informs tier order |
 | New-source discovery | `scripts/source_learning.py candidates --root .` | `logs/source-candidates.json` (`"status": "quarantined"`) | **no** — human approval |
 | Link revalidation | `scripts/link_inventory.py` → `scripts/link_check.py --input links.json` | `links.json` + report JSON | no — quarantine only |
 
-`logs/` is gitignored: learning data is per-installation, not repository state.
+`logs/` is gitignored, so the runtime does **not** write the run log there: a
+file a CI job cannot see is a learning loop that cannot run. On the automated
+path it is written to the telemetry worktree (`record_run_outcomes.py record
+--dest .tmp/telemetry`) and committed to the `telemetry` branch, beside
+`candidates.jsonl`, `fetch-attempts.jsonl` and `rung-attempts.jsonl`. The
+`logs/run-log.jsonl` default remains for a local, per-installation run.
 
 ## 1. Run log
 
-One JSONL row per candidate stream, appended at the end of every run:
+One JSONL row per source observation, appended at the end of every run:
 
 ```json
 {"ts":"2026-09-14T09:12:00+00:00","run_id":"2026-09-14T09","source":"magenta.tv","tier":4,"url":"https://www.magenta.tv/tv/live-basketball-euroleague-88213","outcome":"reject","reason":"no matching free-access announcement on magentasport.de"}
 ```
+
+The CI caller is `scripts/record_run_outcomes.py`: it derives rows from ledgers
+that already exist — `candidates.jsonl` (search hits, including the backend),
+`fetch-attempts.jsonl` (a blocked/gone/5xx fixture source is "an issue during
+the run"), `rung-attempts.jsonl` (a failed or parked render rung) and
+`events.jsonl` (what reached the calendar) — and appends them through
+`source_learning.py`'s own `record`. Before it existed, nothing called `record`
+on any automated path: `logs/run-log.jsonl` was never created by CI, `score`
+exited 1 on the empty file and `candidates` read nothing.
 
 `outcome` ∈ `create | skip | reject | blocked | error`. `ts`, `--now` and
 `--dry-run` make the write deterministic for tests; without `--dry-run` the row

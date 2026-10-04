@@ -13,9 +13,24 @@ Reconciliation rules:
 | nothing | any | **create** |
 | `VERIFIED` | any | **skip** — never touch a confirmed event |
 | `UNVERIFIED` | `VERIFIED` | **update** — promote (colour 5 → 6, drop the prefix) |
-| `UNVERIFIED` | `UNVERIFIED` | **update** — refresh links and timestamp |
+| `UNVERIFIED` | `UNVERIFIED`, anything differs | **update** — refresh title/links/time/colour |
+| `UNVERIFIED` | `UNVERIFIED`, nothing differs | **unchanged** — no write at all |
 | `WRONG` | anything but `WRONG` | **skip** — an audit verdict outranks a fresh guess |
 | `WRONG` | `WRONG` | **skip** — already labelled |
+
+The `unchanged` row is the difference between *identity* and *equality*.
+`events_match` decides whether a stored event is **the same game**; it says nothing
+about whether anything about it is different. The planner used to treat "the same
+game" as "write it again", so every unverified match was re-PATCHed on every run —
+a real HTTP write, and an `action: "update"` row in the applied result claiming
+the calendar changed — even when the stored event already held exactly what the
+writer would send. `body_matches_event` (in `calendar_io.py`) now compares the
+full payload the calendar would end up holding (title, start, end, description,
+colour) against the stored event, and a match that changes nothing emits
+`unchanged`: the event is still ours, it just needs no write. A stored event that
+is *missing* a field we compare — a legacy event with an empty description, say —
+is never `unchanged`; it needs the update that fills it in. A `VERIFIED` promotion
+is never `unchanged` either: the label on a public calendar is the change.
 
 That last-but-one row is a deliberate choice: a `WRONG` label means a human-visible
 audit concluded the broadcast was not free or never live. Silently overwriting it
@@ -63,6 +78,7 @@ try:  # direct CLI execution
     # `latest_per_event` is shared with `audit_events.py` rather than copied: the
     # two must agree about which ledger row is current or this guarantee inverts.
     from audit_events import latest_per_event
+    from calendar_io import body_matches_event, build_event_body, description_for
     from evidence import coerce_evidence
     from stream_links import normalise_links
     from team_tokens import team_matches, team_tokens, text_names_all
@@ -77,6 +93,11 @@ try:  # direct CLI execution
     )
 except ImportError:  # imported as a package module
     from scripts.audit_events import latest_per_event  # type: ignore
+    from scripts.calendar_io import (  # type: ignore
+        body_matches_event,
+        build_event_body,
+        description_for,
+    )
     from scripts.evidence import coerce_evidence  # type: ignore
     from scripts.stream_links import normalise_links  # type: ignore
     from scripts.team_tokens import team_matches, team_tokens, text_names_all  # type: ignore
@@ -95,6 +116,10 @@ VERDICT_WRONG = "WRONG"
 ACTION_CREATE = "create"
 ACTION_UPDATE = "update"
 ACTION_SKIP = "skip"
+# A matching stored event whose full payload is already what this run would send.
+# It is not a skip: the event *is* ours to maintain, it just needs no write. See
+# the reconciliation table above and `plan_upsert`.
+ACTION_UNCHANGED = "unchanged"
 
 
 def parse_dt(value: object) -> datetime | None:
@@ -400,25 +425,52 @@ def plan_upsert(
             continue
 
         promoted = new_state == STATE_VERIFIED
-        plan.append(
-            {
-                "action": ACTION_UPDATE,
-                "reason": (
-                    "promoted UNVERIFIED -> VERIFIED (free access confirmed)"
-                    if promoted
-                    else "refreshed unverified event"
-                ),
-                "game_key": key,
-                "event_id": event_id,
-                "state": new_state,
-                "title": title,
-                "color_id": color,
-                # The existing event's own times win on an update: a source
-                # re-announcing a game an hour later must not silently move an
-                # event subscribers already have in their calendars.
-                **_event_fields({**candidate, "start": match.get("start") or candidate.get("start")}, league),
-            }
-        )
+        row = {
+            "action": ACTION_UPDATE,
+            "reason": (
+                "promoted UNVERIFIED -> VERIFIED (free access confirmed)"
+                if promoted
+                else "refreshed unverified event"
+            ),
+            "game_key": key,
+            "event_id": event_id,
+            "state": new_state,
+            "title": title,
+            "color_id": color,
+            # The existing event's own times win on an update: a source
+            # re-announcing a game an hour later must not silently move an
+            # event subscribers already have in their calendars.
+            **_event_fields({**candidate, "start": match.get("start") or candidate.get("start")}, league),
+        }
+        # **Two different questions live here.** `events_match` above answers "is
+        # this the same game?" — identity. `body_matches_event` answers "is
+        # anything different?" — equality. Only the first was ever asked, so
+        # every unverified match was re-PATCHed on every run: a real HTTP write,
+        # and an `action: "update"` ledger row claiming the calendar changed,
+        # even when the stored event already held exactly what the writer would
+        # send. A quiet day is common, so this ran most days.
+        #
+        # The body is built through the SAME two functions `apply_plan` uses to
+        # send it (`build_event_body` + `description_for`), so the comparison is
+        # against the payload the calendar would end up holding, not a second
+        # opinion about what that payload is. `apply_plan` may be handed explicit
+        # `descriptions`, but nothing on the runtime path passes them, so the
+        # derived description is what actually travels. `visibility` is not
+        # compared: `parse_event` does not read it back, so the stored side has no
+        # field for it — a rule reading a field nothing writes is the trap this
+        # repository already documents.
+        #
+        # A promotion is never `unchanged`. The new state changes the title
+        # prefix *and* is stated explicitly, so the two cannot drift apart even
+        # if a future colour rule made the colour alone ambiguous. A state
+        # transition is a change because it is the event's label on a public
+        # calendar; UNVERIFIED -> UNVERIFIED with identical content is not.
+        if new_state == existing_state:
+            body = build_event_body(row, description=description_for(row))
+            if body_matches_event(body, match):
+                row["action"] = ACTION_UNCHANGED
+                row["reason"] = "stored event already matches — nothing to send"
+        plan.append(row)
     return plan
 
 
@@ -462,7 +514,16 @@ def _event_fields(candidate: dict, league: str) -> dict:
 
 
 def summarise(plan: list[dict]) -> dict:
-    summary = {ACTION_CREATE: 0, ACTION_UPDATE: 0, ACTION_SKIP: 0}
+    # All four actions are seeded at zero, so a reader can always tell "no
+    # unchanged events this run" from "this plan does not speak about unchanged
+    # events". The counter is first-class, not a category that appears only when
+    # it fires.
+    summary = {
+        ACTION_CREATE: 0,
+        ACTION_UPDATE: 0,
+        ACTION_UNCHANGED: 0,
+        ACTION_SKIP: 0,
+    }
     for row in plan:
         summary[row["action"]] = summary.get(row["action"], 0) + 1
     return summary
@@ -490,7 +551,10 @@ def _load(path: Path, key: str) -> list:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Plan calendar creates/updates/skips without duplicating events.",
+        description=(
+            "Plan calendar creates/updates/unchanged/skips without duplicating "
+            "events."
+        ),
     )
     parser.add_argument("--existing", required=True, help="existing events JSON")
     parser.add_argument("--candidates", required=True, help="candidate events JSON")
@@ -526,9 +590,8 @@ def main() -> None:
                 f"{marker} {row['action']:6s} {row['game_key']} — {row['reason']}"
             )
         print(
-            "OK: upsert_events: create={create} update={update} skip={skip}".format(
-                **counts
-            )
+            "OK: upsert_events: create={create} update={update} "
+            "unchanged={unchanged} skip={skip}".format(**counts)
         )
 
 

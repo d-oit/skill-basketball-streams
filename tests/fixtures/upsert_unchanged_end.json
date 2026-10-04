@@ -1,0 +1,27 @@
+{
+  "_comment": "The stored end slips half an hour past what the source now says. Start deliberately stays the stored one (a source re-announcing a game late must not move an event subscribers already have), but end is not taken from the stored event, so a spawned end is a real change and must be written.",
+  "events": [
+    {
+      "event_id": "evt-unchanged-end",
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-10-05T18:00:00Z",
+      "end": "2026-10-05T21:00:00Z",
+      "summary": "[UNVERIFIED] BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "state": "UNVERIFIED",
+      "league_color_id": "5",
+      "description": "League: BBL\nTeams: ALBA Berlin vs FC Bayern Muenchen\nDate/Time: 2026-10-05T18:00:00Z\n"
+    }
+  ],
+  "candidates": [
+    {
+      "league": "BBL",
+      "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+      "start": "2026-10-05T18:00:00Z",
+      "end": "2026-10-05T20:30:00Z",
+      "state": "UNVERIFIED",
+      "summary": "BBL: ALBA Berlin vs FC Bayern Muenchen",
+      "league_color_id": "6"
+    }
+  ]
+}

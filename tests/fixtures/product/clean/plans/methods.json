@@ -1,0 +1,19 @@
+{
+  "methods": [
+    {
+      "name": "add-source-reader",
+      "preconditions": [
+        {
+          "description": "Fixture entry: only the subtask sensors matter to the checker."
+        }
+      ],
+      "subtasks": [
+        {
+          "name": "parse one provider unit into the existing shape, refusing rather than guessing",
+          "sensor": "pytest",
+          "spike_candidate": false
+        }
+      ]
+    }
+  ]
+}

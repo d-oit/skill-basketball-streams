@@ -180,6 +180,32 @@ when-changed = [
 ]
 
 [[sensors]]
+name = "run-outcomes"
+# The self-learning loop's missing caller, as one command. `source_learning.py`
+# implements `record`/`score`/`candidates`, and `references/self-learning.md`
+# tells a reader to run `record` after every run — but nothing in `.github/`
+# calls it, so `run-log.jsonl` was never created by CI, `score` exited 1 on the
+# empty log and `candidates` read nothing. The writer existed; the caller did
+# not. `record_run_outcomes.py` derives rows from the ledgers that already exist
+# (candidates, fetch-attempts, rung-attempts, events) and hands them to the real
+# `source_learning.mode_record`, writing to the telemetry worktree rather than
+# gitignored `logs/`.
+#
+# This gate reads COMMITTED fixtures, not the branch: it re-derives from
+# `tests/fixtures/run_outcomes_good/` and requires the stored `run-log.jsonl` to
+# match, to contain a row for a blocked source and for a parked rung, and to be
+# readable by `source_learning.discover_candidates`. The sibling fixtures
+# (`run_outcomes_missing_blocked`, `run_outcomes_missing_rung`,
+# `run_outcomes_absent`) each make it exit 1 — the log blind to the issue it
+# exists to record, which is the defect in one line.
+argv = ["python3", "scripts/record_run_outcomes.py", "check", "--ledgers", "tests/fixtures/run_outcomes_good"]
+when-changed = [
+  "scripts/record_run_outcomes.py",
+  "scripts/source_learning.py",
+  "tests/fixtures/run_outcomes_*",
+]
+
+[[sensors]]
 name = "eval-synthesis"
 argv = [
   "python3",
@@ -238,6 +264,20 @@ name = "invariants-shape"
 argv = ["python3", "-c", "import json; d=json.load(open('plans/invariants.json')); assert isinstance(d,list), 'invariants.json must be a bare array'"]
 when-changed = ["plans/invariants.json"]
 
+[[sensors]]
+name = "product-contract"
+# `PRODUCT.md` and `tasks.md` are committed documents, and a document nothing
+# reads is decoration. This gate is what makes them claims instead of prose: the
+# product contract may not name a sensor `do-harness.toml` does not declare
+# (a promise guarded by a sensor that does not exist is a rule that has never
+# run -- `plans/methods.json` still named `source-registry` after commit 01f8e77
+# deleted it), every sensor an invariant relies on must be named in the
+# contract's Sensor table, and `tasks.md` must match the `do-harness task
+# export` it mirrors or the board has rotted. Each check is exercised by a
+# fixture in `tests/fixtures/product/` that makes it fail for real.
+argv = ["python3", "scripts/check_product_contract.py", "--root", "."]
+when-changed = ["PRODUCT.md", "tasks.md", "plans/**", "do-harness.toml", "scripts/check_product_contract.py"]
+
 [signal-sets]
 feedback = ["skill-contract", "validate-smoke"]
 verification = [
@@ -258,8 +298,10 @@ verification = [
   "metrics",
   "audit-verdict",
   "event-ledger",
+  "run-outcomes",
   "link-inventory",
   "eval-synthesis",
+  "product-contract",
 ]
 release = [
   "skill-contract",
@@ -279,8 +321,10 @@ release = [
   "metrics",
   "audit-verdict",
   "event-ledger",
+  "run-outcomes",
   "link-inventory",
   "eval-synthesis",
   "link-gate",
   "version-sync",
+  "product-contract",
 ]
