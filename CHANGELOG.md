@@ -960,7 +960,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the calendar error with a crash the caller could not act on.
 
 
+## [1.12.0] - 2026-10-05
+
+### Added
+
+- **The source registry now covers every European country's top division and the
+  German lower tiers — researched live, not compiled.** The request was "search
+  the league in each country, then the name of each team, then on YouTube and
+  web search". What that search actually found, and what the registry now
+  records, is the *verified free-access reality* of each league:
+
+  * **BKT EuroCup** (`eurocupbasketball.com`) — the one European competition
+    missing from Tier 1. Evidence only: in Germany EuroCup games sit with
+    paid/geo-restricted broadcasters, so it is never a `directLink`.
+  * **2. Basketball Bundesliga, ProA/ProB** (`2basketballbundesliga.de`) —
+    **paid**. Verified from the league's own pass page, 2026-10-05: *"Die
+    Spiele der 2. Basketball Bundesliga ProA kostenpflichtig auf Sporteurope.TV"*,
+    Einzelspiel 5,99 € (PPV), Teampass 109,99 €, All-Access 189,99 €. The league
+    site is announcement evidence only.
+  * **Damen Basketball Bundesliga, 1. DBBL** (`toyota-dbbl.de`) — **paid from
+    this season**. The DBBL's own announcement (verified 2026-10-05): 2025/26
+    ran free on the "Dyn Basketball" YouTube channel, but *"Ab der Saison
+    2026/27 ist die Ausstrahlung aller Frauenbundesliga-Spiele auf der
+    Streaming-Plattform Dyn Sport geplant"*, and no DBBL game is in the current
+    month's Dyn Free Spiele list. Last season's free source is gone; the
+    registry now says so.
+  * **Regionalliga** (`rln-basketball.de`, `regionalliga-suedost.de`) —
+    official 4th-tier league sites with **no centralised stream**; a free game
+    requires the club's own official channel with a live/upcoming broadcast.
+  * **Tier 7: European domestic leagues (evidence only)** — one official site
+    per country: Spain `acb.com`, Italy `legabasket.it`, France `lnb.fr`,
+    Adriatic `aba-liga.com`, Greece `esake.gr`, Türkiye `bsl.org.tr`,
+    VTB `vtb-league.com`, BNXT `bnxtleague.com`, Austria `basketball.at`,
+    Switzerland `swiss.basketball`, Poland `plk.pl`. Their domestic streams are
+    paid or geo-restricted in Germany, so they are **evidence and sourceReference
+    only, never a `directLink`** — a link with no explicit free marker fails
+    Check 1. Several answer 403/connection-reset to datacenter IPs (the
+    documented runner-IP class), so an unreachable host is recorded as a
+    transport fact, not evidence against a game.
+
+- **Sporteurope.TV is now explicitly excluded** with the verified pricing, so a
+  quarantined discovery can no longer look promotable.
+
+### Changed
+
+- **Every new row carries its measurement date.** The per-team search (all 17
+  German clubs playing in the 7-day window, plus the per-country league sites)
+  surfaced no German club self-streaming — BBL/BCL rights are centralised — and
+  the TV-guide aggregators it found (`basketballimtv.de`, `liveimtv.de`) are
+  listings sites, not sources, so they were deliberately **not** added. Adding a
+  source now means having verified what it is and what it costs, not having
+  found its URL in a search result.
+
+
+
 ## [Unreleased]
+
 
 
 
