@@ -940,6 +940,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with a name that does not resolve silently falls back rather than erroring
   (verified on the pinned 1.18.33 binary).
 
+- **`bash: deny` would have reddened the run one step later, so it is denied
+  per-command instead.** Disabling the tool outright drops it from the request,
+  and the CLI's free provider (OpenCode Zen — the only rung the agent can use)
+  then refuses the whole call with HTTP 403 `FreeTierError`: *"OpenCode's free
+  tier can only be used from within OpenCode"*. Measured 2026-10-04 on the
+  pinned 1.18.33 binary, `bash: deny` and `read: deny` both 403 while
+  `edit`/`todowrite`/`task`/`lsp`/`glob`/`webfetch` denials are all accepted.
+  The agent therefore keeps the tool with `"*": deny` plus one inert `"true":
+  allow`, and a new preflight proves the restricted agent can serve a model
+  before the run that needs it — otherwise that message, which this repo
+  already documents as the signature of a missing `env:` block, has two causes
+  and names neither.
+
 - **`calendar_io.py` crashed instead of raising `CalendarError` on a synthetic
   `HTTPError`.** `HTTPError.read()` returns `bytes` from a real response but
   `str` when the error was constructed with `fp=None` (some stdlib builds back

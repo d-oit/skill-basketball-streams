@@ -38,11 +38,41 @@ The permissions mirror `agent create --permissions
 read,glob,grep,webfetch,websearch,skill`: everything in the CLI's vocabulary
 that is not on that allow-list is denied. `read`/`glob`/`grep`/`webfetch`/
 `websearch`/`skill` are permissive by default and left alone; `edit` (which
-covers `write` and `apply_patch`), `bash`, `task` (a subagent is not bound by
-this agent's permissions), `todowrite` and `lsp` are denied. `external_directory`
+covers `write` and `apply_patch`), `task` (a subagent is not bound by this
+agent's permissions), `todowrite` and `lsp` are denied. `external_directory`
 and `doom_loop` are deliberately **not** touched: their defaults are the
 stricter `ask`, and a blanket deny would also block the tool-output directory
 opencode reads its own large results back from.
+
+**Why `bash` is denied per-command and not disabled outright.** The obvious
+form,
+
+    permission:
+      bash: deny
+
+is *stricter* and does not work. It drops the `bash` tool from the request, and
+the CLI's free provider (OpenCode Zen, the only rung the agent can use — see
+`scripts/llm_model.py`) then rejects the whole call:
+
+    Error from provider (Console): OpenCode's free tier can only be used from
+    within OpenCode            (HTTP 403, FreeTierError)
+
+Measured 2026-10-04 on the pinned 1.18.33 binary: `bash: deny` and
+`read: deny` both 403, while `edit: deny`, `todowrite: deny`, `task: deny`,
+`lsp: deny`, `glob: deny` and `webfetch: deny` are all accepted. So an outright
+`bash` denial would have made `--agent runtime` fail the job at the run step —
+the fix would have looked correct and reddened one step later.
+
+The working form keeps the tool present and denies every command *through* it:
+
+    permission:
+      bash:
+        "*": deny
+        "true": allow      # inert; keeps the tool in the request
+
+`"true"` is the shell's no-op, so the one permitted command does nothing.
+`tests/test_runtime_agent.py` pins both the form and the reason, because
+"simplify this to `bash: deny`" is exactly the edit a future reader would make.
 
 Streams:
     stdout  the `GITHUB_OUTPUT` payload and nothing else (`key=value` lines).
@@ -69,10 +99,24 @@ AGENT_NAME = "runtime"
 
 DESCRIPTION = "Basketball streams runtime: read-only research, calendar writer"
 
-# Denied explicitly. The allow-list (`read`, `glob`, `grep`, `webfetch`,
+# Denied outright. The allow-list (`read`, `glob`, `grep`, `webfetch`,
 # `websearch`, `skill`) is the CLI's permissive default, so only the denials
-# need writing down. `edit` covers `write` and `apply_patch`.
-DENIED_PERMISSIONS = ("edit", "bash", "task", "todowrite", "lsp")
+# need writing down. `read` must NOT be here: the provider gate rejects a
+# request without it. `bash` is handled separately, below.
+DENIED_PERMISSIONS = ("edit", "task", "todowrite", "lsp")
+
+# The one `bash` command the agent may run. See the module docstring: the
+# provider rejects a request in which `bash` is disabled entirely, so the tool
+# is kept present and every real command is denied by the catch-all above it.
+INERT_BASH_ALLOW = "true"
+
+BASH_RULE_COMMENT = (
+    "Not `bash: deny`. Disabling the tool outright drops it from the request "
+    "and the CLI's free provider then refuses the whole call (HTTP 403, "
+    "FreeTierError: \"OpenCode's free tier can only be used from within "
+    "OpenCode\"), measured on 1.18.33 on 2026-10-04. So the tool stays and "
+    "every command is denied; the single allow is the shell's no-op."
+)
 
 PROMPT = (
     "You are the basketball streams runtime agent. Execute the root SKILL.md "
@@ -94,6 +138,10 @@ def render_agent() -> str:
         f"description: {DESCRIPTION}",
         "mode: primary",
         "permission:",
+        "  bash:",
+        '    "*": deny',
+        f'    "{INERT_BASH_ALLOW}": allow',
+        f"  # {BASH_RULE_COMMENT}",
     ]
     lines += [f"  {name}: deny" for name in DENIED_PERMISSIONS]
     lines += ["---", PROMPT]
@@ -128,8 +176,9 @@ def main() -> None:
     # stdout is the `$GITHUB_OUTPUT` payload: the name `--agent` must use.
     print(f"agent={AGENT_NAME}")
     print(
-        f"OK: runtime_agent: wrote {path} — agent '{AGENT_NAME}', "
-        f"denied: {', '.join(DENIED_PERMISSIONS)}",
+        f"OK: runtime_agent: wrote {path} — agent '{AGENT_NAME}', denied: "
+        f"bash (every command but '{INERT_BASH_ALLOW}'), "
+        f"{', '.join(DENIED_PERMISSIONS)}",
         file=sys.stderr,
     )
     sys.exit(0)

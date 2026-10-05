@@ -40,11 +40,43 @@ class TestTheAgentDefinition:
     def test_it_denies_edit_and_bash(self, tmp_path):
         """The security control `PRODUCT.md` documents."""
         body = runtime_agent.write_agent(tmp_path).read_text(encoding="utf-8")
-        for permission in ("edit", "bash"):
-            assert f"  {permission}: deny" in body, (
-                f"{permission} must be denied; the runtime may not rewrite "
-                "SKILL.md, references/ or the gate scripts mid-run"
-            )
+        assert "  edit: deny" in body
+        # `bash` is denied per-command rather than disabled — see below.
+        assert '    "*": deny' in body
+
+    def test_bash_is_denied_per_command_not_disabled(self, tmp_path):
+        """The obvious, stricter form does not work — it 403s the whole call.
+
+        `bash: deny` drops the tool from the request, and the CLI's free
+        provider (OpenCode Zen, the only rung `llm_model.py` can select) then
+        rejects the run with `FreeTierError: OpenCode's free tier can only be
+        used from within OpenCode`. Measured 2026-10-04 on the pinned 1.18.33
+        binary: `bash: deny` and `read: deny` both 403, while `edit: deny`,
+        `todowrite: deny`, `task: deny`, `lsp: deny`, `glob: deny` and
+        `webfetch: deny` are all accepted.
+
+        So the tool must stay present with a catch-all deny and one inert
+        allow. "Simplify this to `bash: deny`" is exactly the edit a future
+        reader would make, and it breaks the run one step later — hence this
+        test.
+        """
+        body = runtime_agent.write_agent(tmp_path).read_text(encoding="utf-8")
+        assert "  bash:\n" in body, "bash needs the granular (object) form"
+        assert '    "*": deny\n' in body, "every command must be denied"
+        assert f'    "{runtime_agent.INERT_BASH_ALLOW}": allow\n' in body, (
+            "at least one allow keeps the bash tool in the request; without it "
+            "the provider refuses the whole call"
+        )
+        # The shell's no-op, so the single permitted command does nothing.
+        assert runtime_agent.INERT_BASH_ALLOW == "true"
+        # Not the scalar form, and not a second opinion about it.
+        assert "  bash: deny" not in body
+
+    def test_read_is_never_denied(self, tmp_path):
+        """`read: deny` 403s the call for the same reason `bash: deny` does."""
+        body = runtime_agent.write_agent(tmp_path).read_text(encoding="utf-8")
+        assert "  read:" not in body and "  read: deny" not in body
+        assert "read" not in runtime_agent.DENIED_PERMISSIONS
 
     def test_it_denies_the_rest_of_the_cli_vocabulary(self, tmp_path):
         """`agent create --permissions` allows a list; everything else is denied.
@@ -54,8 +86,20 @@ class TestTheAgentDefinition:
         leave the door open.
         """
         body = runtime_agent.write_agent(tmp_path).read_text(encoding="utf-8")
-        for permission in ("task", "todowrite", "lsp"):
+        for permission in ("edit", "task", "todowrite", "lsp"):
+            assert f"  {permission}: deny" in body, permission
+
+    def test_the_denials_are_scalar_for_the_keys_that_require_it(self, tmp_path):
+        """`todowrite` and `lsp` reject the granular (object) form.
+
+        Measured on 1.18.33: `todowrite: {"*": deny}` is a hard config error —
+        `Expected PermissionActionConfig | undefined, got {"*":"deny"}
+        permission.todowrite` — so only `bash` may use the object form.
+        """
+        body = runtime_agent.write_agent(tmp_path).read_text(encoding="utf-8")
+        for permission in ("todowrite", "lsp", "task", "edit"):
             assert f"  {permission}: deny" in body
+            assert f"  {permission}:\n" not in body
 
     def test_it_does_not_touch_external_directory(self, tmp_path):
         """A blanket deny would block opencode reading its own tool output.
@@ -179,3 +223,27 @@ class TestTheWorkflowWiresItUp:
         run = names.index("Run the skill")
         assertion = names.index("Assert the agent used no forbidden tool")
         assert run < assertion, "the transcript has to exist before it is asserted on"
+
+    def test_the_agent_is_proved_servable_before_the_run(self):
+        """The same provider message has two causes, and this tells them apart.
+
+        `FreeTierError: OpenCode's free tier can only be used from within
+        OpenCode` is the repo's recorded signature of a step with no `env:`
+        block. It is *also* what the free provider returns when the request's
+        tool set omits `bash` or `read` — so a permission edit that looks
+        stricter 403s the whole call. Naming that here means a bad permission
+        fails with the agent's name on it, not eight minutes into the run.
+        """
+        step = self._step("Confirm the opencode CLI can serve the restricted agent")
+        assert "opencode run" in step
+        assert '--agent "$AGENT"' in step
+        assert "steps.llm.outputs.model" in step, "prove the pair the run will use"
+        assert "set -o pipefail" in step
+        assert "secrets.OPENROUTER_API_KEY" in step, "a CLI step needs credentials"
+
+    def test_the_probe_sits_between_the_writer_and_the_run(self):
+        names = [s.split("- name: ", 1)[-1].splitlines()[0] for s in self._steps()]
+        writer = names.index("Write the permission-restricted runtime agent")
+        probe = names.index("Confirm the opencode CLI can serve the restricted agent")
+        run = names.index("Run the skill")
+        assert writer < probe < run
