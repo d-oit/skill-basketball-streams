@@ -58,19 +58,46 @@ opencode run --agent "$AGENT" --model "$LLM_MODEL" --format json ... | tee .tmp/
 ```
 
 `scripts/runtime_agent.py` writes `.opencode/agent/runtime.md` with `edit`,
-`bash`, `task`, `todowrite` and `lsp` denied. It replaced `opencode agent
-create`, which generated the same static file with an **LLM call** and failed
-the whole runtime job on 2026-10-04 with a provider's balance error. A security
-control must not depend on a live model, and a generator also picks the agent's
-*name* — which is why the deterministic writer is what makes `--agent` safe to
-read from a step output rather than retype.
+`task`, `todowrite` and `lsp` denied and every `bash` command denied. It
+replaced `opencode agent create`, which generated the same static file with an
+**LLM call** and failed the whole runtime job on 2026-10-04 with a provider's
+balance error. A security control must not depend on a live model, and a
+generator also picks the agent's *name* — which is why the deterministic writer
+is what makes `--agent` safe to read from a step output rather than retype.
+
+**`bash` is denied per-command, not disabled.** The obvious, stricter form
+
+    permission:
+      bash: deny
+
+is what makes the run fail: it drops the tool from the request, and the CLI's
+free provider then rejects the whole call with
+
+    Error from provider (Console): OpenCode's free tier can only be used from
+    within OpenCode            (HTTP 403, FreeTierError)
+
+Measured 2026-10-04 on the pinned 1.18.33 binary, `bash: deny` and `read: deny`
+both 403 while `edit: deny`, `todowrite: deny`, `task: deny`, `lsp: deny`,
+`glob: deny` and `webfetch: deny` are all accepted. The working form is a
+catch-all deny plus one inert allow:
+
+    bash:
+      "*": deny
+      "true": allow      # the shell's no-op; keeps the tool in the request
+
+Two consequences worth remembering. The message above has **two causes** in this
+repo — a CLI step with no `env:` block, and this one — and the workflow proves
+the restricted agent can serve a model *before* the run precisely so an edit
+like `bash: deny` fails with the agent's name on it. And `todowrite`/`lsp`
+reject the object form outright (`Expected PermissionActionConfig`), so only
+`bash` may use it.
 
 Two production runs proved why the selection and the assertion are not
 optional. Without `--agent` the restriction was dead config: the 2026-10-02 log
 shows the agent invoking `bash` and the step spending 21 minutes until
 `timeout` killed it. A malformed permission key is silently ignored too, so the
-claim is checked against the transcript rather than documented. The three
-halves are pinned by `tests/test_runtime_agent.py`.
+claim is checked against the transcript rather than documented. The halves are
+pinned by `tests/test_runtime_agent.py`.
 
 ## Writing to the calendar
 
