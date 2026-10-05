@@ -1,6 +1,6 @@
 {
   "$comment": "Machine-readable mirror of references/approved-sources.md. Consumed by scripts/source_learning.py (approved_domains) so newly discovered domains can be quarantined instead of auto-trusted. Keep in sync with the reference doc.",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "sources": [
     {
       "tier": 1,
@@ -59,6 +59,47 @@
       ],
       "free_access": "selected",
       "notes": "Official BCL site. Free for selected games only — a BCL page, the @BasketballCL X/Twitter account and the Basketball Champions League Facebook page must ALWAYS be checked for the free-game marker. Some games are free, others are behind a broadcaster subscription; a page that does not state free access is REJECTED."
+    },
+    {
+      "tier": 1,
+      "name": "BKT EuroCup",
+      "type": "league",
+      "domains": [
+        "eurocupbasketball.com"
+      ],
+      "free_access": "none",
+      "notes": "Official BKT EuroCup site. Evidence and sourceReference ONLY: in Germany EuroCup games are carried by paid or geo-restricted broadcasters, so this site can never be a directLink. Verified live 2026-10-05 (HTTP 429 to a datacenter IP, the documented runner-IP class; the host answers)."
+    },
+    {
+      "tier": 1,
+      "name": "2. Basketball Bundesliga (ProA/ProB)",
+      "type": "league",
+      "domains": [
+        "2basketballbundesliga.de"
+      ],
+      "free_access": "none",
+      "notes": "Official German second/third-tier league site. Streams are PAID: verified 2026-10-05 from the league's own pass page — 'Die Spiele der 2. Basketball Bundesliga ProA kostenpflichtig auf Sporteurope.TV' with Einzelspiel 5,99 EUR (pay-per-view), Teampass 109,99 EUR, All-Access-Pass 189,99 EUR. The league site is announcement/schedule evidence and NEVER a directLink; a ProA/ProB link with no explicit free marker fails Check 1."
+    },
+    {
+      "tier": 1,
+      "name": "Damen Basketball Bundesliga (1. DBBL)",
+      "type": "league",
+      "domains": [
+        "toyota-dbbl.de"
+      ],
+      "free_access": "none",
+      "notes": "Official German women's top league site. PAID from season 2026/27: the DBBL announcement (verified 2026-10-05) states 2025/26 games ran free on the 'Dyn Basketball' YouTube channel, 'Ab der Saison 2026/27 ist die Ausstrahlung aller Frauenbundesliga-Spiele auf der Streaming-Plattform Dyn Sport geplant' — and no DBBL game is in the current month's Dyn Free Spiele list. League site is announcement evidence ONLY, never a directLink."
+    },
+    {
+      "tier": 1,
+      "name": "Regionalliga (league organisations)",
+      "type": "league",
+      "domains": [
+        "rln-basketball.de",
+        "regionalliga-suedost.de"
+      ],
+      "free_access": "none",
+      "notes": "Official German fourth-tier league sites (RL Nord, RL Suedost). Schedules and standings ONLY — there is no centralised stream; Sporteurope.TV carries an RL Suedost section whose pricing is not readable without a rendering backend. A Regionalliga game is free only when the CLUB's own official channel carries a live/upcoming broadcast (Tier 6 rules apply); a league-site link is never a directLink. Verified 2026-10-05."
     },
     {
       "tier": 1,
@@ -188,6 +229,26 @@
       ],
       "free_access": "free",
       "notes": "Live-only, future-only. See references/youtube-live-search.md."
+    },
+    {
+      "tier": 7,
+      "name": "European domestic leagues (evidence only)",
+      "type": "league",
+      "domains": [
+        "acb.com",
+        "legabasket.it",
+        "lnb.fr",
+        "aba-liga.com",
+        "esake.gr",
+        "bsl.org.tr",
+        "vtb-league.com",
+        "bnxtleague.com",
+        "basketball.at",
+        "swiss.basketball",
+        "plk.pl"
+      ],
+      "free_access": "none",
+      "notes": "Official top-division league sites, one per country (Spain acb.com, Italy legabasket.it, France lnb.fr, Adriatic aba-liga.com, Greece esake.gr, Tuerkiye bsl.org.tr, VTB vtb-league.com, Belgium/Netherlands bnxtleague.com, Austria basketball.at, Switzerland swiss.basketball, Poland plk.pl). Evidence and sourceReference for fixtures and announcements ONLY: their domestic streams are paid or geo-restricted in Germany, so they can NEVER be a directLink and a link with no free marker fails Check 1. Verified live 2026-10-05; several answer 403/connection-reset to datacenter IPs (lnb.fr, bsl.org.tr), the documented runner-IP class, so an unreachable host is a transport fact and not evidence against a game."
     }
   ],
   "excluded": [
@@ -210,6 +271,10 @@
     {
       "name": "Pirate/aggregator sites",
       "reason": "unofficial"
+    },
+    {
+      "name": "Sporteurope.TV",
+      "reason": "paid — ProA/ProB pay-per-view passes, verified 2026-10-05 from the league's own page (Einzelspiel 5,99 EUR, Teampass 109,99 EUR, All-Access 189,99 EUR)"
     }
   ]
 }

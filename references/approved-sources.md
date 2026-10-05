@@ -15,6 +15,10 @@ These are the primary, most reliable sources for official basketball content.
 | EuroLeague | League | `euroleaguebasketball.net` | Official EuroLeague site |
 | Basketball Bundesliga (BBL) | League | `easycredit-bbl.de`, `api.basketball-bundesliga.de` | Official easyCredit BBL site. **Renamed** — `basketball-bundesliga.de` no longer serves it (TLS SNI failure, DNS still resolving) and `x.com/BBLofficial` is a 404. Re-verified 2026-09-17 via `scripts/link_inventory.py` + `scripts/link_check.py`. The schedule page at `/saison/spielplaene_liga-pokalspiele/hauptrunde` is client-rendered: no JSON-LD, no microdata, and the server-rendered list reads “Keine Spiele für diese Saison gefunden”, because fixtures come from `api.basketball-bundesliga.de` (401 without a credential) — so no plain GET of the page can read it. Verified 2026-09-30. **The same host serves the league’s own iCalendar feed without a credential**: `https://api.basketball-bundesliga.de/calendar/ical/all-games` answers HTTP 200, 90,568 bytes, 321 VEVENTs, and is what `scripts/fixtures.py` now reads (`kind = "ics"`). Its `SUMMARY` lines write the competition onto the first club name — measured across all 321 events: exactly two prefixes, `easyCredit BBL Spiel` (306) and `BBL Pokal Spiel` (15), all left-hand side — and every `DTSTART` is floating with the zone declared once as `X-WR-TIMEZONE:Europe/Berlin`. A trimmed verbatim capture is in `tests/fixtures/feeds/`. Verified 2026-09-30 |
 | Basketball Champions League (BCL) | League | `championsleague.basketball` | Official BCL site. **Free for selected games only** — some games are free, others are not. Always check the site *and* the official social accounts (see BCL note below). |
+| BKT EuroCup | League | `eurocupbasketball.com` | Official BKT EuroCup site. **Evidence and sourceReference only** — in Germany EuroCup games sit with paid/geo-restricted broadcasters, so this is never a `directLink`. Verified live 2026-10-05. |
+| 2. Basketball Bundesliga (ProA/ProB) | League | `2basketballbundesliga.de` | Official German 2nd/3rd-tier site. **Streams are PAID** — verified 2026-10-05 from the league's own pass page: *"Die Spiele der 2. Basketball Bundesliga ProA kostenpflichtig auf Sporteurope.TV"*, Einzelspiel 5,99 € (PPV), Teampass 109,99 €, All-Access 189,99 €. Announcement/schedule evidence only, never a `directLink`. |
+| Damen Basketball Bundesliga (1. DBBL) | League | `toyota-dbbl.de` | Official German women's top league. **PAID from 2026/27** — the DBBL announcement (verified 2026-10-05): 2025/26 ran free on the "Dyn Basketball" YouTube channel, *"Ab der Saison 2026/27 ist die Ausstrahlung aller Frauenbundesliga-Spiele auf der Streaming-Plattform Dyn Sport geplant"*, and no DBBL game is in the current month's Dyn Free Spiele list. Evidence only, never a `directLink`. |
+| Regionalliga (league organisations) | League | `rln-basketball.de`, `regionalliga-suedost.de` | Official German 4th-tier league sites (RL Nord, RL Südost). **No centralised stream** — schedules/standings only; Sporteurope.TV has an RL Südost section whose pricing needs a rendering backend to read. A Regionalliga game is free only via the **club's own** official channel with a live/upcoming broadcast (Tier 6 rules); a league-site link is never a `directLink`. Verified 2026-10-05. |
 | DBB (Deutscher Basketball Bund) | Federation | `basketball-bund.de` | German Basketball Federation |
 
 ### Tier 2: National Broadcasters (High Confidence)
@@ -77,6 +81,29 @@ Official YouTube channels for leagues, federations, and clubs.
 | EuroLeague | `youtube.com/@EuroLeague` | Verify |
 | ALBA Berlin | Via `albaberlin.de` social links | Verify |
 | FC Bayern Basketball | Via `fcbayern.com` social links | Verify |
+
+### Tier 7: European Domestic Leagues (evidence only — never a `directLink`)
+
+Official top-division league sites, one per country, for fixture and announcement
+evidence. **Their domestic streams are paid or geo-restricted in Germany**, so
+none of these can ever be a `directLink`; a link with no explicit free marker
+fails Check 1. Verified live 2026-10-05 — several answer 403/connection-reset to
+datacenter IPs (`lnb.fr`, `bsl.org.tr`), the documented runner-IP class, so an
+unreachable host is a transport fact, not evidence against a game.
+
+| Country | League | Domains | Notes |
+|---------|--------|---------|-------|
+| Spain | Liga ACB (Endesa) | `acb.com` | Evidence only |
+| Italy | LBA Serie A | `legabasket.it` | Evidence only |
+| France | LNB Pro A | `lnb.fr` | Evidence only; WAF-blocked from datacenter IPs |
+| Adriatic | ABA League | `aba-liga.com` | Evidence only |
+| Greece | Stoiximan Basket League | `esake.gr` | Evidence only |
+| Türkiye | BSL | `bsl.org.tr` | Evidence only; connection reset from datacenter IPs |
+| Russia/East | VTB United League | `vtb-league.com` | Evidence only |
+| Belgium/Netherlands | BNXT League | `bnxtleague.com` | Evidence only |
+| Austria | win2day Basketball Superliga | `basketball.at` | Evidence only; free-to-air ORF listings are outside this registry's German scope |
+| Switzerland | Swiss Basketball League | `swiss.basketball` | Evidence only |
+| Poland | Orlen Basket Liga | `plk.pl` | Evidence only |
 
 ### Basketball Champions League (BCL) — Selected Games Only
 
@@ -160,6 +187,7 @@ The tier system prioritizes sources based on:
 | DAZN | Paid subscription |
 | Sport1+ | Paid |
 | Amazon Prime (general) | Paid (Dyn Sport Mix free tier only) |
+| Sporteurope.TV | **Paid** — ProA/ProB pay-per-view passes, verified 2026-10-05 from the league's own page (Einzelspiel 5,99 €, Teampass 109,99 €, All-Access 189,99 €) |
 | Pirate/aggregator sites | Unofficial |
 | Third-party stream sites | Unofficial |
 | Social media accounts as stream sources | Validation only — never a `directLink` |
