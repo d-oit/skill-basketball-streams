@@ -1012,6 +1012,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   source now means having verified what it is and what it costs, not having
   found its URL in a search result.
 
+### Fixed
+
+- **The render ladder's primary local rung could never have worked — three
+  defects in one class, all found by using it.** `SKILL.md` Step 2.8 and
+  `references/magenta-tv.md` both route a JS-rendered, bot-blocked page through
+  `scripts/render_ladder.py`, and its `patchright` rung was broken in three
+  independent ways:
+
+  1. **The driver was resolved at the package root.** `dir(patchright)` is
+     *empty* — `sync_playwright` lives at `patchright.sync_api` — so the rung
+     raised `AttributeError: module 'patchright' has no attribute
+     'sync_playwright'`. `run_daily.py`'s render-arena rung imports from
+     `patchright.sync_api`, which is why *it* read the same page while the
+     ladder could not.
+  2. **The driver was never entered.** `sync_playwright()` returns a *context
+     manager*, and the browsers exist only inside it, so
+     `getattr(playwright, "chromium")` raised `'PlaywrightContextManager' object
+     has no attribute 'chromium'` — the error the 2026-10-02 production log
+     recorded verbatim. The agent worked around it by hand at runtime; the rung
+     was never repaired.
+  3. **It asked for a Chrome that nothing installs.** `launch_kwargs =
+     {"channel": "chrome"}` needs the *system* Chrome, while
+     `runtime-daily.yml` installs `patchright install --with-deps chromium`:
+     `Chromium distribution 'chrome' is not found at /opt/google/chrome/chrome`.
+     The working render-arena rung launches the bundled chromium headless with
+     `--no-sandbox`, so those are the kwargs now.
+
+  `tests/test_render_ladder.py` pins all three — a faked browser cannot see any
+  of them, which is why they survived. `offline`'s docstring also records that a
+  rung which *is* importable stops the ladder on its own failure, so the
+  `urllib` assertion is only made when the ladder got that far.
+
+- **`references/search-backends.md` now documents the two routes that read a
+  blocked page without a renderer**, because finding them is what the ladder is
+  for. Verified 2026-10-05: `championsleague.basketball/en/games` carries its
+  whole 136-game fixture list as JSON escaped inside the served HTML, and
+  `search.sporteurope.tv/api/v1/search?q=<query>` returns the complete stream
+  catalogue (`name`, `home_team`, `content_start_date`, `type`,
+  `monetizations`) for a site whose pages are otherwise an empty app shell.
+
+
 
 
 ## [Unreleased]

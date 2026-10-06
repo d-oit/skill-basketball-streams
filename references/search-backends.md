@@ -129,6 +129,37 @@ MCP wiring (any MCP-capable runtime):
 Verify package names against the vendor docs before installing — treat this
 block as a template, not a pinned manifest.
 
+## Reading a JS-rendered or bot-blocked page without a renderer
+
+`SKILL.md` Step 2.8 climbs the fetch ladder because some pages are app shells.
+Before paying for a render, try the two routes that need no browser — both were
+verified working on 2026-10-05, and both were found by *using* the ladder and
+reading what the shell actually loads:
+
+1. **The page's embedded state.** A client-rendered page usually ships its data
+   inside the HTML it serves. `championsleague.basketball/en/games` is a 1 MB
+   document whose game list is a JSON array escaped inside a script string —
+   136 games with `gameId`, `teamA`/`teamB`, `gameDateTime`, `gameDateTimeUTC`,
+   `statusCode`, `isLive`, `round`, venue — readable with one GET and a
+   `json.loads` after unescaping. That is the whole BCL fixture feed, no browser.
+   Look for `__NEXT_DATA__`, `__NUXT__`, `window.__*__`, `application/json` and
+   the escaped `\"key\":` form.
+2. **The site's own public API.** A shell that renders nothing still names the
+   API it calls. `www.magenta.tv/sport` is an 858-byte shell loading
+   `static-app/client.<version>.js`; the bundle names its backends, and the app's
+   settings come from `dcm.telekom-dienste.de`. `sporteurope.tv` is the same
+   shape: its bundle names `https://api.sporteurope.tv/api/web/public/...` and
+   `https://search.sporteurope.tv/api/v1/search?q=<query>`, and that last one
+   returns the **whole stream catalogue as JSON** — `name`, `home_team`,
+   `content_start_date`, `type` (`LIVESTREAM`/`VIDEO`), `monetizations`,
+   `product_names`, `flags`. Grep the bundle for `https://`, `"/(api|graphql|v[0-9])/`
+   and `baseUrl`.
+
+Neither route is a substitute for the render when the data really is drawn by
+JavaScript, and neither bypasses a paywall — `monetizations` and the league's own
+pass page are the evidence for that. They are the cheap first attempt, and they
+leave the ladder for the pages that need it.
+
 ## Free LLM APIs (the *decide* layer)
 
 ### OpenCode Zen — the free catalogue, and how to see it
