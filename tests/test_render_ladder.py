@@ -416,6 +416,54 @@ class TestGameAnchor:
         assert payload["game"]["matched"] is False
 
 
+class TestThePlaywrightishRungsCanActuallyLaunch:
+    """Three defects, all in one rung, all found on 2026-10-05 by using it.
+
+    The ladder is the documented way to read a JS-rendered, bot-blocked page
+    (`SKILL.md` Step 2.8, `references/magenta-tv.md`), and its primary local rung
+    could never have worked. The 2026-10-02 production log recorded the symptom
+    (`patchright: ok=False ... 'PlaywrightContextManager' object has no attribute
+    'chromium'`) and the agent worked around it by hand; the rung was never fixed.
+
+    None of the three is visible to a test that fakes the browser, so these are
+    asserted against the class attributes and the source, which is where each
+    defect lived.
+    """
+
+    def test_the_driver_is_resolved_from_the_submodule_that_has_it(self):
+        """`dir(patchright)` is EMPTY; the driver is at `patchright.sync_api`.
+
+        Resolving `sync_playwright` against the package root raises
+        `AttributeError: module 'patchright' has no attribute 'sync_playwright'`.
+        `run_daily.py`'s render-arena rung imports from `patchright.sync_api`,
+        which is why *it* worked while the ladder did not.
+        """
+        assert ALL_RUNGS["patchright"].driver_module == "patchright.sync_api"
+        assert ALL_RUNGS["patchright"].driver == "sync_playwright"
+
+    def test_the_driver_is_entered_as_a_context_manager(self):
+        """`sync_playwright()` returns a manager, not a Playwright.
+
+        The browsers exist only inside `with sync_playwright() as p:`. Calling
+        `.chromium` on the manager is the exact error the production log recorded.
+        """
+        source = (REPO_ROOT / "scripts" / "render_ladder.py").read_text(encoding="utf-8")
+        assert "with getattr(module, self.driver)() as playwright:" in source
+        assert "getattr(playwright, self.browser).launch(" in source
+
+    def test_it_launches_the_bundled_chromium_not_the_chrome_channel(self):
+        """`channel: chrome` needs a system Chrome that nothing installs.
+
+        `runtime-daily.yml` runs `patchright install --with-deps chromium`, so the
+        rung failed at launch with `Chromium distribution 'chrome' is not found at
+        /opt/google/chrome/chrome`. The working render-arena rung launches the
+        bundled chromium headless with `--no-sandbox`, so these are the kwargs.
+        """
+        kwargs = ALL_RUNGS["patchright"].launch_kwargs
+        assert "channel" not in kwargs
+        assert kwargs.get("headless") is True
+        assert "--no-sandbox" in (kwargs.get("args") or [])
+
 class TestRungHealth:
     def test_parks_after_max_consecutive_failures(self):
         health = RungHealth()
@@ -468,6 +516,14 @@ def offline(monkeypatch):
     deterministic), and `urllib` is the one rung that would otherwise reach the
     internet from a test. A closed loopback proxy port is a connection error to
     it, which is exactly the 'real error stops the ladder' path.
+
+    The **optional local rungs are forced uninstalled** for the same reason. A
+    rung that *is* importable stops the ladder on its own failure before
+    `urllib` is ever tried, so without this the test asserted something about
+    the machine rather than about the ladder: it passed on a CI runner with no
+    patchright and failed on a workstation that had it (found 2026-10-05, when
+    the render ladder was being repaired and patchright was installed to use
+    it).
     """
     for key in ("http_proxy", "https_proxy", "HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY"):
         monkeypatch.setenv(key, "http://127.0.0.1:1")
@@ -528,7 +584,14 @@ class TestCli:
         # which is the distinction the rung ledger is built on.
         assert "firecrawl: skipped" in result.stdout
         assert "firecrawl: failed" not in result.stdout
-        assert "urllib: failed" in result.stdout
+        # `urllib` is only reached when no JS browser rung is importable: a rung
+        # that IS installed stops the ladder on its own failure, and `installed()`
+        # is a real import check that a subprocess (which this CLI is) cannot be
+        # monkeypatched out of. So the *labels* above are the environment-
+        # independent assertion, and this one holds whenever the ladder got that
+        # far -- on a CI runner, which installs no patchright, it always does.
+        if "patchright: failed" not in result.stdout:
+            assert "urllib: failed" in result.stdout, result.stdout
 
 
 class TestAttemptState:

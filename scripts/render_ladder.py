@@ -573,6 +573,16 @@ class _PlaywrightishRung(LocalRung):
 
     requires_js = True
     driver = "sync_playwright"
+    # Where the driver *lives*. `patchright`'s top level is empty — the driver is
+    # only at `patchright.sync_api.sync_playwright` — so resolving it against the
+    # package root raises `AttributeError: module 'patchright' has no attribute
+    # 'sync_playwright'`, which is how this rung failed on 2026-10-02
+    # (`patchright: ok=False ... 'PlaywrightContextManager' object has no
+    # attribute 'chromium'`) while `run_daily.py`'s render-arena rung, which
+    # imports from `patchright.sync_api`, worked. Empty means "the package root",
+    # which is what camoufox's driver is written against.
+    driver_module = ""
+
     browser = "chromium"
     launch_kwargs: dict = {}
 
@@ -580,43 +590,63 @@ class _PlaywrightishRung(LocalRung):
         if not self.installed():
             return self._skip(f"{self.package} not installed")
         started = time.monotonic()
-        module = __import__(self.package, fromlist=[self.driver])
-        playwright = getattr(module, self.driver)()
+        module = __import__(self.driver_module or self.package, fromlist=[self.driver])
+        # `sync_playwright()` returns a **context manager**, not a Playwright: the
+        # browsers only exist inside it. Calling `.chromium` on the manager is the
+        # second half of the same defect as the import path above, and it is the
+        # one the 2026-10-02 log recorded verbatim --
+        # `patchright: failed ... 'PlaywrightContextManager' object has no
+        # attribute 'chromium'`. So the driver is *entered*, and everything that
+        # touches the browser happens inside the block.
         try:
-            browser = getattr(playwright, self.browser).launch(**self.launch_kwargs)
-            page = browser.new_page(user_agent=USER_AGENT)
-            response = page.goto(url, wait_until="domcontentloaded", timeout=timeout * 1000)
-            page.wait_for_timeout(3000)
-            html = page.content()
-            text = page.inner_text("body")
-            status = response.status if response else None
-            return FetchResult(
-                ok=status is not None and status < 400,
-                status=status,
-                blocked=status in BLOCKED_STATUSES,
-                text=text,
-                html=html,
-                rung=self.name,
-                elapsed_ms=int((time.monotonic() - started) * 1000),
-            )
+            with getattr(module, self.driver)() as playwright:
+                browser = getattr(playwright, self.browser).launch(**self.launch_kwargs)
+                try:
+                    page = browser.new_page(user_agent=USER_AGENT)
+                    response = page.goto(
+                        url, wait_until="domcontentloaded", timeout=timeout * 1000
+                    )
+                    page.wait_for_timeout(3000)
+                    html = page.content()
+                    text = page.inner_text("body")
+                    status = response.status if response else None
+                finally:
+                    try:
+                        browser.close()
+                    except Exception:  # noqa: BLE001
+                        pass
         except Exception as exc:  # noqa: BLE001
             return FetchResult(
                 ok=False, rung=self.name, error=str(exc),
                 elapsed_ms=int((time.monotonic() - started) * 1000),
             )
-        finally:
-            try:
-                playwright.stop()  # type: ignore[attr-defined]
-            except Exception:  # noqa: BLE001
-                pass
+        return FetchResult(
+            ok=status is not None and status < 400,
+            status=status,
+            blocked=status in BLOCKED_STATUSES,
+            text=text,
+            html=html,
+            rung=self.name,
+            elapsed_ms=int((time.monotonic() - started) * 1000),
+        )
 
 
 class PatchrightRung(_PlaywrightishRung):
     name = "patchright"
     license = LICENCE_APACHE
     package = "patchright"
+    # The driver is NOT at the package root: `dir(patchright)` is empty and
+    # `patchright.sync_api` is where `sync_playwright` lives. Verified 2026-10-05
+    # against the installed 1.18.33-era wheel.
+    driver_module = "patchright.sync_api"
     browser = "chromium"
-    launch_kwargs = {"channel": "chrome"}
+    # NOT `{"channel": "chrome"}`. That channel is the *system* Chrome, which
+    # nothing in this repository installs -- `runtime-daily.yml` runs
+    # `patchright install --with-deps chromium`, so the rung failed at launch with
+    # `Chromium distribution 'chrome' is not found at /opt/google/chrome/chrome`.
+    # The render-arena rung in `run_daily.py` launches the bundled chromium
+    # headless and reads the same page, so these are the kwargs that work.
+    launch_kwargs = {"headless": True, "args": ["--no-sandbox"]}
 
 
 class CamoufoxRung(_PlaywrightishRung):
