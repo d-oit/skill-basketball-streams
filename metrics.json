@@ -12,10 +12,10 @@
     "dropped": 0,
     "duplicates": 0,
     "fixture_recall": 0.0,
-    "fixtures": 29,
-    "rows": 29,
+    "fixtures": 32,
+    "rows": 32,
     "surfaced": 0,
-    "unseen": 29,
+    "unseen": 32,
     "unseen_keys": [
       "BBL|ALBA BERLIN|VET-CONCEPT Gladiators Trier|2026-10-10T18:00Z",
       "BBL|BMA365 Bamberg Baskets|SYNTAINICS MBC|2026-10-10T16:30Z",
@@ -28,6 +28,7 @@
       "BBL|SKYLINERS|Veolia Towers Hamburg|2026-10-11T14:30Z",
       "BBL|Science City Jena|Telekom Baskets Bonn|2026-10-09T18:00Z",
       "Basketball Champions League|AEK BC|Salon Vilpas|2026-10-07T16:00Z",
+      "Basketball Champions League|ALBA BERLIN|Igokea m:tel|2026-10-13T18:00Z",
       "Basketball Champions League|ALBA BERLIN|SK Slavia Praha ERA NBK|2026-10-07T16:00Z",
       "Basketball Champions League|Asisa Joventut|Bnei Penlink Herzliya|2026-10-06T18:30Z",
       "Basketball Champions League|BC Juventus Utena|Unicaja|2026-10-07T17:00Z",
@@ -40,8 +41,10 @@
       "Basketball Champions League|FC Porto|Telekom Baskets Bonn|2026-10-07T18:00Z",
       "Basketball Champions League|Falco KC Szombathely|Windrose Giants Antwerp|2026-10-07T18:00Z",
       "Basketball Champions League|Igokea m:tel|Surne Bilbao|2026-10-06T18:00Z",
+      "Basketball Champions League|Itelyum Varese|Peristeri Betsson|2026-10-13T18:00Z",
       "Basketball Champions League|Itelyum Varese|UCAM Murcia|2026-10-07T18:30Z",
       "Basketball Champions League|Legia Warszawa|SIG Strasbourg|2026-10-06T18:00Z",
+      "Basketball Champions League|Nanterre 92|Rytas Vilnius|2026-10-13T18:00Z",
       "Basketball Champions League|Nanterre 92|Trabzonspor|2026-10-07T16:00Z",
       "Basketball Champions League|Pallacanestro Varese|UCAM Murcia|2026-10-07T18:30Z",
       "Basketball Champions League|RASTA Vechta|Spartak Office Shoes|2026-10-07T18:00Z",
@@ -50,8 +53,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 443,
-    "missed": 443,
+    "eligible": 450,
+    "missed": 450,
     "missed_keys": [
       "https://about.fiba.basketball/en/news/watch-it-live-day-1-of-fiba-intercontinental-cup-2026",
       "https://apps.apple.com/",
@@ -63,6 +66,7 @@
       "https://basketballimtv.de/live/2026/alba-berlin-ratiopharm-ulm-64990.html",
       "https://basketballimtv.de/live/2026/alba-berlin-skyliners-frankfurt-64906.html",
       "https://basketballimtv.de/live/2026/alba-berlin-telekom-baskets-bonn-52990.html",
+      "https://basketballimtv.de/live/2026/bamberg-baskets-syntainics-mbc-64952.html",
       "https://basketballimtv.de/live/2026/bayern-muenchen-alba-berlin-64922.html",
       "https://basketballimtv.de/live/2026/bayern-muenchen-ewe-baskets-oldenburg-64936.html",
       "https://basketballimtv.de/live/2026/gladiators-trier-alba-berlin-64955.html",
@@ -179,6 +183,7 @@
       "https://sporteurope.tv/barmer-2-basketball-bundesliga",
       "https://sporteurope.tv/en/alba-berlin-nbbl",
       "https://sporteurope.tv/en/barmer-2-basketball-bundesliga",
+      "https://sporteurope.tv/en/euroleague",
       "https://sporteurope.tv/en/videos/basketball",
       "https://sporteurope.tv/videos/basketball",
       "https://sports.justwatch.com/de/basketball",
@@ -198,6 +203,8 @@
       "https://sportticker.harzkurier.de/basketball/bbl/ma12415672/fc-bayern-muenchen_bamberg-baskets/liveticker/",
       "https://streameaste.cc/euroleague",
       "https://toyota-dbbl.de/1-bundesliga/samstag-im-livestream-letzter-test-fuer-alba-vor-dem-dbbl-saisonstart-gegen-osnabrueck/",
+      "https://tvheute.at/newsticker/magentatv-zeigt-basketball-em-alle-spiele-live-und-gratis-73494",
+      "https://tvlander.com/basketball/euroleague",
       "https://uk.pcmag.com/video-streaming-services/167068/how-to-watch-2026-fiba-womens-basketball-world-cup-semifinals-live-free",
       "https://viewgrid.tv/events/fiba-womens-basketball-world-cup-2026",
       "https://watch-live-stream.com/basketball/olympiacos-piraeus-real-madrid",
@@ -329,6 +336,7 @@
       "https://www.it-boltwise.de/basketball-bundesliga-playoffs-wfcrzburg-vs-bonn-live-auf-dyn-und-joyn.html",
       "https://www.it-boltwise.de/bbl-saison-2025-26-fc-bayern-muenchen-auf-titeljagd-im-livestream.html",
       "https://www.kulturigo.de/magentasport-mit-exklusivem-basketball-angebot-mission-em-gewinn-startet-am-08-august-per-g-nther-und-marie-g-lich-als-experten-dabei-alle-76-spiele-und-alle-tests-live-deutsche-partien-kostenlos-2189882.html/",
+      "https://www.kurierverlag.de/na-pressemitteilungen/europas-bester-basketball-mit-neun-deutschen-klubs-live-nur-bei-magentasport-morgen-startet-die-basketball-champions-league-berlin-bamberg-bonn-und-zr-94525224.html",
       "https://www.kurierverlag.de/na-pressemitteilungen/magentasport-und-magentatv-zeigen-alle-spiele-der-eurobasket-2025-live-die-deutschen-spiele-kostenlos-telekom-vergibt-sublizenz-an-rtl-deutschland-zr-93650895.html",
       "https://www.livescorehunter.com/basketball-germany-livescore-live-streaming-links",
       "https://www.livesport.com/basketball/europe/champions-league/",
@@ -378,6 +386,7 @@
       "https://www.news.de/sport/860037197/mhp-riesen-ludwigsburg-vet-concept-gladiators-trier-bbl-livestream-basketball-bundesliga-am-04-10-2026-in-ludwigsburg-anfahrt-und-tickets/1/",
       "https://www.news.de/sport/860052559/telekom-baskets-bonn-science-city-jena-bbl-livestream-basketball-bundesliga-am-09-10-2026-in-bonn-anfahrt-und-tickets/1/",
       "https://www.news.de/sport/860054371/niners-chemnitz-fc-bayern-muenchen-basketball-bbl-livestream-kostenlos-basketball-bundesliga-am-10-10-2026-in-chemnitz-anfahrt-und-tickets/1/",
+      "https://www.news.de/sport/860057914/rasta-vechta-ratiopharm-ulm-bbl-livestream-basketball-bundesliga-am-10-10-2026-in-vechta-anfahrt-und-tickets/1/",
       "https://www.presseportal.de/pm/147981/6057601",
       "https://www.presseportal.de/pm/147981/6364994",
       "https://www.ran.de/sports/basketball/bbl/news/bbl-saison202526-joyn-zeigt-ausgewaehlte-topspiele-kostenlos-im-livestream-596107",
@@ -459,6 +468,7 @@
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-jena-bayern-muenchen-uebertragung-im-tv-stream",
       "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/crvena-zvezda-anadolu-efes_mtc22011163/live.shtml",
       "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/hapoel-ibi-tel-aviv-real-madrid_mtc22011181/live.shtml",
+      "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/olympiacos-anadolu-efes_mtc22011286/live.shtml",
       "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/paris-zalgiris-kaunas_mtc22011293/live.shtml",
       "https://www.tomsguide.com/entertainment/sports/how-to-watch-germany-vs-turkiye-eurobasket-final-2025-live",
       "https://www.topfreizeit.de/am-mittwoch-startet-die-bbl-mit-berlin-hamburg-kostenlos-bei-magentasport-lust-auf-mehr-basketball-ber-700-spiele-aus-bbl-euroleague-eurocup-und-vom-der-deutschen-national-mannschaft-live-2010051.html",
@@ -498,9 +508,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 7138,
-    "unique_games": 622,
-    "unverifiable": 443,
+    "rows": 7341,
+    "unique_games": 635,
+    "unverifiable": 450,
     "unverifiable_keys": [
       "https://about.fiba.basketball/en/news/watch-it-live-day-1-of-fiba-intercontinental-cup-2026",
       "https://apps.apple.com/",
@@ -512,6 +522,7 @@
       "https://basketballimtv.de/live/2026/alba-berlin-ratiopharm-ulm-64990.html",
       "https://basketballimtv.de/live/2026/alba-berlin-skyliners-frankfurt-64906.html",
       "https://basketballimtv.de/live/2026/alba-berlin-telekom-baskets-bonn-52990.html",
+      "https://basketballimtv.de/live/2026/bamberg-baskets-syntainics-mbc-64952.html",
       "https://basketballimtv.de/live/2026/bayern-muenchen-alba-berlin-64922.html",
       "https://basketballimtv.de/live/2026/bayern-muenchen-ewe-baskets-oldenburg-64936.html",
       "https://basketballimtv.de/live/2026/gladiators-trier-alba-berlin-64955.html",
@@ -628,6 +639,7 @@
       "https://sporteurope.tv/barmer-2-basketball-bundesliga",
       "https://sporteurope.tv/en/alba-berlin-nbbl",
       "https://sporteurope.tv/en/barmer-2-basketball-bundesliga",
+      "https://sporteurope.tv/en/euroleague",
       "https://sporteurope.tv/en/videos/basketball",
       "https://sporteurope.tv/videos/basketball",
       "https://sports.justwatch.com/de/basketball",
@@ -647,6 +659,8 @@
       "https://sportticker.harzkurier.de/basketball/bbl/ma12415672/fc-bayern-muenchen_bamberg-baskets/liveticker/",
       "https://streameaste.cc/euroleague",
       "https://toyota-dbbl.de/1-bundesliga/samstag-im-livestream-letzter-test-fuer-alba-vor-dem-dbbl-saisonstart-gegen-osnabrueck/",
+      "https://tvheute.at/newsticker/magentatv-zeigt-basketball-em-alle-spiele-live-und-gratis-73494",
+      "https://tvlander.com/basketball/euroleague",
       "https://uk.pcmag.com/video-streaming-services/167068/how-to-watch-2026-fiba-womens-basketball-world-cup-semifinals-live-free",
       "https://viewgrid.tv/events/fiba-womens-basketball-world-cup-2026",
       "https://watch-live-stream.com/basketball/olympiacos-piraeus-real-madrid",
@@ -778,6 +792,7 @@
       "https://www.it-boltwise.de/basketball-bundesliga-playoffs-wfcrzburg-vs-bonn-live-auf-dyn-und-joyn.html",
       "https://www.it-boltwise.de/bbl-saison-2025-26-fc-bayern-muenchen-auf-titeljagd-im-livestream.html",
       "https://www.kulturigo.de/magentasport-mit-exklusivem-basketball-angebot-mission-em-gewinn-startet-am-08-august-per-g-nther-und-marie-g-lich-als-experten-dabei-alle-76-spiele-und-alle-tests-live-deutsche-partien-kostenlos-2189882.html/",
+      "https://www.kurierverlag.de/na-pressemitteilungen/europas-bester-basketball-mit-neun-deutschen-klubs-live-nur-bei-magentasport-morgen-startet-die-basketball-champions-league-berlin-bamberg-bonn-und-zr-94525224.html",
       "https://www.kurierverlag.de/na-pressemitteilungen/magentasport-und-magentatv-zeigen-alle-spiele-der-eurobasket-2025-live-die-deutschen-spiele-kostenlos-telekom-vergibt-sublizenz-an-rtl-deutschland-zr-93650895.html",
       "https://www.livescorehunter.com/basketball-germany-livescore-live-streaming-links",
       "https://www.livesport.com/basketball/europe/champions-league/",
@@ -827,6 +842,7 @@
       "https://www.news.de/sport/860037197/mhp-riesen-ludwigsburg-vet-concept-gladiators-trier-bbl-livestream-basketball-bundesliga-am-04-10-2026-in-ludwigsburg-anfahrt-und-tickets/1/",
       "https://www.news.de/sport/860052559/telekom-baskets-bonn-science-city-jena-bbl-livestream-basketball-bundesliga-am-09-10-2026-in-bonn-anfahrt-und-tickets/1/",
       "https://www.news.de/sport/860054371/niners-chemnitz-fc-bayern-muenchen-basketball-bbl-livestream-kostenlos-basketball-bundesliga-am-10-10-2026-in-chemnitz-anfahrt-und-tickets/1/",
+      "https://www.news.de/sport/860057914/rasta-vechta-ratiopharm-ulm-bbl-livestream-basketball-bundesliga-am-10-10-2026-in-vechta-anfahrt-und-tickets/1/",
       "https://www.presseportal.de/pm/147981/6057601",
       "https://www.presseportal.de/pm/147981/6364994",
       "https://www.ran.de/sports/basketball/bbl/news/bbl-saison202526-joyn-zeigt-ausgewaehlte-topspiele-kostenlos-im-livestream-596107",
@@ -908,6 +924,7 @@
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-jena-bayern-muenchen-uebertragung-im-tv-stream",
       "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/crvena-zvezda-anadolu-efes_mtc22011163/live.shtml",
       "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/hapoel-ibi-tel-aviv-real-madrid_mtc22011181/live.shtml",
+      "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/olympiacos-anadolu-efes_mtc22011286/live.shtml",
       "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/paris-zalgiris-kaunas_mtc22011293/live.shtml",
       "https://www.tomsguide.com/entertainment/sports/how-to-watch-germany-vs-turkiye-eurobasket-final-2025-live",
       "https://www.topfreizeit.de/am-mittwoch-startet-die-bbl-mit-berlin-hamburg-kostenlos-bei-magentasport-lust-auf-mehr-basketball-ber-700-spiele-aus-bbl-euroleague-eurocup-und-vom-der-deutschen-national-mannschaft-live-2010051.html",
@@ -947,30 +964,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-10-05T17:18Z",
+  "run_id": "2026-10-06T15:22Z",
   "source": {
     "audit_rows": 0,
-    "candidates_rows": 7138,
-    "fixtures_rows": 29
+    "candidates_rows": 7341,
+    "fixtures_rows": 32
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 111,
-      "missed": 111,
-      "recall": 0.0,
-      "rows": 210,
-      "run_id": "2026-09-29T12:57Z",
-      "unique_games": 175
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -1191,7 +1191,24 @@
       "rows": 91,
       "run_id": "2026-10-05T17:17Z",
       "unique_games": 82
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 124,
+      "missed": 124,
+      "recall": 0.0,
+      "rows": 203,
+      "run_id": "2026-10-06T15:21Z",
+      "unique_games": 181
     }
   ],
-  "ts": "2026-10-05T17:18:28.479754+00:00"
+  "ts": "2026-10-06T15:22:51.673659+00:00"
 }
