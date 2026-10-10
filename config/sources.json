@@ -231,6 +231,16 @@
       "notes": "Live-only, future-only. See references/youtube-live-search.md."
     },
     {
+      "tier": 6,
+      "name": "Tampa 2 Films (community amateur-sport channel)",
+      "type": "youtube",
+      "handles": [
+        "youtube.com/@tampa2films"
+      ],
+      "free_access": "free",
+      "notes": "Community channel (not a league or federation): Tom films local Berlin amateur sport as a free hobby project. Added 2026-10-10 at the operator's request. Verified live 2026-10-10: `youtube.com/@tampa2films` answers 200 (channel UCDH9pTsSYS2zJDd_Rr9xbWg) and its RSS feed lists amateur basketball — `TuS Neukölln vs. VIMODROM Baskets Jena | DBBL-POKAL`, `TuS Lichterfelde vs. BBC 90 Köpenick | BBV-Pokal Herren`, `Mitte Supersonics vs. TSV Sportuniversum | Landesliga` — alongside other local sport, so it is a source only for a game it actually carries live. Live-only, future-only: see references/youtube-live-search.md."
+    },
+    {
       "tier": 7,
       "name": "European domestic leagues (evidence only)",
       "type": "league",
