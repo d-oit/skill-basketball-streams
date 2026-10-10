@@ -923,42 +923,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **The runtime job could not start, because a security control depended on a
   live model.** `opencode agent create` *generates* the agent with an LLM, and
   on 2026-10-04 it failed the whole `runtime` job with a provider's balance
-  error — "This request requires at least $1.00 in balance for image or video
-  output" — while the agent it produces is static: a fixed description and a
-  fixed tool allow-list. `scripts/runtime_agent.py` writes
-  `.opencode/agent/runtime.md` deterministically now, and the workflow reads
-  the agent name from its output.
+  error -- "This request requires at least $1.00 in balance for image or video
+  output". `opencode.json` now pins `opencode/big-pickle`, a free Zen model, so
+  that step runs on a repository with no paid balance.
 
 - **The permission restriction was never in effect.** `opencode run` without
   `--agent` selects the built-in `build` agent, whose permission set is
-  `*: allow`; the generated agent was dead config. The 2026-10-02 production
-  log shows the consequence — the agent invoked `bash` and the step spent 21
-  minutes exploring the runner until `timeout` killed it. So `PRODUCT.md`'s
-  "denied `edit` and `bash`" was a promise nothing kept. The run now passes
-  `--agent runtime`, and a new step asserts the claim against the transcript:
-  a `"tool":"bash"` or `"tool":"edit"` event reds the job, because `--agent`
-  with a name that does not resolve silently falls back rather than erroring
-  (verified on the pinned 1.18.33 binary).
+  `*: allow`; an agent file that nothing selects is dead config. The 2026-10-02
+  production log shows the consequence -- the agent invoked `bash` and the step
+  spent 21 minutes exploring the runner until `timeout` killed it. So
+  `PRODUCT.md`'s "denied `edit` and `bash`" was a promise nothing kept. The
+  restriction now lives in `opencode.json`'s project `permission` block, which
+  opencode merges into **every** agent -- including the default `build` one --
+  so it holds without a flag. It is written in config, not in the workflow,
+  because `.github/workflows/runtime-daily.yml` cannot be changed by this
+  repository's automation credential (a GitHub App without the `workflows`
+  permission), so a `--agent` flag there could not land.
 
 - **`bash: deny` would have reddened the run one step later, so it is denied
   per-command instead.** Disabling the tool outright drops it from the request,
-  and the CLI's free provider (OpenCode Zen — the only rung the agent can use)
+  and the CLI's free provider (OpenCode Zen -- the only rung the agent can use)
   then refuses the whole call with HTTP 403 `FreeTierError`: *"OpenCode's free
   tier can only be used from within OpenCode"*. Measured 2026-10-04 on the
   pinned 1.18.33 binary, `bash: deny` and `read: deny` both 403 while
   `edit`/`todowrite`/`task`/`lsp`/`glob`/`webfetch` denials are all accepted.
-  The agent therefore keeps the tool with `"*": deny` plus one inert `"true":
-  allow`, and a new preflight proves the restricted agent can serve a model
-  before the run that needs it — otherwise that message, which this repo
-  already documents as the signature of a missing `env:` block, has two causes
-  and names neither.
+  The config therefore keeps the tool with `"*": deny` plus one inert `"true":
+  allow`. `opencode debug agent build` is the check that the CLI resolved it.
 
 - **`calendar_io.py` crashed instead of raising `CalendarError` on a synthetic
   `HTTPError`.** `HTTPError.read()` returns `bytes` from a real response but
   `str` when the error was constructed with `fp=None` (some stdlib builds back
   that with a `StringIO`), so `.decode` was an `AttributeError` that replaced
   the calendar error with a crash the caller could not act on.
-
 
 ## [1.12.0] - 2026-10-05
 
