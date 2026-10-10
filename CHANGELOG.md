@@ -924,8 +924,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   live model.** `opencode agent create` *generates* the agent with an LLM, and
   on 2026-10-04 it failed the whole `runtime` job with a provider's balance
   error -- "This request requires at least $1.00 in balance for image or video
-  output". `opencode.json` now pins `opencode/big-pickle`, a free Zen model, so
-  that step runs on a repository with no paid balance.
+  output". `opencode.json` now pins `opencode/space-bunny-free`, the free Zen id
+  that serves `agent create` itself, so that step runs on a repository with no
+  paid balance.
 
 - **The permission restriction was never in effect.** `opencode run` without
   `--agent` selects the built-in `build` agent, whose permission set is
