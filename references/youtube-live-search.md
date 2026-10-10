@@ -81,7 +81,7 @@ Only channels in `references/approved-sources.md` Tier 6 / `config/sources.json`
 ```
 youtube.com/@fiba           youtube.com/@basketballbundesliga
 youtube.com/@EuroLeague     youtube.com/@BasketballCL
-youtube.com/user/TheDBBTV
+youtube.com/user/TheDBBTV   youtube.com/@tampa2films
 ```
 
 A live broadcast on an unlisted channel is a new-source **candidate**

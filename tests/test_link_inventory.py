@@ -286,10 +286,11 @@ class TestCli:
         assert result.returncode == 1
         payload = json.loads(report.read_text(encoding="utf-8"))
         assert payload["summary"]["INVALID"] == 1
-        # 58 approved-domain entries: the registry grew by the 2026-10-05
-        # European search — 4 Tier 1 evidence sources (EuroCup, ProA/ProB, the
-        # women's 1. DBBL, Regionalliga) and the Tier 7 per-country league sites
-        # (before that, by api.basketball-bundesliga.de on 2026-09-30, and by
-        # dyn.sport on 2026-09-26). The count is the point — it is how a registry
-        # edit becomes visible here rather than silently changing what is probed.
-        assert payload["summary"]["OK"] == 58
+        # 59 approved entries: the registry grew by the 2026-10-05 European
+        # search — 4 Tier 1 evidence sources (EuroCup, ProA/ProB, the women's
+        # 1. DBBL, Regionalliga) and the Tier 7 per-country league sites (before
+        # that, by api.basketball-bundesliga.de on 2026-09-30, and by dyn.sport
+        # on 2026-09-26) — and by the operator-approved `youtube.com/@tampa2films`
+        # handle on 2026-10-10. The count is the point — it is how a registry edit
+        # becomes visible here rather than silently changing what is probed.
+        assert payload["summary"]["OK"] == 59
