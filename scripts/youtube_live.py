@@ -116,6 +116,7 @@ DEFAULT_ALLOWED_HANDLES = (
     "basketballbundesliga",
     "euroleague",
     "basketballcl",
+    "tampa2films",
 )
 
 

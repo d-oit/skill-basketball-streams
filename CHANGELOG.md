@@ -1054,6 +1054,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`youtube.com/@tampa2films` is an approved Tier 6 source** (operator,
+  2026-10-10). A free Berlin amateur-sport channel — Tom films local teams
+  as a hobby project — that carries amateur basketball (DBBL-Pokal,
+  Landesliga, 3x3) alongside other local sport. Verified live 2026-10-10:
+  the channel answers HTTP 200 and its RSS feed lists those games. It is
+  added to `config/sources.json`, the Tier 6 table, the YouTube allow-list
+  (`scripts/youtube_live.py`) and the `link_inventory` count pin (58 → 59).
+  It is a source only for a game it actually carries live, and the
+  live-only / future-only gate is unchanged.
+
 
 
 

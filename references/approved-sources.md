@@ -71,7 +71,8 @@ Official websites of BBL clubs that may host live streams.
 | VET-CONCEPT Gladiators Trier | `gladiators-trier.de` | ✅ Tier 5 |
 
 ### Tier 6: Official YouTube Channels (Medium Confidence)
-Official YouTube channels for leagues, federations, and clubs.
+Official YouTube channels for leagues, federations and clubs, plus the
+one operator-approved community channel for local amateur basketball.
 
 | Channel | Handle / URL | Notes |
 |---------|--------------|-------|
@@ -81,6 +82,7 @@ Official YouTube channels for leagues, federations, and clubs.
 | EuroLeague | `youtube.com/@EuroLeague` | Verify |
 | ALBA Berlin | Via `albaberlin.de` social links | Verify |
 | FC Bayern Basketball | Via `fcbayern.com` social links | Verify |
+| Tampa 2 Films (community) | `youtube.com/@tampa2films` | ✅ Verified live 2026-10-10 — Berlin amateur-sport channel, free. Carries local basketball (DBBL-Pokal, Landesliga, 3x3) alongside other local sport, so a stream is evidence only for the game it actually carries. Added at the operator’s request. |
 
 ### Tier 7: European Domestic Leagues (evidence only — never a `directLink`)
 
