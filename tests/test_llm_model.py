@@ -318,7 +318,7 @@ class TestWorkflowWiring:
         """
         text = RUNTIME_DAILY.read_text(encoding="utf-8")
         step = text[text.index("name: Resolve the model") :]
-        step = step[: step.index("name: Write the permission-restricted")]
+        step = step[: step.index("name: Create the permission-restricted runtime agent")]
         for name in ALL_CREDENTIALS:
             assert f"{name}: ${{{{ secrets.{name} }}}}" in step, name
 

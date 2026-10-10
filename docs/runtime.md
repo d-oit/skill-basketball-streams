@@ -41,29 +41,38 @@ looks like a confirmed one. `WRONG` is terminal, set only by
 
 ## The runtime agent's permission restriction
 
-The runtime runs as a **restricted agent**, and both halves of that are load
-bearing — the file that defines it, and the flag that selects it.
+The runtime runs as a **restricted agent**: the calendar-writing run must not be
+able to edit `SKILL.md`, `references/` or the gate scripts mid-run, and must not
+be able to run shell commands. `PRODUCT.md` promises it; `opencode.json` at the
+repository root is what keeps it.
 
-```bash
-# 1. write the agent. Deterministic: no model call, so a provider outage or an
-#    exhausted free tier cannot stop the job.
-python3 scripts/runtime_agent.py --path .opencode/agent >> "$GITHUB_OUTPUT"
-
-# 2. select it. `opencode run` without `--agent` uses the built-in `build`
-#    agent, whose permission set is `*: allow`.
-opencode run --agent "$AGENT" --model "$LLM_MODEL" --format json ... | tee .tmp/transcript.json
-
-# 3. assert it. `--agent <wrong-name>` does NOT error -- the CLI silently falls
-#    back -- so a `bash` or `edit` tool event in the transcript reds the job.
+```json
+{
+  "model": "opencode/big-pickle",
+  "permission": {
+    "edit": "deny",
+    "task": "deny",
+    "todowrite": "deny",
+    "lsp": "deny",
+    "bash": { "*": "deny", "true": "allow" }
+  }
+}
 ```
 
-`scripts/runtime_agent.py` writes `.opencode/agent/runtime.md` with `edit`,
-`task`, `todowrite` and `lsp` denied and every `bash` command denied. It
-replaced `opencode agent create`, which generated the same static file with an
-**LLM call** and failed the whole runtime job on 2026-10-04 with a provider's
-balance error. A security control must not depend on a live model, and a
-generator also picks the agent's *name* — which is why the deterministic writer
-is what makes `--agent` safe to read from a step output rather than retype.
+opencode merges a project config's `permission` block into **every** agent,
+including the built-in `build` agent that `opencode run` selects when no
+`--agent` is given, so the restriction holds without a flag. That is why it
+lives in config rather than in the workflow: `.github/workflows/runtime-daily.yml`
+cannot be changed by this repository's automation credential (a GitHub App
+without the `workflows` permission), so a fix that needs a `--agent` flag there
+cannot land. `opencode debug agent build` is the check -- it prints the denied
+permissions, and with no `opencode.json` it prints `*: allow` for everything.
+
+The `model` pin is the other half. The `Create the permission-restricted runtime
+agent` step is `opencode agent create`, an **LLM call** whose default model is a
+paid image/video one; on 2026-10-04 it failed the whole runtime job with "This
+request requires at least $1.00 in balance for image or video output". Pinning a
+free Zen model makes that step succeed on a repository with no paid balance.
 
 **`bash` is denied per-command, not disabled.** The obvious, stricter form
 
@@ -86,18 +95,17 @@ catch-all deny plus one inert allow:
       "true": allow      # the shell's no-op; keeps the tool in the request
 
 Two consequences worth remembering. The message above has **two causes** in this
-repo — a CLI step with no `env:` block, and this one — and the workflow proves
-the restricted agent can serve a model *before* the run precisely so an edit
-like `bash: deny` fails with the agent's name on it. And `todowrite`/`lsp`
-reject the object form outright (`Expected PermissionActionConfig`), so only
-`bash` may use it.
+repo -- a CLI step with no `env:` block, and this one -- so an edit like
+`bash: deny` fails with a provider message that names neither; the tests are
+what name it. And `todowrite`/`lsp` reject the object form outright
+(`Expected PermissionActionConfig`), so only `bash` may use it.
 
-Two production runs proved why the selection and the assertion are not
-optional. Without `--agent` the restriction was dead config: the 2026-10-02 log
-shows the agent invoking `bash` and the step spending 21 minutes until
-`timeout` killed it. A malformed permission key is silently ignored too, so the
-claim is checked against the transcript rather than documented. The halves are
-pinned by `tests/test_runtime_agent.py`.
+A production run proved why the restriction is not optional. Before it, the
+2026-10-02 log shows the agent invoking `bash` and the step spending 21 minutes
+until `timeout` killed it -- the restriction was documented and not in effect.
+`tests/test_runtime_agent.py` pins the config, and the same module asserts the
+CLI actually resolves it with `opencode debug agent build` (skipped where the
+CLI is absent).
 
 ## Writing to the calendar
 

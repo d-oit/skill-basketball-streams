@@ -28,16 +28,12 @@ defect, so the tests assert the *agreement*, not each document's wording.
 from __future__ import annotations
 
 import re
-import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILL = REPO_ROOT / "SKILL.md"
 RUNTIME_DAILY = REPO_ROOT / ".github" / "workflows" / "runtime-daily.yml"
 EXTRACT = REPO_ROOT / "scripts" / "extract_candidates.py"
-
-sys.path.insert(0, str(REPO_ROOT / "scripts"))
-import runtime_agent  # noqa: E402
 
 STEP_START = re.compile(r"^      - (?:name|uses|id):", re.M)
 
@@ -158,22 +154,18 @@ class TestTheChannelIsTheOnlyOneThereIs:
         Without this, the contract above looks like belt-and-braces. With it, the
         requirement is a consequence of the permission model.
 
-        The permissions moved from an `opencode agent create --permissions`
-        flag to `scripts/runtime_agent.py` (the agent is written
-        deterministically, then selected with `--agent`). The deny list is still
-        the reason the transcript is the only channel.
+        The restriction lives in `opencode.json` (pinned by
+        `tests/test_runtime_agent.py`): opencode merges a project config's
+        `permission` block into every agent, including the built-in `build` agent
+        that `opencode run` selects, so the deny list holds without a `--agent`
+        flag. The deny list is the reason the transcript is the only channel.
         """
-        step = _agent_step()
-        assert "--agent" in step, (
-            "the run must select the restricted agent, or the built-in `build` "
-            "agent runs with every tool and the transcript is not the only channel"
-        )
-        body = runtime_agent.render_agent()
-        for permission in ("edit", "bash"):
-            assert f"{permission}: deny" in body, (
-                f"{permission} must stay denied; the transcript is then the only "
-                "channel"
-            )
+        import json
+
+        config = json.loads((REPO_ROOT / "opencode.json").read_text(encoding="utf-8"))
+        permission = config["permission"]
+        assert permission["edit"] == "deny"
+        assert permission["bash"]["*"] == "deny"
 
     def test_the_extractor_is_the_only_reader_of_that_block(self):
         """One reader, one shape — so the contract has exactly one consumer."""
