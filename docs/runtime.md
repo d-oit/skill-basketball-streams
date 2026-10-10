@@ -48,7 +48,7 @@ repository root is what keeps it.
 
 ```json
 {
-  "model": "opencode/big-pickle",
+  "model": "opencode/space-bunny-free",
   "permission": {
     "edit": "deny",
     "task": "deny",
@@ -71,8 +71,13 @@ permissions, and with no `opencode.json` it prints `*: allow` for everything.
 The `model` pin is the other half. The `Create the permission-restricted runtime
 agent` step is `opencode agent create`, an **LLM call** whose default model is a
 paid image/video one; on 2026-10-04 it failed the whole runtime job with "This
-request requires at least $1.00 in balance for image or video output". Pinning a
-free Zen model makes that step succeed on a repository with no paid balance.
+request requires at least $1.00 in balance for image or video output". It must
+then be a free Zen id, and specifically `space-bunny-free`: the other free ids
+(`big-pickle`, `longcat-2.5-preview-free`, `mimo-v2.6-flash-free`) answer
+`FreeTierError: OpenCode's free tier can only be used from within OpenCode` to
+`agent create` even though `opencode run` is served by them. `opencode run` is
+unaffected: the workflow passes `--model "$LLM_MODEL"` explicitly, so the pin
+only decides the generator.
 
 **`bash` is denied per-command, not disabled.** The obvious, stricter form
 

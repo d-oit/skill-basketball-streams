@@ -121,16 +121,23 @@ class TestTheProjectConfig:
         assert "external_directory" not in permission
         assert "doom_loop" not in permission
 
-    def test_the_model_is_a_free_zen_model(self):
+    def test_the_model_is_the_free_zen_model_agent_create_can_use(self):
         """`opencode agent create` reads this model, and it must not need billing.
 
         The runtime job's `Create the permission-restricted runtime agent` step
         is an LLM call whose default model is a paid image/video one; on
         2026-10-04 it failed the whole job with "This request requires at least
-        $1.00 in balance for image or video output". Pinning a free Zen model
-        here is what lets that step succeed on a repository with no paid balance.
+        $1.00 in balance for image or video output".
+
+        `space-bunny-free` is the free Zen id that serves `agent create` itself.
+        The other free ids -- `big-pickle`, `longcat-2.5-preview-free`,
+        `mimo-v2.6-flash-free` -- answer `FreeTierError: OpenCode's free tier
+        can only be used from within OpenCode` to `agent create` even though
+        `opencode run` is served by them (measured on the pinned 1.18.33
+        binary). `opencode run` is unaffected by this pin: the workflow passes
+        `--model "$LLM_MODEL"` explicitly, so this only decides the generator.
         """
-        assert _config()["model"] == "opencode/big-pickle"
+        assert _config()["model"] == "opencode/space-bunny-free"
 
     def test_the_cli_resolves_the_restriction(self):
         """The config is only real if the CLI merges it into the default agent.
