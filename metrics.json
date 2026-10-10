@@ -61,8 +61,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 518,
-    "missed": 518,
+    "eligible": 527,
+    "missed": 527,
     "missed_keys": [
       "https://about.fiba.basketball/en/news/watch-it-live-day-1-of-fiba-intercontinental-cup-2026",
       "https://apps.apple.com/",
@@ -93,6 +93,9 @@
       "https://basketballsphere.com/en/watch-euroleague-2026-27-live-for-free/",
       "https://basketballsphere.com/en/watch-euroleague-for-free/",
       "https://basketnews.com/news-254411-where-to-watch-wembanyama-jokic-live-in-fiba-basketball.html",
+      "https://buffsports.io/euroleague/live-barcelona-vs-zalgiris-kaunas",
+      "https://buffsports.io/euroleague/live-baskonia-vs-besiktas",
+      "https://buffsports.io/euroleague/live-olympiacos-vs-anadolu-efes",
       "https://buffsports.io/watch-fiba-stream",
       "https://ca.pcmag.com/video-streaming-services/17805/how-to-watch-the-2026-fiba-womens-basketball-world-cup-live-even-without-cable",
       "https://cms.magentasport.de/",
@@ -121,6 +124,7 @@
       "https://forums.vmix.com/posts/t1908-Live-Stream-Basketball-Beko-BBL--professional-league----Bayern-Munich",
       "https://freestreams-live1.watch/league/euroleague.html",
       "https://freestreams-live1h.pk/euroleague-stream95/",
+      "https://freestreams-live1i.pk/euroleague-stream90/",
       "https://ga.de/sport/telekom-baskets-bonn/livestream-telekom-baskets-bonn-gegen-hapoel-jerusalem_aid-90349947",
       "https://go3.lt/",
       "https://go3.lt/en/sports",
@@ -235,6 +239,7 @@
       "https://watch-live-stream.com/category/basketball/euroleague",
       "https://wetten.com/sportwetten/sportuebertragung-im-tv/basketball/",
       "https://www.365scores.com/en-us/basketball/league/bundesliga-27",
+      "https://www.365scores.com/en-us/basketball/team/bayern-munich-8648",
       "https://www.aiscore.com/basketball/tournament-basketball-champions-league/0m2q19srgipk6xw",
       "https://www.albaberlin.de/frauen/saison/liveuebertragungen",
       "https://www.albaberlin.de/frauen/saison/liveuebertragungen/",
@@ -309,6 +314,7 @@
       "https://www.eurosport.de/basketball/basketball-champions-league/2025-2026/live-trieste-canarias_mtc1641460/live.shtml",
       "https://www.eurosport.de/basketball/basketball-champions-league/2025-2026/live-trieste-era-nymburk_mtc1641454/live.shtml",
       "https://www.eurosport.de/basketball/basketball-champions-league/2025-2026/live-trieste-gran-canaria_mtc1641457/live.shtml",
+      "https://www.eurosport.de/basketball/basketball-champions-league/2026-2027/alba-berlin-igokea-mtel_mtc22030588/live.shtml",
       "https://www.eurosport.de/basketball/basketball-champions-league/2026-2027/bamberg-murcia_mtc22030562/live.shtml",
       "https://www.eurosport.de/basketball/basketball-champions-league/2026-2027/live-murcia-varese_mtc22030544/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2024-2025/live-fc-bayern-muenchen-niners-chemnitz_mtc1553576/live.shtml",
@@ -322,6 +328,7 @@
       "https://www.eurosport.de/basketball/bbl/2026-2027/fitness-first-wuerzburg-baskets-bonn_mtc21940159/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/frankfurt-fitness-first-wuerzburg-baskets_mtc21940026/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/live-alba-berlin-niners-chemnitz_mtc21939999/live.shtml",
+      "https://www.eurosport.de/basketball/bbl/2026-2027/live-bamberg-syntainics-mbc_mtc21940008/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/live-bayern-muenchen-alba-berlin_mtc21940263/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/live-ludwigsburg-trier_mtc21940118/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/live-niners-chemnitz-bayern-muenchen_mtc21940270/live.shtml",
@@ -553,6 +560,7 @@
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XBEK2Lix8FMK_xl4Xsr-2pmcod1J_QQCzkgZNcpItsndA30iZu",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XKmED8HFkAEXKQ3wDxG2gxbGqyx46AdexhuCr4CKshPBdh2E3O",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XeCRtTWOvkCkYkQXRBWE7yGgDkgNiH0fhsYTstPKr2kHH16lYF",
+      "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XfcBieGKZpKYlOElUW3Lh4CLgWvnc7DXlxiWLwgxRFZJ4n-cIx",
       "https://www.watchathletics.com/schedule/watchlive/12323",
       "https://www.welt.de/",
       "https://www.wettfreunde.net/sport-im-tv-live/basketball/",
@@ -563,6 +571,7 @@
       "https://www.youtube.com/watch?v=CQbozxkSjiI",
       "https://www.youtube.com/watch?v=FNmWY99kc8Y",
       "https://www.youtube.com/watch?v=MNNLKYurqBI",
+      "https://www.youtube.com/watch?v=WuV5w2L5qGw",
       "https://www.youtube.com/watch?v=X7_I_xPsLHE",
       "https://www.youtube.com/watch?v=YYnRLewvo-4&xstg=CAMSBhUD-7L2Hw%3D%3D",
       "https://www.youtube.com/watch?v=ZuSRsofRXn8",
@@ -584,9 +593,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 8149,
-    "unique_games": 717,
-    "unverifiable": 518,
+    "rows": 8360,
+    "unique_games": 727,
+    "unverifiable": 527,
     "unverifiable_keys": [
       "https://about.fiba.basketball/en/news/watch-it-live-day-1-of-fiba-intercontinental-cup-2026",
       "https://apps.apple.com/",
@@ -617,6 +626,9 @@
       "https://basketballsphere.com/en/watch-euroleague-2026-27-live-for-free/",
       "https://basketballsphere.com/en/watch-euroleague-for-free/",
       "https://basketnews.com/news-254411-where-to-watch-wembanyama-jokic-live-in-fiba-basketball.html",
+      "https://buffsports.io/euroleague/live-barcelona-vs-zalgiris-kaunas",
+      "https://buffsports.io/euroleague/live-baskonia-vs-besiktas",
+      "https://buffsports.io/euroleague/live-olympiacos-vs-anadolu-efes",
       "https://buffsports.io/watch-fiba-stream",
       "https://ca.pcmag.com/video-streaming-services/17805/how-to-watch-the-2026-fiba-womens-basketball-world-cup-live-even-without-cable",
       "https://cms.magentasport.de/",
@@ -645,6 +657,7 @@
       "https://forums.vmix.com/posts/t1908-Live-Stream-Basketball-Beko-BBL--professional-league----Bayern-Munich",
       "https://freestreams-live1.watch/league/euroleague.html",
       "https://freestreams-live1h.pk/euroleague-stream95/",
+      "https://freestreams-live1i.pk/euroleague-stream90/",
       "https://ga.de/sport/telekom-baskets-bonn/livestream-telekom-baskets-bonn-gegen-hapoel-jerusalem_aid-90349947",
       "https://go3.lt/",
       "https://go3.lt/en/sports",
@@ -759,6 +772,7 @@
       "https://watch-live-stream.com/category/basketball/euroleague",
       "https://wetten.com/sportwetten/sportuebertragung-im-tv/basketball/",
       "https://www.365scores.com/en-us/basketball/league/bundesliga-27",
+      "https://www.365scores.com/en-us/basketball/team/bayern-munich-8648",
       "https://www.aiscore.com/basketball/tournament-basketball-champions-league/0m2q19srgipk6xw",
       "https://www.albaberlin.de/frauen/saison/liveuebertragungen",
       "https://www.albaberlin.de/frauen/saison/liveuebertragungen/",
@@ -833,6 +847,7 @@
       "https://www.eurosport.de/basketball/basketball-champions-league/2025-2026/live-trieste-canarias_mtc1641460/live.shtml",
       "https://www.eurosport.de/basketball/basketball-champions-league/2025-2026/live-trieste-era-nymburk_mtc1641454/live.shtml",
       "https://www.eurosport.de/basketball/basketball-champions-league/2025-2026/live-trieste-gran-canaria_mtc1641457/live.shtml",
+      "https://www.eurosport.de/basketball/basketball-champions-league/2026-2027/alba-berlin-igokea-mtel_mtc22030588/live.shtml",
       "https://www.eurosport.de/basketball/basketball-champions-league/2026-2027/bamberg-murcia_mtc22030562/live.shtml",
       "https://www.eurosport.de/basketball/basketball-champions-league/2026-2027/live-murcia-varese_mtc22030544/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2024-2025/live-fc-bayern-muenchen-niners-chemnitz_mtc1553576/live.shtml",
@@ -846,6 +861,7 @@
       "https://www.eurosport.de/basketball/bbl/2026-2027/fitness-first-wuerzburg-baskets-bonn_mtc21940159/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/frankfurt-fitness-first-wuerzburg-baskets_mtc21940026/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/live-alba-berlin-niners-chemnitz_mtc21939999/live.shtml",
+      "https://www.eurosport.de/basketball/bbl/2026-2027/live-bamberg-syntainics-mbc_mtc21940008/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/live-bayern-muenchen-alba-berlin_mtc21940263/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/live-ludwigsburg-trier_mtc21940118/live.shtml",
       "https://www.eurosport.de/basketball/bbl/2026-2027/live-niners-chemnitz-bayern-muenchen_mtc21940270/live.shtml",
@@ -1077,6 +1093,7 @@
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XBEK2Lix8FMK_xl4Xsr-2pmcod1J_QQCzkgZNcpItsndA30iZu",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XKmED8HFkAEXKQ3wDxG2gxbGqyx46AdexhuCr4CKshPBdh2E3O",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XeCRtTWOvkCkYkQXRBWE7yGgDkgNiH0fhsYTstPKr2kHH16lYF",
+      "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XfcBieGKZpKYlOElUW3Lh4CLgWvnc7DXlxiWLwgxRFZJ4n-cIx",
       "https://www.watchathletics.com/schedule/watchlive/12323",
       "https://www.welt.de/",
       "https://www.wettfreunde.net/sport-im-tv-live/basketball/",
@@ -1087,6 +1104,7 @@
       "https://www.youtube.com/watch?v=CQbozxkSjiI",
       "https://www.youtube.com/watch?v=FNmWY99kc8Y",
       "https://www.youtube.com/watch?v=MNNLKYurqBI",
+      "https://www.youtube.com/watch?v=WuV5w2L5qGw",
       "https://www.youtube.com/watch?v=X7_I_xPsLHE",
       "https://www.youtube.com/watch?v=YYnRLewvo-4&xstg=CAMSBhUD-7L2Hw%3D%3D",
       "https://www.youtube.com/watch?v=ZuSRsofRXn8",
@@ -1108,30 +1126,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-10-10T14:36Z",
+  "run_id": "2026-10-10T18:25Z",
   "source": {
     "audit_rows": 0,
-    "candidates_rows": 8149,
+    "candidates_rows": 8360,
     "fixtures_rows": 40
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 96,
-      "missed": 96,
-      "recall": 0.0,
-      "rows": 161,
-      "run_id": "2026-09-29T18:00Z",
-      "unique_games": 151
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -1352,7 +1353,24 @@
       "rows": 193,
       "run_id": "2026-10-10T14:34Z",
       "unique_games": 165
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 119,
+      "missed": 119,
+      "recall": 0.0,
+      "rows": 211,
+      "run_id": "2026-10-10T18:23Z",
+      "unique_games": 180
     }
   ],
-  "ts": "2026-10-10T14:36:18.247697+00:00"
+  "ts": "2026-10-10T18:25:22.222168+00:00"
 }
