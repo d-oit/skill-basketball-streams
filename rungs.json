@@ -1,36 +1,36 @@
 {
   "derived": true,
-  "ledger_rows": 496,
+  "ledger_rows": 506,
   "max_strikes": 3,
   "parked": [
     "tinyfish"
   ],
-  "run_id": "2026-10-09T15:24Z",
+  "run_id": "2026-10-10T14:33Z",
   "rungs": {
     "curl_cffi": {
-      "attempts": 104,
+      "attempts": 106,
       "consecutive_failures": 0,
       "failures": 0,
       "last_error": "curl_cffi not installed",
       "last_host": "championsleague.basketball",
-      "last_seen": "2026-10-09T15:24:46+00:00",
+      "last_seen": "2026-10-10T14:33:50+00:00",
       "last_state": "skipped",
       "max_strikes": 3,
       "ok_no_evidence": 0,
       "parked": false,
-      "skipped": 104,
+      "skipped": 106,
       "successes": 0
     },
     "firecrawl": {
-      "attempts": 138,
+      "attempts": 141,
       "consecutive_failures": 0,
       "failures": 0,
       "last_error": "",
       "last_host": "magenta.tv",
-      "last_seen": "2026-10-09T15:24:46+00:00",
+      "last_seen": "2026-10-10T14:33:50+00:00",
       "last_state": "ok-no-evidence",
       "max_strikes": 3,
-      "ok_no_evidence": 42,
+      "ok_no_evidence": 45,
       "parked": false,
       "skipped": 96,
       "successes": 0
@@ -50,12 +50,12 @@
       "successes": 0
     },
     "tinyfish": {
-      "attempts": 138,
+      "attempts": 141,
       "consecutive_failures": 3,
-      "failures": 102,
+      "failures": 105,
       "last_error": "<urlopen error [Errno -5] No address associated with hostname>",
       "last_host": "magenta.tv",
-      "last_seen": "2026-10-09T15:24:46+00:00",
+      "last_seen": "2026-10-10T14:33:50+00:00",
       "last_state": "failed",
       "max_strikes": 3,
       "ok_no_evidence": 0,
@@ -64,19 +64,19 @@
       "successes": 0
     },
     "urllib": {
-      "attempts": 104,
-      "consecutive_failures": 0,
-      "failures": 0,
-      "last_error": "",
+      "attempts": 106,
+      "consecutive_failures": 1,
+      "failures": 1,
+      "last_error": "HTTP 403",
       "last_host": "championsleague.basketball",
-      "last_seen": "2026-10-09T15:24:46+00:00",
-      "last_state": "ok-no-evidence",
+      "last_seen": "2026-10-10T14:33:50+00:00",
+      "last_state": "blocked",
       "max_strikes": 3,
-      "ok_no_evidence": 104,
+      "ok_no_evidence": 105,
       "parked": false,
       "skipped": 0,
       "successes": 0
     }
   },
-  "ts": "2026-10-09T15:24:53+00:00"
+  "ts": "2026-10-10T14:34:18+00:00"
 }
