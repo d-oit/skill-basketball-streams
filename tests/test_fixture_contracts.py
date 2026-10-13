@@ -18,6 +18,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 FIXTURES = REPO_ROOT / "tests" / "fixtures"
 UPSERT = REPO_ROOT / "scripts" / "upsert_events.py"
+UPSERT_NOW = "2026-09-15T08:30:00Z"
 AUDIT = REPO_ROOT / "scripts" / "audit_events.py"
 CANDIDATES = REPO_ROOT / "scripts" / "candidates.py"
 FIXTURE_PARSER = REPO_ROOT / "scripts" / "fixtures.py"
@@ -42,6 +43,8 @@ class TestUpsertFixture:
             [
                 "--existing", str(FIXTURES / "upsert_existing.json"),
                 "--candidates", str(FIXTURES / "upsert_candidates.json"),
+                "--now", UPSERT_NOW,
+                "--window-days", "7",
                 "--json",
             ],
         )
@@ -63,6 +66,8 @@ class TestUpsertFixture:
             [
                 "--existing", str(FIXTURES / "upsert_existing.json"),
                 "--candidates", str(FIXTURES / "upsert_candidates.json"),
+                "--now", UPSERT_NOW,
+                "--window-days", "7",
                 "--json",
             ],
         )
@@ -78,6 +83,8 @@ class TestUpsertFixture:
             [
                 "--existing", str(FIXTURES / "upsert_existing.json"),
                 "--candidates", str(FIXTURES / "upsert_candidates.json"),
+                "--now", UPSERT_NOW,
+                "--window-days", "7",
                 "--json",
             ],
         )
@@ -116,6 +123,8 @@ class TestVerdictFixture:
             [
                 "--existing", str(FIXTURES / "upsert_verdict_existing.json"),
                 "--candidates", str(FIXTURES / "upsert_verdict_candidates.json"),
+                "--now", UPSERT_NOW,
+                "--window-days", "7",
                 *extra,
                 "--json",
             ],

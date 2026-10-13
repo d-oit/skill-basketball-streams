@@ -21,7 +21,6 @@ For non-YouTube sources, use `webSearch` with `limit: 20`:
 - "BR24 Basketball live"
 - "RBB24 Basketball live"
 - "NBBL JBBL basketball live stream Sporteurope"
-- "ProB basketball livestream kostenlos Sporteurope"
 - "Basketball Regionalliga livestream kostenlos"
 - "ALBA Berlin live stream free"
 - "FC Bayern München Basketball live free"
@@ -34,8 +33,8 @@ For non-YouTube sources, use `webSearch` with `limit: 20`:
 For YouTube, use only the prebuilt Live-filter URLs in
 `config/youtube-live-queries.json`; never use these generic search queries to
 discover YouTube broadcasts. Focus on official domains in approved-sources.md,
-and require current, game-specific free-access evidence for ProB and
-Regionalliga streams.
+and require current, game-specific free-access evidence for Regionalliga
+streams. ProB is excluded from this calendar as not free of charge.
 
 ## Team Name Variations
 
@@ -50,7 +49,8 @@ Regionalliga streams.
 - EuroLeague
 - Basketball Champions League
 - FIBA
-- ProA, ProB (German second/third divisions)
+- ProA (German second division)
+- ProB is recognized as basketball vocabulary but excluded from this calendar
 
 ## Exclusion Keywords (reject)
 

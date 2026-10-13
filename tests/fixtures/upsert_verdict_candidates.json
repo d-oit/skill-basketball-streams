@@ -8,7 +8,12 @@
       "state": "VERIFIED",
       "summary": "BCL: Lenovo Tenerife vs Telekom Baskets Bonn",
       "evidence": {"live_confirmed": true, "free_confirmed": true},
-      "league_color_id": "6"
+      "league_color_id": "6",
+      "directLink": "https://stream.example/live/bcl",
+      "sourceReference": "https://official.example/schedule/bcl",
+      "access": "Free",
+      "validationTimestamp": "2026-09-15T08:00:00Z",
+      "validationNotes": "Official event page confirms free live viewing."
     },
     {
       "league": "BBL",
@@ -17,7 +22,12 @@
       "state": "VERIFIED",
       "summary": "BBL: ALBA Berlin vs FC Bayern Muenchen",
       "evidence": {"live_confirmed": true, "free_confirmed": true},
-      "league_color_id": "6"
+      "league_color_id": "6",
+      "directLink": "https://stream.example/live/bbl",
+      "sourceReference": "https://official.example/schedule/bbl",
+      "access": "Free",
+      "validationTimestamp": "2026-09-15T08:00:00Z",
+      "validationNotes": "Official event page confirms free live viewing."
     }
   ]
 }

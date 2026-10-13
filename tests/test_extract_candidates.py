@@ -19,6 +19,7 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -31,6 +32,7 @@ from scripts.extract_candidates import (
     normalise_candidate,
     transcript_text,
 )
+from scripts.upsert_events import ACTION_CREATE, ACTION_SKIP, plan_upsert
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCRIPT = REPO_ROOT / "scripts" / "extract_candidates.py"
@@ -272,6 +274,49 @@ class TestNormaliseCandidate:
     def test_a_flat_evidence_flag_is_read_too(self):
         candidate = normalise_candidate({**CANDIDATE, "paid": "yes"})
         assert candidate["evidence"] == {"paid": True}
+
+    def test_extracted_stream_proof_reaches_the_final_write_gate(self):
+        now = "2026-10-13T19:00:00Z"
+        raw = {
+            **CANDIDATE,
+            "start": "2026-10-13T20:00:00Z",
+            "directLink": "https://stream.example/live/game",
+            "sourceReference": "https://official.example/schedule/game",
+            "access": "Free",
+            "validationTimestamp": "2026-10-13T18:00:00Z",
+            "validationNotes": "Official event page confirms free live viewing.",
+            "evidence": {"free_confirmed": True, "live_confirmed": True},
+        }
+
+        extracted = normalise_candidate(raw)
+        assert extracted["direct_links"] == [
+            {"source": "", "url": "https://stream.example/live/game"}
+        ]
+        assert extracted["source_reference"] == "https://official.example/schedule/game"
+        assert extracted["access"] == "Free"
+        assert extracted["validated_at"] == "2026-10-13T18:00:00Z"
+        plan = plan_upsert(
+            [],
+            [extracted],
+            now=datetime.fromisoformat(now.replace("Z", "+00:00")),
+        )
+        assert plan[0]["action"] == ACTION_CREATE
+
+    def test_boolean_claims_without_source_proof_are_skipped_by_the_planner(self):
+        extracted = normalise_candidate(
+            {
+                **CANDIDATE,
+                "start": "2026-10-13T20:00:00Z",
+                "evidence": {"free_confirmed": True, "live_confirmed": True},
+            }
+        )
+        plan = plan_upsert(
+            [],
+            [extracted],
+            now=datetime.fromisoformat("2026-10-13T19:00:00+00:00"),
+        )
+        assert plan[0]["action"] == ACTION_SKIP
+        assert "direct stream URL" in plan[0]["reason"]
 
 
 class TestExtract:

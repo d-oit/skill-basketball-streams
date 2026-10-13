@@ -104,6 +104,10 @@ argv = [
   "tests/fixtures/upsert_existing.json",
   "--candidates",
   "tests/fixtures/upsert_candidates.json",
+  "--now",
+  "2026-09-15T08:30:00Z",
+  "--window-days",
+  "7",
 ]
 when-changed = ["scripts/upsert_events.py", "scripts/verification.py", "tests/fixtures/**"]
 
@@ -122,6 +126,10 @@ argv = [
   "tests/fixtures/upsert_verdict_candidates.json",
   "--verdicts",
   "tests/fixtures/upsert_verdicts.jsonl",
+  "--now",
+  "2026-09-15T08:30:00Z",
+  "--window-days",
+  "7",
 ]
 when-changed = ["scripts/upsert_events.py", "scripts/audit_events.py", "tests/fixtures/upsert_verdict*", "tests/fixtures/audit*", "tests/fixtures/synthesise*", "tests/fixtures/**"]
 

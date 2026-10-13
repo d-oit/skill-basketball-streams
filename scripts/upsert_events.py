@@ -6,6 +6,13 @@ ordering is a safety property, not a detail: the runtime lists existing events
 *today…today+7d* and reconciles in memory **before** any write, so it can never
 duplicate an event it is about to create.
 
+The planner's runtime entry point also enforces candidate eligibility before
+reconciliation: ProB is excluded; start time must fall strictly after the
+captured `--now` and no later than its seven-day cutoff; and free/live status
+must be explicitly supported by evidence flags, a direct stream URL, a source
+reference, free-access wording, a validation timestamp and explanatory notes.
+An `UNVERIFIED` state cannot substitute for any of those facts.
+
 Reconciliation rules:
 
 | Existing | New candidate | Action |
@@ -56,10 +63,11 @@ Run without `--apply`, this prints the plan only — the calendar API call itsel
 belongs to the workflow, so this module stays testable with no credentials.
 
 Usage:
-    python3 scripts/upsert_events.py --existing existing.json --candidates candidates.json
-    python3 scripts/upsert_events.py --existing existing.json --candidates candidates.json --json
+    python3 scripts/upsert_events.py --existing existing.json --candidates candidates.json --now 2026-10-13T19:00:00Z
+    python3 scripts/upsert_events.py --existing existing.json --candidates candidates.json --now 2026-10-13T19:00:00Z --json
     python3 scripts/upsert_events.py --existing existing.json \\
-        --candidates candidates.json --verdicts telemetry/audit.jsonl
+        --candidates candidates.json --verdicts telemetry/audit.jsonl \\
+        --now 2026-10-13T19:00:00Z --window-days 7
 
 Exit codes:
     0  PASS — a plan was produced
@@ -70,9 +78,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from urllib.parse import urlparse
 
 try:  # direct CLI execution
     # `latest_per_event` is shared with `audit_events.py` rather than copied: the
@@ -120,6 +130,9 @@ ACTION_SKIP = "skip"
 # It is not a skip: the event *is* ours to maintain, it just needs no write. See
 # the reconciliation table above and `plan_upsert`.
 ACTION_UNCHANGED = "unchanged"
+# The calendar's current access policy excludes all ProB games. This is a hard
+# planner rule so a model-provided `free_confirmed: true` cannot promote one.
+PROB_LABEL_RE = re.compile(r"\bpro[\s-]*b\b", re.IGNORECASE)
 
 
 def parse_dt(value: object) -> datetime | None:
@@ -314,10 +327,85 @@ def verdict_wrong(verdict: dict | None) -> bool:
     return str(verdict.get("verdict") or "").strip().upper() == VERDICT_WRONG
 
 
+def eligibility_reason(
+    candidate: dict,
+    league: str,
+    *,
+    now: datetime,
+    window_days: int = 7,
+) -> str | None:
+    """Return why a candidate cannot be written to the upcoming-game calendar."""
+    labels = " ".join(
+        str(candidate.get(key) or "") for key in ("competition", "summary")
+    )
+    if PROB_LABEL_RE.search(f"{league} {labels}"):
+        return "ProB is excluded by the calendar's free-access policy"
+
+    start = parse_dt(candidate.get("start") or candidate.get("startTime"))
+    if start is None:
+        return "candidate start is missing or is not a valid ISO-8601 datetime"
+    start = start.astimezone(timezone.utc)
+    current = (
+        now.replace(tzinfo=timezone.utc)
+        if now.tzinfo is None
+        else now.astimezone(timezone.utc)
+    )
+    if start <= current:
+        return f"candidate start {start.isoformat()} is not after now {current.isoformat()}"
+    cutoff = current + timedelta(days=window_days)
+    if start > cutoff:
+        return (
+            f"candidate start {start.isoformat()} is beyond the next "
+            f"{window_days} days (through {cutoff.isoformat()})"
+        )
+
+    evidence = coerce_evidence(candidate)
+    if evidence.get("paid") is True:
+        return "candidate evidence says the stream is paid"
+    if evidence.get("free_confirmed") is not True:
+        return "free access is not explicitly confirmed by the candidate evidence"
+    if evidence.get("live_confirmed") is not True:
+        return "live-stream status is not explicitly confirmed by the candidate evidence"
+
+    links = normalise_links(candidate)
+    direct_links = links.get("direct_links") or []
+    if not any(_is_http_url(row.get("url")) for row in direct_links):
+        return "candidate has no valid direct stream URL"
+    if not _is_http_url(links.get("source_reference")):
+        return "candidate has no valid sourceReference URL"
+
+    access = str(links.get("access") or "").strip().casefold()
+    if re.search(r"\b(paid|paywall|pay-per-view|subscription|kostenpflichtig|abo)\b", access):
+        return "candidate access field indicates paid or subscription access"
+    if not re.search(r"\b(free|gratis|kostenlos)\b", access):
+        return "candidate access field does not explicitly say the stream is free"
+
+    validated_at = parse_dt(links.get("validated_at"))
+    if validated_at is None:
+        return "candidate has no valid validationTimestamp"
+    if validated_at.astimezone(timezone.utc) > current:
+        return "candidate validationTimestamp is in the future"
+    if not links.get("validation_notes"):
+        return "candidate has no validationNotes describing the free live stream"
+    return None
+
+
+def _is_http_url(value: object) -> bool:
+    """Whether a field is an absolute HTTP(S) URL with a hostname."""
+    try:
+        parsed = urlparse(str(value or "").strip())
+    except ValueError:
+        return False
+    return parsed.scheme in {"http", "https"} and bool(parsed.hostname)
+
+
 def plan_upsert(
     existing_events: list[dict],
     candidates: list[dict],
     verdicts: dict | None = None,
+    *,
+    now: datetime | None = None,
+    window_days: int = 7,
 ) -> list[dict]:
     """Reconcile candidates against existing events. Returns one plan row each.
 
@@ -337,6 +425,29 @@ def plan_upsert(
         key = candidate.get("game_key") or game_key(
             league, _teams_of(candidate), candidate.get("start")
         )
+
+        # The command-line writer always supplies `now`. Keeping this optional
+        # preserves the pure planner's use in historical fixture comparisons;
+        # production planning receives an explicit, freshly resolved timestamp.
+        if now is not None:
+            ineligible = eligibility_reason(
+                candidate, league, now=now, window_days=window_days
+            )
+            if ineligible:
+                plan.append(
+                    {
+                        "action": ACTION_SKIP,
+                        "reason": ineligible,
+                        "game_key": key,
+                        "event_id": "",
+                        "state": new_state,
+                        "title": "",
+                        "color_id": "",
+                        **_event_fields(candidate, league),
+                    }
+                )
+                continue
+
         title = title_for(new_state, str(candidate.get("summary") or ""))
         color = color_for(new_state, league_color)
 
@@ -563,8 +674,25 @@ def main() -> None:
         help=("the audit ledger (JSONL); a WRONG verdict for an event is honoured "
               "from the record, not only from the calendar's title prefix"),
     )
+    parser.add_argument(
+        "--now",
+        required=True,
+        help="required current ISO-8601 datetime used to enforce the upcoming-game window",
+    )
+    parser.add_argument(
+        "--window-days",
+        type=int,
+        default=7,
+        help="allow starts after --now through --now + this many days (default: 7)",
+    )
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
+
+    if args.window_days < 1:
+        parser.error("--window-days must be at least 1")
+    now = parse_dt(args.now)
+    if now is None:
+        parser.error(f"--now {args.now!r} is not a valid ISO-8601 datetime")
 
     existing = _load(Path(args.existing), "events")
     candidates = _load(Path(args.candidates), "candidates")
@@ -572,7 +700,13 @@ def main() -> None:
     # whose audit has not run yet, and defaulting to "no verdicts" would be a
     # silent way to lose the one input that enforces the hard requirement.
     verdicts = load_verdicts(Path(args.verdicts)) if args.verdicts else {}
-    plan = plan_upsert(existing, candidates, verdicts)
+    plan = plan_upsert(
+        existing,
+        candidates,
+        verdicts,
+        now=now,
+        window_days=args.window_days,
+    )
     counts = summarise(plan)
 
     if not plan:

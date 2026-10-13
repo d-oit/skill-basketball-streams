@@ -4,8 +4,9 @@ Phase 2 writes to a **public** calendar, so the acceptance criteria in
 `live-stream-runtime-spec.md` §16 are tested literally:
 
 * a game with confirmed free access is created `VERIFIED` / colour `6`;
-* a plausible live stream without free confirmation is created `UNVERIFIED`
-  (`[UNVERIFIED]` prefix, colour `5`) — surfaced, but visibly uncertain;
+* runtime eligibility skips candidates missing explicit free/live proof or
+  source provenance; state-colour behavior is tested separately by the pure
+  reconciliation cases below;
 * a re-run over the same window plans **zero** creates;
 * verified events are left byte-identical (the plan carries empty title/colour,
   so a writer has nothing to send).
@@ -50,6 +51,12 @@ def _candidate(**overrides) -> dict:
         "start": "2026-09-16T19:00:00+02:00",
         "state": "UNVERIFIED",
         "summary": "BBL: ALBA Berlin vs FC Bayern Muenchen",
+        "directLink": "https://stream.example/live/game",
+        "sourceReference": "https://official.example/schedule/game",
+        "access": "Free",
+        "validationTimestamp": "2026-09-14T08:00:00Z",
+        "validationNotes": "Official event page confirms free live viewing.",
+        "evidence": {"free_confirmed": True, "live_confirmed": True},
     }
     row.update(overrides)
     return row
@@ -384,7 +391,7 @@ class TestPlanUpsert:
         }
 
     def test_a_candidate_with_no_evidence_puts_no_key_on_the_plan(self):
-        assert "evidence" not in plan_upsert([], [_candidate()])[0]
+        assert "evidence" not in plan_upsert([], [_candidate(evidence={})])[0]
 
     def test_a_promotion_keeps_the_new_evidence(self):
         """The promotion is the moment the evidence is worth recording."""
@@ -633,6 +640,10 @@ class TestSummarise:
 
 
 def _run(args: list[str]) -> subprocess.CompletedProcess:
+    # The CLI requires an injected clock so fixture tests never depend on the
+    # day they happen to run. Tests for the production clock pass it explicitly.
+    if "--now" not in args:
+        args = [*args, "--now", "2026-09-14T09:00:00Z"]
     return subprocess.run(
         [sys.executable, str(SCRIPT), *args], capture_output=True, text=True
     )
@@ -731,3 +742,82 @@ class TestCli:
             ["--existing", str(existing_file), "--candidates", str(candidate_file)]
         )
         assert result.returncode == 0
+
+    def test_runtime_plan_skips_prob_and_dates_outside_the_next_seven_days(self, tmp_path):
+        now = "2026-10-13T19:00:00Z"
+        candidates = [
+            _candidate(
+                league="ProB",
+                start="2026-10-13T20:00:00Z",
+                state="VERIFIED",
+                summary="ProB: Team North vs Team South",
+                evidence={"free_confirmed": True, "live_confirmed": True},
+            ),
+            _candidate(start="2026-10-13T18:59:59Z"),
+            _candidate(start=now),
+            _candidate(start="not-a-date"),
+            _candidate(
+                league="NBBL",
+                start="2026-10-13T20:00:00Z",
+                summary="NBBL: Berlin vs Hamburg",
+            ),
+            _candidate(start="2026-10-20T19:00:00Z"),
+            _candidate(start="2026-10-20T19:00:01Z"),
+        ]
+        existing_file, candidate_file = self._write(tmp_path, [], candidates)
+        result = _run(
+            [
+                "--existing", str(existing_file),
+                "--candidates", str(candidate_file),
+                "--now", now,
+                "--window-days", "7",
+                "--json",
+            ]
+        )
+
+        assert result.returncode == 0, result.stderr
+        payload = json.loads(result.stdout)
+        assert payload["summary"] == {
+            "create": 2,
+            "update": 0,
+            "unchanged": 0,
+            "skip": 5,
+        }
+        plan = payload["plan"]
+        assert "ProB is excluded" in plan[0]["reason"]
+        assert plan[0]["action"] == ACTION_SKIP
+        assert plan[1]["action"] == ACTION_SKIP
+        assert "not after now" in plan[1]["reason"]
+        assert plan[2]["action"] == ACTION_SKIP
+        assert "not after now" in plan[2]["reason"]
+        assert plan[3]["action"] == ACTION_SKIP
+        assert "not a valid ISO-8601" in plan[3]["reason"]
+        assert plan[4]["action"] == ACTION_CREATE
+        assert plan[5]["action"] == ACTION_CREATE  # the seven-day endpoint is inclusive
+        assert plan[6]["action"] == ACTION_SKIP
+        assert "beyond the next 7 days" in plan[6]["reason"]
+
+    def test_runtime_plan_requires_a_current_time(self, tmp_path):
+        existing_file, candidate_file = self._write(tmp_path, [], [_candidate()])
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPT),
+                "--existing", str(existing_file),
+                "--candidates", str(candidate_file),
+            ],
+            capture_output=True,
+            text=True,
+        )
+        assert result.returncode == 2
+        assert "--now" in result.stderr
+
+
+def test_runtime_workflow_passes_its_resolved_clock_to_the_calendar_gate():
+    workflow = (REPO_ROOT / ".github" / "workflows" / "runtime-daily.yml").read_text(
+        encoding="utf-8"
+    )
+    plan_step = workflow.split("- name: Plan the calendar writes (no API calls)", 1)[1]
+    plan_step = plan_step.split("- name: Apply the plan", 1)[0]
+    assert 'RUN_NOW="$(date -u +' in plan_step
+    assert '--now "$RUN_NOW" --window-days 7' in plan_step

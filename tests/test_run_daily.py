@@ -483,7 +483,7 @@ class TestJsonStdoutIsParseable:
 class TestRuntimeDailyWiring:
     def test_default_queries_cover_youth_and_regional_leagues(self):
         lowered = [query.lower() for query in DEFAULT_QUERIES]
-        assert any("prob" in query for query in lowered)
+        assert not any("prob" in query for query in lowered)
         assert any("nbbl" in query for query in lowered)
         assert any("jbbl" in query for query in lowered)
         assert any("regionalliga" in query for query in lowered)

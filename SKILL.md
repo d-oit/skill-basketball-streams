@@ -1,7 +1,7 @@
 ---
 name: skill-basketball-streams
 description: Search for FREE basketball live streams in Germany from approved official sources (BBL, EuroLeague, FIBA, Basketball Champions League, MagentaSport/MagentaTV, public broadcasters, clubs, YouTube channels), validate them with a 7-check pipeline (URL, page content, source allow-list, basketball-specific, date range, live proof, source reference), then add confirmed streams to Google Calendar. Renders the JS-rendered, bot-blocked magenta.tv via a fetch ladder, searches YouTube live-only under a strict start-datetime-greater-than-now gate, and revalidates stored links while discovering new sources through an append-only run log. Use when the user wants free basketball streams in Germany on a calendar, needs a stream URL validated, or reports broken links in past events. Triggers - "find basketball streams", "free BBL stream", "any free EuroLeague game today?", "validate this basketball URL", "add stream to basketball calendar". Not for paid broadcasters (Sky/DAZN/Prime), highlight reels, or non-basketball sports.
-version: "1.12.0"
+version: "1.12.1"
 category: workflow
 license: MIT
 allowed-tools: webSearch openUrl webFetch firecrawlScrape tinyfishFetch youtubeLiveSearch linkCheck GOOGLECALENDAR_EVENTS_LIST GOOGLECALENDAR_CREATE_EVENT GOOGLECALENDAR_PATCH_EVENT
@@ -28,7 +28,7 @@ Search for FREE basketball live streams in Germany from official sources, valida
 
 ## Approved Sources
 
-Full list and YouTube URL rules: `references/approved-sources.md`; machine-readable mirror in `config/sources.json`. Summary: Dyn Sport Mix (free **per game**), MagentaSport / MagentaTV (selected free EuroLeague games), Sportschau / ARD (selected free BBL games), Sporteurope.TV (NBBL/JBBL free in 2026/27; ProA paid; ProB needs current game-specific free proof), regional broadcasters, Basketball Champions League (selected games), official clubs, and approved YouTube channels including Tampa 2 Films. ProA and 1. DBBL are paid; Regionalliga streams require per-game free evidence; BKT EuroCup and Tier 7 European league sites are evidence-only. Regionalliga, ProB, NBBL/JBBL and club channels are discovery targets; unapproved channels stay quarantined. YouTube discovery uses only YouTube's Live filter (`sp=EgJAAQ%3D%3D`); accepted stream links are `youtube.com/@handle/live`, `youtube.com/live/<id>`, and `youtube.com/watch?v=<id>` for live/upcoming broadcasts. Reject channel, playlist, results and shorts URLs as stream links.
+Full list and YouTube URL rules: `references/approved-sources.md`; machine-readable mirror in `config/sources.json`. Summary: Dyn Sport Mix (free **per game**), MagentaSport / MagentaTV (selected free EuroLeague games), Sportschau / ARD (selected free BBL games), Sporteurope.TV (NBBL/JBBL free in 2026/27; ProA paid; ProB excluded as not free of charge), regional broadcasters, Basketball Champions League (selected games), official clubs, and approved YouTube channels including Tampa 2 Films. ProA and 1. DBBL are paid; Regionalliga streams require per-game free evidence; BKT EuroCup and Tier 7 European league sites are evidence-only. Regionalliga, NBBL/JBBL and club channels are discovery targets; unapproved channels stay quarantined. YouTube discovery uses only YouTube's Live filter (`sp=EgJAAQ%3D%3D`); accepted stream links are `youtube.com/@handle/live`, `youtube.com/live/<id>`, and `youtube.com/watch?v=<id>` for live/upcoming broadcasts. Reject channel, playlist, results and shorts URLs as stream links.
 
 ## Process
 
@@ -93,17 +93,17 @@ Self-learning is conservative: the skill never promotes a source or deletes an e
 1. **Link revalidation** — `scripts/link_check.py` classifies stored links: `OK`, `BROKEN` (404/410 → quarantine the link), `BLOCKED` (401/403/429/451 → climb the fetch ladder, keep the event), `ERROR` (5xx → retry, do not delete), `UNREACHABLE`, `INVALID`. Revalidate daily for events inside today…today+7d and again ~2 h before start.
 2. **Run log** — append one row per candidate with `scripts/source_learning.py record` (outcome `create|skip|reject|blocked|error`).
 3. **Source scoring** — `scripts/source_learning.py score` reports per-source hit rate; use ≥10 attempts before re-ordering tiers.
-4. **New-source discovery** — `scripts/source_learning.py candidates` writes unapproved domains and YouTube channel identities as **quarantined**; runtime discoveries travel in the `source_leads` JSON field. Search ProB, NBBL/JBBL and Regionalliga for new leads; promotion requires a PR with one accept + one reject eval case. Until then a URL from that source is rejected at Check 3.
+4. **New-source discovery** — `scripts/source_learning.py candidates` writes unapproved domains and YouTube channel identities as **quarantined**; runtime discoveries travel in the `source_leads` JSON field. Search NBBL/JBBL and Regionalliga for new leads; ProB is excluded as not free of charge. Promotion requires a PR with one accept + one reject eval case. Until then a URL from that source is rejected at Check 3.
 
 ### Step 3 — Run the 7-Check Pipeline
 
 Full definitions in `references/validation-workflow.md`. **ANY failure → REJECT**, no calendar event:
 
-1. **Free Access** — no `Abo`, `kostenpflichtig`, `pay-per-view`, members-only access, or subscription. For BCL, a per-game free statement from Step 2.6; for Sporteurope see the current ProA, ProB and NBBL/JBBL rules in `references/approved-sources.md`.
+1. **Free Access** — no `Abo`, `kostenpflichtig`, `pay-per-view`, members-only access, or subscription. ProB is excluded as not free of charge. For BCL, a per-game free statement from Step 2.6; for Sporteurope see the current ProA and NBBL/JBBL rules in `references/approved-sources.md`.
 2. **Live Content** — page contains `live`/`Live`/`LIVE`; no `highlights`/`replay`/`zusammenfassung`/`on demand`. YouTube items must pass the Step 2.7 live/`actualEndTime` rules.
 3. **Official Source** — domain in approved list; quarantined domains fail.
 4. **Basketball-Specific** — mentions BBL, EuroLeague, FIBA, Basketball Champions League, or approved club name
-5. **Date/Time Within Range** — today…today+7d, 14:00–23:00 CET
+5. **Date/Time Within Range** — start strictly after the current time and no more than seven days ahead, 14:00–23:00 CET. `scripts/upsert_events.py` enforces the rolling time window immediately before any calendar write.
 6. **Working Link** — HTTP 200 **with readable page content** (not 404 / 500 / paywall redirect / empty SPA shell)
 7. **Direct Stream Verification** — page content contains active video player and / or "Live" badge text; for `magenta.tv`, the Step 2.8 render markers
 
@@ -145,15 +145,15 @@ Markdown table with columns `Status | League | Teams | Date/Time (CET) | Direct 
 
 ```json
 {"candidates": [
-  {"league": "BBL", "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
-   "start": "2026-06-20T19:00:00+02:00", "state": "VERIFIED",
-   "summary": "BBL: ALBA Berlin vs FC Bayern Muenchen",
-   "url": "https://www.dyn.sport/deinsender/dyn-sport-mix/",
-   "evidence": {"free_confirmed": true, "live_confirmed": true}}
+  {"league": "Example League", "teams": ["Club North", "Club South"],
+   "start": "2026-10-18T18:00:00+02:00", "state": "VERIFIED",
+   "summary": "Example League: Club North vs Club South", "url": "https://stream.example/live/game", "directLink": "https://stream.example/live/game",
+   "sourceReference": "https://official.example/schedule/game", "access": "Free", "validationTimestamp": "2026-10-13T18:00:00Z",
+   "validationNotes": "Official game page confirms free live viewing.", "evidence": {"free_confirmed": true, "live_confirmed": true}}
 ]}
 ```
 
-Refused rather than repaired, so get them right: exactly two teams, a `start` that parses as ISO-8601, and a `state` of `VERIFIED` or `UNVERIFIED` — `WRONG` is an audit verdict and is never a proposal (see Step 6.5). One entry per game you decided to store, **including the ones already on the calendar** — that is how the dedupe step sees them. If you found nothing, emit `{"candidates": []}` rather than leaving the block out.
+Refused rather than repaired, so get them right: exactly two teams; a `start` that parses as ISO-8601; and a `state` of `VERIFIED` or `UNVERIFIED` — `WRONG` is an audit verdict and is never a proposal (see Step 6.5). Every candidate also needs a direct stream URL, official `sourceReference`, explicit free `access`, `validationTimestamp`, descriptive `validationNotes`, and true `free_confirmed` and `live_confirmed` evidence flags. A boolean or an official-looking URL by itself is not proof; unclear, missing, or paid access means no candidate. The final planner enforces these fields and the rolling window. One entry per game you decided to store, **including the ones already on the calendar** — that is how the dedupe step sees them. If you found nothing, emit `{"candidates": []}` rather than leaving the block out.
 
 ## Important Constraints
 
@@ -161,13 +161,13 @@ Refused rather than repaired, so get them right: exactly two teams, a `start` th
 2. **All 7 checks must PASS** — including Direct Stream Verification (page read).
 3. **No paid content** — Sky / DAZN / general Prime → REJECT, even if domain is on the allow-list.
 4. **No unofficial streams** — no pirate sites, third-party aggregators, fan-run YouTube.
-5. **Date accuracy** — every event must fall in today…today+7d.
+5. **Date accuracy** — every event must start strictly after now and no later than now + 7 days; the final planner enforces this window.
 6. **Link testing** — every direct link tested with `openUrl` and confirmed working.
 7. **Live verification** — read page content to confirm an active live stream exists.
 8. **YouTube URL rules** — only `@handle`, `@handle/live`, and `/user/TheDBBTV` are accepted.
 9. **Include references** — every event description must contain `sourceReference` and validation timestamp.
-10. **No event without a live stream** — Check 7 must pass; if the live content itself is unverified there is no event. Free access that is merely *unconfirmed* is different: it is still created, but labelled `[UNVERIFIED]` (colour `5`) instead of being rejected.
-11. **Magenta per-game free rule (changed 2026-09-29)** — free **EuroLeague basketball** games are listed under "KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT" on `magenta.tv/sport`, a page in **no search index**: render it, never search it. `magentasport.de` / social are corroboration only, and their silence is **not** evidence against free access. A `magenta.tv` game absent from that section is **REJECTED** — such a game may only be created `UNVERIFIED`, never `VERIFIED`.
+10. **No event without explicit free and live proof** — the final planner requires `free_confirmed=true`, `live_confirmed=true`, a direct stream URL, a source reference, `access` explicitly marked Free/Gratis/Kostenlos, a valid validation timestamp, and notes describing the evidence. If any required fact is missing, paid, or unclear, the candidate is skipped. `UNVERIFIED` may describe secondary uncertainty only after those core facts pass; it cannot bypass the free-access gate.
+11. **Magenta per-game free rule (changed 2026-09-29)** — free **EuroLeague basketball** games are listed under "KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT" on `magenta.tv/sport`, a page in **no search index**: render it, never search it. `magentasport.de` / social are corroboration only, and their silence is **not** evidence against free access. A `magenta.tv` game absent from that section is **REJECTED** and cannot be created as `UNVERIFIED` without explicit free-access proof.
 12. **Magenta render rule** — a `magenta.tv` URL only counts as *working* after a browser-rendering backend (Step 2.8) returns player + live markers. A plain GET returning 200 on the app shell fails Check 6/7 and creates no event.
 13. **BCL per-game rule** — Basketball Champions League free access is decided per game via site + `@BasketballCL` + BCL Facebook; silence is not consent.
 14. **YouTube live-only rule** — only real live broadcasts with `scheduled_start` strictly greater than now (or a live-now stream with no `actualEndTime`) may be promoted. VODs, recordings, replays and ended broadcasts never are.
@@ -194,9 +194,9 @@ All scripts are stdlib-only on Python 3.8+ and share the same exit codes: `0` PA
 - **`scripts/calendar_config.py`** — reads `config/calendar.json` with the `BASKETBALL_CALENDAR_ID` override.
 - **`scripts/color_mapping.py`** — `get_color_id(league, event_type, state)` for the calendar `colorId`. The league and verification-state dimensions are orthogonal.
 - **`scripts/verification.py`** — the verification state machine (`VERIFIED`/`UNVERIFIED`/`WRONG`): prefixes, colour precedence, idempotent `title_for`.
-- **`scripts/upsert_events.py`** — dedupe-then-replace planner (Step 5/6). `--existing existing.json --candidates candidates.json [--json]` prints the plan; it never calls the calendar API.
+- **`scripts/upsert_events.py`** — dedupe-then-replace planner (Step 5/6). `--existing existing.json --candidates candidates.json --now ISO [--window-days 7] [--json]` prints the plan; it skips ProB, candidates without explicit free/live proof and source provenance, and starts outside the strict upcoming window; it never calls the calendar API.
 - **`scripts/audit_events.py`** — post-hoc verdicts and the promotion sweep (Step 6.5). `--events events.json --evidence evidence.json [--now ISO] [--out audit.jsonl]`; `--events` accepts JSONL as well as JSON.
-- **`scripts/extract_candidates.py`** — the transcript → candidate seam for Steps 5/6. The runtime agent has no file-write tool, so this is its only channel; it refuses `state=WRONG` (an audit verdict, never a proposal) and any candidate without two teams and a parseable start.
+- **`scripts/extract_candidates.py`** — the transcript → candidate seam for Steps 5/6. The runtime agent has no file-write tool, so this is its only channel; it refuses `state=WRONG` (an audit verdict, never a proposal) and any candidate without two teams and a parseable start, and preserves the evidence and link fields the planner requires.
 - **`scripts/calendar_io.py`** — the only module that reads or writes the calendar, through Composio tool execution (`COMPOSIO_API_KEY`; no Google project). `list` recovers the verification state from the title prefix, which is what lets Step 6 honour "never touch a verified event"; `apply` makes **no HTTP request at all** unless `--live` is passed.
 - **`scripts/fixtures.py`** — official league fixtures → `game_key`s, so recall can be measured against something other than our own search results. JSON-LD first, microdata fallback, and a fixture that fails to parse is dropped, never guessed. A named source that yields nothing is a failure **even when another league parsed** (`exit 1` + a `FAIL:` line per source), so two dead sources cannot hide behind one healthy `OK` line.
 - **`scripts/synthesise_eval_case.py`** — audit verdict → regression eval case (Step 6.5 feeds it). `--verify` asserts every assertion needle resolves, so no case can be filed that grades nothing.
@@ -255,4 +255,4 @@ All scripts are stdlib-only on Python 3.8+ and share the same exit codes: `0` PA
 - `docs/runtime.md` — daily runtime operations: cadence, secrets, telemetry schema, rung health, recovery runbook, AGPL notice
 - `references/lessons-learned.md` — incident post-mortem (broken `/user/FIBA` events), root causes, prevention checklist, validation log template and worked examples
 - `config/sources.json` — machine-readable approved-source registry + excluded sources
-- `evals/evals.json` — 42 eval cases (driving the `skill-evaluator` rubric; see `README.md` → Self-Validation)
+- `evals/evals.json` — 43 eval cases (driving the `skill-evaluator` rubric; see `README.md` → Self-Validation)
