@@ -1,5 +1,5 @@
 {
-  "$comment": "Machine-readable mirror of references/approved-sources.md. Consumed by scripts/source_learning.py (approved_domains) so newly discovered domains can be quarantined instead of auto-trusted. Keep in sync with the reference doc.",
+  "$comment": "Machine-readable mirror of references/approved-sources.md. Consumed by scripts/source_learning.py (approved_domains) so newly discovered domains and YouTube channel identities can be quarantined instead of auto-trusted. Keep in sync with the reference doc.",
   "version": "1.4.0",
   "sources": [
     {
@@ -34,16 +34,17 @@
     {
       "tier": 1,
       "name": "Basketball Bundesliga",
-      "type": "league","domains": [
-    "easycredit-bbl.de",
-    "api.basketball-bundesliga.de"
-   ],
+      "type": "league",
+      "domains": [
+        "easycredit-bbl.de",
+        "api.basketball-bundesliga.de"
+      ],
       "social": [
         "x.com/easyCreditBBL",
         "facebook.com/BBLofficial"
       ],
       "free_access": "selected",
-      "notes": "Official easyCredit BBL site. The league renamed: `basketball-bundesliga.de` no longer serves this site (TLS SNI failure on both the bare and www host, while DNS still resolves) and `x.com/BBLofficial` is a 404 while the other four approved X accounts answer 200 — the current locators are `easycredit-bbl.de`, `x.com/easyCreditBBL` and `youtube.com/@basketballbundesliga`. Verified 2026-09-17 by `scripts/link_inventory.py` + `scripts/link_check.py`. The Facebook page is UNVERIFIED either way and deliberately left as it was: facebook.com answers HTTP 400 to every user agent this repo sends, for every handle including a known-good one, so a probe there cannot tell a dead page from a blocked one. Re-verified 2026-09-30: the schedule page `/saison/spielplaene_liga-pokalspiele/hauptrunde` answers 200 with ~285 KB of server-rendered markup but carries NO `application/ld+json` and NO microdata, and its server-rendered game list reads \u201eKeine Spiele f\u00fcr diese Saison gefunden\u201c \u2014 the fixtures are fetched client-side from `api.basketball-bundesliga.de`, which answers 401 without the credential the site itself holds. `scripts/fixtures.py` therefore needs a rendered capture fed through `--input` before BBL contributes any fixture; a plain GET legitimately yields none. That requirement is now met by a different route: the league's OWN iCalendar feed on the very host the page calls, `https://api.basketball-bundesliga.de/calendar/ical/all-games`, answers HTTP 200 with 90,568 bytes and 321 VEVENTs to any caller, no credential — verified 2026-09-30. `api.basketball-bundesliga.de` is listed here as the approved host for it. Its `SUMMARY` lines glue the competition onto the first club name (`easyCredit BBL Spiel ALBA BERLIN vs NINERS Chemnitz`), measured across all 321 events: exactly two prefixes, `easyCredit BBL Spiel` (306) and `BBL Pokal Spiel` (15), all left-hand side; `DTSTART` is floating and the zone is declared once at calendar level as `X-WR-TIMEZONE:Europe/Berlin`. A trimmed verbatim capture is in `tests/fixtures/feeds/`."
+      "notes": "Official easyCredit BBL site. The league renamed: `basketball-bundesliga.de` no longer serves this site (TLS SNI failure on both the bare and www host, while DNS still resolves) and `x.com/BBLofficial` is a 404 while the other four approved X accounts answer 200 — the current locators are `easycredit-bbl.de`, `x.com/easyCreditBBL` and `youtube.com/@basketballbundesliga`. Verified 2026-09-17 by `scripts/link_inventory.py` + `scripts/link_check.py`. The Facebook page is UNVERIFIED either way and deliberately left as it was: facebook.com answers HTTP 400 to every user agent this repo sends, for every handle including a known-good one, so a probe there cannot tell a dead page from a blocked one. Re-verified 2026-09-30: the schedule page `/saison/spielplaene_liga-pokalspiele/hauptrunde` answers 200 with ~285 KB of server-rendered markup but carries NO `application/ld+json` and NO microdata, and its server-rendered game list reads „Keine Spiele für diese Saison gefunden“ — the fixtures are fetched client-side from `api.basketball-bundesliga.de`, which answers 401 without the credential the site itself holds. `scripts/fixtures.py` therefore needs a rendered capture fed through `--input` before BBL contributes any fixture; a plain GET legitimately yields none. That requirement is now met by a different route: the league's OWN iCalendar feed on the very host the page calls, `https://api.basketball-bundesliga.de/calendar/ical/all-games`, answers HTTP 200 with 90,568 bytes and 321 VEVENTs to any caller, no credential — verified 2026-09-30. `api.basketball-bundesliga.de` is listed here as the approved host for it. Its `SUMMARY` lines glue the competition onto the first club name (`easyCredit BBL Spiel ALBA BERLIN vs NINERS Chemnitz`), measured across all 321 events: exactly two prefixes, `easyCredit BBL Spiel` (306) and `BBL Pokal Spiel` (15), all left-hand side; `DTSTART` is floating and the zone is declared once at calendar level as `X-WR-TIMEZONE:Europe/Berlin`. A trimmed verbatim capture is in `tests/fixtures/feeds/`."
     },
     {
       "tier": 1,
@@ -78,7 +79,7 @@
         "2basketballbundesliga.de"
       ],
       "free_access": "none",
-      "notes": "Official German second/third-tier league site. Streams are PAID: verified 2026-10-05 from the league's own pass page — 'Die Spiele der 2. Basketball Bundesliga ProA kostenpflichtig auf Sporteurope.TV' with Einzelspiel 5,99 EUR (pay-per-view), Teampass 109,99 EUR, All-Access-Pass 189,99 EUR. The league site is announcement/schedule evidence and NEVER a directLink; a ProA/ProB link with no explicit free marker fails Check 1."
+      "notes": "Official German second/third-tier league site. ProA 2026/27 streams are paid (official single-game and season passes). ProB is not presumed free: a current official free statement must name the exact game. The league site is schedule/announcement evidence, never a directLink. Verified 2026-10-13."
     },
     {
       "tier": 1,
@@ -168,6 +169,16 @@
     },
     {
       "tier": 4,
+      "name": "Sporteurope.TV (selected basketball competitions)",
+      "type": "streaming_platform",
+      "domains": [
+        "sporteurope.tv"
+      ],
+      "free_access": "selected",
+      "notes": "Access is competition- and game-specific. Verified 2026-10-13 against current official sources: all 2026/27 ProA streams are paid (official single-game and season passes); NBBL/JBBL remain free under the two-season agreement covering 2025/26 and 2026/27; ProB is not presumed free and needs a current official game-specific kostenlos/free announcement. An October 2026 ProB preview identified one free game, not a league-wide rule. Sources: https://www.2basketballbundesliga.de/livestream-paesse-fuer-die-proa-saison-2026-27-ab-sofort-buchbar/ ; https://www.2basketballbundesliga.de/nbbl-und-jbbl-kuenftig-auf-der-gleichen-plattform-wie-proa-und-prob-sporteurope-tv-weitet-basketballangebot-aus/ ; https://www.2basketballbundesliga.de/vorberichte-prob-nord-3-spieltag-4/"
+    },
+    {
+      "tier": 4,
       "name": "Dyn Sport Mix",
       "type": "streaming_platform",
       "domains": [
@@ -227,8 +238,8 @@
         "youtube.com/@BasketballCL",
         "youtube.com/user/TheDBBTV"
       ],
-      "free_access": "free",
-      "notes": "Live-only, future-only. See references/youtube-live-search.md."
+      "free_access": "selected",
+      "notes": "Only publicly accessible broadcasts qualify; check each stream is not members-only or paywalled. Live-only, future-only. See references/youtube-live-search.md."
     },
     {
       "tier": 6,
@@ -263,6 +274,10 @@
   ],
   "excluded": [
     {
+      "name": "ProA on Sporteurope.TV (2026/27)",
+      "reason": "official 2026/27 season pass and pay-per-view required"
+    },
+    {
       "name": "Sky Sport",
       "reason": "paid subscription"
     },
@@ -281,10 +296,6 @@
     {
       "name": "Pirate/aggregator sites",
       "reason": "unofficial"
-    },
-    {
-      "name": "Sporteurope.TV",
-      "reason": "paid — ProA/ProB pay-per-view passes, verified 2026-10-05 from the league's own page (Einzelspiel 5,99 EUR, Teampass 109,99 EUR, All-Access 189,99 EUR)"
     }
   ]
 }

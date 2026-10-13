@@ -5,6 +5,30 @@ All notable changes to `skill-basketball-streams` will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.0] - 2026-10-13
+
+### Added
+
+- **YouTube discovery now uses YouTube's Live filter in the daily runtime.** The
+  workflow generates exact `sp=EgJAAQ%3D%3D` URLs from
+  `config/youtube-live-queries.json`, attaches them to the agent, and requires
+  `webfetch` on those URLs. Generic web search is no longer an acceptable source
+  for YouTube livestream candidates. Queries now include ProB, NBBL/JBBL and
+  Regionalliga; newly found YouTube handles are quarantined and shown as source
+  leads in the daily job summary.
+- **Sporteurope.TV has explicit, current-season access rules.** As verified on
+  2026-10-13, ProA 2026/27 is paid, NBBL/JBBL remain free through the current
+  two-season agreement, and ProB requires an official free statement for the
+  exact game. Eval cases 40–42 cover the NBBL acceptance and ProA/ProB rejects.
+
+### Fixed
+
+- **The scheduled runtime no longer makes a redundant model-generation call.**
+  The 2026-10-13 run failed at `opencode agent create` with OpenCode's app-only
+  free-tier error. The checked-in `opencode.json` already restricts the built-in
+  agent, so the workflow now uses that tested policy without generating another
+  agent. Its preflight probes the same resolved model the skill run will use.
+
 ## [1.6.0] - 2026-09-29
 
 ### Added

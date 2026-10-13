@@ -525,6 +525,51 @@
         "SKILL.md",
         "references/magenta-tv.md"
       ]
+    },
+    {
+      "id": 40,
+      "prompt": "Accept an NBBL livestream on Sporteurope.TV for 2026-10-17 when the official two-season agreement confirms NBBL/JBBL games remain live and available without a paywall throughout 2026/27. Input: url=https://sporteurope.tv/basketball/nbbl/live/example; title=NBBL LIVE: Berlin vs Hamburg; league=NBBL; teams=Berlin vs Hamburg; date=2026-10-17T18:00:00+02:00; free_access_evidence=https://www.2basketballbundesliga.de/nbbl-und-jbbl-kuenftig-auf-der-gleichen-plattform-wie-proa-und-prob-sporteurope-tv-weitet-basketballangebot-aus/; free_tier=True; live_confirmed=True; official_event_url=True.",
+      "expected_output": "Decision=CREATE; reason=current official NBBL/JBBL agreement keeps games free through 2026/27; checks: freeAccess=PASS, liveContent=PASS, officialSource=PASS",
+      "assertions": [
+        "freeAccess expected PASS",
+        "liveContent expected PASS",
+        "officialSource expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md",
+        "config/sources.json"
+      ]
+    },
+    {
+      "id": 41,
+      "prompt": "Reject a ProA match on Sporteurope.TV during the 2026/27 season when the official current-season notice says ProA streams are paid and lists a €5.99 pay-per-view game pass. Input: url=https://sporteurope.tv/basketball/proa/live/example; title=ProA LIVE; league=ProA; teams=Crailsheim vs Giessen; date=2026-10-16T19:00:00+02:00; official_pass_notice=https://www.2basketballbundesliga.de/livestream-paesse-fuer-die-proa-saison-2026-27-ab-sofort-buchbar/; free_tier=False; live_confirmed=True.",
+      "expected_output": "Decision=SKIP; reason=the official 2026/27 ProA notice requires paid access; checks: freeAccess=FAIL, officialSource=PASS, liveContent=PASS",
+      "assertions": [
+        "freeAccess expected FAIL",
+        "officialSource expected PASS",
+        "liveContent expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md",
+        "config/sources.json"
+      ]
+    },
+    {
+      "id": 42,
+      "prompt": "Reject an upcoming ProB Sporteurope.TV stream when the current 2026/27 event page gives no free-access statement. A previous season's blanket announcement is not current evidence. Input: url=https://sporteurope.tv/basketball/prob/live/example; title=ProB LIVE; league=ProB; teams=Team North vs Team South; date=2026-10-17T19:00:00+02:00; free_access_evidence=none for this exact game; free_tier=unknown; live_confirmed=True.",
+      "expected_output": "Decision=SKIP; reason=ProB access is not assumed free and the current event has no game-specific free announcement; checks: freeAccess=FAIL, officialSource=PASS, liveContent=PASS",
+      "assertions": [
+        "freeAccess expected FAIL",
+        "officialSource expected PASS",
+        "liveContent expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md",
+        "config/sources.json"
+      ]
     }
   ]
 }

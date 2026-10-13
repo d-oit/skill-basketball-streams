@@ -9,10 +9,10 @@ approved allow-list by itself. Instead it
 2. `score` — aggregates the log into a per-source hit rate, so search tiers can
    be reordered (a Tier 5 club site that hits 40% outranks a Tier 3 regional
    broadcaster that hits 0%).
-3. `candidates` — extracts domains that produced search hits but are **not** in
-   `config/sources.json` and writes them to `logs/source-candidates.json` with
-   `"status": "quarantined"`. A human (or a PR) must approve a candidate before
-   it is added to the allow-list.
+3. `candidates` — extracts domains and YouTube channel identities that produced
+   search hits but are **not** in `config/sources.json`, and writes them to
+   `logs/source-candidates.json` with `"status": "quarantined"`. A human (or a
+   PR) must approve a candidate before it is added to the allow-list.
 
 Usage:
     python3 scripts/source_learning.py record --source magenta.tv \\
@@ -21,6 +21,8 @@ Usage:
 
     python3 scripts/source_learning.py score --root . --json
     python3 scripts/source_learning.py candidates --root . --dry-run
+    python3 scripts/source_learning.py record-leads --input source-leads.json \\
+        --root . --dest .tmp/telemetry
 
 Exit codes:
     0  PASS — the requested mode completed
@@ -90,8 +92,28 @@ def load_sources(root: Path) -> dict:
         sys.exit(2)
 
 
+def _youtube_channel_identity(url: str) -> str:
+    """Canonical YouTube channel path for handles and legacy /user/ URLs."""
+    candidate = url if "://" in url else f"https://{url}"
+    try:
+        parsed = urlparse(candidate)
+    except ValueError:
+        return ""
+    host = (parsed.hostname or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    if host != "youtube.com":
+        return ""
+    parts = [part for part in parsed.path.split("/") if part]
+    if parts and parts[0].startswith("@") and len(parts[0]) > 1:
+        return f"youtube.com/{parts[0].lower()}"
+    if len(parts) >= 2 and parts[0].lower() == "user":
+        return f"youtube.com/user/{parts[1].lower()}"
+    return ""
+
+
 def approved_domains(sources: dict) -> set[str]:
-    """Every domain claimed by an approved source (including its aliases)."""
+    """Approved hosts/aliases plus exact YouTube channel identities."""
     domains: set[str] = set()
     for source in sources.get("sources", []):
         if not isinstance(source, dict):
@@ -102,6 +124,10 @@ def approved_domains(sources: dict) -> set[str]:
                 domains.add(value.lower())
             elif isinstance(value, list):
                 domains.update(str(item).lower() for item in value)
+        for handle in source.get("handles", []):
+            identity = _youtube_channel_identity(str(handle))
+            if identity:
+                domains.add(identity)
     return domains
 
 
@@ -167,6 +193,63 @@ def mode_record(args) -> int:
     return 0
 
 
+def mode_record_leads(args) -> int:
+    """Append unapproved source leads captured by the runtime to the run log."""
+    root = Path(args.root).resolve()
+    try:
+        payload = json.loads(Path(args.input).read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        print(f"FAIL: source_learning: {args.input}: file not found", file=sys.stderr)
+        return 2
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"FAIL: source_learning: {args.input}: invalid JSON ({exc})", file=sys.stderr)
+        return 2
+    leads = payload.get("leads", []) if isinstance(payload, dict) else payload
+    if not isinstance(leads, list):
+        print("FAIL: source_learning: leads input must contain a list", file=sys.stderr)
+        return 2
+
+    approved = approved_domains(load_sources(root))
+    log_path = resolve_log_path(args)
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    now = _parse_time(args.now).isoformat()
+    rows: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+    for lead in leads:
+        if not isinstance(lead, dict):
+            continue
+        url = str(lead.get("url") or "").strip()
+        source_domain = _domain(url)
+        channel = _youtube_channel_identity(url)
+        discovered = discover_candidates([{"url": url}], approved)
+        if not discovered:
+            continue
+        source = channel or source_domain
+        key = (source, url)
+        if not source or key in seen:
+            continue
+        seen.add(key)
+        rows.append(
+            {
+                "ts": now,
+                "run_id": args.run_id or "unassigned",
+                "source": source,
+                "tier": 6 if channel else 0,
+                "url": url,
+                "outcome": "skip",
+                "reason": str(lead.get("reason") or "unapproved source lead from runtime research"),
+            }
+        )
+    if not rows:
+        print("OK: source_learning: no unapproved runtime source leads to record")
+        return 0
+    with log_path.open("a", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+    print(f"OK: source_learning: recorded {len(rows)} quarantined source leads -> {log_path}")
+    return 0
+
+
 def score_entries(entries: list[dict]) -> dict:
     """Aggregate a run log into per-source statistics."""
     stats: dict[str, dict] = {}
@@ -226,23 +309,39 @@ def mode_score(args) -> int:
 def discover_candidates(
     entries: list[dict], approved: set[str]
 ) -> list[dict]:
-    """Domains seen in the run log that are not approved and not plumbing."""
+    """Unapproved source domains and YouTube channels, kept quarantined."""
     seen: dict[str, dict] = {}
     for entry in entries:
         url = str(entry.get("url") or "")
         domain = _domain(url)
-        if not domain or domain in approved or domain in NON_SOURCE_DOMAINS:
-            continue
-        if any(domain.endswith("." + ok) or domain == ok for ok in approved):
-            continue
+        channel = _youtube_channel_identity(url)
+        if channel:
+            if channel in approved:
+                continue
+            identity = channel
+        else:
+            if not domain or domain in approved or domain in NON_SOURCE_DOMAINS:
+                continue
+            if any(domain.endswith("." + ok) or domain == ok for ok in approved):
+                continue
+            identity = domain
         bucket = seen.setdefault(
-            domain,
-            {"domain": domain, "status": "quarantined", "hits": 0, "examples": []},
+            identity,
+            {
+                "domain": domain,
+                **({"channel": channel} if channel else {}),
+                "status": "quarantined",
+                "hits": 0,
+                "examples": [],
+            },
         )
         bucket["hits"] += 1
         if url and url not in bucket["examples"] and len(bucket["examples"]) < 3:
             bucket["examples"].append(url)
-    return sorted(seen.values(), key=lambda item: (-item["hits"], item["domain"]))
+    return sorted(
+        seen.values(),
+        key=lambda item: (-item["hits"], item["domain"], item.get("channel", "")),
+    )
 
 
 def mode_candidates(args) -> int:
@@ -262,9 +361,10 @@ def mode_candidates(args) -> int:
         Path(args.out) if args.out else root / CANDIDATES_RELATIVE_PATH
     )
     for candidate in candidates:
+        label = candidate.get("channel") or candidate["domain"]
         print(
-            "OK: source_learning: candidate {domain}: hits={hits} "
-            "(quarantined, requires manual approval)".format(**candidate)
+            f"OK: source_learning: candidate {label}: hits={candidate['hits']} "
+            "(quarantined, requires manual approval)"
         )
     if args.dry_run:
         print(f"OK: source_learning: dry-run, would write {out_path}")
@@ -306,6 +406,17 @@ def main() -> None:
     record.add_argument("--now", help="ISO-8601 timestamp (default: now)")
     record.add_argument("--dry-run", action="store_true")
     record.set_defaults(handler=mode_record)
+
+    record_leads = sub.add_parser(
+        "record-leads", help="append unapproved source leads from runtime research"
+    )
+    record_leads.add_argument("--input", required=True, help="JSON leads file")
+    record_leads.add_argument("--root", default=".")
+    record_leads.add_argument("--dest", help="directory to write run-log.jsonl into")
+    record_leads.add_argument("--log", default=LOG_RELATIVE_PATH)
+    record_leads.add_argument("--run-id")
+    record_leads.add_argument("--now", help="ISO-8601 timestamp (default: now)")
+    record_leads.set_defaults(handler=mode_record_leads)
 
     score = sub.add_parser("score", help="per-source hit rates")
     score.add_argument("--root", default=".")

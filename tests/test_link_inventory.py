@@ -44,7 +44,7 @@ def _entries(payload: dict, kind: str) -> list[dict]:
 
 
 class TestRegistryHalf:
-    """The half no check covered: 18 of 22 approved domains were unverified."""
+    """The half no check covered: 19 of 23 approved domains are unverified."""
 
     def test_every_approved_domain_is_inventoried(self):
         sources = load_sources(REPO_ROOT)
@@ -286,11 +286,8 @@ class TestCli:
         assert result.returncode == 1
         payload = json.loads(report.read_text(encoding="utf-8"))
         assert payload["summary"]["INVALID"] == 1
-        # 59 approved entries: the registry grew by the 2026-10-05 European
-        # search — 4 Tier 1 evidence sources (EuroCup, ProA/ProB, the women's
-        # 1. DBBL, Regionalliga) and the Tier 7 per-country league sites (before
-        # that, by api.basketball-bundesliga.de on 2026-09-30, and by dyn.sport
-        # on 2026-09-26) — and by the operator-approved `youtube.com/@tampa2films`
-        # handle on 2026-10-10. The count is the point — it is how a registry edit
-        # becomes visible here rather than silently changing what is probed.
-        assert payload["summary"]["OK"] == 59
+        # 60 approved entries: the registry grew by the 2026-10-05 European
+        # search and Tier 7 sites, the operator-approved Tampa 2 Films channel,
+        # and sporteurope.tv added on 2026-10-13. The count makes registry
+        # changes visible rather than silently changing what is probed.
+        assert payload["summary"]["OK"] == 60

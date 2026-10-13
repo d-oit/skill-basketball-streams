@@ -35,15 +35,15 @@ Candidate schema (all keys optional except `url`):
       "live_broadcast_content": "live" | "upcoming" | "none",
       "is_live_now": true,
       "is_live_content": true,          # ytInitialPlayerResponse videoDetails
-      "scheduled_start": "2026-09-20T18:00:00+02:00",   # scheduledStartTime
-      "actual_start": "2026-09-20T18:02:11+02:00",      # actualStartTime
+      "scheduled_start": "2026-10-15T18:00:00+02:00",   # scheduledStartTime
+      "actual_start": "2026-10-15T18:02:11+02:00",      # actualStartTime
       "actual_end": null,                                # actualEndTime
       "duration_seconds": null
     }
 
 Usage:
     python3 scripts/youtube_live.py --input candidates.json
-    python3 scripts/youtube_live.py --input candidates.json --now 2026-09-14T12:00:00Z --json
+    python3 scripts/youtube_live.py --input candidates.json --now 2026-10-13T12:00:00Z --json
     python3 scripts/youtube_live.py --print-urls "EuroLeague live"
 
 Exit codes:
@@ -205,6 +205,19 @@ def build_live_search_url(query: str) -> str:
         "https://www.youtube.com/results?search_query="
         f"{quote_plus(query)}&sp={LIVE_SEARCH_SP}"
     )
+
+
+def build_live_searches(queries: list[str]) -> list[dict[str, str]]:
+    """Build a validated query/URL pair for each YouTube Live search."""
+    if not isinstance(queries, list) or not queries:
+        raise ValueError("queries must be a non-empty list")
+    searches = []
+    for query in queries:
+        if not isinstance(query, str) or not query.strip():
+            raise ValueError("each query must be a non-empty string")
+        clean = query.strip()
+        searches.append({"query": clean, "url": build_live_search_url(clean)})
+    return searches
 
 
 
@@ -402,14 +415,40 @@ def main() -> None:
         metavar="QUERY",
         help="print the live-filtered HTML search URL for QUERY (no API key)",
     )
+    parser.add_argument(
+        "--queries-file",
+        help="JSON file containing a list of search queries; emit Live-filter URLs",
+    )
+    parser.add_argument(
+        "--out",
+        help="write --queries-file output to this JSON file (default: stdout)",
+    )
     args = parser.parse_args()
 
     if args.print_urls:
         print(f"OK: html: {build_live_search_url(args.print_urls)}")
         return
 
+    if args.queries_file:
+        try:
+            payload = json.loads(Path(args.queries_file).read_text(encoding="utf-8"))
+            queries = payload.get("queries") if isinstance(payload, dict) else payload
+            searches = build_live_searches(queries)
+        except (OSError, json.JSONDecodeError, ValueError) as exc:
+            print(f"FAIL: youtube_live: invalid queries file: {exc}", file=sys.stderr)
+            sys.exit(2)
+        rendered = json.dumps({"searches": searches}, indent=2) + "\n"
+        if args.out:
+            out_path = Path(args.out)
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            out_path.write_text(rendered, encoding="utf-8")
+            print(f"OK: youtube_live: wrote {len(searches)} Live-filter URLs to {out_path}")
+        else:
+            print(rendered, end="")
+        return
+
     if not args.input:
-        parser.error("--input is required (or use --print-urls)")
+        parser.error("--input is required (or use --print-urls / --queries-file)")
 
     now = parse_iso(args.now) if args.now else datetime.now(timezone.utc)
     if args.now and now is None:

@@ -7,11 +7,11 @@ Search-query templates, time/team/vocab conventions, and code for `validateStrea
 - Timezone: **`Europe/Berlin`** (CEST = UTC+2 Apr–Oct, CET = UTC+1 Nov–Mar)
 - Anchor "now" with `new Date().toISOString()` then convert to CET
 - Date range: today (00:00 CET) through today + 7 days (23:59 CET)
-- Emit ISO 8601 with offset, e.g. `2026-06-27T19:00:00+02:00`
+- Emit ISO 8601 with offset, e.g. `2026-10-13T19:00:00+02:00` (CEST on 2026-10-13)
 
 ## Canonical Search Queries
 
-For `webSearch` with `limit: 20`:
+For non-YouTube sources, use `webSearch` with `limit: 20`:
 
 ```
 - "Dyn Sport Mix Basketball live stream today"
@@ -20,6 +20,9 @@ For `webSearch` with `limit: 20`:
 - "MDR Basketball live stream"
 - "BR24 Basketball live"
 - "RBB24 Basketball live"
+- "NBBL JBBL basketball live stream Sporteurope"
+- "ProB basketball livestream kostenlos Sporteurope"
+- "Basketball Regionalliga livestream kostenlos"
 - "ALBA Berlin live stream free"
 - "FC Bayern München Basketball live free"
 - "ratiopharm Ulm live stream"
@@ -28,7 +31,11 @@ For `webSearch` with `limit: 20`:
 - "BBL live stream free Germany"
 ```
 
-Focus on official domains in approved-sources.md; reject anything else.
+For YouTube, use only the prebuilt Live-filter URLs in
+`config/youtube-live-queries.json`; never use these generic search queries to
+discover YouTube broadcasts. Focus on official domains in approved-sources.md,
+and require current, game-specific free-access evidence for ProB and
+Regionalliga streams.
 
 ## Team Name Variations
 

@@ -305,10 +305,24 @@ class TestWorkflowWiring:
     def test_the_resolver_precedes_its_consumer_in_runtime_daily(self):
         text = RUNTIME_DAILY.read_text(encoding="utf-8")
         resolver = text.index("name: Resolve the model")
-        # The agent step by its own name: the CLI proof step runs the agent CLI
-        # too, and it must not satisfy this ordering by appearing first.
+        probe = text.index("name: Confirm the opencode CLI can run a model")
         consumer = text.index("- name: Run the skill")
-        assert resolver < consumer, "the agent's LLM_MODEL env would be empty"
+        assert resolver < probe < consumer, (
+            "the selected model must be resolved before the CLI proof and runtime"
+        )
+
+    def test_cli_probe_uses_the_resolved_model(self):
+        text = self._without_comments(RUNTIME_DAILY.read_text(encoding="utf-8"))
+        probe_start = text.index("- name: Confirm the opencode CLI can run a model")
+        run_start = text.index("- name: Run the skill")
+        probe = text[probe_start:run_start]
+        assert "LLM_MODEL: ${{ steps.llm.outputs.model }}" in probe
+        assert 'opencode run --model "$LLM_MODEL"' in probe
+
+    def test_runtime_uses_project_permissions_without_generating_an_agent(self):
+        text = self._without_comments(RUNTIME_DAILY.read_text(encoding="utf-8"))
+        assert "opencode agent create" not in text
+        assert "Create the permission-restricted runtime agent" not in text
 
     def test_the_resolver_sees_exactly_what_the_gate_sees(self):
         """A narrower credential set would make the two disagree.
@@ -318,7 +332,7 @@ class TestWorkflowWiring:
         """
         text = RUNTIME_DAILY.read_text(encoding="utf-8")
         step = text[text.index("name: Resolve the model") :]
-        step = step[: step.index("name: Create the permission-restricted runtime agent")]
+        step = step[: step.index("name: Confirm the opencode CLI can run a model")]
         for name in ALL_CREDENTIALS:
             assert f"{name}: ${{{{ secrets.{name} }}}}" in step, name
 

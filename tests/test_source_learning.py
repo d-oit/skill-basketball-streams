@@ -68,6 +68,8 @@ class TestApprovedDomains:
         assert "championsleague.basketball" in domains
         assert "magenta.tv" in domains
         assert "magentasport.de" in domains
+        assert "sporteurope.tv" in domains
+        assert "youtube.com/@fiba" in domains
 
 
 class TestDiscoverCandidates:
@@ -94,6 +96,23 @@ class TestDiscoverCandidates:
             approved,
         )
         assert found == []
+
+    def test_unknown_youtube_channels_are_quarantined_by_identity(self):
+        approved = approved_domains(load_sources(REPO_ROOT))
+        found = discover_candidates(
+            [
+                _entry("", "skip", "https://www.youtube.com/@regionalliga-live/live"),
+                _entry("", "skip", "https://youtube.com/@regionalliga-live/live"),
+                _entry("", "skip", "https://youtube.com/@fiba/live"),
+            ],
+            approved,
+        )
+        assert len(found) == 1
+        assert found[0]["domain"] == "youtube.com"
+        assert found[0]["channel"] == "youtube.com/@regionalliga-live"
+        assert found[0]["hits"] == 2
+        assert found[0]["status"] == "quarantined"
+        assert len(found[0]["examples"]) == 2
 
     def test_examples_capped_at_three(self):
         entries = [
@@ -190,6 +209,51 @@ class TestCliRecord:
         assert payload["color_id"] == "5"
         assert payload["event_id"] == "abc123"
         assert payload["state"] == "UNVERIFIED"
+
+    def test_record_leads_persists_only_unapproved_source_identities(self, tmp_path):
+        leads = tmp_path / "source-leads.json"
+        leads.write_text(
+            json.dumps(
+                {
+                    "leads": [
+                        {
+                            "url": "https://www.youtube.com/@regionalliga-live/live",
+                            "reason": "regional league channel",
+                        },
+                        {"url": "https://new-league-streams.example/live/game"},
+                        {"url": "https://www.youtube.com/@fiba/live"},
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        dest = tmp_path / "telemetry"
+        result = _run(
+            [
+                "record-leads",
+                "--input",
+                str(leads),
+                "--root",
+                str(REPO_ROOT),
+                "--dest",
+                str(dest),
+                "--run-id",
+                "2026-10-13T16:00Z",
+                "--now",
+                "2026-10-13T16:00:00Z",
+            ]
+        )
+        assert result.returncode == 0, result.stderr
+        rows = [
+            json.loads(line)
+            for line in (dest / "run-log.jsonl").read_text(encoding="utf-8").splitlines()
+        ]
+        assert {row["source"] for row in rows} == {
+            "youtube.com/@regionalliga-live",
+            "new-league-streams.example",
+        }
+        assert all(row["outcome"] == "skip" for row in rows)
+        assert all("unapproved source lead" in row["reason"] or row["reason"] == "regional league channel" for row in rows)
 
     def test_optional_keys_absent_when_not_supplied(self, tmp_path):
         log = tmp_path / "run-log.jsonl"

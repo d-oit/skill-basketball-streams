@@ -19,6 +19,8 @@ Contract, deliberately narrow:
   in the event envelope does not silently produce zero candidates.
 * Candidates arrive in a fenced ```` ```json ```` block containing either a list
   of objects or an object with a `candidates` list.
+* Optional `source_leads` URLs in that same block are written to a separate
+  artifact; they are source-learning input and never calendar candidates.
 * A candidate is accepted only with a non-empty `league`, exactly two `teams`
   (a list, or an `"A vs B"` string) and a parseable `start`. Anything else is
   reported by index, so a malformed emission is diagnosable rather than silent.
@@ -42,6 +44,7 @@ import json
 import re
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 try:  # direct CLI execution: `python3 scripts/extract_candidates.py`
     from evidence import coerce_evidence
@@ -207,6 +210,45 @@ def candidate_objects(payload: object) -> list[dict]:
         if payload.get("league") and payload.get("start"):
             return [payload]
     return []
+
+
+def extract_source_leads(payload: object) -> list[dict]:
+    """Read proposed source URLs from the model block for later quarantine.
+
+    Source leads are deliberately separate from calendar candidates: their only
+    downstream use is the append-only source-learning log, where unapproved
+    domains and YouTube channels remain quarantined.
+    """
+    leads: list[dict] = []
+    seen: set[str] = set()
+    for block in json_blocks(transcript_text(payload)):
+        if not isinstance(block, dict):
+            continue
+        rows = block.get("source_leads")
+        if not isinstance(rows, list):
+            continue
+        for raw in rows:
+            if isinstance(raw, str):
+                raw = {"url": raw}
+            if not isinstance(raw, dict):
+                continue
+            url = str(raw.get("url") or "").strip()
+            try:
+                parsed = urlparse(url)
+            except ValueError:
+                continue
+            if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+                continue
+            if url in seen:
+                continue
+            seen.add(url)
+            lead = {"url": url}
+            for key in ("name", "league", "reason"):
+                value = str(raw.get(key) or "").strip()
+                if value:
+                    lead[key] = value
+            leads.append(lead)
+    return leads
 
 
 def normalise_candidate(raw: dict) -> dict:
@@ -450,6 +492,15 @@ def main() -> None:
     )
     parser.add_argument("--transcript", required=True, help="transcript JSON")
     parser.add_argument("--out", help="write {\"candidates\": [...]} here")
+    parser.add_argument(
+        "--source-leads-out",
+        help="write model-reported source leads to this quarantine input file",
+    )
+    parser.add_argument(
+        "--source-leads-only",
+        action="store_true",
+        help="extract source leads without requiring any calendar candidates",
+    )
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
@@ -469,6 +520,19 @@ def main() -> None:
         # Plain-text transcripts are legitimate: `--format json` is an option,
         # not a guarantee.
         payload = text
+
+    leads = extract_source_leads(payload)
+    if args.source_leads_out:
+        target = Path(args.source_leads_out)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(
+            json.dumps({"leads": leads}, indent=2) + "\n", encoding="utf-8"
+        )
+        print(f"OK: extract_candidates: wrote {len(leads)} source leads to {target}")
+    if args.source_leads_only:
+        if not args.source_leads_out:
+            parser.error("--source-leads-only requires --source-leads-out")
+        return
 
     candidates, rejected = extract(payload)
 

@@ -78,7 +78,7 @@ name = "link-inventory"
 # and `description_for` wrote only `League:`/`Teams:`. The loop could not run even
 # in principle. This pins the round trip that makes it runnable: a candidate's
 # link, through the planner and the description writer, back out of the reader and
-# into the inventory — plus coverage of all 22 approved domains, of which the page
+# into the inventory — plus coverage of all 23 approved domains, of which the page
 # corpus reaches 4.
 argv = ["python3", "-m", "pytest", "tests/test_link_inventory.py", "-q"]
 when-changed = [

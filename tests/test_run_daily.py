@@ -22,6 +22,7 @@ import pytest
 
 from scripts.run_daily import (
     ALL_BACKENDS,
+    DEFAULT_QUERIES,
     LADDER,
     Backend,
     ExaMcpKeylessBackend,
@@ -480,6 +481,13 @@ class TestJsonStdoutIsParseable:
 
 
 class TestRuntimeDailyWiring:
+    def test_default_queries_cover_youth_and_regional_leagues(self):
+        lowered = [query.lower() for query in DEFAULT_QUERIES]
+        assert any("prob" in query for query in lowered)
+        assert any("nbbl" in query for query in lowered)
+        assert any("jbbl" in query for query in lowered)
+        assert any("regionalliga" in query for query in lowered)
+
     """The telemetry job must gate configuration and tolerate only content.
 
     Parsed with a regex rather than PyYAML: the production scripts stay
@@ -663,9 +671,8 @@ class TestTheLlmPreflightSeesTheCredentialsItGatesOn:
         reads as a dead key rather than a missing `env:`, and sent three
         diagnoses down the wrong path.
 
-        Stated over every such step rather than one at a time, because each
-        instance was only found after the previous was fixed: the preflight, the
-        server, and the agent-creation step were all credential-less in turn.
+        Stated over every such step rather than one at a time: the model probe
+        and runtime call must not drift from the credential-bearing gate.
         """
         for step in self._runtime_steps():
             script = "\n".join(
@@ -709,7 +716,12 @@ class TestTheLlmPreflightSeesTheCredentialsItGatesOn:
             line for line in step.splitlines() if not line.lstrip().startswith("#")
         )
         for path in re.findall(r"--file\s+(\S+)", code):
-            assert (REPO_ROOT / path).is_file(), f"--file {path} does not exist"
+            if path == ".tmp/youtube-live-searches.json":
+                assert "mkdir -p .tmp" in code
+                assert "--queries-file config/youtube-live-queries.json" in code
+                assert f"--out {path}" in code
+            else:
+                assert (REPO_ROOT / path).is_file(), f"--file {path} does not exist"
 
     def test_every_reference_the_contract_names_is_attached(self):
         """The other direction: a reference the agent needs but never receives.

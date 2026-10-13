@@ -28,7 +28,7 @@ Search for FREE basketball live streams in Germany from official sources, valida
 
 ## Approved Sources
 
-Full list and YouTube URL rules: `references/approved-sources.md`; machine-readable mirror in `config/sources.json`. Summary: Dyn Sport Mix (free **per game** — the official free-games list lives on `dyn.sport`; streams on Joyn / Pluto TV / Zattoo free tier only), MagentaSport / MagentaTV (one free EuroLeague game per matchday), Sportschau / ARD (also streams selected BBL top games free), regional broadcasters (MDR, BR24, RBB24), **Basketball Champions League (`championsleague.basketball`, selected games only)**, official BBL club websites, and official YouTube channels only. **Evidence-only, never a directLink:** BKT EuroCup, the German lower tiers (ProA/ProB and the women's 1. DBBL are **paid**; the Regionalliga has no centralised stream — a free game needs the club's own channel), and the Tier 7 European domestic league sites (`acb.com`, `legabasket.it`, `lnb.fr`, `aba-liga.com`, `esake.gr`, `bsl.org.tr`, `vtb-league.com`, `bnxtleague.com`, `basketball.at`, `swiss.basketball`, `plk.pl`); Sporteurope.TV is excluded (paid). **Accepted YouTube URL patterns:** `youtube.com/@handle/live`, `youtube.com/live/<id>`, `youtube.com/watch?v=<id>` (live/upcoming only), `youtube.com/@handle`, `youtube.com/user/TheDBBTV`. **Rejected:** `youtube.com/@FIBAWorld`, any `youtube.com/user/[*]` except `TheDBBTV`, any `youtube.com/channel/UC…`, `/playlist`, `/results`, `/shorts`.
+Full list and YouTube URL rules: `references/approved-sources.md`; machine-readable mirror in `config/sources.json`. Summary: Dyn Sport Mix (free **per game**), MagentaSport / MagentaTV (selected free EuroLeague games), Sportschau / ARD (selected free BBL games), Sporteurope.TV (NBBL/JBBL free in 2026/27; ProA paid; ProB needs current game-specific free proof), regional broadcasters, Basketball Champions League (selected games), official clubs, and approved YouTube channels including Tampa 2 Films. ProA and 1. DBBL are paid; Regionalliga streams require per-game free evidence; BKT EuroCup and Tier 7 European league sites are evidence-only. Regionalliga, ProB, NBBL/JBBL and club channels are discovery targets; unapproved channels stay quarantined. YouTube discovery uses only YouTube's Live filter (`sp=EgJAAQ%3D%3D`); accepted stream links are `youtube.com/@handle/live`, `youtube.com/live/<id>`, and `youtube.com/watch?v=<id>` for live/upcoming broadcasts. Reject channel, playlist, results and shorts URLs as stream links.
 
 ## Process
 
@@ -77,10 +77,10 @@ For every result, call `validateStreamUrl(url)` (TypeScript in `references/imple
 
 A YouTube hit is promotable only when it is a **real live broadcast** AND its start datetime is **greater than now** (or it is live at this moment with no end timestamp). Full contract: `references/youtube-live-search.md`. Gate every candidate with `scripts/youtube_live.py`.
 
-1. **Search live-only** — either the HTML live filter `https://www.youtube.com/results?search_query=<q>&sp=EgJAAQ%3D%3D`, or the Data API `search.list` with `eventType=live&type=video` (free: 10,000 units/day, 100 units per search).
-2. **Normalize** each hit into the candidate schema (field mapping in the reference).
-3. **Gate** with `classify_stream`: `@handle/live`, `/live/<id>` or `/watch?v=<id>` URLs only; reject `liveBroadcastContent == none`, a set `actualEndTime` (ended broadcast → archived VOD), a fixed `duration_seconds` while not live now, and any `scheduled_start` that is not strictly greater than now.
-4. Only `LIVE` and `SCHEDULED` decisions continue to Step 3. Never invent or reuse a `/live` URL from a finished broadcast.
+1. **Search YouTube only with its Live filter** (`sp=EgJAAQ%3D%3D`): the daily runtime fetches every URL in `.tmp/youtube-live-searches.json` with `webfetch`; interactive runs use `youtubeLiveSearch`. Never use generic `webSearch` results or the Data API for YouTube stream discovery.
+2. **Normalize** each Live-filter hit into the candidate schema (field mapping in the reference).
+3. **Gate** with `classify_stream`: direct `/@handle/live`, `/live/<id>` or `/watch?v=<id>` URLs only; reject `liveBroadcastContent == none`, a set `actualEndTime` (ended broadcast → archived VOD), a fixed `duration_seconds` while not live now, and any `scheduled_start` that is not strictly greater than now.
+4. Only `LIVE` and `SCHEDULED` decisions continue to Step 3. Never invent or reuse a `/live` URL from a finished broadcast; unapproved handles are quarantine leads only.
 
 ### Step 2.8 — Fetch Ladder for Dynamic / Bot-Blocked Pages
 
@@ -93,13 +93,13 @@ Self-learning is conservative: the skill never promotes a source or deletes an e
 1. **Link revalidation** — `scripts/link_check.py` classifies stored links: `OK`, `BROKEN` (404/410 → quarantine the link), `BLOCKED` (401/403/429/451 → climb the fetch ladder, keep the event), `ERROR` (5xx → retry, do not delete), `UNREACHABLE`, `INVALID`. Revalidate daily for events inside today…today+7d and again ~2 h before start.
 2. **Run log** — append one row per candidate with `scripts/source_learning.py record` (outcome `create|skip|reject|blocked|error`).
 3. **Source scoring** — `scripts/source_learning.py score` reports per-source hit rate; use ≥10 attempts before re-ordering tiers.
-4. **New-source discovery** — `scripts/source_learning.py candidates` writes unapproved domains as **quarantined**. Promotion requires a PR that adds the tier row, the `config/sources.json` entry, and one accept + one reject eval case. Until then a URL from that domain is rejected at Check 3.
+4. **New-source discovery** — `scripts/source_learning.py candidates` writes unapproved domains and YouTube channel identities as **quarantined**; runtime discoveries travel in the `source_leads` JSON field. Search ProB, NBBL/JBBL and Regionalliga for new leads; promotion requires a PR with one accept + one reject eval case. Until then a URL from that source is rejected at Check 3.
 
 ### Step 3 — Run the 7-Check Pipeline
 
 Full definitions in `references/validation-workflow.md`. **ANY failure → REJECT**, no calendar event:
 
-1. **Free Access** — no `Abo`, `kostenpflichtig`, `pay-per-view`, or subscription. For BCL, a per-game free statement from Step 2.6.
+1. **Free Access** — no `Abo`, `kostenpflichtig`, `pay-per-view`, members-only access, or subscription. For BCL, a per-game free statement from Step 2.6; for Sporteurope see the current ProA, ProB and NBBL/JBBL rules in `references/approved-sources.md`.
 2. **Live Content** — page contains `live`/`Live`/`LIVE`; no `highlights`/`replay`/`zusammenfassung`/`on demand`. YouTube items must pass the Step 2.7 live/`actualEndTime` rules.
 3. **Official Source** — domain in approved list; quarantined domains fail.
 4. **Basketball-Specific** — mentions BBL, EuroLeague, FIBA, Basketball Champions League, or approved club name
@@ -186,11 +186,11 @@ Always emit the Step 7 table. On total failure return `"Found [N] potential stre
 All scripts are stdlib-only on Python 3.8+ and share the same exit codes: `0` PASS, `1` FAIL, `2` USAGE. `OK: …` goes to stdout, `FAIL: …` to stderr.
 
 - **`scripts/validate.py`** — self-contained validator. `python3 scripts/validate.py --root .` runs every check: `--check {all,evals,skill,references,calendar-config,smoke-test}`. Wire into CI so a failing validation never lands in the basketball calendar.
-- **`scripts/youtube_live.py`** — the live-only, future-only gate (Step 2.7). `--input candidates.json [--now ISO] [--json]` classifies candidates as `LIVE`/`SCHEDULED`/`REJECT`; `--print-urls QUERY` emits the `sp=EgJAAQ%3D%3D` HTML URL and the `eventType=live` API URL. Exits `1` when nothing is promotable. The approved-channel list is read from `config/sources.json` (`handles`), so promoting a channel is a config change, not a code change.
+- **`scripts/youtube_live.py`** — the live-only, future-only gate (Step 2.7). `--input candidates.json [--now ISO] [--json]` classifies candidates as `LIVE`/`SCHEDULED`/`REJECT`; `--queries-file config/youtube-live-queries.json --out PATH` builds only Live-filtered URLs. Exits `1` when nothing is promotable. Approved channel identities are read from `config/sources.json` (`handles`).
 - **`scripts/relevance.py`** — a fail-open "is this basketball at all?" pre-filter, used by `youtube_live.py` for URLs that carry no `@handle` (`/live/<id>`, `/watch?v=`), which the allow-list cannot judge. It removes obvious off-topic live results before they consume a 7-check pass. It **fails open** — unrecognised text passes — because a rejected game is not an error, it is a stream nobody gets, and it never overrides an approved channel. Not Check 3 or Check 4, which remain authoritative.
 - **`scripts/link_check.py`** — revalidates stored links (Step 2.9). `--input links.json [--dry-run] [--out report.json]`; `--dry-run` makes no network requests. Classifies `OK`/`BROKEN`/`BLOCKED`/`ERROR`/`UNREACHABLE`/`INVALID`.
 - **`scripts/link_inventory.py`** — builds the `links.json` that revalidation reads: the stored links out of each event description, plus every approved domain/channel/account in `config/sources.json`. Makes no network request; only `link_check.py` probes.
-- **`scripts/source_learning.py`** — self-learning (Step 2.9). `record` appends a JSONL run-log row, `score` reports per-source hit rates, `candidates` quarantines newly discovered domains into `logs/source-candidates.json`. Never promotes a source.
+- **`scripts/source_learning.py`** — self-learning (Step 2.9). `record` appends a JSONL run-log row, `record-leads` persists runtime-discovered URLs, `score` reports per-source hit rates, and `candidates` quarantines newly discovered domains and YouTube channel identities. Never promotes a source.
 - **`scripts/calendar_config.py`** — reads `config/calendar.json` with the `BASKETBALL_CALENDAR_ID` override.
 - **`scripts/color_mapping.py`** — `get_color_id(league, event_type, state)` for the calendar `colorId`. The league and verification-state dimensions are orthogonal.
 - **`scripts/verification.py`** — the verification state machine (`VERIFIED`/`UNVERIFIED`/`WRONG`): prefixes, colour precedence, idempotent `title_for`.
@@ -255,4 +255,4 @@ All scripts are stdlib-only on Python 3.8+ and share the same exit codes: `0` PA
 - `docs/runtime.md` — daily runtime operations: cadence, secrets, telemetry schema, rung health, recovery runbook, AGPL notice
 - `references/lessons-learned.md` — incident post-mortem (broken `/user/FIBA` events), root causes, prevention checklist, validation log template and worked examples
 - `config/sources.json` — machine-readable approved-source registry + excluded sources
-- `evals/evals.json` — 39 eval cases (driving the `skill-evaluator` rubric; see `README.md` → Self-Validation)
+- `evals/evals.json` — 42 eval cases (driving the `skill-evaluator` rubric; see `README.md` → Self-Validation)

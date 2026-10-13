@@ -5,7 +5,7 @@ loops, all backed by append-only files:
 
 | Loop | Command | Artifact | Auto-applied? |
 |---|---|---|---|
-| Run log | `scripts/record_run_outcomes.py record --dest .tmp/telemetry` (runtime) / `scripts/source_learning.py record …` (local) | `telemetry/run-log.jsonl` on the `telemetry` branch | yes (append only) |
+| Run log | `scripts/record_run_outcomes.py record --dest .tmp/telemetry` (runtime) / `scripts/source_learning.py record …` or `record-leads …` | `telemetry/run-log.jsonl` on the `telemetry` branch | yes (append only) |
 | Post-hoc audit | `scripts/audit_events.py --events … --evidence …` | `logs/audit.jsonl` | yes — relabels events (§6) |
 | Source scoring | `scripts/source_learning.py score --root .` | stdout / `--json` | no — informs tier order |
 | New-source discovery | `scripts/source_learning.py candidates --root .` | `logs/source-candidates.json` (`"status": "quarantined"`) | **no** — human approval |
@@ -15,15 +15,18 @@ loops, all backed by append-only files:
 file a CI job cannot see is a learning loop that cannot run. On the automated
 path it is written to the telemetry worktree (`record_run_outcomes.py record
 --dest .tmp/telemetry`) and committed to the `telemetry` branch, beside
-`candidates.jsonl`, `fetch-attempts.jsonl` and `rung-attempts.jsonl`. The
-`logs/run-log.jsonl` default remains for a local, per-installation run.
+`candidates.jsonl`, `fetch-attempts.jsonl`, `rung-attempts.jsonl` and the
+runtime's `source-leads.json`. The latter is extracted from the agent transcript,
+uploaded with the run ledger, and appended through `source_learning.py
+record-leads` by the audit job. The `logs/run-log.jsonl` default remains for a
+local, per-installation run.
 
 ## 1. Run log
 
 One JSONL row per source observation, appended at the end of every run:
 
 ```json
-{"ts":"2026-09-14T09:12:00+00:00","run_id":"2026-09-14T09","source":"magenta.tv","tier":4,"url":"https://www.magenta.tv/tv/live-basketball-euroleague-88213","outcome":"reject","reason":"no matching free-access announcement on magentasport.de"}
+{"ts":"2026-10-13T09:12:00+02:00","run_id":"2026-10-13T09","source":"magenta.tv","tier":4,"url":"https://www.magenta.tv/tv/live-basketball-euroleague-88213","outcome":"reject","reason":"no matching free-access announcement on the current source"}
 ```
 
 The CI caller is `scripts/record_run_outcomes.py`: it derives rows from ledgers
@@ -31,7 +34,10 @@ that already exist — `candidates.jsonl` (search hits, including the backend),
 `fetch-attempts.jsonl` (a blocked/gone/5xx fixture source is "an issue during
 the run"), `rung-attempts.jsonl` (a failed or parked render rung) and
 `events.jsonl` (what reached the calendar) — and appends them through
-`source_learning.py`'s own `record`. Before it existed, nothing called `record`
+`source_learning.py`'s own `record`. Runtime-discovered source leads are added
+separately with `record-leads`; they include URLs surfaced by YouTube's Live
+filter and stay quarantined until manually approved. Before the writer existed,
+nothing called `record`
 on any automated path: `logs/run-log.jsonl` was never created by CI, `score`
 exited 1 on the empty file and `candidates` read nothing.
 
@@ -63,30 +69,34 @@ attached in the fetch ladder rather than being dropped — see
 
 ## 3. New-source discovery (quarantine, never auto-promote)
 
-`candidates` extracts every domain that produced a search hit but is absent from
-`config/sources.json`, and writes them quarantined:
+`candidates` extracts every domain or exact YouTube channel identity that
+produced a search hit but is absent from `config/sources.json`, and writes them
+quarantined:
 
 ```json
 {
   "candidates": [
     {"domain": "example-basketball.tv", "status": "quarantined",
-     "hits": 3, "examples": ["https://example-basketball.tv/live/123"]}
+     "hits": 3, "examples": ["https://example-basketball.tv/live/123"]},
+    {"domain": "youtube.com", "channel": "youtube.com/@new-basketball-channel",
+      "status": "quarantined", "hits": 1,
+      "examples": ["https://youtube.com/@new-basketball-channel/live"]}
   ]
 }
 ```
 
 Promotion requires **all four** of these, done by a human in a PR:
 
-1. The domain is an official league / federation / club / public broadcaster
-   (never a pirate or aggregator site).
+1. The domain or channel is an official league / federation / club / public
+   broadcaster (never a pirate or aggregator site).
 2. Free access is documented (or "selected games" with an announcement channel).
 3. `references/approved-sources.md` gains a tier row **and** the matching entry
    is added to `config/sources.json`.
 4. `evals/evals.json` gains one accept case and one reject case for the new
    source (reject = its paid variant).
 
-Until then the domain stays quarantined and any URL from it is rejected at
-Check 3.
+Until then the domain or channel stays quarantined and any URL from it is
+rejected at Check 3.
 
 ## 4. Link revalidation
 
