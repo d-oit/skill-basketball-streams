@@ -23,6 +23,7 @@ from scripts.render_ladder import (
     RungHealth,
     FetchResult,
     LicenceError,
+    TinyFishRung,
     anchor_game,
     assert_shippable,
     attempt_state,
@@ -272,6 +273,120 @@ class TestFetchWithLadder:
     def test_empty_ladder(self):
         result, attempts = fetch_with_ladder("https://example.com/x", rungs=[])
         assert attempts == [] and result.ok is False
+
+
+class TestTheHostedRungsAskTheRightQuestion:
+    """A hosted rung is only as good as its endpoint and its body.
+
+    `tinyfish` shipped pointing at `https://api.tinyfish.ai/fetch` — a host that
+    **does not resolve** — so every attempt was
+    `<urlopen error [Errno -5] No address associated with hostname>`.
+    `rung_health.py` read that as a retired backend and filed §18.4's parked-rung
+    issue for 15 consecutive days. Nothing in the suite had ever looked at what a
+    hosted rung *sent*, which is why a wrong hostname could look exactly like a
+    dead provider.
+    """
+
+    def _capture(self, monkeypatch, response):
+        sent: dict = {}
+
+        def fake_post(endpoint, payload, headers, timeout):
+            sent.update(endpoint=endpoint, payload=payload, headers=headers)
+            return response
+
+        monkeypatch.setattr(render_ladder_module, "_http_post_json", fake_post)
+        return sent
+
+    def test_tinyfish_fetch_targets_the_documented_host(self):
+        """Pinned because the wrong host was invisible for a whole release.
+
+        Fetch and Search are different services: Search is
+        `api.search.tinyfish.ai`, Fetch is `api.fetch.tinyfish.ai`
+        (https://docs.tinyfish.ai/fetch-api).
+        """
+        assert TinyFishRung.endpoint == "https://api.fetch.tinyfish.ai"
+
+    def test_tinyfish_sends_a_urls_list_to_the_fetch_api(self, monkeypatch):
+        sent = self._capture(
+            monkeypatch, (200, {"results": [{"text": EVIDENCE}], "errors": []})
+        )
+        monkeypatch.setenv("TINYFISH_API_KEY", "k")
+        result = TinyFishRung().fetch("https://www.magenta.tv/sport")
+        assert sent["endpoint"] == "https://api.fetch.tinyfish.ai"
+        assert sent["payload"] == {
+            "urls": ["https://www.magenta.tv/sport"],
+            "format": "html",
+        }
+        assert sent["headers"] == {"X-API-Key": "k"}
+        assert result.ok is True and result.text == EVIDENCE
+        assert result.has_stream_evidence()
+
+    def test_tinyfish_reads_the_document_out_of_the_batch_envelope(self, monkeypatch):
+        """`results[0].text`, not a top-level `text` — the envelope is the API."""
+        self._capture(
+            monkeypatch, (200, {"results": [{"url": "u", "text": "<video>Jetzt live"}]})
+        )
+        monkeypatch.setenv("TINYFISH_API_KEY", "k")
+        result = TinyFishRung().fetch("https://x/")
+        assert result.ok is True
+        assert result.has_stream_evidence() is True
+
+    def test_a_per_url_error_beside_a_200_is_a_failure_not_an_empty_page(
+        self, monkeypatch
+    ):
+        """TinyFish answers 200 with `errors[]` for a URL it could not fetch.
+
+        Reading that as `ok` would classify it `ok-no-evidence` — the same
+        reading as a page with no stream — so a dead provider would never accrue
+        a strike and the ladder would keep climbing into it forever.
+        """
+        self._capture(
+            monkeypatch,
+            (200, {"results": [], "errors": [{"url": "https://x/", "error": "bot_blocked"}]}),
+        )
+        monkeypatch.setenv("TINYFISH_API_KEY", "k")
+        result = TinyFishRung().fetch("https://x/")
+        assert result.ok is False
+        assert result.error == "bot_blocked"
+        assert attempt_state(result) == "failed"
+
+    def test_a_per_url_error_keeps_the_upstream_status(self, monkeypatch):
+        self._capture(
+            monkeypatch,
+            (
+                200,
+                {
+                    "results": [],
+                    "errors": [
+                        {"url": "https://x/", "error": "target_http_error", "status": 503}
+                    ],
+                },
+            ),
+        )
+        monkeypatch.setenv("TINYFISH_API_KEY", "k")
+        result = TinyFishRung().fetch("https://x/")
+        assert result.error == "target_http_error (HTTP 503)"
+
+    def test_a_rejected_key_is_still_blocked_and_not_failed(self, monkeypatch):
+        self._capture(monkeypatch, (401, {"error": "invalid api key"}))
+        monkeypatch.setenv("TINYFISH_API_KEY", "k")
+        result = TinyFishRung().fetch("https://x/")
+        assert result.blocked is True
+        assert attempt_state(result) == "blocked"
+
+    def test_a_transport_failure_is_reported_not_swallowed(self, monkeypatch):
+        self._capture(monkeypatch, (None, {"error": "<urlopen error boom>"}))
+        monkeypatch.setenv("TINYFISH_API_KEY", "k")
+        result = TinyFishRung().fetch("https://x/")
+        assert result.ok is False
+        assert "urlopen error boom" in result.error
+        assert attempt_state(result) == "failed"
+
+    def test_no_key_is_skipped_rather_than_failed(self, monkeypatch):
+        monkeypatch.delenv("TINYFISH_API_KEY", raising=False)
+        result = TinyFishRung().fetch("https://x/")
+        assert result.skipped is True
+        assert attempt_state(result) == "skipped"
 
 
 class TestStreamEvidence:

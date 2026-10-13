@@ -33,6 +33,7 @@ from rehearse import (  # noqa: E402
     VALID,
     Check,
     Row,
+    _probe_tinyfish_fetch,
     apply_env_file,
     apply_env_text,
     assess,
@@ -338,6 +339,66 @@ class TestTheRegistryStaysComplete:
             expected_env = (backend.env_var,) if backend.env_var else ()
             assert checks[f"search:{backend.name}"].env == expected_env, backend.name
 
+    def test_the_tinyfish_fetch_rung_is_probed_not_merely_present(self):
+        """Presence is not reachability — the whole of issue #46.
+
+        `render:tinyfish` shipped pointing at `api.tinyfish.ai`, a host that does
+        not resolve. Every other report called the rung configured; only a real
+        request can say whether it serves.
+        """
+        check = self._by_name()["render:tinyfish"]
+        assert check.env == ("TINYFISH_API_KEY",)
+        assert check.probe is not None
+
+    def test_the_tinyfish_probe_reports_an_unresolvable_host_as_invalid(self, monkeypatch):
+        import render_ladder
+
+        class DeadRung:
+            endpoint = "https://api.tinyfish.ai/fetch"
+
+            def fetch(self, url, *, timeout=20.0):
+                return render_ladder.FetchResult(
+                    ok=False,
+                    rung="tinyfish",
+                    error="<urlopen error [Errno -5] No address associated with hostname>",
+                )
+
+        monkeypatch.setitem(render_ladder.ALL_RUNGS, "tinyfish", DeadRung())
+        ok, detail = _probe_tinyfish_fetch(5)()
+        assert ok is False
+        assert "No address associated with hostname" in detail
+
+    def test_the_tinyfish_probe_accepts_a_real_fetch(self, monkeypatch):
+        import render_ladder
+
+        class GoodRung:
+            endpoint = "https://api.fetch.tinyfish.ai"
+
+            def fetch(self, url, *, timeout=20.0):
+                return render_ladder.FetchResult(
+                    ok=True, rung="tinyfish", status=200, text="<html>ok</html>"
+                )
+
+        monkeypatch.setitem(render_ladder.ALL_RUNGS, "tinyfish", GoodRung())
+        ok, detail = _probe_tinyfish_fetch(5)()
+        assert ok is True
+        assert "api.fetch.tinyfish.ai" in detail
+
+    def test_the_tinyfish_probe_reports_an_empty_200_as_invalid(self, monkeypatch):
+        """A 200 with no content is what a wrong endpoint shape returns."""
+        import render_ladder
+
+        class EmptyRung:
+            endpoint = "https://api.fetch.tinyfish.ai"
+
+            def fetch(self, url, *, timeout=20.0):
+                return render_ladder.FetchResult(ok=True, rung="tinyfish", status=200, text="")
+
+        monkeypatch.setitem(render_ladder.ALL_RUNGS, "tinyfish", EmptyRung())
+        ok, detail = _probe_tinyfish_fetch(5)()
+        assert ok is False
+        assert "no content" in detail
+
     def test_every_credential_the_runtime_reads_has_a_surface(self):
         """The invariant that matters, over the union rather than per-component.
 
@@ -409,7 +470,7 @@ class TestTheRegistryStaysComplete:
         as a rule that reads a field nothing writes.
         """
         optional = {check.name for check in build_checks() if check.optional}
-        assert optional == {"render:firecrawl"}
+        assert optional == {"render:firecrawl", "render:tinyfish"}
 
     def test_no_surface_names_a_credential_the_code_never_reads(self):
         """The regression guard for that class, over the real registry.

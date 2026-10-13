@@ -417,6 +417,13 @@ class HostedRung(Rung):
             return result
         if status is None or status >= 400:
             return result
+        if payload.get("failed"):
+            # A 2xx that *reports* the target could not be fetched. TinyFish's
+            # Fetch API answers 200 with a per-URL entry in `errors[]`, so
+            # without this the attempt would be `ok` with no content —
+            # `ok-no-evidence`, which reads exactly like a page that simply has
+            # no stream, and a dead provider would never accrue a strike.
+            return result
         result.ok = True
         result.text = payload.get("text")
         result.html = payload.get("html")
@@ -452,21 +459,69 @@ class FirecrawlRung(HostedRung):
 
 
 class TinyFishRung(HostedRung):
+    """The vendor's **Fetch** API, which is a different service from Search.
+
+    `api.search.tinyfish.ai` answers Search; Fetch is
+    `POST https://api.fetch.tinyfish.ai` (https://docs.tinyfish.ai/fetch-api).
+    This rung shipped pointing at `https://api.tinyfish.ai/fetch`, a host that
+    **does not resolve**, so every attempt failed with
+    `<urlopen error [Errno -5] No address associated with hostname>`. The ladder
+    recorded that as a failed hosted attempt, `rung_health.py` parked the rung
+    after three strikes and filed §18.4's issue — the backend read as retired
+    while the credential was fine and only the hostname was wrong. The comment
+    that stood here said `[VERIFY]`; nothing ever verified it.
+
+    The response is a **batch envelope** — `{"results": [...], "errors": [...]}`
+    — and a URL that could not be fetched appears in `errors[]` beside an HTTP
+    `200`. Hence the body is `{"urls": [url]}` (a list) and the document lives at
+    `results[0].text`.
+    """
+
     name = "tinyfish"
     env_var = "TINYFISH_API_KEY"
-    # [VERIFY] Fetch endpoint path — Search is api.search.tinyfish.ai; Fetch is
-    # configured here so a correction is a one-line change.
-    endpoint = "https://api.tinyfish.ai/fetch"
+    endpoint = "https://api.fetch.tinyfish.ai"
+    # `html`, not the API's default `markdown`: `has_stream_evidence` matches
+    # markup markers (`<video`, `.m3u8`, `.mpd`, `og:video`) and the German live
+    # badge, none of which survive markdown conversion.
+    output_format = "html"
 
     def _request(self, url: str, key: str, timeout: float) -> tuple[int | None, dict]:
         status, payload = _http_post_json(
-            self.endpoint, {"url": url}, {"X-API-Key": key}, timeout
+            self.endpoint,
+            {"urls": [url], "format": self.output_format},
+            {"X-API-Key": key},
+            timeout,
         )
-        return status, {
-            "text": payload.get("text") or payload.get("content"),
-            "html": payload.get("html"),
-            "error": payload.get("error"),
-        }
+        error = payload.get("error")
+        if error:
+            # A whole-request failure: a 4xx/5xx body, or a transport failure
+            # (`status is None`) whose text is the exception.
+            return status, {"error": str(error)}
+        results = payload.get("results") or []
+        entry = results[0] if results else {}
+        text = entry.get("text")
+        if text is not None:
+            return status, {"text": text}
+        failure = _tinyfish_failure(payload.get("errors") or [], url)
+        if failure:
+            code = str(failure.get("error") or "fetch failed")
+            upstream = failure.get("status")
+            detail = f"{code} (HTTP {upstream})" if upstream else code
+            return status, {"failed": True, "error": detail}
+        return status, {}
+
+
+def _tinyfish_failure(errors: list, url: str) -> dict:
+    """The `errors[]` entry for `url`, or the first one when none names it.
+
+    One URL is sent per request, so the match is normally exact; the fallback
+    keeps a malformed entry from reading as a success.
+    """
+    for entry in errors:
+        if isinstance(entry, dict) and (not entry.get("url") or entry.get("url") == url):
+            return entry
+    first = errors[0] if errors else None
+    return first if isinstance(first, dict) else {}
 
 
 class LocalRung(Rung):

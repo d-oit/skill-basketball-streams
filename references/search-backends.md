@@ -15,7 +15,7 @@ come from the backends below.
 
 | Backend | Free allowance | JS render | MCP | Best for |
 |---|---|---|---|---|
-| **TinyFish** | Search + Fetch **free at any balance**; 5,000 req/month allowance, 30 req/min (Search), 150 URLs/min (Fetch) | Fetch yes; Browser tool for hard pages | — | Primary search: `after_date` / `before_date` / `recency_minutes` filters map directly onto the "datetime > now" gate |
+| **TinyFish** | Search free up to 12,000 requests/day; Fetch free up to 1,000 URLs/day; 30 requests/min per key, shared across both | Fetch yes (`api.fetch.tinyfish.ai`); Browser tool for hard pages | — | Primary search: `after_date` / `before_date` / `recency_minutes` filters map directly onto the "datetime > now" gate |
 | **Firecrawl** | 1,000 credits/month, no card; keyless mode (no API key) for search + scrape | **Yes** (`waitFor`, `onlyMainContent`) | `firecrawl-mcp` | Rendering `magenta.tv` and other SPAs; the paid-plan escape hatch for anti-bot pages |
 | **Tavily** | 1,000 credits/month, no card | via `extract` | `tavily-mcp` | `/search`, `/extract`, `/crawl` for announcement pages |
 | **Exa** | MCP server is **free, keyless, rate-limited** (`https://mcp.exa.ai/mcp`); sign-up adds $20 credits (~2,800 searches) | `search_and_contents` returns page text | `exa-mcp-server`; hosted `mcp.exa.ai/mcp` | Semantic discovery of unindexed dynamic slugs; the keyless rung is Phase 0's zero-secret default |
@@ -99,6 +99,24 @@ curl "https://api.search.tinyfish.ai?query=Basketball+Champions+League+live+free
 ```
 
 `after_date` must be `YYYY-MM-DD`; never combine it with `recency_minutes`.
+
+TinyFish **Fetch** is a different service on a different host — a POST of a URL
+*list*, answered with a batch envelope (`{"results": [...], "errors": [...]}`).
+The `errors[]` array is populated beside an HTTP `200` when a URL could not be
+fetched, so a caller that only looks at the status code reads a failed fetch as a
+successful empty page:
+
+```bash
+curl -X POST https://api.fetch.tinyfish.ai \
+  -H "X-API-Key: $TINYFISH_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"urls":["https://www.magenta.tv/sport"],"format":"html"}'
+```
+
+`format: "html"` (not the default `markdown`) is what `render_ladder.py` asks
+for: the stream-evidence gate matches markup markers (`<video`, `.m3u8`,
+`og:video`) and the German live badge, none of which survive markdown
+conversion. Rate limits are per key and shared: **30 requests/minute**.
 
 Firecrawl scrape (rendering `magenta.tv`):
 

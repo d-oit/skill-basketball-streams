@@ -344,6 +344,34 @@ def _probe_render_arena() -> Probe:
     return run
 
 
+def _probe_tinyfish_fetch(timeout: int) -> Probe:
+    """Fetch one stable URL through the rung the ladder actually climbs to.
+
+    Presence is not evidence for a hosted rung. `tinyfish` shipped pointing at
+    `https://api.tinyfish.ai/fetch`, a host that **does not resolve**, so every
+    attempt was a DNS failure and `rung_health.py` read it as a retired backend —
+    for fifteen consecutive days, on a runner where the credential was fine.
+    `render:firecrawl` reports presence only because its probe would spend a
+    credit; this one costs nothing (Fetch is free to 1,000 URLs/day) and is the
+    only thing that can tell "configured" from "reachable".
+    """
+    def run() -> tuple[bool | None, str]:
+        import render_ladder
+
+        rung = render_ladder.ALL_RUNGS["tinyfish"]
+        result = rung.fetch("https://example.com/", timeout=timeout)
+        if result.skipped:
+            return None, result.error
+        if result.ok and (result.text or "").strip():
+            return True, (
+                f"fetched example.com through {rung.endpoint}: "
+                f"{len(result.text)} char(s)"
+            )
+        return False, result.error or f"HTTP {result.status} with no content"
+
+    return run
+
+
 def _probe_calendar(timeout: int) -> Probe:
     def run() -> tuple[bool | None, str]:
         import calendar_io
@@ -592,6 +620,17 @@ def build_checks(*, timeout: int = 60) -> list[Check]:
             # app shell does not contain — so it fails on an empty result rather
             # than reporting success. It costs no provider credit.
             probe=_probe_render_arena(),
+        ),
+        Check(
+            name="render:tinyfish",
+            env=("TINYFISH_API_KEY",),
+            what="render rung 2, the hosted Fetch API the ladder climbs to for SPAs",
+            # Probed, unlike `render:firecrawl`, and for the reason #46 existed:
+            # a hosted rung whose *hostname* is wrong is indistinguishable from a
+            # retired backend in every other report. The probe is a real Fetch of
+            # a stable page, which is free.
+            probe=_probe_tinyfish_fetch(timeout),
+            optional=True,
         ),
         Check(
             name="render:firecrawl",
