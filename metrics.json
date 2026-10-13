@@ -70,8 +70,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 624,
-    "missed": 624,
+    "eligible": 633,
+    "missed": 633,
     "missed_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://about.fiba.basketball/en/news/watch-it-live-day-1-of-fiba-intercontinental-cup-2026",
@@ -149,6 +149,7 @@
       "https://ishd.de/news/4964",
       "https://khelnow.com/basketball/where-to-watch-fiba-basketball-world-cup-2027-asian-qualifiers-india-vs-lebanon-202606",
       "https://lees-corner.de/calendar/index.php?event%2F7479-twitch-livestream-nbbl-playoffs%2F=",
+      "https://linebet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://lite.apex-football.com/de-DE/news/729cbfc3260918de_de",
       "https://live-sport-online.com/basketball/panathinaikos-aktor-athens-fenerbahce-tarfin-istanbul",
       "https://live-sport-online.com/basketball/real-madrid-ea7-emporio-armani-milan",
@@ -174,6 +175,7 @@
       "https://liveticker.morgenpost.de/basketball/bbl/ma12415702/fc-bayern-muenchen_alba-berlin/liveticker/",
       "https://livetv902.me/enx/eventinfo/382490809_turkey_belarus/",
       "https://livetvworld.net/euroleague-basketball-tv",
+      "https://m.aiscore.com/basketball/tournament-german-regionalliga/r8lk2di8xt0736d",
       "https://mainsports.me/euroleague/stream/lyon-villeurbanne-vs-valencia/live",
       "https://mashable.com/article/nba-live-stream-for-free",
       "https://matchcast.tv/match/fenerbahce-sk-vs-algiris-euroleague-2026-10-13",
@@ -241,9 +243,11 @@
       "https://sporteurope.tv/en/1-basketball-regionalliga-west-maenner",
       "https://sporteurope.tv/en/alba-berlin-nbbl",
       "https://sporteurope.tv/en/barmer-2-basketball-bundesliga",
+      "https://sporteurope.tv/en/bba-hagen-nbbl",
       "https://sporteurope.tv/en/euroleague",
       "https://sporteurope.tv/en/jbbl",
       "https://sporteurope.tv/en/kickz-ibam-jbbl",
+      "https://sporteurope.tv/en/regionalliga-suedost",
       "https://sporteurope.tv/en/videos/basketball",
       "https://sporteurope.tv/nbbl",
       "https://sporteurope.tv/videos/basketball",
@@ -444,6 +448,7 @@
       "https://www.freiepresse.de/sport/basketball/niners-chemnitz/liveticker-niners-chemnitz-starten-beim-deutschen-meister-alba-berlin-in-die-bundesligasaison-artikel14413643",
       "https://www.fubo.tv/welcome/leagues/13324137",
       "https://www.fubo.tv/welcome/leagues/13324137?irad=356362&irmp=3324905&subId1=DP233548813",
+      "https://www.fubo.tv/welcome/leagues/14448104",
       "https://www.fubo.tv/welcome/leagues/3605745",
       "https://www.fubo.tv/welcome/teams/9470",
       "https://www.gestreamt.de/streaming-dienste/magenta-sport/magenta-sport-basketball/",
@@ -684,9 +689,11 @@
       "https://www.youtube.com/watch?v=kaCZh9gyy_c",
       "https://www.youtube.com/watch?v=ljOk922Rj0E",
       "https://www.youtube.com/watch?v=lw6xP9c2wfw",
+      "https://www.youtube.com/watch?v=lw6xP9c2wfw&xstg=CAMSBhUDze3xHw%3D%3D",
       "https://www.youtube.com/watch?v=nNVx-_qzLWE",
       "https://www.youtube.com/watch?v=neWq1PECVP8",
       "https://www.youtube.com/watch?v=nvoq4smkLZU&xstg=CAMSBhUDzO3xHw%3D%3D",
+      "https://www.youtube.com/watch?v=owkfJIFOsfI",
       "https://www.youtube.com/watch?v=qBjVtqOVv9M",
       "https://www.youtube.com/watch?v=qBjVtqOVv9M&xstg=CAMSBhUD-7L2Hw%3D%3D",
       "https://www.youtube.com/watch?v=qmYie2F_0Uk",
@@ -694,14 +701,16 @@
       "https://www.youtube.com/watch?v=rnPeiFEgyMA&xstg=CAMSBhUD-7L2Hw%3D%3D",
       "https://www.youtube.com/watch?v=rnPeiFEgyMA&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=sOX01RgDiBU",
+      "https://www.youtube.com/watch?v=tGvsJG5JeSE",
+      "https://www.youtube.com/watch?v=ueFpASwTpgw",
       "https://www.youtube.com/watch?v=wAyC8M2R3JA",
       "https://www.youtube.com/watch?v=zNU44AAcyOc",
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 9481,
-    "unique_games": 874,
-    "unverifiable": 624,
+    "rows": 9758,
+    "unique_games": 888,
+    "unverifiable": 633,
     "unverifiable_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://about.fiba.basketball/en/news/watch-it-live-day-1-of-fiba-intercontinental-cup-2026",
@@ -779,6 +788,7 @@
       "https://ishd.de/news/4964",
       "https://khelnow.com/basketball/where-to-watch-fiba-basketball-world-cup-2027-asian-qualifiers-india-vs-lebanon-202606",
       "https://lees-corner.de/calendar/index.php?event%2F7479-twitch-livestream-nbbl-playoffs%2F=",
+      "https://linebet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://lite.apex-football.com/de-DE/news/729cbfc3260918de_de",
       "https://live-sport-online.com/basketball/panathinaikos-aktor-athens-fenerbahce-tarfin-istanbul",
       "https://live-sport-online.com/basketball/real-madrid-ea7-emporio-armani-milan",
@@ -804,6 +814,7 @@
       "https://liveticker.morgenpost.de/basketball/bbl/ma12415702/fc-bayern-muenchen_alba-berlin/liveticker/",
       "https://livetv902.me/enx/eventinfo/382490809_turkey_belarus/",
       "https://livetvworld.net/euroleague-basketball-tv",
+      "https://m.aiscore.com/basketball/tournament-german-regionalliga/r8lk2di8xt0736d",
       "https://mainsports.me/euroleague/stream/lyon-villeurbanne-vs-valencia/live",
       "https://mashable.com/article/nba-live-stream-for-free",
       "https://matchcast.tv/match/fenerbahce-sk-vs-algiris-euroleague-2026-10-13",
@@ -871,9 +882,11 @@
       "https://sporteurope.tv/en/1-basketball-regionalliga-west-maenner",
       "https://sporteurope.tv/en/alba-berlin-nbbl",
       "https://sporteurope.tv/en/barmer-2-basketball-bundesliga",
+      "https://sporteurope.tv/en/bba-hagen-nbbl",
       "https://sporteurope.tv/en/euroleague",
       "https://sporteurope.tv/en/jbbl",
       "https://sporteurope.tv/en/kickz-ibam-jbbl",
+      "https://sporteurope.tv/en/regionalliga-suedost",
       "https://sporteurope.tv/en/videos/basketball",
       "https://sporteurope.tv/nbbl",
       "https://sporteurope.tv/videos/basketball",
@@ -1074,6 +1087,7 @@
       "https://www.freiepresse.de/sport/basketball/niners-chemnitz/liveticker-niners-chemnitz-starten-beim-deutschen-meister-alba-berlin-in-die-bundesligasaison-artikel14413643",
       "https://www.fubo.tv/welcome/leagues/13324137",
       "https://www.fubo.tv/welcome/leagues/13324137?irad=356362&irmp=3324905&subId1=DP233548813",
+      "https://www.fubo.tv/welcome/leagues/14448104",
       "https://www.fubo.tv/welcome/leagues/3605745",
       "https://www.fubo.tv/welcome/teams/9470",
       "https://www.gestreamt.de/streaming-dienste/magenta-sport/magenta-sport-basketball/",
@@ -1314,9 +1328,11 @@
       "https://www.youtube.com/watch?v=kaCZh9gyy_c",
       "https://www.youtube.com/watch?v=ljOk922Rj0E",
       "https://www.youtube.com/watch?v=lw6xP9c2wfw",
+      "https://www.youtube.com/watch?v=lw6xP9c2wfw&xstg=CAMSBhUDze3xHw%3D%3D",
       "https://www.youtube.com/watch?v=nNVx-_qzLWE",
       "https://www.youtube.com/watch?v=neWq1PECVP8",
       "https://www.youtube.com/watch?v=nvoq4smkLZU&xstg=CAMSBhUDzO3xHw%3D%3D",
+      "https://www.youtube.com/watch?v=owkfJIFOsfI",
       "https://www.youtube.com/watch?v=qBjVtqOVv9M",
       "https://www.youtube.com/watch?v=qBjVtqOVv9M&xstg=CAMSBhUD-7L2Hw%3D%3D",
       "https://www.youtube.com/watch?v=qmYie2F_0Uk",
@@ -1324,35 +1340,20 @@
       "https://www.youtube.com/watch?v=rnPeiFEgyMA&xstg=CAMSBhUD-7L2Hw%3D%3D",
       "https://www.youtube.com/watch?v=rnPeiFEgyMA&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=sOX01RgDiBU",
+      "https://www.youtube.com/watch?v=tGvsJG5JeSE",
+      "https://www.youtube.com/watch?v=ueFpASwTpgw",
       "https://www.youtube.com/watch?v=wAyC8M2R3JA",
       "https://www.youtube.com/watch?v=zNU44AAcyOc",
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-10-13T18:42Z",
+  "run_id": "2026-10-13T19:59Z",
   "source": {
     "audit_rows": 0,
-    "candidates_rows": 9481,
+    "candidates_rows": 9758,
     "fixtures_rows": 50
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 119,
-      "missed": 119,
-      "recall": 0.0,
-      "rows": 215,
-      "run_id": "2026-10-04T14:14Z",
-      "unique_games": 181
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -1573,7 +1574,24 @@
       "rows": 310,
       "run_id": "2026-10-13T18:39Z",
       "unique_games": 271
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 158,
+      "missed": 158,
+      "recall": 0.0,
+      "rows": 277,
+      "run_id": "2026-10-13T19:57Z",
+      "unique_games": 239
     }
   ],
-  "ts": "2026-10-13T18:42:15.366443+00:00"
+  "ts": "2026-10-13T19:59:24.089970+00:00"
 }
