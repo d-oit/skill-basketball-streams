@@ -27,7 +27,7 @@ the same checks.
 - Requires registration/payment before viewing
 - YouTube stream is members-only or otherwise paywalled
 - Contains pricing information
-- Sporteurope.TV ProA 2026/27 is paid; ProB requires an official free statement for the exact game
+- Sporteurope.TV ProA 2026/27 is paid; ProB is excluded from this calendar as not free of charge
 
 ## Check 2: Live Content (check id: `liveContent`)
 

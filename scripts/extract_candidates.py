@@ -22,11 +22,14 @@ Contract, deliberately narrow:
 * Optional `source_leads` URLs in that same block are written to a separate
   artifact; they are source-learning input and never calendar candidates.
 * A candidate is accepted only with a non-empty `league`, exactly two `teams`
-  (a list, or an `"A vs B"` string) and a parseable `start`. Anything else is
-  reported by index, so a malformed emission is diagnosable rather than silent.
+  (a list, or an `"A vs B"` string) and a parseable `start`. Link, access and
+  validation metadata is preserved for the planner's final eligibility gate;
+  extraction never turns missing proof into a claim. Anything malformed is
+  reported by index, so a bad emission is diagnosable rather than silent.
 
-The output feeds `scripts/upsert_events.py`, which does the dedupe and the state
-labelling. This script validates but never decides.
+The output feeds `scripts/upsert_events.py`, which checks the carried evidence,
+does the dedupe and assigns the state label. This script validates but never
+decides whether missing evidence should count as free or live.
 
 Usage:
     python3 scripts/extract_candidates.py --transcript .tmp/transcript.json --out .tmp/candidates.json
@@ -48,9 +51,11 @@ from urllib.parse import urlparse
 
 try:  # direct CLI execution: `python3 scripts/extract_candidates.py`
     from evidence import coerce_evidence
+    from stream_links import normalise_links
     from upsert_events import game_key as build_game_key, parse_dt
 except ImportError:  # imported as a package module, e.g. scripts.extract_candidates
     from scripts.evidence import coerce_evidence  # type: ignore
+    from scripts.stream_links import normalise_links  # type: ignore
     from scripts.upsert_events import game_key as build_game_key, parse_dt  # type: ignore
 
 FENCED_BLOCK = re.compile(r"```(?:json)?\s*\n(.*?)```", re.DOTALL)
@@ -309,6 +314,10 @@ def normalise_candidate(raw: dict) -> dict:
     evidence = coerce_evidence(raw)
     if evidence:
         candidate["evidence"] = evidence
+    # These are the exact fields the write planner requires for eligibility.
+    # The old allowlist retained only booleans, silently dropping the URL and
+    # source evidence needed to check those booleans before a calendar write.
+    candidate.update(normalise_links(raw))
     return candidate
 
 

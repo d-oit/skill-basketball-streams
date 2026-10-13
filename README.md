@@ -99,7 +99,7 @@ live-stream-runtime-spec.md           Spec: daily runtime, evals, self-improveme
   ├── corpus-refresh.yml              Weekly: re-record the evidence corpus; ONE issue per verdict flip, never per byte change
   └── codeql.yml                      CodeQL analysis
 evals/
-  └── evals.json                      39 standard-schema eval cases (driving the rubric)
+  └── evals.json                      43 standard-schema eval cases (driving the rubric)
 scripts/
   ├── validate.py                     Self-contained validator (stdlib only): four checks plus smoke-test regression guard.
   ├── runtime_eval.py                 Runtime skill-evaluator: structural + canned-stub passes, plus --transcripts for real captured runs.
@@ -208,7 +208,7 @@ references/
 - Mandatory source reference URL and ISO validation timestamp on every event.
 - Duplicate detection via `GOOGLECALENDAR_EVENTS_LIST` over the whole window (±30 min, team pair, compatible league), then a payload comparison: an event that already holds exactly what the run would send is `unchanged` and no request is sent at all.
 - Mandatory `## Rationalizations` / `## Red Flags` sections to defend against agent drift.
-- Schema-conformant `evals/evals.json` (39 standard-shape cases passable by any external evaluator).
+- Schema-conformant `evals/evals.json` (43 standard-shape cases passable by any external evaluator).
 
 ## Approved Sources (top-level categories)
 
@@ -269,7 +269,7 @@ Run before each release; every item is checkable without external tooling.
 - [ ] Frontmatter contains `name`, `description`, `category`, and `version`
 - [ ] `description` line is ≤ 1024 chars
 - [ ] Includes `## Rationalizations` and `## Red Flags` sections
-- [ ] Contains at least 3 realistic eval cases in `evals/evals.json` (currently 39)
+- [ ] Contains at least 3 realistic eval cases in `evals/evals.json` (currently 43)
 - [ ] JSON-shape validation passes (`id:int`, `prompt`, `expected_output`, `assertions[]`)
 - [ ] Every assertion needle `"<name>=PASS|FAIL"` appears in its case's `expected_output`
 - [ ] All backtick-wrapped `.md` paths in `SKILL.md` and `README.md` resolve to real files
@@ -278,7 +278,7 @@ Run before each release; every item is checkable without external tooling.
 - [ ] `python3 -m pytest tests/` passes (1169 tests as of runtime Phases 1-5)
 - [ ] `plans/invariants.json` parses and every header carries only `{invariant, rationale, sensor, category}`
 - [ ] `python3 scripts/render_ladder.py --list` shows no AGPL rung with `opt_in=False`
-- [ ] `python3 scripts/upsert_events.py --existing tests/fixtures/upsert_existing.json --candidates tests/fixtures/upsert_candidates.json` reports `create=1 skip=1`
+- [ ] `python3 scripts/upsert_events.py --existing tests/fixtures/upsert_existing.json --candidates tests/fixtures/upsert_candidates.json --now 2026-09-15T08:30:00Z --window-days 7` reports `create=1 skip=1`
 - [ ] `python3 scripts/audit_events.py --events tests/fixtures/audit_events.json --evidence tests/fixtures/audit_evidence.json --now 2026-09-15T08:30:00Z` reports `wrong=1 inconclusive=1`
 - [ ] `python3 scripts/synthesise_eval_case.py --verify` reports every eval case is gradeable
 - [ ] `python3 scripts/candidates.py unseen --ledger tests/fixtures/candidates_ledger.jsonl --fixtures tests/fixtures/league_fixtures.jsonl` reports `unseen=1`

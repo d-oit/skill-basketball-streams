@@ -125,8 +125,10 @@ python3 scripts/extract_candidates.py --transcript .tmp/transcript.json \
 python3 scripts/calendar_io.py list --days 7 --out .tmp/existing.json
 
 # 3. plan in memory -- no API calls at all
+RUN_NOW="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 python3 scripts/upsert_events.py --existing .tmp/existing.json \
-  --candidates .tmp/candidates.json --json > .tmp/plan.json
+  --candidates .tmp/candidates.json --now "$RUN_NOW" --window-days 7 \
+  --json > .tmp/plan.json
 
 # 4. dry run (no token needed), then the real writes
 python3 scripts/calendar_io.py apply --plan .tmp/plan.json --out .tmp/applied.json
@@ -378,7 +380,8 @@ So the planner reads the record itself:
 git fetch --depth=1 origin telemetry
 # ...then, only if the file exists:
 python3 scripts/upsert_events.py --existing .tmp/existing.json \
-  --candidates .tmp/candidates.json --verdicts .tmp/audit.jsonl --json
+  --candidates .tmp/candidates.json --verdicts .tmp/audit.jsonl \
+  --now "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" --window-days 7 --json
 ```
 
 An event whose **newest** verdict is `WRONG` is skipped regardless of its title,
@@ -891,7 +894,7 @@ the permission restriction to the built-in agent, so no generated agent file is 
 | `--list-models` shows `NO opencode cli: exit 1: ...` while `--check-rungs` says `OK rung opencode` | The rung is *configured* (a token is set) but the CLI cannot start — e.g. a package-manager shim that never installed. Presence and usability are different questions; the capture will fail with `no output for case(s) [...]` |
 | `audit` job notices missing inputs | Phase 2 has not written any events yet. It records a notice and does nothing rather than inventing a verdict |
 | `INCONCLUSIVE` every day | Evidence is not being produced. Check the gate scripts emit `live_confirmed`/`free_confirmed`, not just a link status |
-| Duplicate events appear | `scripts/upsert_events.py --existing … --candidates …` will show why. If a club's short and long names differ beyond one being a subset of the other, extend `_team_matches`, not the window |
+| Duplicate events appear | `scripts/upsert_events.py --existing … --candidates … --now "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"` will show why. If a club's short and long names differ beyond one being a subset of the other, extend `_team_matches`, not the window |
 | `unseen` is non-zero | Expected, and the point of Phase 5: games no backend surfaced. Feed them into the search queries rather than lowering a gate |
 | `fixtures.py` returns nothing | A site changed its markup, or carries no JSON-LD. Capture the page as a fixture and add a parser; do **not** loosen the "no match means no fixture" rule |
 | `extract_candidates` rejects everything | The agent did not emit a fenced ```json block. Check the transcript before suspecting the parser |
@@ -915,7 +918,8 @@ python3 scripts/rung_health.py probe --dest .tmp/telemetry \
 python3 scripts/rung_health.py parked --dest .tmp/telemetry --days 3 --markdown
 python3 scripts/verification.py
 python3 scripts/upsert_events.py --existing existing.json \
-  --candidates candidates.json --json
+  --candidates candidates.json --now "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+  --window-days 7 --json
 python3 scripts/audit_events.py --events events.jsonl --evidence evidence.json \
   --out .tmp/telemetry/audit.jsonl --dry-run
 python3 scripts/extract_candidates.py \

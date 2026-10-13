@@ -558,8 +558,8 @@
     },
     {
       "id": 42,
-      "prompt": "Reject an upcoming ProB Sporteurope.TV stream when the current 2026/27 event page gives no free-access statement. A previous season's blanket announcement is not current evidence. Input: url=https://sporteurope.tv/basketball/prob/live/example; title=ProB LIVE; league=ProB; teams=Team North vs Team South; date=2026-10-17T19:00:00+02:00; free_access_evidence=none for this exact game; free_tier=unknown; live_confirmed=True.",
-      "expected_output": "Decision=SKIP; reason=ProB access is not assumed free and the current event has no game-specific free announcement; checks: freeAccess=FAIL, officialSource=PASS, liveContent=PASS",
+      "prompt": "Reject every ProB game from this calendar because ProB is not free of charge. The agent's `free_tier=True` claim cannot override that policy. Input: url=https://sporteurope.tv/basketball/prob/live/example; title=ProB LIVE; league=ProB; teams=Team North vs Team South; date=2026-10-17T19:00:00+02:00; free_access_evidence=https://example.invalid/model-claimed-free; free_tier=True; live_confirmed=True.",
+      "expected_output": "Decision=SKIP; reason=ProB is excluded by the calendar's free-access policy regardless of the candidate's claim; checks: freeAccess=FAIL, officialSource=PASS, liveContent=PASS",
       "assertions": [
         "freeAccess expected FAIL",
         "officialSource expected PASS",
@@ -569,6 +569,20 @@
         "references/validation-workflow.md",
         "references/approved-sources.md",
         "config/sources.json"
+      ]
+    },
+    {
+      "id": 43,
+      "prompt": "Reject a candidate that only asserts free_tier=True and live_confirmed=True but supplies no direct stream URL, official source reference, access wording, validation timestamp, or validation notes. Boolean claims alone do not prove this game's free live broadcast.",
+      "expected_output": "Decision=SKIP; reason=Boolean claims alone do not prove this game's free live broadcast; direct stream URL, official source reference, explicit free-access wording, validation timestamp, and notes are required; checks: freeAccess=FAIL, directStreamVerification=FAIL",
+      "assertions": [
+        "freeAccess expected FAIL",
+        "directStreamVerification expected FAIL"
+      ],
+      "files": [
+        "SKILL.md",
+        "references/validation-workflow.md",
+        "scripts/upsert_events.py"
       ]
     }
   ]

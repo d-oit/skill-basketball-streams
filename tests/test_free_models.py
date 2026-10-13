@@ -24,7 +24,6 @@ recorded in a fixture instead.
 from __future__ import annotations
 
 import json
-import subprocess
 import sys
 from pathlib import Path
 
@@ -33,7 +32,6 @@ import pytest
 from scripts import free_models
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SCRIPT = REPO_ROOT / "scripts" / "free_models.py"
 # Recorded from a real `https://models.dev/api.json` fetch on 2026-09-29,
 # reduced to the three cases that decide the answer: a free id with no suffix,
 # a free id with one, and a paid model.
@@ -198,14 +196,6 @@ class TestItStaysAReport:
 
 
 class TestTheCli:
-    def _run(self, *args: str, catalogue: dict | None = None) -> subprocess.CompletedProcess:
-        return subprocess.run(
-            [sys.executable, str(SCRIPT), *args],
-            capture_output=True,
-            text=True,
-            cwd=REPO_ROOT,
-        )
-
     def test_json_leaves_stdout_as_the_payload_alone(self, monkeypatch, capsys):
         """In-process: `monkeypatch` cannot reach a subprocess.
 
@@ -263,11 +253,15 @@ class TestTheCli:
         assert excinfo.value.code == 1
         assert "no free" in capsys.readouterr().err
 
-    def test_dry_run_is_accepted_and_writes_nothing(self, monkeypatch, tmp_path):
+    def test_dry_run_is_accepted_and_writes_nothing(self, monkeypatch, tmp_path, capsys):
         monkeypatch.setattr(free_models, "fetch_catalogue", lambda *a, **k: CATALOGUE)
-        result = self._run("--dry-run", "--json")
-        assert result.returncode == 0, result.stderr
-        assert json.loads(result.stdout)["free"]
+        monkeypatch.setattr(sys, "argv", ["free_models.py", "--dry-run", "--json"])
+        monkeypatch.chdir(tmp_path)
+        free_models.main()
+        captured = capsys.readouterr()
+        assert json.loads(captured.out)["free"]
+        assert "OK: free_models:" in captured.err
+        assert list(tmp_path.iterdir()) == []
 
 
 class TestTheTableIsSafeToRender:

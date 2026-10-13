@@ -6,7 +6,13 @@
       "start": "2026-09-16T19:00:00+02:00",
       "state": "VERIFIED",
       "summary": "BBL: ALBA Berlin vs FC Bayern Muenchen",
-      "league_color_id": "6"
+      "league_color_id": "6",
+      "directLink": "https://stream.example/live/bbl",
+      "sourceReference": "https://official.example/schedule/bbl",
+      "access": "Free",
+      "validationTimestamp": "2026-09-15T08:00:00Z",
+      "validationNotes": "Official event page confirms free live viewing.",
+      "evidence": {"free_confirmed": true, "live_confirmed": true}
     },
     {
       "league": "Basketball Champions League",
@@ -14,7 +20,13 @@
       "start": "2026-09-17T20:00:00+02:00",
       "state": "UNVERIFIED",
       "summary": "BCL: Lenovo Tenerife vs Telekom Baskets Bonn",
-      "league_color_id": "6"
+      "league_color_id": "6",
+      "directLink": "https://stream.example/live/bcl",
+      "sourceReference": "https://official.example/schedule/bcl",
+      "access": "Free",
+      "validationTimestamp": "2026-09-15T08:00:00Z",
+      "validationNotes": "Official event page confirms free live viewing.",
+      "evidence": {"free_confirmed": true, "live_confirmed": true}
     }
   ]
 }

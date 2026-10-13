@@ -470,6 +470,7 @@ class TestCli:
         assert len(searches) >= 8
         assert any("Regionalliga" in row["query"] for row in searches)
         assert any("NBBL" in row["query"] for row in searches)
+        assert not any("prob" in row["query"].lower() for row in searches)
         assert all(f"&sp={LIVE_SEARCH_SP}" in row["url"] for row in searches)
 
     def test_runtime_fetches_the_prebuilt_live_search_urls(self):

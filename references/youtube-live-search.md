@@ -86,7 +86,7 @@ youtube.com/user/TheDBBTV   youtube.com/@tampa2films
 A live broadcast on an unlisted channel is a new-source **candidate**
 (`scripts/source_learning.py candidates`) — quarantined, shown in the daily
 telemetry summary, and never auto-promoted. This is how new Regionalliga,
-NBBL/JBBL, ProB and club channels can be reviewed without trusting them early.
+NBBL/JBBL and club channels can be reviewed without trusting them early.
 
 ## Canonical queries
 
@@ -95,12 +95,14 @@ NBBL/JBBL, ProB and club channels can be reviewed without trusting them early.
 "EuroLeague live"                 "Basketball Champions League live"
 "FIBA Basketball live"            "NBBL Basketball live stream"
 "JBBL Basketball live stream"     "Basketball Regionalliga live Deutschland"
-"ProB Basketball live stream"     "<club name> live"
+"<club name> live"
 ```
 
 The workflow's complete query set is in `config/youtube-live-queries.json`.
-ProB, Regionalliga, and other unlisted league streams are discovery leads; they
-still need current, event-specific free-access evidence before promotion.
+ProB is excluded from search and calendar eligibility because it is not free of
+charge under this calendar's access policy. Regionalliga and other unlisted
+league streams remain discovery leads and need current, event-specific
+free-access evidence before promotion.
 
 ## Worked example — promote
 

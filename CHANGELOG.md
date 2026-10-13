@@ -5,6 +5,23 @@ All notable changes to `skill-basketball-streams` will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.1] - 2026-10-13
+
+### Fixed
+
+- **Calendar writes now enforce the actual upcoming seven-day window.** The
+  runtime resolves UTC `now` once; the final planner skips candidates at or
+  before that instant, after `now + 7 days`, or without a valid start time.
+- **ProB is excluded from the calendar's free-stream policy.** The planner
+  rejects ProB even when the candidate claims free access, and ProB was removed
+  from the YouTube Live query list. YouTube discovery continues to use only
+  YouTube's Live filter; ordinary YouTube search results are not accepted.
+- **Calendar eligibility now requires source proof, not only model flags.** The
+  extractor preserves direct stream/source links, access wording, validation
+  timestamp and notes. The final planner skips candidates that lack any of
+  those fields or explicit free/live evidence, including a source that says the
+  stream is paid. A regression eval covers boolean-only claims.
+
 ## [1.12.0] - 2026-10-13
 
 ### Added
