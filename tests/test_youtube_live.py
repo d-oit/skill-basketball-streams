@@ -22,6 +22,7 @@ from scripts.youtube_live import (
     DECISION_REJECT,
     DECISION_SCHEDULED,
     LIVE_SEARCH_SP,
+    build_live_searches,
     build_live_search_url,
     classify_stream,
     filter_candidates,
@@ -419,6 +420,18 @@ class TestUrlBuilders:
         assert f"sp={LIVE_SEARCH_SP}" in url
         assert "EuroLeague+live" in url
 
+    def test_query_list_builds_only_live_filtered_searches(self):
+        searches = build_live_searches(
+            ["NBBL Basketball live", "Basketball Regionalliga live"]
+        )
+        assert [row["query"] for row in searches] == [
+            "NBBL Basketball live",
+            "Basketball Regionalliga live",
+        ]
+        assert all(f"&sp={LIVE_SEARCH_SP}" in row["url"] for row in searches)
+        with pytest.raises(ValueError, match="non-empty"):
+            build_live_searches(["BBL live", "  "])
+
 
 def _run(args: list[str]) -> subprocess.CompletedProcess:
     return subprocess.run(
@@ -440,6 +453,38 @@ class TestCli:
         assert "OK: html:" in result.stdout
         assert "OK: api:" not in result.stdout
         assert "key=" not in result.stdout
+
+    def test_configured_queries_write_live_filtered_urls(self, tmp_path):
+        out = tmp_path / "youtube-live-searches.json"
+        result = _run(
+            [
+                "--queries-file",
+                str(REPO_ROOT / "config" / "youtube-live-queries.json"),
+                "--out",
+                str(out),
+            ]
+        )
+        assert result.returncode == 0, result.stderr
+        payload = json.loads(out.read_text(encoding="utf-8"))
+        searches = payload["searches"]
+        assert len(searches) >= 8
+        assert any("Regionalliga" in row["query"] for row in searches)
+        assert any("NBBL" in row["query"] for row in searches)
+        assert all(f"&sp={LIVE_SEARCH_SP}" in row["url"] for row in searches)
+
+    def test_runtime_fetches_the_prebuilt_live_search_urls(self):
+        workflow = (REPO_ROOT / ".github" / "workflows" / "runtime-daily.yml").read_text(
+            encoding="utf-8"
+        )
+        assert "--queries-file config/youtube-live-queries.json" in workflow
+        assert "--file .tmp/youtube-live-searches.json" in workflow
+        prompt = workflow.lower()
+        assert "webfetch on every url in the attached youtube-live-searches.json" in prompt
+        assert "never use generic websearch results to discover youtube streams" in prompt
+        assert "--source-leads-out .tmp/source-leads.json" in workflow
+        assert "source_learning.py record-leads" in workflow
+        assert r'{\"candidates\": [], \"source_leads\": []}' in workflow
+        assert "2026-10-15T18:30:00" not in workflow
 
     def test_promotable_fixture_exits_zero(self, tmp_path):
         fixture = tmp_path / "c.json"

@@ -58,6 +58,10 @@ except ImportError:  # imported as a package module, e.g. scripts.run_daily
 
 DEFAULT_QUERIES = (
     "Basketball Bundesliga live stream heute kostenlos",
+    "ProB Basketball Livestream kostenlos",
+    "NBBL Basketball Livestream",
+    "JBBL Basketball Livestream",
+    "Basketball Regionalliga Livestream kostenlos",
     "EuroLeague live stream free today",
     "Basketball Champions League live kostenlos",
     "MagentaSport kostenlos Basketball live",

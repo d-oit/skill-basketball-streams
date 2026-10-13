@@ -68,16 +68,12 @@ without the `workflows` permission), so a fix that needs a `--agent` flag there
 cannot land. `opencode debug agent build` is the check -- it prints the denied
 permissions, and with no `opencode.json` it prints `*: allow` for everything.
 
-The `model` pin is the other half. The `Create the permission-restricted runtime
-agent` step is `opencode agent create`, an **LLM call** whose default model is a
-paid image/video one; on 2026-10-04 it failed the whole runtime job with "This
-request requires at least $1.00 in balance for image or video output". It must
-then be a free Zen id, and specifically `space-bunny-free`: the other free ids
-(`big-pickle`, `longcat-2.5-preview-free`, `mimo-v2.6-flash-free`) answer
-`FreeTierError: OpenCode's free tier can only be used from within OpenCode` to
-`agent create` even though `opencode run` is served by them. `opencode run` is
-unaffected: the workflow passes `--model "$LLM_MODEL"` explicitly, so the pin
-only decides the generator.
+The `model` field remains a free default for interactive OpenCode use. The
+scheduled workflow passes its resolved model explicitly to `opencode run`, so
+this project default does not choose the scheduled model. The workflow no longer
+calls `opencode agent create`: the project permission block already applies to
+the built-in `build` agent, and the separate agent-generation call failed with
+OpenCode's app-only free-tier error on 2026-10-13.
 
 **`bash` is denied per-command, not disabled.** The obvious, stricter form
 
@@ -853,44 +849,25 @@ Two more rules are worth knowing before you touch this:
 
 ### Which model the agent run uses
 
-`capture_transcripts.py` chooses its model by credential at capture time, and the agent run
-has to choose the same way — a Zen model id as the unconditional default asks the CLI for
-something a Gemini-only or OpenRouter-only repository has no credential for, and the run then
-produces no transcript, which is indistinguishable from a quiet day. `scripts/llm_model.py`
-resolves it in ordinary Python, following the ladder's own order, and both workflow steps read
-`steps.llm.outputs.model` rather than re-deriving it:
+The transcript evaluator's OpenRouter/Gemini ladder is separate from the runtime agent, which
+runs through the OpenCode CLI. `scripts/llm_model.py` resolves the CLI model once:
+`vars.LLM_MODEL` wins when set; otherwise it uses the pinned, free OpenCode model below. The
+CLI probe and skill run read the same `steps.llm.outputs.model` value:
 
 | Situation | Model |
 |---|---|
-| `vars.LLM_MODEL` set | used verbatim — the pin wins over everything below |
-| `OPENROUTER_API_KEY` | `openrouter/openrouter/free` — the free router, first in the ladder (reordered 2026-09-17 by operator decision) |
-| `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) | `google/<gemini id>` — second rung |
-| `OPENCODE_ZEN_API_KEY` | `opencode/big-pickle` — third rung |
+| `vars.LLM_MODEL` set | Used verbatim as the OpenCode `provider/model` id |
+| Pin unset | `opencode/longcat-2.5-preview-free` |
 
 ```bash
 # What would this repository actually run? Reports rung, model and reason.
 python3 scripts/llm_model.py
 ```
 
-Two boundaries are deliberate. It is a **selector, not a gate**: `--check-rungs` is the gate on
-"at least one rung is configured", and duplicating that here would both give the repo two
-answers to one question and break `replay_ci.py`, whose replays strip every `*_API_KEY` by
-design. And a runner authenticated only through `opencode auth login` is **not** detected — it
-reads the environment, not `~/.local/share/opencode/auth.json` — so that case is what the
-`LLM_MODEL` pin is for.
-
-**What is verified about those ids, and what is not.** `opencode` composes a model reference as
-`provider_id/model_id`, and a model whose own id contains a slash therefore produces a
-three-segment reference (`edenai/anthropic/claude-sonnet-5` is the documented example), so
-`openrouter/openrouter/free` is the correct shape for the free router: provider `openrouter`
-(confirmed in OpenCode's provider directory, which also documents adding models under
-`provider.openrouter.models`) plus the slug `openrouter/free` (confirmed in OpenRouter's own
-docs). `opencode/big-pickle` was already the repo's rung-2 id. `google/<id>` for rung 1 is the
-one **unverified** value: OpenCode's provider directory documents *Google Vertex AI* but no
-Google AI Studio entry, and models.dev — which supplies the provider ids — was not reachable
-from here. It is a loud failure rather than a silent one (an unknown provider aborts the CLI,
-and the step also prints the rung, the model and the reason), and `LLM_MODEL` overrides it.
-Confirm with `opencode models` before relying on it.
+The runtime workflow resolves the model before using the CLI. It passes that exact value to
+`opencode run` as a short probe and to the full skill run. The probe tests the selected model
+itself before the workflow reaches calendar planning. The checked-in `opencode.json` applies
+the permission restriction to the built-in agent, so no generated agent file is needed.
 
 ## Recovery runbook
 

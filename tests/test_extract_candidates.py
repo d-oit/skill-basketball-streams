@@ -26,6 +26,7 @@ import pytest
 from scripts.extract_candidates import (
     candidate_objects,
     extract,
+    extract_source_leads,
     json_blocks,
     normalise_candidate,
     transcript_text,
@@ -303,6 +304,27 @@ class TestExtract:
         accepted, _ = extract(json.dumps({"candidates": [CANDIDATE]}))
         assert len(accepted) == 1
 
+    def test_extracts_distinct_http_source_leads_from_the_candidate_block(self):
+        payload = self._wrap(
+            json.dumps(
+                {
+                    "candidates": [CANDIDATE],
+                    "source_leads": [
+                        {"url": "https://www.youtube.com/@regionalliga-live/live", "reason": "official club channel"},
+                        {"url": "https://www.youtube.com/@regionalliga-live/live", "reason": "duplicate"},
+                        {"url": "javascript:alert(1)", "reason": "invalid"},
+                    ],
+                }
+            )
+        )
+        leads = extract_source_leads(payload)
+        assert leads == [
+            {
+                "url": "https://www.youtube.com/@regionalliga-live/live",
+                "reason": "official club channel",
+            }
+        ]
+
 
 def _run(args: list[str]) -> subprocess.CompletedProcess:
     return subprocess.run(
@@ -325,6 +347,33 @@ class TestCli:
         assert result.returncode == 0, result.stderr
         payload = json.loads(out.read_text(encoding="utf-8"))
         assert len(payload["candidates"]) == 1
+
+    def test_source_leads_only_writes_even_when_no_games_were_found(self, tmp_path):
+        transcript = self._write(
+            tmp_path,
+            json.dumps(
+                {
+                    "candidates": [],
+                    "source_leads": [
+                        {"url": "https://www.youtube.com/@regionalliga-live/live"}
+                    ],
+                }
+            ),
+        )
+        out = tmp_path / "source-leads.json"
+        result = _run(
+            [
+                "--transcript",
+                str(transcript),
+                "--source-leads-out",
+                str(out),
+                "--source-leads-only",
+            ]
+        )
+        assert result.returncode == 0, result.stderr
+        assert json.loads(out.read_text(encoding="utf-8"))["leads"] == [
+            {"url": "https://www.youtube.com/@regionalliga-live/live"}
+        ]
 
     def test_json_mode_is_parseable(self, tmp_path):
         transcript = self._write(tmp_path, json.dumps([CANDIDATE]))

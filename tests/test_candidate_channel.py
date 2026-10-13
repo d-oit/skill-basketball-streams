@@ -133,8 +133,8 @@ class TestTheContractIsStatedWhereItIsConsumed:
         assert len(candidate["teams"]) == 2
         assert candidate["state"] in ("VERIFIED", "UNVERIFIED")
 
-    def test_the_prompt_example_is_also_accepted(self):
-        """Same, for the prompt's inline example."""
+    def test_the_prompt_empty_example_is_accepted(self):
+        """The no-results response shown in the prompt parses cleanly."""
         from scripts.extract_candidates import extract
 
         prompt = _agent_prompt()
@@ -144,7 +144,7 @@ class TestTheContractIsStatedWhereItIsConsumed:
         assert example, "the prompt must show the block, not just name it"
         accepted, rejected = extract(example.group(1))
         assert rejected == [], f"the prompt's example is refused: {rejected}"
-        assert len(accepted) == 1
+        assert accepted == []
 
 
 class TestTheChannelIsTheOnlyOneThereIs:

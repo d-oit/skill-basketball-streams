@@ -359,6 +359,26 @@ jobs:
             echo "Recall denominator grows here first; without it no later change can be judged."
           } >> "$GITHUB_STEP_SUMMARY"
 
+          if [ -s .tmp/telemetry/source-candidates.json ]; then
+            python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          payload = json.load(open(".tmp/telemetry/source-candidates.json", encoding="utf-8"))
+          rows = payload.get("candidates", [])
+          print("## Quarantined source leads")
+          print()
+          print("Discovery ideas only; none are auto-approved for calendar use.")
+          print()
+          print("| Channel/domain | Hits | Example URL |")
+          print("|---|---:|---|")
+          for row in rows:
+              label = row.get("channel") or row.get("domain", "unknown")
+              example = (row.get("examples") or [""])[0].replace("`", "'")
+              print(f"| `{label}` | {row.get('hits', 0)} | `{example}` |")
+          PY
+          else
+            echo "No unapproved domains or YouTube channels were found this run." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
           # Reuse the renderer rather than reformatting the snapshot here: two
           # formatters for one artifact drift, and the misleading one wins.
           if [ -f .tmp/telemetry/metrics.json ]; then
@@ -504,12 +524,24 @@ jobs:
           python3 scripts/capture_transcripts.py --check-rungs
           python3 scripts/capture_transcripts.py --list-models
 
-      # Zero-token proof that the installed CLI can start and reach a model,
-      # before anything depends on it. A broken CLI is then reported here with
-      # its own message rather than as a failed skill run 40 seconds later.
-      #
-      # The prompt precedes `--file` because in 1.18.33 `--file` is an array;
-      # here there is one flag, so the ordering only documents the rule.
+      # ONE decision, in tested Python, of which model the run below uses.
+      # The CLI probe and skill run receive this exact resolved model.
+      - name: Resolve the model
+        id: llm
+        env:
+          LLM_MODEL: ${{ vars.LLM_MODEL }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python3 scripts/llm_model.py >> "$GITHUB_OUTPUT"
+
+      # Prove the exact model selected above before starting the skill. A
+      # broken CLI or model is reported here directly.
       - name: Confirm the opencode CLI can run a model
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -519,13 +551,14 @@ jobs:
           ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          LLM_MODEL: ${{ steps.llm.outputs.model }}
         run: |
           set -o pipefail
-          opencode run --model opencode/big-pickle --format json \
+          opencode run --model "$LLM_MODEL" --format json \
             "Reply with exactly: OK" \
             | tee /tmp/opencode-check.json \
             | grep -q '"text":"OK"' \
-            || { echo "::error::the opencode CLI could not serve a model — see the log above"; exit 1; }
+            || { echo "::error::the opencode CLI could not serve resolved model $LLM_MODEL — see the log above"; exit 1; }
 
       # **There is no long-lived backend, and that is the fix.**
       #
@@ -547,59 +580,12 @@ jobs:
       # exits with the answer. The cost is one boot per run; the benefit is a
       # step that cannot outlive its job.
 
-      # ONE decision, in tested Python, of which model the run below uses.
-      #
-      # This replaced `LLM_MODEL: ${{ vars.LLM_MODEL || 'opencode/big-pickle' }}`,
-      # which named a Zen model unconditionally: a repository holding a Gemini or
-      # an OpenRouter key and no Zen key is correctly configured (`--check-rungs`
-      # passes for it), yet the run asked the CLI for a model it had no
-      # credential for and produced no transcript — indistinguishable from a
-      # quiet day. Which rung serves is a fact about the credentials that are
-      # set, so it cannot be a workflow literal; and a decision written as an
-      # unexpanded workflow expression cannot be tested. See scripts/llm_model.py.
-      #
-      # The credential list here is deliberately the same one `--check-rungs`
-      # considers, including the CLI's own providers: if the resolver saw a
-      # narrower set than the gate, the two would disagree about what
-      # "configured" means.
-      - name: Resolve the model
-        id: llm
-        env:
-          LLM_MODEL: ${{ vars.LLM_MODEL }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-        run: |
-          python3 scripts/llm_model.py >> "$GITHUB_OUTPUT"
-
-      # Security control: the calendar-writing agent must NOT be able to edit
-      # SKILL.md, references/ or the gate scripts mid-run. `edit` and `bash` are
-      # omitted, and anything omitted is denied.
-      # `agent create` **generates** the agent with a model, so it needs the
-      # credentials too. It had no `env:` block, and a step that cannot reach a
-      # model fails with whatever the CLI's default provider says — which is how
-      # this job spent a week reporting a credential fault that was a missing
-      # `env:` three steps earlier.
-      - name: Create the permission-restricted runtime agent
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-        run: |
-          set -o pipefail
-          opencode agent create \
-            --path .opencode/agent \
-            --description "Basketball streams runtime: read-only research, calendar writer" \
-            --mode primary \
-            --permissions read,glob,grep,webfetch,websearch,skill
+      # Security control: the checked-in opencode.json denies editing and all
+      # shell commands other than the inert "true" command for every agent,
+      # including the built-in `build` agent this run selects. Generating a
+      # primary agent per run is unnecessary, and its separate provider call
+      # failed with OpenCode's app-only free-tier error on 2026-10-13. The
+      # config's effective permissions are pinned by tests/test_runtime_agent.py.
 
       # A local rendering rung, because the hosted one cannot read this page.
       #
@@ -651,6 +637,9 @@ jobs:
           # `if-no-files-found: ignore` hid that: the run was failing to record a
           # transcript while looking like a quiet day.
           mkdir -p .tmp
+          python3 scripts/youtube_live.py \
+            --queries-file config/youtube-live-queries.json \
+            --out .tmp/youtube-live-searches.json
           # The prompt comes **before** the `--file` flags, and that is not
           # style. In opencode 1.18.33 `--file` is declared as an *array*, so it
           # swallows every following token: with the prompt last, the CLI read
@@ -685,16 +674,19 @@ jobs:
             --model "$LLM_MODEL" --format json \
             "Execute Steps 1-7 for today (Europe/Berlin). DRY_RUN=$DRY_RUN. Emit the Step 7 table.
 
+            YouTube discovery must use webfetch on every URL in the attached youtube-live-searches.json. Each URL already has YouTube's Live filter (sp=EgJAAQ%3D%3D). Never use generic websearch results to discover YouTube streams, and never fetch a YouTube results URL without that exact Live filter. New YouTube handles and other unapproved source URLs are quarantined source leads unless already approved. Do not omit source_leads from the final JSON: add it beside candidates and use [] when no new sources were found.
+
             You are also the ONLY channel the planner has. The runtime agent is denied 'edit' and 'bash', so it cannot write a file, and scripts/extract_candidates.py reads the final answer out of your transcript. It accepts a fenced \`\`\`json block and NOTHING else - a markdown table, prose, or a tool result are all invisible to it.
 
             So end your reply with exactly this, after the table:
 
             \`\`\`json
-            {\"candidates\": [{\"league\": \"BBL\", \"teams\": [\"ALBA BERLIN\", \"BMA365 Bamberg Baskets\"], \"start\": \"2026-10-03T18:30:00+02:00\", \"state\": \"VERIFIED\", \"summary\": \"BBL: ALBA BERLIN vs BMA365 Bamberg Baskets\", \"url\": \"<the directLink you stored>\", \"evidence\": {\"free_confirmed\": true, \"live_confirmed\": true}}]}
+            {\"candidates\": [], \"source_leads\": []}
             \`\`\`
 
-            Rules that are refused rather than repaired: exactly two teams, a start that parses as an ISO-8601 datetime, and a state of VERIFIED or UNVERIFIED - 'WRONG' is an audit verdict, never a proposal. One entry per game you decided to store, including the ones already on the calendar. If you found nothing, emit exactly {\"candidates\": []} - an empty array, not an omitted block, because a missing block is what a failed run looks like." \
+            Rules that are refused rather than repaired: exactly two teams, a start that parses as an ISO-8601 datetime, and a state of VERIFIED or UNVERIFIED - 'WRONG' is an audit verdict, never a proposal. One entry per game you decided to store, including the ones already on the calendar. If you found nothing, emit exactly {\"candidates\": [], \"source_leads\": []} - an empty array, not an omitted block, because a missing block is what a failed run looks like." \
             --file SKILL.md \
+            --file .tmp/youtube-live-searches.json \
             --file references/validation-workflow.md \
             --file references/youtube-live-search.md \
             --file references/magenta-tv.md \
@@ -706,6 +698,19 @@ jobs:
             --file references/implementation-notes.md \
             --file config/sources.json --file config/calendar.json \
             | tee .tmp/transcript.json
+
+      - name: Extract source leads from runtime research
+        if: always()
+        run: |
+          if [ -f .tmp/transcript.json ]; then
+            python3 scripts/extract_candidates.py \
+              --transcript .tmp/transcript.json \
+              --source-leads-out .tmp/source-leads.json \
+              --source-leads-only
+          else
+            echo "::notice::No runtime transcript was written, so there are no source leads to record."
+            python3 -c "import json,pathlib;pathlib.Path('.tmp/source-leads.json').write_text(json.dumps({'leads': []}) + '\\n', encoding='utf-8')"
+          fi
 
       # ── The write path. Ordered, and each step is inspectable on its own. ──
       # 1. Read the calendar FIRST (dedupe-before-write is a safety property,
@@ -1038,6 +1043,7 @@ jobs:
             .tmp/evidence.json
             .tmp/outcomes.jsonl
             .tmp/calendar-log.jsonl
+            .tmp/source-leads.json
           if-no-files-found: ignore
           retention-days: 30
 
@@ -1138,6 +1144,21 @@ jobs:
         with:
           name: run-ledger
           path: .tmp/telemetry
+
+      - name: Learn from newly discovered source leads
+        if: always()
+        run: |
+          if [ -f .tmp/telemetry/source-leads.json ]; then
+            python3 scripts/source_learning.py record-leads \
+              --input .tmp/telemetry/source-leads.json \
+              --root . --dest .tmp/telemetry \
+              --run-id "$(date -u +%Y-%m-%dT%H:%MZ)"
+            python3 scripts/source_learning.py candidates \
+              --root . --dest .tmp/telemetry \
+              --out .tmp/telemetry/source-candidates.json
+          else
+            echo "OK: no runtime source-leads artifact (the runtime did not complete)."
+          fi
 
       # `calendar-log.jsonl` is append-only across runs, and the download above
       # **overwrites** a file that already exists — so on its own it would
@@ -1281,6 +1302,26 @@ jobs:
             echo ""
             echo "A \`WRONG\` verdict relabels an event; it never deletes one. Fix the gate on the self-improvement branch, never the event."
           } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -s .tmp/telemetry/source-candidates.json ]; then
+            python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          payload = json.load(open(".tmp/telemetry/source-candidates.json", encoding="utf-8"))
+          rows = payload.get("candidates", [])
+          print("## Quarantined source leads")
+          print()
+          print("These are review suggestions only; the workflow does not auto-approve them.")
+          print()
+          print("| Channel/domain | Hits | Example URL |")
+          print("|---|---:|---|")
+          for row in rows:
+              label = row.get("channel") or row.get("domain", "unknown")
+              example = (row.get("examples") or [""])[0].replace("`", "'")
+              print(f"| `{label}` | {row.get('hits', 0)} | `{example}` |")
+          PY
+          else
+            echo "No quarantined source leads are currently recorded." >> "$GITHUB_STEP_SUMMARY"
+          fi
 
   # ---------------------------------------------------------------------------
   # §18.4's other half: a rung parked for N consecutive days raises an issue.

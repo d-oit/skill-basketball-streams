@@ -19,8 +19,12 @@ come from the backends below.
 | **Firecrawl** | 1,000 credits/month, no card; keyless mode (no API key) for search + scrape | **Yes** (`waitFor`, `onlyMainContent`) | `firecrawl-mcp` | Rendering `magenta.tv` and other SPAs; the paid-plan escape hatch for anti-bot pages |
 | **Tavily** | 1,000 credits/month, no card | via `extract` | `tavily-mcp` | `/search`, `/extract`, `/crawl` for announcement pages |
 | **Exa** | MCP server is **free, keyless, rate-limited** (`https://mcp.exa.ai/mcp`); sign-up adds $20 credits (~2,800 searches) | `search_and_contents` returns page text | `exa-mcp-server`; hosted `mcp.exa.ai/mcp` | Semantic discovery of unindexed dynamic slugs; the keyless rung is Phase 0's zero-secret default |
-| **YouTube Data API v3** | 10,000 units/day; `search.list` = 100 units (~100 live searches/day) | n/a | — | `eventType=live` live-only search (see `references/youtube-live-search.md`) |
 | **Composio (Google Calendar toolkit)** | Free Hobby tier, 100K tool calls/month | n/a | Composio's own MCP server | Reading and writing the events — no Google Cloud project, no service account |
+
+YouTube live discovery is separate from this search ladder: the workflow builds
+keyless URLs carrying YouTube's `sp=EgJAAQ%3D%3D` Live filter, then fetches those
+URLs directly. Do not use generic web search or the Data API for YouTube stream
+discovery; see `references/youtube-live-search.md`.
 
 The implemented search ladder is `run_daily.py`'s `LADDER`, and it is the truth:
 
@@ -28,7 +32,7 @@ The implemented search ladder is `run_daily.py`'s `LADDER`, and it is the truth:
 
 i.e. paid Exa → keyless Exa → TinyFish → headless render. The table above lists
 the backends an *agent runtime* may also call, which is a different list: it
-includes YouTube Data API and Composio (neither is a search rung) and Firecrawl,
+includes Composio (not a search rung) and Firecrawl,
 which `run_daily.py` has no backend for — `render_ladder.py` uses Firecrawl as a
 **fetch/render** rung (`firecrawl`, `tinyfish`, `curl_cffi`, `patchright`,
 `urllib`), not as a Phase 0 search step.

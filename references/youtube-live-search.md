@@ -9,7 +9,7 @@ Implementation: `scripts/youtube_live.py` (`classify_stream`,
 `filter_candidates`, `build_live_search_url`).
 Eval cases 21–24 in `evals/evals.json` pin this behaviour.
 
-## The search entry point: HTML live filter — no API key, no quota
+## The search entry point: YouTube's Live filter
 
 Append YouTube's "Live" search filter to a results URL:
 
@@ -21,31 +21,30 @@ https://www.youtube.com/results?search_query=<query>&sp=EgJAAQ%3D%3D
 contains only live-now and upcoming broadcasts. Build it with
 `build_live_search_url(query)` — never hand-assemble the URL.
 
-**The Data API v3 entry point was removed.** It was documented here and built by
-`build_api_live_search_url()`, and `YOUTUBE_API_KEY` was a rehearsal surface, but
-nothing ever *fetched* the URL it produced: the only callers were `--print-urls`
-and a test asserting the string. YouTube is reached through the agent's
-`youtubeLiveSearch` tool, and this keyless filter is the whole search path. The
-field-mapping table below still carries the API v3 column, because the agent
-normalises whatever a search returns — that mapping is about the *payload*, not
-about a credential this repository never used.
+The daily GitHub workflow generates the query URLs from
+`config/youtube-live-queries.json`, attaches them to the runtime, and instructs
+it to call `webfetch` on every URL. Interactive runs use the `youtubeLiveSearch`
+tool. **Never use generic `webSearch` results or the YouTube Data API for stream
+discovery.** A YouTube results URL without the exact Live filter is not an
+acceptable search input.
 
 ## Field mapping (raw payload → candidate schema)
 
-| Candidate key | HTML (`ytInitialData`) | API v3 response |
-|---|---|---|
-| `url` | `videoRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url` → prefix `https://www.youtube.com` | `https://www.youtube.com/watch?v=` + `items[].id.videoId` |
-| `video_id` | `videoRenderer.videoId` | `items[].id.videoId` |
-| `title` | `videoRenderer.title.runs[0].text` | `items[].snippet.title` |
-| `channel` | `videoRenderer.ownerText.runs[0].text` | `items[].snippet.channelTitle` |
-| `live_broadcast_content` | `videoRenderer.badges[].metadataBadgeRenderer.label` (`LIVE`/`UPCOMING`) | `items[].snippet.liveBroadcastContent` |
-| `is_live_now` | `liveBroadcastDetails.isLiveNow` (page) | `videos.list?part=liveStreamingDetails` → `liveStreamingDetails.concurrentViewers` present |
-| `scheduled_start` | `liveBroadcastDetails.startTimestamp` | `liveStreamingDetails.scheduledStartTime` |
-| `actual_start` / `actual_end` | `liveBroadcastDetails.startTimestamp` / page `actualEndTime` | `liveStreamingDetails.actualStartTime` / `actualEndTime` |
-| `duration_seconds` | `videoRenderer.lengthText` (only present for VODs) | `videos.list?part=contentDetails` → `contentDetails.duration` |
+| Candidate key | Live-filtered result/page field |
+|---|---|
+| `url` | `videoRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url` → prefix `https://www.youtube.com` |
+| `video_id` | `videoRenderer.videoId` |
+| `title` | `videoRenderer.title.runs[0].text` |
+| `channel` | `videoRenderer.ownerText.runs[0].text` |
+| `live_broadcast_content` | `videoRenderer.badges[].metadataBadgeRenderer.label` (`LIVE`/`UPCOMING`) |
+| `is_live_now` | `liveBroadcastDetails.isLiveNow` (page) |
+| `scheduled_start` | `liveBroadcastDetails.startTimestamp` |
+| `actual_start` / `actual_end` | `liveBroadcastDetails.startTimestamp` / page `actualEndTime` |
+| `duration_seconds` | `videoRenderer.lengthText` (only present for VODs) |
 
-`liveStreamingDetails` requires a **second** call (`videos.list`, 1 unit) — cheap
-and worth it: `actualEndTime` is the single most reliable "this is over" signal.
+Open the result page when the search result does not expose a scheduled start or
+end state. A missing start time is not evidence that an upcoming stream is
+future-dated; reject it.
 
 ## The gate (all must hold)
 
@@ -85,25 +84,32 @@ youtube.com/user/TheDBBTV   youtube.com/@tampa2films
 ```
 
 A live broadcast on an unlisted channel is a new-source **candidate**
-(`scripts/source_learning.py candidates`) — quarantined, never auto-promoted.
+(`scripts/source_learning.py candidates`) — quarantined, shown in the daily
+telemetry summary, and never auto-promoted. This is how new Regionalliga,
+NBBL/JBBL, ProB and club channels can be reviewed without trusting them early.
 
 ## Canonical queries
 
 ```
 "<team1> vs <team2> live"         "BBL live heute"
 "EuroLeague live"                 "Basketball Champions League live"
-"FIBA Basketball live"            "ProA Basketball live stream"
-"<club name> live"                "DBB live"
+"FIBA Basketball live"            "NBBL Basketball live stream"
+"JBBL Basketball live stream"     "Basketball Regionalliga live Deutschland"
+"ProB Basketball live stream"     "<club name> live"
 ```
+
+The workflow's complete query set is in `config/youtube-live-queries.json`.
+ProB, Regionalliga, and other unlisted league streams are discovery leads; they
+still need current, event-specific free-access evidence before promotion.
 
 ## Worked example — promote
 
 ```
 candidate: {"url": "https://www.youtube.com/@EuroLeague/live",
             "live_broadcast_content": "upcoming",
-            "scheduled_start": "2026-09-16T20:30:00+02:00"}
-now:       2026-09-14T09:00:00Z
--> SCHEDULED: scheduled live broadcast starts 2026-09-16T20:30:00+02:00
+            "scheduled_start": "2026-10-15T20:30:00+02:00"}
+now:       2026-10-13T09:00:00Z
+-> SCHEDULED: scheduled live broadcast starts 2026-10-15T20:30:00+02:00
    (greater than now)  -> continue to Check 1
 ```
 
@@ -121,14 +127,14 @@ now:       2026-09-14T09:00:00Z
 ```
 candidate: {"url": "https://www.youtube.com/live/abc123",
             "is_live_content": true,
-            "actual_end": "2026-09-13T22:05:00Z"}
--> REJECT: broadcast already ended (2026-09-13T22:05:00+00:00) — archived live
+            "actual_end": "2026-10-12T22:05:00Z"}
+-> REJECT: broadcast already ended (2026-10-12T22:05:00+00:00) — archived live
 ```
 
 ```
 candidate: {"url": "https://www.youtube.com/@fiba/live",
             "live_broadcast_content": "upcoming",
-            "scheduled_start": "2026-09-14T07:00:00Z"}
-now:       2026-09-14T09:00:00Z
--> REJECT: scheduled start 2026-09-14T07:00:00+00:00 is not greater than now
+            "scheduled_start": "2026-10-13T07:00:00Z"}
+now:       2026-10-13T09:00:00Z
+-> REJECT: scheduled start 2026-10-13T07:00:00+00:00 is not greater than now
 ```
