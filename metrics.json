@@ -741,8 +741,8 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 10200,
-    "unique_games": 928,
+    "rows": 10201,
+    "unique_games": 929,
     "unverifiable": 662,
     "unverifiable_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
@@ -1409,30 +1409,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-10-14T13:56Z",
+  "run_id": "",
   "source": {
     "audit_rows": 0,
-    "candidates_rows": 10200,
+    "candidates_rows": 10201,
     "fixtures_rows": 54
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 115,
-      "missed": 115,
-      "recall": 0.0,
-      "rows": 204,
-      "run_id": "2026-10-07T15:40Z",
-      "unique_games": 180
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -1653,7 +1636,24 @@
       "rows": 221,
       "run_id": "2026-10-14T13:54Z",
       "unique_games": 196
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 1,
+      "run_id": "2026-10-14T14:04Z",
+      "unique_games": 1
     }
   ],
-  "ts": "2026-10-14T13:56:37.514276+00:00"
+  "ts": "2026-10-14T14:04:44.037893+00:00"
 }
