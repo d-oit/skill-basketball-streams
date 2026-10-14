@@ -88,10 +88,15 @@ jobs:
 
       - name: Check out the telemetry branch as a worktree
         run: |
-          git fetch origin telemetry || echo "telemetry branch does not exist yet"
-          if git show-ref --verify --quiet refs/remotes/origin/telemetry; then
+          if git ls-remote --exit-code --heads origin telemetry >/dev/null; then
+            git fetch origin telemetry
             git worktree add .tmp/telemetry -B telemetry origin/telemetry
           else
+            status=$?
+            if [ "$status" -ne 2 ]; then
+              exit "$status"
+            fi
+            echo "::notice::telemetry branch does not exist yet; initializing it"
             git worktree add --orphan -b telemetry .tmp/telemetry
           fi
           mkdir -p .tmp/telemetry
@@ -217,10 +222,15 @@ jobs:
 
       - name: Check out the telemetry branch as a worktree
         run: |
-          git fetch origin telemetry || echo "telemetry branch does not exist yet"
-          if git show-ref --verify --quiet refs/remotes/origin/telemetry; then
+          if git ls-remote --exit-code --heads origin telemetry >/dev/null; then
+            git fetch origin telemetry
             git worktree add .tmp/telemetry -B telemetry origin/telemetry
           else
+            status=$?
+            if [ "$status" -ne 2 ]; then
+              exit "$status"
+            fi
+            echo "::notice::telemetry branch does not exist yet; initializing it"
             git worktree add --orphan -b telemetry .tmp/telemetry
           fi
           mkdir -p .tmp/telemetry
@@ -276,9 +286,6 @@ jobs:
           else
             echo "OK: no fetch ledger written this run"
           fi
-
-      - name: Recall report
-        run: python3 scripts/candidates.py --ledger .tmp/telemetry/candidates.jsonl recall || true
 
       # Derived snapshot: regenerable from the JSONL streams, so it is rewritten
       # every run. Written AFTER the fixtures so fixture_recall reflects the
@@ -740,8 +747,6 @@ jobs:
           # The runtime agent is deliberately denied `edit` and `bash`, so it
           # cannot write this file itself — the transcript is the channel, and
           # the extraction contract is enforced below rather than assumed.
-          python3 scripts/capture_transcripts.py --runner replay \
-            --from .tmp/transcript.json --check >/dev/null 2>&1 || true
           python3 scripts/extract_candidates.py \
             --transcript .tmp/transcript.json --out .tmp/candidates.json
 
@@ -764,8 +769,16 @@ jobs:
         if: vars.ENABLE_CALENDAR_WRITES == 'true'
         run: |
           mkdir -p .tmp
-          if git fetch --depth=1 origin telemetry 2>/dev/null; then
-            git show origin/telemetry:audit.jsonl > .tmp/audit.jsonl 2>/dev/null || true
+          if git ls-remote --exit-code --heads origin telemetry >/dev/null; then
+            git fetch --depth=1 origin telemetry
+            if git cat-file -e origin/telemetry:audit.jsonl 2>/dev/null; then
+              git show origin/telemetry:audit.jsonl > .tmp/audit.jsonl
+            fi
+          else
+            status=$?
+            if [ "$status" -ne 2 ]; then
+              exit "$status"
+            fi
           fi
           if [ -s .tmp/audit.jsonl ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
@@ -1157,10 +1170,15 @@ jobs:
 
       - name: Check out the telemetry branch as a worktree
         run: |
-          git fetch origin telemetry || echo "telemetry branch does not exist yet"
-          if git show-ref --verify --quiet refs/remotes/origin/telemetry; then
+          if git ls-remote --exit-code --heads origin telemetry >/dev/null; then
+            git fetch origin telemetry
             git worktree add .tmp/telemetry -B telemetry origin/telemetry
           else
+            status=$?
+            if [ "$status" -ne 2 ]; then
+              exit "$status"
+            fi
+            echo "::notice::telemetry branch does not exist yet; initializing it"
             git worktree add --orphan -b telemetry .tmp/telemetry
           fi
           mkdir -p .tmp/telemetry
@@ -1239,11 +1257,22 @@ jobs:
         run: |
           # Exit 1 means every event was INCONCLUSIVE — a real signal, not an
           # error, so it must not red the workflow.
+          audit_status=0
           python3 scripts/audit_events.py \
             --events .tmp/telemetry/events.jsonl \
             --evidence .tmp/telemetry/evidence.json \
             --out .tmp/telemetry/audit.jsonl \
-            --run-id "$(date -u +%Y-%m-%dT%H:%MZ)" || true
+            --run-id "$(date -u +%Y-%m-%dT%H:%MZ)" \
+            > .tmp/audit-events.log 2>&1 || audit_status=$?
+          cat .tmp/audit-events.log
+          if [ "$audit_status" -ne 0 ]; then
+            if [ "$audit_status" -eq 1 ] \
+              && grep -q '^FAIL: audit_events: no actionable verdicts ' .tmp/audit-events.log; then
+              echo "::notice::Audit completed without an actionable verdict; all events were inconclusive."
+            else
+              exit "$audit_status"
+            fi
+          fi
 
       # The other half of the recall seam, and the only place the ledger can
       # grow: `candidates.jsonl` already exists in this worktree (Phase 0
@@ -1277,13 +1306,6 @@ jobs:
           # rather than left describing a ledger without its numerator. Phase 0
           # already wrote it; this run changed the input it is derived from.
           python3 scripts/metrics.py --dest .tmp/telemetry || echo "::warning::metrics snapshot failed"
-
-      - name: Recall report
-        if: always()
-        run: |
-          if [ -f .tmp/telemetry/candidates.jsonl ]; then
-            python3 scripts/candidates.py --ledger .tmp/telemetry/candidates.jsonl recall || true
-          fi
 
       # Gated on EITHER producer, not on the audit's inputs alone: before the
       # recall seam this step's condition was the only thing deciding whether a
@@ -1386,11 +1408,15 @@ jobs:
       - name: Check out the telemetry branch (read-only)
         id: ledger
         run: |
-          git fetch origin telemetry || echo "telemetry branch does not exist yet"
-          if git show-ref --verify --quiet refs/remotes/origin/telemetry; then
+          if git ls-remote --exit-code --heads origin telemetry >/dev/null; then
+            git fetch origin telemetry
             git worktree add .tmp/telemetry origin/telemetry
             echo "ready=true" >> "$GITHUB_OUTPUT"
           else
+            status=$?
+            if [ "$status" -ne 2 ]; then
+              exit "$status"
+            fi
             echo "ready=false" >> "$GITHUB_OUTPUT"
             echo "::notice::No telemetry branch yet, so there is no rung ledger to read."
           fi

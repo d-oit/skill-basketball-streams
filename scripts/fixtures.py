@@ -232,6 +232,25 @@ def event_to_fixture(
 
 WANTED_ITEMPROPS = ("name", "startDate", "endDate")
 
+_HTML_VOID_ELEMENTS = frozenset(
+    {
+        "area",
+        "base",
+        "br",
+        "col",
+        "embed",
+        "hr",
+        "img",
+        "input",
+        "link",
+        "meta",
+        "param",
+        "source",
+        "track",
+        "wbr",
+    }
+)
+
 
 class _MicrodataEvents(HTMLParser):
     """Fallback extractor for `itemtype="...SportsEvent"` microdata.
@@ -268,7 +287,9 @@ class _MicrodataEvents(HTMLParser):
             self.pending = (len(self.open_events) - 1, prop)
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        self.depth += 1
+        # Void elements have no end tag to balance a depth increment.
+        if tag.lower() not in _HTML_VOID_ELEMENTS:
+            self.depth += 1
         self._start({key: (value or "") for key, value in attrs})
 
     def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
@@ -276,6 +297,9 @@ class _MicrodataEvents(HTMLParser):
         self._start({key: (value or "") for key, value in attrs})
 
     def handle_endtag(self, tag: str) -> None:
+        # Invalid closing tags for void elements cannot close their parents.
+        if tag.lower() in _HTML_VOID_ELEMENTS:
+            return
         while self.open_events and self.open_events[-1]["depth"] >= self.depth:
             self.events.append(self.open_events.pop())
         self.depth = max(0, self.depth - 1)

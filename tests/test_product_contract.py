@@ -137,13 +137,14 @@ class TestTheBoardMatchesTheCommittedExport:
         assert {k: int(v) for k, v in data["summary"].items()} == counted
 
     def test_a_stale_status_is_detected(self):
-        """The defect the fixture carries: one row's status moves, the export
-        does not. Shown at the parser level so the assertion names the row."""
+        """The defect fixture is checked against its matching clean export,
+        independently of task statuses in the live repository."""
         board = (DEFECTS / "bad_tasks.md").read_text(encoding="utf-8")
+        clean_export = json.loads(
+            (CLEAN / "plans" / "tasks.json").read_text(encoding="utf-8")
+        )
         assert _task_rows(board)[1][1] == "done"
-        assert json.loads(TASKS_JSON.read_text(encoding="utf-8"))["tasks"][0][
-            "status"
-        ] == "pending"
+        assert clean_export["tasks"][0]["status"] == "pending"
 
 
 # --------------------------------------------------------------------------

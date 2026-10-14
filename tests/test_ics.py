@@ -235,6 +235,33 @@ class TestParseFeed:
         keys = [r["game_key"] for r in _parse()]
         assert not any("2026-10-05" in k for k in keys)
 
+    @pytest.mark.parametrize("start_line", [None, "DTSTART:not-a-date"])
+    def test_event_without_usable_dtstart_is_dropped(self, start_line):
+        lines = ["BEGIN:VCALENDAR", "BEGIN:VEVENT"]
+        if start_line is not None:
+            lines.append(start_line)
+        lines.extend(
+            [
+                "SUMMARY:ALBA BERLIN vs FC Bayern Muenchen",
+                "END:VEVENT",
+                "END:VCALENDAR",
+            ]
+        )
+        assert _parse("\r\n".join(lines)) == []
+
+    def test_event_without_a_team_pair_is_dropped(self):
+        feed = "\r\n".join(
+            [
+                "BEGIN:VCALENDAR",
+                "BEGIN:VEVENT",
+                "DTSTART:20261001T190000",
+                "SUMMARY:ALBA BERLIN",
+                "END:VEVENT",
+                "END:VCALENDAR",
+            ]
+        )
+        assert _parse(feed) == []
+
     def test_a_cancelled_event_is_dropped(self):
         # A cancelled game will not be played, so no stream can exist for it, and
         # counting it as ground truth reports a miss on every run for ever.

@@ -1,27 +1,27 @@
 {
-  "exported_at": 1790795849,
+  "exported_at": 1791970460,
   "tasks": [
     {
       "id": 1,
       "parent_id": null,
       "title": "Phase 5 fixture parsing",
-      "method": null,
-      "subtask_index": 0,
-      "status": "pending",
-      "precondition": null,
+      "method": "add-source-reader",
+      "subtask_index": 5,
+      "status": "done",
+      "precondition": "Microdata-only pages with a non-div SportsEvent container still produce the existing fixture shape, and repeated --out runs do not duplicate game_keys.",
       "created_at": 1789402377,
-      "updated_at": 1789402377
+      "updated_at": 1791970460
     },
     {
       "id": 2,
       "parent_id": null,
       "title": "Add an iCalendar (RFC 5545) parser so fixture ground truth can come from a feed instead of a page",
-      "method": null,
-      "subtask_index": 0,
-      "status": "pending",
+      "method": "add-source-reader",
+      "subtask_index": 5,
+      "status": "done",
       "precondition": "parse_ics emits the same fixture/game_key shape as parse_page, so a feed row joins the ledger; a VEVENT with no usable DTSTART or no team pair is dropped, never guessed",
       "created_at": 1790793252,
-      "updated_at": 1790793252
+      "updated_at": 1791961200
     },
     {
       "id": 3,
@@ -58,9 +58,9 @@
     }
   ],
   "summary": {
-    "pending": 2,
+    "pending": 0,
     "in_progress": 0,
-    "done": 1,
+    "done": 3,
     "failed": 2
   }
 }

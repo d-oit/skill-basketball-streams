@@ -5,6 +5,21 @@ All notable changes to `skill-basketball-streams` will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **HTML void tags no longer extend microdata event scope.** A bare `<meta>`
+  inside a `SportsEvent` cannot leave the event open and borrow a later
+  `time[itemprop="startDate"]`, which previously created a phantom fixture.
+- **GitHub telemetry workflows now distinguish expected empty states from
+  failures.** An absent telemetry branch is handled explicitly; fetch errors,
+  malformed audit inputs, and failed red-gate issue creation remain visible.
+  The runtime also drops the incompatible raw-transcript eval replay check and
+  duplicate recall reports.
+  Self-improvement also passes generated case selectors as a quoted argument
+  array.
+
 ## [1.12.1] - 2026-10-13
 
 ### Fixed

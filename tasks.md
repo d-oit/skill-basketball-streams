@@ -11,12 +11,12 @@ the `Totals:` line below to match. `scripts/check_product_contract.py` (the
 `product-contract` sensor) fails if any id, title or status disagrees with
 `plans/tasks.json`, or if the totals disagree with the export's `summary`.
 
-Totals: pending=2 in_progress=0 done=1 failed=2
+Totals: pending=0 in_progress=0 done=3 failed=2
 
 | id | title | status |
 | --- | --- | --- |
-| 1 | Phase 5 fixture parsing | pending |
-| 2 | Add an iCalendar (RFC 5545) parser so fixture ground truth can come from a feed instead of a page | pending |
+| 1 | Phase 5 fixture parsing | done |
+| 2 | Add an iCalendar (RFC 5545) parser so fixture ground truth can come from a feed instead of a page | done |
 | 3 | schema probe | failed |
 | 4 | schema probe | failed |
 | 5 | Discover the official BBL iCalendar feed URL and pin it so BBL contributes fixtures | done |

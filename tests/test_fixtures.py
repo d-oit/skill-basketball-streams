@@ -360,6 +360,30 @@ class TestParsePage:
         assert len(found) == 1
         assert found[0]["source_url"] == BBL["url"]
 
+    def test_falls_back_to_microdata_in_non_div_container(self):
+        html = (
+            '<article itemscope itemtype="https://schema.org/SportsEvent">'
+            '<div><span itemprop="name">A - B</span></div>'
+            '<time itemprop="startDate" datetime="2026-09-20T15:00:00+02:00">'
+            "20.09.2026 15:00</time>"
+            "</article>"
+        )
+        found = parse_page(html, league="BBL", source="bbl")
+        assert len(found) == 1
+        assert found[0]["teams"] == ["A", "B"]
+        assert found[0]["game_key"] == "BBL|A|B|2026-09-20T13:00Z"
+
+    def test_void_meta_does_not_extend_sports_event_scope(self):
+        html = (
+            '<article itemscope itemtype="https://schema.org/SportsEvent">'
+            '<span itemprop="name">A - B</span>'
+            '<meta charset="utf-8">'
+            "</article>"
+            '<time itemprop="startDate" datetime="2026-09-20T15:00:00+02:00">'
+            "20.09.2026 15:00</time>"
+        )
+        assert parse_page(html, league="BBL", source="bbl") == []
+
     def test_a_page_with_neither_shape_yields_nothing(self):
         assert parse_page("<html><body>hi</body></html>", league="BBL", source="bbl") == []
 

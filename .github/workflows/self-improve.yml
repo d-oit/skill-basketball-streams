@@ -88,9 +88,21 @@ jobs:
         id: ledger
         run: |
           mkdir -p .tmp
-          if git fetch --depth=1 origin telemetry 2>/dev/null; then
-            git show origin/telemetry:audit.jsonl      > .tmp/audit.jsonl      2>/dev/null || true
-            git show origin/telemetry:candidates.jsonl > .tmp/candidates.jsonl 2>/dev/null || true
+          if git ls-remote --exit-code --heads origin telemetry >/dev/null; then
+            git fetch --depth=1 origin telemetry
+            if git cat-file -e origin/telemetry:audit.jsonl 2>/dev/null; then
+              git show origin/telemetry:audit.jsonl > .tmp/audit.jsonl
+            fi
+            if git cat-file -e origin/telemetry:candidates.jsonl 2>/dev/null; then
+              git show origin/telemetry:candidates.jsonl > .tmp/candidates.jsonl
+            else
+              echo "::notice::No candidates.jsonl on the telemetry branch yet."
+            fi
+          else
+            status=$?
+            if [ "$status" -ne 2 ]; then
+              exit "$status"
+            fi
           fi
           if [ -s .tmp/audit.jsonl ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
@@ -155,14 +167,15 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
-          ids=$(python3 -c "import json; print(' '.join('--only %d' % c['id'] for c in json.load(open('.tmp/new-cases.json'))['cases']))")
-          if [ -z "$ids" ]; then
+          only_args_text="$(python3 -c "import json; print(' '.join('--only %d' % c['id'] for c in json.load(open('.tmp/new-cases.json'))['cases']))")"
+          read -r -a only_args <<< "$only_args_text"
+          if [ "${#only_args[@]}" -eq 0 ]; then
             echo "::notice::No new case ids to capture."
             exit 0
           fi
           # A partial capture writes no file at all, so the file *existing* is
           # the signal that every new case was captured.
-          if python3 scripts/capture_transcripts.py --runner ladder $ids \
+          if python3 scripts/capture_transcripts.py --runner ladder "${only_args[@]}" \
                --out .tmp/new-transcripts.json; then
             echo "captured=true" >> "$GITHUB_OUTPUT"
           else
@@ -337,7 +350,7 @@ jobs:
           )"
           gh issue create \
             --title "[runtime] self-improvement gate red" \
-            --body "$body" || true
+            --body "$body"
 
       - name: Job summary
         if: always()
