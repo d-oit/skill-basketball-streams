@@ -344,11 +344,12 @@ def list_gemini_models(*, timeout: int = 60) -> tuple[list[str], str]:
 
 
 def rank_gemini_models(ids: list[str]) -> list[str]:
-    """Best-first: the Lite tier, newest version, non-preview.
+    """Best-first Flash-Lite models only: newest version, non-preview.
 
-    Why Lite first is a cost decision, not a quality one — the Lite tier
-    carries the most generous free RPD (spec §15.3 item 3), and a capture run
-    spends one call per eval case.
+    Only Flash-Lite is ever selected by discovery. Lite carries the most generous
+    free RPD (spec §15.3 item 3), and a capture run spends one call per eval case.
+    A non-Lite model is never chosen automatically; if no Lite model is listed,
+    the result is empty and the caller falls back to the pinned Lite default.
     """
 
     def score(model: str) -> tuple[int, float, int, str]:
@@ -360,8 +361,8 @@ def rank_gemini_models(ids: list[str]) -> list[str]:
             model,
         )
 
-    flash_like = [m for m in ids if "flash" in m or "lite" in m]
-    return sorted(flash_like or list(ids), key=score, reverse=True)
+    lite = [m for m in ids if "flash" in m and "lite" in m]
+    return sorted(lite, key=score, reverse=True)
 
 
 def resolve_gemini_model(args) -> tuple[str, str]:

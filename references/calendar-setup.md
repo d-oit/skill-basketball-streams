@@ -318,6 +318,8 @@ GOOGLECALENDAR_CREATE_EVENT {
 GOOGLECALENDAR_PATCH_EVENT { calendar_id, event_id, color_id, send_updates: "none" }
 ```
 
+Removal uses `GOOGLECALENDAR_DELETE_EVENT { calendar_id, event_id, send_updates: "none" }`, executed by `apply_plan`'s `delete` action. The planner does not emit it yet, so no event is removed automatically.
+
 The **event id is the return value that matters**. It is what `telemetry/events.jsonl` is
 keyed by and the only way a Phase 3 verdict can be resolved back to an event, so a create
 that returns no id is recorded as a failure rather than as a created event.
