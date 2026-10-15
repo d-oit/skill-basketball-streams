@@ -332,10 +332,12 @@ class TestRankGeminiModels:
         )
         assert ranked[0] == "gemini-3.5-flash-lite"
 
-    def test_non_flash_models_are_used_only_if_nothing_else_exists(self):
-        assert ct.rank_gemini_models(["gemini-embedding-001"]) == ["gemini-embedding-001"]
+    def test_only_flash_lite_is_ever_ranked(self):
+        """Non-Lite and non-flash models are never selected by discovery."""
+        assert ct.rank_gemini_models(["gemini-embedding-001"]) == []
+        assert ct.rank_gemini_models(["gemini-3.8-flash", "gemini-pro"]) == []
         ranked = ct.rank_gemini_models(["other-model", "gemini-3.5-flash-lite"])
-        assert ranked[0] == "gemini-3.5-flash-lite"
+        assert ranked == ["gemini-3.5-flash-lite"]
 
 
 class TestResolveGeminiModel:

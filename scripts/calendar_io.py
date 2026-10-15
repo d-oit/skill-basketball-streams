@@ -123,6 +123,7 @@ COMPOSIO_TOOLKIT_VERSION = "latest"
 TOOL_EVENTS_LIST = "GOOGLECALENDAR_EVENTS_LIST"
 TOOL_CREATE_EVENT = "GOOGLECALENDAR_CREATE_EVENT"
 TOOL_PATCH_EVENT = "GOOGLECALENDAR_PATCH_EVENT"
+TOOL_DELETE_EVENT = "GOOGLECALENDAR_DELETE_EVENT"
 TIMEOUT_SECONDS = 30
 DEFAULT_TIMEZONE = "Europe/Berlin"
 # `VISIBILITY_VALUES` comes from `calendar_config.py`, which owns the field: the
@@ -140,6 +141,10 @@ ACTION_SKIP = "skip"
 # — a real HTTP write and an `action: "update"` ledger row claiming a change —
 # even when nothing about the game had changed. See `upsert_events.plan_upsert`.
 ACTION_UNCHANGED = "unchanged"
+# Removes a stored event. Only `apply_plan` executes it; the planner does not yet
+# emit it, so nothing reaches a public calendar as a delete until a policy row
+# asks for one.
+ACTION_DELETE = "delete"
 
 
 class CalendarError(RuntimeError):
@@ -636,6 +641,47 @@ def patch_arguments(
     return arguments
 
 
+def _apply_delete(
+    row: dict,
+    result: dict,
+    *,
+    live: bool,
+    calendar_id: str,
+    api_key: str,
+    scope: dict,
+) -> None:
+    """Delete one event. Dry-run records the intent and sends nothing.
+
+    The event id is required: a delete without one would have no target, and
+    refusing it is the only safe reading of that row.
+    """
+    game_key = str(row.get("game_key") or "")
+    event_id = str(row.get("event_id") or "")
+    if not event_id:
+        result["failed"].append({"game_key": game_key, "reason": "delete row without an event_id"})
+        return
+    if not live:
+        result["actions"].append(
+            {"action": ACTION_DELETE, "game_key": game_key, "event_id": event_id, "body": {}}
+        )
+        result["deleted"] += 1
+        return
+    try:
+        _execute_tool(
+            TOOL_DELETE_EVENT,
+            {"calendar_id": calendar_id, "event_id": event_id, "send_updates": "none"},
+            api_key=api_key,
+            scope=scope,
+        )
+    except CalendarError as exc:
+        result["failed"].append({"game_key": game_key, "reason": str(exc), "status": exc.status})
+        return
+    result["deleted"] += 1
+    result["actions"].append(
+        {"action": ACTION_DELETE, "game_key": game_key, "event_id": event_id, "body": {}}
+    )
+
+
 def apply_plan(
     plan: list[dict],
     *,
@@ -659,6 +705,7 @@ def apply_plan(
         "dry_run": not live,
         "created": 0,
         "updated": 0,
+        "deleted": 0,
         # Additive: `.tmp/applied.json` is read by `event_ledger.py` and by
         # `candidates.py record --applied` on the real path, so nothing existing
         # is renamed or removed. An `unchanged` row sends **nothing**, exactly
@@ -680,6 +727,9 @@ def apply_plan(
         # payload against the stored event through `body_matches_event`.
         if action in (ACTION_SKIP, ACTION_UNCHANGED):
             result["skipped" if action == ACTION_SKIP else "unchanged"] += 1
+            continue
+        if action == ACTION_DELETE:
+            _apply_delete(row, result, live=live, calendar_id=calendar_id, api_key=api_key, scope=scope)
             continue
         if action not in (ACTION_CREATE, ACTION_UPDATE):
             result["failed"].append(

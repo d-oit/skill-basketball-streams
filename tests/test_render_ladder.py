@@ -6,6 +6,7 @@ pinned without a network call or a browser.
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -501,10 +502,9 @@ class TestRungHealth:
         assert health.is_parked("a") is False
 
 
-def _run(args: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess:
-    return subprocess.run(
+def _run(args: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess:        return subprocess.run(
         [sys.executable, str(SCRIPT), *args], capture_output=True, text=True,
-        cwd=str(cwd) if cwd else None,
+        encoding="utf-8", errors="replace", cwd=str(cwd) if cwd else None,
     )
 
 
@@ -575,8 +575,12 @@ class TestCli:
         'everything was tried and nothing had a key' look identical in a
         one-line failure. The four hosted/optional rungs come before `urllib` on
         this host, so their reasons are printed before it is attempted."""
-        result = _run(
-            ["--url", "https://www.magenta.tv/tv/live-x", "--probe", "--timeout", "5"]
+        no_keys = {k: v for k, v in os.environ.items() if not k.endswith("_API_KEY")}
+        result = subprocess.run(
+            [sys.executable, str(SCRIPT), "--url", "https://www.magenta.tv/tv/live-x",
+             "--probe", "--timeout", "5"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            env=no_keys,
         )
         assert result.returncode == 1
         assert "firecrawl" in result.stdout and "FIRECRAWL_API_KEY" in result.stdout

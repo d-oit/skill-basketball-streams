@@ -4,7 +4,7 @@ description: Search for FREE basketball live streams in Germany from approved of
 version: "1.12.1"
 category: workflow
 license: MIT
-allowed-tools: webSearch openUrl webFetch firecrawlScrape tinyfishFetch youtubeLiveSearch linkCheck GOOGLECALENDAR_EVENTS_LIST GOOGLECALENDAR_CREATE_EVENT GOOGLECALENDAR_PATCH_EVENT
+allowed-tools: webSearch openUrl webFetch firecrawlScrape tinyfishFetch youtubeLiveSearch linkCheck GOOGLECALENDAR_EVENTS_LIST GOOGLECALENDAR_CREATE_EVENT GOOGLECALENDAR_PATCH_EVENT GOOGLECALENDAR_DELETE_EVENT
 compatibility: Requires internet access (webSearch + openUrl HTTP probe + an optional browser-rendering backend for magenta.tv) and calendar access through **Composio tool execution** (`GOOGLECALENDAR_EVENTS_LIST` + `GOOGLECALENDAR_CREATE_EVENT`, credential `COMPOSIO_API_KEY`, account `COMPOSIO_USER_ID`). Timezone configurable via `config/calendar.json` (default: Europe/Berlin). Free search/LLM backends: see `references/search-backends.md`.
 ---
 

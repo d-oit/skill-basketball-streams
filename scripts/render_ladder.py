@@ -454,18 +454,26 @@ class FirecrawlRung(HostedRung):
 class TinyFishRung(HostedRung):
     name = "tinyfish"
     env_var = "TINYFISH_API_KEY"
-    # [VERIFY] Fetch endpoint path — Search is api.search.tinyfish.ai; Fetch is
-    # configured here so a correction is a one-line change.
-    endpoint = "https://api.tinyfish.ai/fetch"
+    # Per the TinyFish Fetch API reference (docs.tinyfish.ai/fetch-api/reference):
+    # POST to api.fetch.tinyfish.ai with a `urls` array. The old host
+    # api.tinyfish.ai does not resolve, which is the DNS failure in #46.
+    endpoint = "https://api.fetch.tinyfish.ai"
 
     def _request(self, url: str, key: str, timeout: float) -> tuple[int | None, dict]:
         status, payload = _http_post_json(
-            self.endpoint, {"url": url}, {"X-API-Key": key}, timeout
+            self.endpoint,
+            {"urls": [url], "format": "markdown"},
+            {"X-API-Key": key},
+            timeout,
         )
+        # Response field names beyond `results` are not verified against a live
+        # reply here; the first result is read, with the flat shape as fallback.
+        results = payload.get("results") or []
+        item = results[0] if results and isinstance(results[0], dict) else payload
         return status, {
-            "text": payload.get("text") or payload.get("content"),
-            "html": payload.get("html"),
-            "error": payload.get("error"),
+            "text": item.get("text") or item.get("content"),
+            "html": item.get("html"),
+            "error": item.get("error") or (payload.get("errors") or [None])[0],
         }
 
 
@@ -944,6 +952,11 @@ def _judge_body(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
+    # Page titles are non-ASCII (emoji, umlauts). A Windows console defaults to
+    # cp1252, so printing one raised UnicodeEncodeError and hid the verdict.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(
         description="Render a URL through the ladder and report per-rung evidence.",
     )
