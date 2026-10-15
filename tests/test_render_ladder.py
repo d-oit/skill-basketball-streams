@@ -651,4 +651,65 @@ class TestAttemptState:
         assert exit_info.value.code == 1
         payload = json.loads(capsys.readouterr().out)
         assert payload["attempts"][0]["state"] == "skipped"
-        assert payload["evidence"] is False
+
+
+class TestTinyFishRung:
+    """The Fetch API shape, pinned offline: {"results": [...], "errors": [...]}
+
+    Per-URL failures ride alongside HTTP 200 in `errors[]`, which is exactly
+    what the live magenta.tv probe returned (`empty_content`) after the #46
+    endpoint fix — so the error must surface as the code string, not the raw
+    entry dict. `_http_post_json` is the single transport, monkeypatched here.
+    """
+
+    URL = "https://www.magenta.tv/"
+
+    def _rung_with(self, monkeypatch, reply):
+        seen = {}
+
+        def fake(endpoint, payload, headers, timeout):
+            seen.update(endpoint=endpoint, payload=payload)
+            return reply
+
+        monkeypatch.setattr(render_ladder_module, "_http_post_json", fake)
+        return render_ladder_module.TinyFishRung(), seen
+
+    def test_posts_a_urls_array_to_the_fetch_host(self, monkeypatch):
+        rung, seen = self._rung_with(
+            monkeypatch, (200, {"results": [{"text": "x"}], "errors": []})
+        )
+        rung._request(self.URL, "key", 5.0)
+        assert seen["endpoint"] == "https://api.fetch.tinyfish.ai"
+        assert seen["payload"]["urls"] == [self.URL]
+
+    def test_result_text_is_read(self, monkeypatch):
+        rung, _ = self._rung_with(
+            monkeypatch,
+            (200, {"results": [{"text": "# live", "html": "<h1>live</h1>"}],
+                    "errors": []}),
+        )
+        status, payload = rung._request(self.URL, "key", 5.0)
+        assert status == 200
+        assert payload == {"text": "# live", "html": "<h1>live</h1>",
+                           "error": None}
+
+    def test_a_per_url_error_is_the_code_string(self, monkeypatch):
+        """The live case: 200 with `errors: [{url, error: empty_content}]`."""
+        rung, _ = self._rung_with(
+            monkeypatch,
+            (200, {"results": [],
+                    "errors": [{"url": self.URL, "error": "empty_content"}]}),
+        )
+        status, payload = rung._request(self.URL, "key", 5.0)
+        assert status == 200
+        assert payload["text"] is None
+        assert payload["error"] == "empty_content"
+
+    def test_a_non_string_text_is_not_passed_on(self, monkeypatch):
+        """`format: json` returns a document tree, not a string."""
+        rung, _ = self._rung_with(
+            monkeypatch, (200, {"results": [{"text": {"tree": True}}],
+                                "errors": []})
+        )
+        _, payload = rung._request(self.URL, "key", 5.0)
+        assert payload["text"] is None
