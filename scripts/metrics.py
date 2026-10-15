@@ -288,6 +288,12 @@ def render(snapshot: dict) -> str:
 
 
 def main() -> None:
+    # Trend output carries non-ASCII markers; a Windows console defaults to
+    # cp1252, so printing them raised UnicodeEncodeError (same class as the
+    # render_ladder verdict crash).
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(
         description="Derive the runtime metrics snapshot from telemetry ledgers."
     )

@@ -33,10 +33,14 @@ VERDICTS = ROOT / "tests" / "fixtures" / "synthesise_verdicts.jsonl"
 
 
 def run(*args: str) -> subprocess.CompletedProcess:
+    # metrics.py reconfigures its streams to UTF-8 (Windows consoles default
+    # to cp1252), so the parent must decode as UTF-8 too — strictly, so a
+    # mojibake regression still fails instead of passing silently.
     return subprocess.run(
         [sys.executable, str(SCRIPT), *args],
         capture_output=True,
         text=True,
+        encoding="utf-8",
     )
 
 

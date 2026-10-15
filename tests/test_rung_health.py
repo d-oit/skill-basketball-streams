@@ -574,26 +574,92 @@ class TestCli:
 class TestGithubIsOnlyTouchedWhenThereIsAFinding:
     """Stub `gh` on `PATH`: the negative is the property that matters."""
 
-    def _stub_gh(self, tmp_path: Path, *, list_output: str = "[]") -> Path:
+    # A minimal `gh` stand-in, driven by environment so no shell ever parses
+    # the issue body (which is full of pipes and backticks). Classic C# 5
+    # syntax: the inbox .NET Framework compiler is the only toolchain a
+    # Windows runner is guaranteed to have.
+    # Raw string: the C# newline escape below must reach the compiler as
+    # backslash-n, not as a real line break (CS1010 otherwise).
+    _GH_STUB_CS = r"""
+using System;
+using System.IO;
+public static class GhStub {
+    public static int Main(string[] args) {
+        string calls = Environment.GetEnvironmentVariable("GH_STUB_CALLS");
+        if (!string.IsNullOrEmpty(calls)) {
+            File.AppendAllText(calls, "CALLED " + string.Join(" ", args) + "\n");
+        }
+        if (args.Length >= 2 && args[0] == "issue" && args[1] == "list") {
+            Console.Write(Environment.GetEnvironmentVariable("GH_STUB_LIST") ?? "[]");
+        }
+        return 0;
+    }
+}
+"""
+
+    def _stub_gh(
+        self, tmp_path: Path, *, list_output: str = "[]"
+    ) -> tuple[Path, dict]:
         bin_dir = tmp_path / "bin"
         bin_dir.mkdir(exist_ok=True)
         calls = tmp_path / "gh-calls.txt"
-        script = bin_dir / "gh"
-        script.write_text(
-            "#!/bin/sh\n"
-            f'echo "$@" >> "{calls}"\n'
-            'if [ "$1" = "issue" ] && [ "$2" = "list" ]; then\n'
-            f"  echo '{list_output}'\n"
-            "  exit 0\n"
-            "fi\n"
-            "exit 0\n",
-            encoding="utf-8",
-        )
-        script.chmod(script.stat().st_mode | stat.S_IXUSR)
-        return bin_dir
+        extra = {
+            "GH_STUB_CALLS": str(calls),
+            "GH_STUB_LIST": list_output,
+        }
+        if os.name == "nt":
+            # Windows cannot execute a `#!/bin/sh` script, and bare-name
+            # lookup (what `run_gh` relies on) only ever resolves `.exe` —
+            # a batch file is invisible to it. So the stub is compiled to
+            # `gh.exe` with the inbox C# compiler. A stub that fails to
+            # engage must fail loudly: with ambient credentials the real
+            # `gh` once filed issue #56 from this very suite.
+            import shutil
+            import subprocess
 
-    def _env(self, bin_dir: Path) -> dict:
-        return {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}"}
+            csc = shutil.which("csc") or (
+                r"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
+            )
+            if csc is None or not Path(csc).exists():
+                raise RuntimeError(
+                    "the `gh` stub needs an exe and no C# compiler was found"
+                )
+            (bin_dir / "gh.cs").write_text(self._GH_STUB_CS, encoding="utf-8")
+            compiled = subprocess.run(
+                [csc, "/nologo", "/t:exe", "/out:gh.exe", "gh.cs"],
+                capture_output=True, text=True, cwd=str(bin_dir),
+            )
+            if compiled.returncode != 0 or not (bin_dir / "gh.exe").exists():
+                detail = (compiled.stdout or "") + (compiled.stderr or "")
+                raise RuntimeError(
+                    f"the `gh` stub did not compile: {detail[:400]}"
+                )
+        else:
+            script = bin_dir / "gh"
+            script.write_text(
+                "#!/bin/sh\n"
+                f'echo "$@" >> "{calls}"\n'
+                'if [ "$1" = "issue" ] && [ "$2" = "list" ]; then\n'
+                f"  echo '{list_output}'\n"
+                "  exit 0\n"
+                "fi\n"
+                "exit 0\n",
+                encoding="utf-8",
+            )
+            script.chmod(script.stat().st_mode | stat.S_IXUSR)
+        return bin_dir, extra
+
+    def _env(self, bin_dir: Path, extra: dict | None = None) -> dict:
+        env = {
+            **os.environ,
+            "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}",
+        }
+        # A stub that fails to engage must fail loudly, never file for real:
+        # ambient credentials once filed issue #56 from this very suite.
+        env.pop("GH_TOKEN", None)
+        env.pop("GITHUB_TOKEN", None)
+        env.update(extra or {})
+        return env
 
     def _ledger(self, tmp_path: Path) -> Path:
         append_rows(
@@ -606,20 +672,22 @@ class TestGithubIsOnlyTouchedWhenThereIsAFinding:
         return tmp_path
 
     def test_a_quiet_day_never_invokes_gh(self, tmp_path):
-        bin_dir = self._stub_gh(tmp_path)
+        bin_dir, extra = self._stub_gh(tmp_path)
         dest = tmp_path / "dest"
         dest.mkdir()
         completed = _run(
-            ["parked", "--dest", str(dest), "--days", "3", "--file"], env=self._env(bin_dir)
+            ["parked", "--dest", str(dest), "--days", "3", "--file"],
+            env=self._env(bin_dir, extra),
         )
         assert completed.returncode == 0
         assert not (tmp_path / "gh-calls.txt").exists(), "gh was called on a quiet day"
 
     def test_a_finding_opens_one_issue(self, tmp_path):
-        bin_dir = self._stub_gh(tmp_path)
+        bin_dir, extra = self._stub_gh(tmp_path)
         dest = self._ledger(tmp_path / "dest")
         completed = _run(
-            ["parked", "--dest", str(dest), "--days", "3", "--file"], env=self._env(bin_dir)
+            ["parked", "--dest", str(dest), "--days", "3", "--file"],
+            env=self._env(bin_dir, extra),
         )
         assert completed.returncode == 0
         calls = (tmp_path / "gh-calls.txt").read_text()
@@ -628,10 +696,11 @@ class TestGithubIsOnlyTouchedWhenThereIsAFinding:
 
     def test_a_persistent_finding_comments_instead_of_piling_up(self, tmp_path):
         existing = json.dumps([{"number": 12, "title": TITLE_MARKER}])
-        bin_dir = self._stub_gh(tmp_path, list_output=existing)
+        bin_dir, extra = self._stub_gh(tmp_path, list_output=existing)
         dest = self._ledger(tmp_path / "dest")
         completed = _run(
-            ["parked", "--dest", str(dest), "--days", "3", "--file"], env=self._env(bin_dir)
+            ["parked", "--dest", str(dest), "--days", "3", "--file"],
+            env=self._env(bin_dir, extra),
         )
         assert completed.returncode == 0
         calls = (tmp_path / "gh-calls.txt").read_text()

@@ -60,7 +60,9 @@ def test_structural_pass_passes_on_current_repo():
     assert r.returncode == 0, r.stderr
     # One "OK: structural: Case N:" line per case.
     assert r.stdout.count("OK: structural:") == len(
-        json.loads((REPO_ROOT / "evals" / "evals.json").read_text())["evals"]
+        json.loads(
+            (REPO_ROOT / "evals" / "evals.json").read_text(encoding="utf-8")
+        )["evals"]
     )
 
 
@@ -71,7 +73,7 @@ def test_structural_pass_spot_checks_lowest_and_highest_case_ids():
     # Highest id in current data — resolved dynamically to remain robust
     # against future case-count changes.
     cases = json.loads(
-        (REPO_ROOT / "evals" / "evals.json").read_text()
+        (REPO_ROOT / "evals" / "evals.json").read_text(encoding="utf-8")
     )["evals"]
     highest = max(c["id"] for c in cases)
     assert f"Case {highest}:" in r.stdout
@@ -92,7 +94,7 @@ def test_runtime_pass_with_synthesized_stubs_passes(tmp_path):
     r = _run(["--root", str(tmp_repo), "--stubs", str(stubs_path)])
     assert r.returncode == 0, r.stderr
     cases = json.loads(
-        (REPO_ROOT / "evals" / "evals.json").read_text()
+        (REPO_ROOT / "evals" / "evals.json").read_text(encoding="utf-8")
     )["evals"]
     assert r.stdout.count("OK: runtime:") == len(cases)
 
@@ -102,7 +104,9 @@ def test_runtime_pass_with_trailing_whitespace_still_passes(tmp_path):
     tmp_repo = tmp_path / "repo"
     tmp_repo.mkdir()
     _copy_evals_into(tmp_repo)
-    d = json.loads((REPO_ROOT / "evals" / "evals.json").read_text())
+    d = json.loads(
+        (REPO_ROOT / "evals" / "evals.json").read_text(encoding="utf-8")
+    )
     stubs = {
         str(c["id"]): c["expected_output"] + "\n\n  \n" for c in d["evals"]
     }
