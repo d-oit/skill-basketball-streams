@@ -466,14 +466,24 @@ class TinyFishRung(HostedRung):
             {"X-API-Key": key},
             timeout,
         )
-        # Response field names beyond `results` are not verified against a live
-        # reply here; the first result is read, with the flat shape as fallback.
+        # Response shape per the Fetch API reference: {"results": [...],
+        # "errors": [...]}. Each result carries `text`; each errors entry
+        # carries the requested `url` plus a per-URL `error` code (e.g.
+        # empty_content), riding alongside HTTP 200. The first result is
+        # read, with the flat shape as fallback.
         results = payload.get("results") or []
         item = results[0] if results and isinstance(results[0], dict) else payload
+        text = item.get("text") or item.get("content")
+        errors = payload.get("errors") or []
+        entry = next(
+            (e for e in errors if isinstance(e, dict) and e.get("url") == url),
+            errors[0] if errors and isinstance(errors[0], dict) else None,
+        )
+        code = entry.get("error") if isinstance(entry, dict) else entry
         return status, {
-            "text": item.get("text") or item.get("content"),
+            "text": text if isinstance(text, str) else None,
             "html": item.get("html"),
-            "error": item.get("error") or (payload.get("errors") or [None])[0],
+            "error": code or item.get("error"),
         }
 
 
