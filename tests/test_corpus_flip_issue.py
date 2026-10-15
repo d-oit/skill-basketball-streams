@@ -76,6 +76,33 @@ def report(tmp_path: Path, flips: list[dict], *, pages: int = 8) -> Path:
     return path
 
 
+# A minimal `gh` stand-in, driven by environment so no shell ever parses
+# the issue body (which is full of pipes and backticks). Raw string: the
+# C# newline escape must reach the compiler as backslash-n (CS1010
+# otherwise). Classic C# 5 syntax for the inbox .NET Framework compiler.
+_GH_STUB_CS = r"""
+using System;
+using System.IO;
+public static class GhStub {
+    public static int Main(string[] args) {
+        string log = Environment.GetEnvironmentVariable("GH_LOG");
+        if (!string.IsNullOrEmpty(log)) {
+            File.AppendAllText(log, string.Join(" ", args) + "\n");
+        }
+        if (args.Length >= 2 && args[0] == "issue" && args[1] == "list") {
+            string list = Environment.GetEnvironmentVariable("GH_LIST");
+            if (!string.IsNullOrEmpty(list) && File.Exists(list)) {
+                Console.Write(File.ReadAllText(list));
+                return 0;
+            }
+        }
+        Console.Write("ok");
+        return 0;
+    }
+}
+"""
+
+
 def fake_gh(tmp_path: Path, list_payload: str = "[]") -> tuple[Path, Path]:
     """A `gh` that records its argv instead of talking to GitHub.
 
@@ -86,6 +113,34 @@ def fake_gh(tmp_path: Path, list_payload: str = "[]") -> tuple[Path, Path]:
     bindir.mkdir(exist_ok=True)
     log = tmp_path / "gh-calls.log"
     log.write_text("")
+    if os.name == "nt":
+        # Windows cannot execute a `#!/bin/sh` script, and bare-name lookup
+        # (what the script under test relies on) only ever resolves `.exe`.
+        # The stub is compiled to `gh.exe` with the inbox C# compiler; it
+        # needs no interpreter, so the narrowed PATH the tests use is fine.
+        import shutil
+
+        csc = shutil.which("csc") or (
+            r"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
+        )
+        if csc is None or not Path(csc).exists():
+            raise RuntimeError(
+                "the `gh` stub needs an exe and no C# compiler was found"
+            )
+        (bindir / "gh.cs").write_text(
+            _GH_STUB_CS, encoding="utf-8"
+        )
+        compiled = subprocess.run(
+            [csc, "/nologo", "/t:exe", "/out:gh.exe", "gh.cs"],
+            capture_output=True, text=True, cwd=str(bindir),
+        )
+        detail = (compiled.stdout or "") + (compiled.stderr or "")
+        if compiled.returncode != 0 or not (bindir / "gh.exe").exists():
+            raise RuntimeError(
+                f"the `gh` stub did not compile: {detail[:400]}"
+            )
+        (tmp_path / "gh-list.json").write_text(list_payload + "\n")
+        return bindir, log
     gh = bindir / "gh"
     gh.write_text(
         "#!/bin/sh\n"

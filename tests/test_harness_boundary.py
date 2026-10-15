@@ -431,10 +431,20 @@ def _run_commitlint(message: str, *args: str):
     The stdin form is **no `--message` flag at all**; `--message <path>` takes a
     file. Passing `--message -` is a usage error (exit 2), not a stdin alias.
     """
+    import shutil
     import subprocess
 
+    argv = [str(COMMITLINT), *args]
+    if sys.platform == "win32":
+        # Windows cannot execute a .sh file directly; the neighbouring
+        # test_check_commitlint.py invokes shell scripts through an explicit
+        # interpreter for the same reason. `sh` is the shell the shebang
+        # names; Git ships it on Windows.
+        sh = shutil.which("sh")
+        assert sh is not None, "check-commitlint.sh needs sh, none on PATH"
+        argv = [sh, *argv]
     return subprocess.run(
-        [str(COMMITLINT), *args],
+        argv,
         input=message,
         capture_output=True,
         text=True,

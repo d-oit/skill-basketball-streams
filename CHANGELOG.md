@@ -1093,7 +1093,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [1.12.2] - 2026-10-15
+
+### Fixed
+
+- **TinyFish rung calls the documented Fetch endpoint.** The rung posted to
+  `api.tinyfish.ai`, which does not resolve, so the magenta.tv rung was parked
+  with a DNS failure (#46). It now posts to `POST https://api.fetch.tinyfish.ai`
+  with a `urls` array, and per-URL error codes from `errors[]` (e.g.
+  `empty_content`, which rides alongside HTTP 200) surface as code strings.
+  Verified live: the rung answers status 200 with nothing parked.
+- **Metrics CLI no longer crashes on Windows consoles.** Trend output carries
+  non-ASCII markers that raised `UnicodeEncodeError` under cp1252; streams are
+  now reconfigured to UTF-8, the same fix the render ladder received.
+
+### Changed
+
+- `requirements-dev.txt` gains `tzdata`, so `zoneinfo` resolves
+  `Europe/Berlin` on platforms without system tzdata (Windows).
+
+
 ## [Unreleased]
+
 
 ### Added
 

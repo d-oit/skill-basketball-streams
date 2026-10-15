@@ -576,6 +576,24 @@ class TestCli:
         assert not out.exists()
 
 
+def _write_cli_stub(tmp_path, name, posix_body, windows_body):
+    """An executable stand-in for the `opencode` binary, on either platform.
+
+    The probe executes whatever `shutil.which` returns with `shell=False`, and
+    Windows cannot execute a `#!/bin/sh` script — so on `nt` the stub is a
+    batch file. The filename is irrelevant (`which` is monkeypatched in every
+    test that uses this); the behaviours under test are identical.
+    """
+    if os.name == "nt":
+        stub = tmp_path / f"{name}.bat"
+        stub.write_text("@echo off\n" + windows_body, encoding="utf-8")
+    else:
+        stub = tmp_path / name
+        stub.write_text("#!/bin/sh\n" + posix_body, encoding="utf-8")
+        stub.chmod(0o755)
+    return stub
+
+
 class TestProbeOpencodeCli:
     """The gap this closes, found in the wild on this machine.
 
@@ -595,12 +613,11 @@ class TestProbeOpencodeCli:
         assert "no `opencode` on PATH" in detail
 
     def test_a_broken_shim_is_reported_with_its_own_message(self, monkeypatch, tmp_path):
-        broken = tmp_path / "opencode"
-        broken.write_text(
-            "#!/bin/sh\necho 'failed to install the right version' >&2\nexit 1\n",
-            encoding="utf-8",
+        broken = _write_cli_stub(
+            tmp_path, "opencode",
+            "echo 'failed to install the right version' >&2\nexit 1\n",
+            "@echo failed to install the right version 1>&2\nexit /b 1\n",
         )
-        broken.chmod(0o755)
         monkeypatch.setattr(ct.shutil, "which", lambda name: str(broken))
         ok, detail = ct.probe_opencode_cli()
         assert ok is False
@@ -608,27 +625,33 @@ class TestProbeOpencodeCli:
         assert "exit 1" in detail
 
     def test_a_working_cli_reports_its_version(self, monkeypatch, tmp_path):
-        working = tmp_path / "opencode"
-        working.write_text("#!/bin/sh\necho '0.4.2'\n", encoding="utf-8")
-        working.chmod(0o755)
+        working = _write_cli_stub(
+            tmp_path, "opencode",
+            "echo '0.4.2'\n",
+            "@echo 0.4.2\n",
+        )
         monkeypatch.setattr(ct.shutil, "which", lambda name: str(working))
         ok, detail = ct.probe_opencode_cli()
         assert ok is True
         assert detail == "0.4.2"
 
     def test_a_hanging_cli_is_a_failure_not_a_hang(self, monkeypatch, tmp_path):
-        slow = tmp_path / "opencode"
-        slow.write_text("#!/bin/sh\nsleep 30\n", encoding="utf-8")
-        slow.chmod(0o755)
+        slow = _write_cli_stub(
+            tmp_path, "opencode",
+            "sleep 30\n",
+            "@ping -n 30 127.0.0.1 >nul\n",
+        )
         monkeypatch.setattr(ct.shutil, "which", lambda name: str(slow))
         ok, detail = ct.probe_opencode_cli(timeout=1)
         assert ok is False
         assert "TimeoutExpired" in detail
 
     def test_output_is_truncated_so_one_line_stays_one_line(self, monkeypatch, tmp_path):
-        noisy = tmp_path / "opencode"
-        noisy.write_text("#!/bin/sh\necho 'x' | tr -d '\\n'; printf 'y%.0s' $(seq 400)\n", encoding="utf-8")
-        noisy.chmod(0o755)
+        noisy = _write_cli_stub(
+            tmp_path, "opencode",
+            "echo 'x' | tr -d '\\n'; printf 'y%.0s' $(seq 400)\n",
+            "@echo " + "y" * 400 + "\n",
+        )
         monkeypatch.setattr(ct.shutil, "which", lambda name: str(noisy))
         ok, detail = ct.probe_opencode_cli()
         assert ok is True

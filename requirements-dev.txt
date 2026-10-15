@@ -9,3 +9,8 @@ pytest>=8.0
 # exercises that script (tests/test_replay_ci.py), so CI must install it too —
 # a dependency only a fresh checkout can prove missing.
 pyyaml>=6.0
+
+# Time-zone database for zoneinfo on platforms without system tzdata
+# (Windows). The calendar/ics tests resolve Europe/Berlin; without this they
+# fail with ZoneInfoNotFoundError there while passing on Linux.
+tzdata>=2024.1
