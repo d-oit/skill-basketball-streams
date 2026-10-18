@@ -29,7 +29,10 @@ from scripts.extract_candidates import (
     extract,
     extract_source_leads,
     json_blocks,
+    model_text_chunks,
     normalise_candidate,
+    text_chunks,
+    transcript_blocks,
     transcript_text,
 )
 from scripts.upsert_events import ACTION_CREATE, ACTION_SKIP, plan_upsert
@@ -110,6 +113,51 @@ class TestTheRealTranscriptShape:
         lines = self.FIXTURE.read_text(encoding="utf-8").splitlines()
         mixed = lines[0] + "\nnot json at all\n"
         assert transcript_text(mixed) == mixed
+
+
+class TestAFenceInAToolResult:
+    """A page quoted in a tool result must not swallow the model's answer.
+
+    The 2026-10-18 daily run: a `webfetch` output contained a bare ` ``` `
+    opener, the model's own answer contained a complete ` ```json ` block, and
+    `transcript_text` joined both into one string. The tool's opener paired with
+    the model's closing fence, the "block" between them was 47 KB of page
+    source, and extraction reported `no-block` — on a run whose answer was
+    correct. The fixture is reduced from that transcript; the first assertion
+    pins the old path so the regression is visible rather than asserted.
+    """
+
+    FIXTURE = REPO_ROOT / "tests" / "fixtures" / "agent_transcript_stray_fence.jsonl"
+
+    def test_the_models_block_survives_a_stray_fence(self):
+        raw = self.FIXTURE.read_text(encoding="utf-8")
+        accepted, rejected = extract(raw)
+        assert rejected == [], rejected
+        assert len(accepted) == 1, accepted
+        assert accepted[0]["league"] == "BBL"
+
+    def test_the_joined_text_is_what_used_to_break_it(self):
+        """The mechanism, not just the outcome.
+
+        If `json_blocks(transcript_text(...))` ever starts finding this block,
+        the fixture has stopped exercising the cross-chunk pairing and should be
+        rebuilt — otherwise the passing test above proves nothing.
+        """
+        raw = self.FIXTURE.read_text(encoding="utf-8")
+        assert json_blocks(transcript_text(raw)) == []
+        assert len(transcript_blocks(raw)) == 1
+
+    def test_the_block_is_read_one_chunk_at_a_time(self):
+        raw = self.FIXTURE.read_text(encoding="utf-8")
+        kinds = [
+            part.get("type")
+            for event in (json.loads(line) for line in raw.splitlines() if line.strip())
+            for part in [event.get("part")]
+            if isinstance(part, dict)
+        ]
+        assert "tool" in kinds and "text" in kinds, kinds
+        assert any("```json" in chunk for chunk in model_text_chunks(raw))
+        assert not any("```json" in chunk for chunk in text_chunks(raw)[:1])
 
 
 class TestTranscriptText:

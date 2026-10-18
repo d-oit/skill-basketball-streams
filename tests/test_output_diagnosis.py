@@ -163,6 +163,23 @@ class TestTheThreeFaultsAreDistinct:
         # the model was silent if a caller asks.
         assert report["chars"] > 0
 
+    def test_a_page_quoted_in_a_tool_result_does_not_change_the_verdict(self):
+        """The 2026-10-18 run, diagnosed wrongly on top of failing.
+
+        The envelope contained a tool result with a bare fence and the model's
+        answer contained a complete block. Diagnosis walked the *envelope*, so it
+        saw no fence and reported `no-block` — "ordinary prose, contract not
+        followed" — for an answer that had followed it. The verdict is about the
+        model, so the fence and the size come from `part.text` alone.
+        """
+        raw = (FIXTURES / "agent_transcript_stray_fence.jsonl").read_text(
+            encoding="utf-8"
+        )
+        report = diagnose(raw)
+        assert report["fence"] is True
+        assert report["verdict"] != "no-block"
+        assert "```json" in _model_text(raw)
+
 
 class TestTheCliReportsIt:
     def test_the_failure_names_the_verdict_not_only_the_contract(self):

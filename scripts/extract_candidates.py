@@ -183,6 +183,90 @@ def transcript_text(payload: object) -> str:
     return "\n".join(chunk for chunk in chunks if chunk)
 
 
+def text_chunks(payload: object) -> list[str]:
+    """Every chunk of transcript text **separately**, in document order.
+
+    `transcript_text` joins the chunks, which is right for a human-readable
+    summary and wrong for parsing: a fenced block that *opens* in one chunk and
+    *closes* in another is not a block the model wrote. The real daily run hit
+    exactly that — a `webfetch` result quoted page source containing a bare
+    ` ``` ` opener, and the model's own ` ```json ` block supplied the closing
+    fence. The concatenated text therefore held one fence spanning 47 KB of page
+    source, the block was swallowed, and a correct run reported "no-block".
+
+    Chunks are parsed one at a time so a fence cannot pair across a boundary.
+    The shapes that worked before are preserved: a single JSON document is one
+    chunk (splitting it would defeat the bare-document path in `json_blocks`),
+    and a plain-text transcript is one chunk.
+    """
+    if isinstance(payload, str):
+        stripped = payload.strip()
+        if stripped.startswith(("{", "[")):
+            try:
+                json.loads(stripped)
+                return [payload]
+            except json.JSONDecodeError:
+                pass
+        decoded = _decode_jsonl(payload)
+        if decoded is None:
+            return [payload] if payload else []
+        return text_chunks(decoded)
+    chunks: list[str] = []
+    _collect(payload, chunks, only_text_keys=True)
+    if not chunks:
+        _collect(payload, chunks, only_text_keys=False)
+    return [chunk for chunk in chunks if chunk]
+
+
+def model_text_chunks(payload: object) -> list[str]:
+    """The model's own `part.text` messages, one chunk each.
+
+    A `tool_use` part's `output` is the *tool's* answer — the harness reporting
+    back — and is deliberately excluded. Only a `text`-type part is where the
+    model speaks, which is also the only place its Step 7 block can legitimately
+    appear.
+    """
+    decoded = _decode_jsonl(payload) if isinstance(payload, str) else payload
+    if decoded is None:
+        return []
+    parts: list[object] = decoded if isinstance(decoded, list) else [decoded]
+    chunks: list[str] = []
+    for node in parts:
+        if not isinstance(node, dict):
+            continue
+        part = node.get("part")
+        if not isinstance(part, dict) or part.get("type") != "text":
+            continue
+        value = part.get("text")
+        if isinstance(value, str) and value:
+            chunks.append(value)
+    return chunks
+
+
+def transcript_blocks(payload: object) -> list[object]:
+    """Fenced/bare JSON blocks, with the model's own text tried first.
+
+    Two guards, both learned from real runs:
+
+    * **Model text before everything else.** A tool result may quote arbitrary
+      page source, including fences; only the model can *answer*. If its own
+      text yields a block, that is the answer.
+    * **One chunk at a time.** See `text_chunks`: joining lets a stray opening
+      fence in a tool result swallow the model's real block.
+
+    Falls back to the joined transcript so the shapes that worked before — a
+    single document, a bare fence, a flat `{"transcripts": ...}` envelope — keep
+    working.
+    """
+    for chunks in (model_text_chunks(payload), text_chunks(payload)):
+        parsed: list[object] = []
+        for chunk in chunks:
+            parsed.extend(json_blocks(chunk))
+        if parsed:
+            return parsed
+    return json_blocks(transcript_text(payload))
+
+
 def json_blocks(text: str) -> list[object]:
     """Parse every fenced JSON block, plus a bare top-level JSON document."""
     parsed: list[object] = []
@@ -226,7 +310,7 @@ def extract_source_leads(payload: object) -> list[dict]:
     """
     leads: list[dict] = []
     seen: set[str] = set()
-    for block in json_blocks(transcript_text(payload)):
+    for block in transcript_blocks(payload):
         if not isinstance(block, dict):
             continue
         rows = block.get("source_leads")
@@ -326,7 +410,7 @@ def extract(payload: object) -> tuple[list[dict], list[str]]:
     accepted: list[dict] = []
     rejected: list[str] = []
     seen: set[str] = set()
-    for index, block in enumerate(json_blocks(transcript_text(payload))):
+    for index, block in enumerate(transcript_blocks(payload)):
         for offset, raw in enumerate(candidate_objects(block)):
             label = f"block {index} item {offset}"
             try:
@@ -399,22 +483,12 @@ def _model_text(payload: object) -> str:
     The payload is decoded first, exactly as `transcript_text` does, so a raw
     string transcript reaches this as events rather than as one leaf.
     """
+    chunks = model_text_chunks(payload)
+    if chunks:
+        return "\n".join(chunks)
     decoded = _decode_jsonl(payload) if isinstance(payload, str) else payload
     if decoded is None:
         return payload if isinstance(payload, str) else ""
-    parts: list[object] = decoded if isinstance(decoded, list) else [decoded]
-    chunks: list[str] = []
-    for node in parts:
-        if not isinstance(node, dict):
-            continue
-        part = node.get("part")
-        if not isinstance(part, dict) or part.get("type") != "text":
-            continue
-        value = part.get("text")
-        if isinstance(value, str):
-            chunks.append(value)
-    if chunks:
-        return "\n".join(chunks)
     # A transcript with no `part` shape at all — the hand-written fixtures use
     # the flat `{"text": …}` form — falls back to the collector rather than
     # reporting "the model said nothing".
@@ -447,9 +521,16 @@ def diagnose(payload: object, *, text: str | None = None) -> dict[str, Any]:
     # both: model text 0.986, whole envelope 0.638, same file.
     model_text = _model_text(payload)
     stripped = (text if text is not None else transcript_text(payload)).strip()
+    # The verdict is about what the *model* did, so the fence and the size come
+    # from its own prose when there is any. The envelope contains tool results
+    # too, and a quoted page can open a fence the model never wrote: scoring that
+    # reported "no-block" for a run whose answer carried a complete block (the
+    # 2026-10-18 daily run). When the payload has no `part` shape, the supplied
+    # or collected text is all there is.
+    evidence_text = model_text.strip() or stripped
     diversity = _token_diversity(model_text)
-    has_fence = bool(FENCED_BLOCK.search(stripped))
-    length = len(stripped)
+    has_fence = bool(FENCED_BLOCK.search(evidence_text))
+    length = len(evidence_text)
     degenerate = diversity is not None and diversity >= DEGENERATION_DIVERSITY
     if degenerate:
         verdict = "degenerate"
@@ -490,8 +571,8 @@ def diagnose(payload: object, *, text: str | None = None) -> dict[str, Any]:
         # Enough to recognise the output without downloading the artifact. The
         # transcript is uploaded separately; a reader who needs all of it should
         # have to go and get it.
-        "head": stripped[:200],
-        "tail": stripped[-200:],
+        "head": evidence_text[:200],
+        "tail": evidence_text[-200:],
     }
 
 
@@ -554,7 +635,7 @@ def main() -> None:
         # and the response was to edit a contract the model never read. So the
         # failure now says what the agent actually did, and names where the fault
         # is.
-        report = diagnose(payload, text=text)
+        report = diagnose(payload)
         print(
             f"FAIL: extract_candidates: no usable candidates "
             f"({len(rejected)} rejected) — {report['verdict']}",
