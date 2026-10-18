@@ -1142,8 +1142,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   runtime prompt requires that block when nothing was found and explains that a
   *missing* block is what a failure looks like, but the extractor exited 1 for
   the empty one — so the 2026-10-13 run, which did exactly what it was told,
-  reddened the job before the planner could record a quiet day. A block whose
-  candidates were all rejected still fails; the rejection lines say why.
+  reddened the job before the planner could record a quiet day. The extractor,
+  `upsert_events.py` and `calendar_io.py` now carry an empty candidate list
+  through to a zero-row plan. The fault they used to signal is still detectable:
+  a transcript with no block, a block whose candidates were all rejected, a
+  candidates object without its `"candidates"` key, and a bare `{"plan": []}`
+  with no producer summary all still fail.
 - **`runtime-daily.yml` no longer swallows a check that can never pass.** The
   `capture_transcripts.py --runner replay --from .tmp/transcript.json --check
   ... || true` line exited 2 on every run: a JSONL event stream is not the
