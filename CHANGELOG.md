@@ -1113,7 +1113,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Europe/Berlin` on platforms without system tzdata (Windows).
 
 
+## [1.12.3] - 2026-10-18
+
+### Fixed
+
+- **The daily runtime extracts candidates from the model's own answer, not from
+  a concatenation of the whole event stream.** `opencode run --format json`
+  writes JSONL, and a `webfetch` result in the 2026-10-18 run quoted page source
+  containing a bare ` ``` ` opener. `transcript_text` joined every text leaf, so
+  that opener paired with the closing fence of the model's ` ```json ` block,
+  the "block" between them was 47 KB of page source, and a correct run failed
+  with `no usable candidates ... no-block`. Extraction now parses the model's
+  `part.text` chunks first and each chunk separately, so a fence cannot pair
+  across a tool/model boundary; the joined transcript remains the fallback for
+  the document shapes that already worked. The same fix restores `source_leads`.
+- **The failure diagnosis reports the model's text, not the envelope.** It
+  scored the fence and size over the collected transcript while scoring
+  diversity over `part.text`, so the same run was called "ordinary prose and no
+  fenced json block" despite carrying a complete block. `chars`, `fence`,
+  `head` and `tail` now come from the model's own text when there is any.
+- **`runtime-daily.yml` no longer swallows a check that can never pass.** The
+  `capture_transcripts.py --runner replay --from .tmp/transcript.json --check
+  ... || true` line exited 2 on every run: a JSONL event stream is not the
+  `{id: text}` / `{"transcripts": [...]}` document that `load_transcripts`
+  accepts, and `|| true` hid it. It is removed; `extract_candidates.py` enforces
+  the same contract and fails with a diagnosis.
+
+### Changed
+
+- **The skill step's bound is 30 minutes instead of 20.** Three 2026-10-15
+  dispatches exited 124 at exactly 1200 s, while successful runs on 2026-10-17
+  and 2026-10-18 took 13m00s and 14m21s on the free rung. 1800 s keeps the step
+  bounded inside the job's 45-minute cap without turning normal variance into a
+  red run.
+
+
 ## [Unreleased]
+
 
 
 ### Added
