@@ -255,4 +255,4 @@ All scripts are stdlib-only on Python 3.8+ and share the same exit codes: `0` PA
 - `docs/runtime.md` — daily runtime operations: cadence, secrets, telemetry schema, rung health, recovery runbook, AGPL notice
 - `references/lessons-learned.md` — incident post-mortem (broken `/user/FIBA` events), root causes, prevention checklist, validation log template and worked examples
 - `config/sources.json` — machine-readable approved-source registry + excluded sources
-- `evals/evals.json` — 43 eval cases (driving the `skill-evaluator` rubric; see `README.md` → Self-Validation)
+- `evals/evals.json` — 45 eval cases (driving the `skill-evaluator` rubric; see `README.md` → Self-Validation)

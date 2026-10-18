@@ -1148,6 +1148,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a transcript with no block, a block whose candidates were all rejected, a
   candidates object without its `"candidates"` key, and a bare `{"plan": []}`
   with no producer summary all still fail.
+- **The self-improvement gate is green again on its own regression cases.** The
+  2026-10-17 synthesis added eval cases 44–45 for `INCONCLUSIVE` audits of
+  events already published as `VERIFIED`, but nothing named the ids they are
+  graded on (`verifiedClaimed`, `regression`), and `PRODUCT.md` still stated 43
+  cases. The gate correctly refused its own output. The ids are now stated as
+  ids in `references/self-learning.md` — one of the references those cases
+  declare — and the count is 45 in `PRODUCT.md`, `README.md` and `SKILL.md`. The
+  eval cases themselves are unchanged: this documents the vocabulary the gate
+  grades, rather than re-baselining the gate.
 - **`runtime-daily.yml` no longer swallows a check that can never pass.** The
   `capture_transcripts.py --runner replay --from .tmp/transcript.json --check
   ... || true` line exited 2 on every run: a JSONL event stream is not the
