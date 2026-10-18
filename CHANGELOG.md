@@ -1132,6 +1132,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   diversity over `part.text`, so the same run was called "ordinary prose and no
   fenced json block" despite carrying a complete block. `chars`, `fence`,
   `head` and `tail` now come from the model's own text when there is any.
+- **A JSON event stream is decoded by value, not by line.** `str.splitlines()`
+  also splits on U+2028, which JSON allows inside a string; the 2026-10-13
+  transcript contains 15 of them inside `webfetch` output. Every fragment after
+  the first failed to parse and the whole stream fell back to raw text, so a
+  valid model block was invisible. `JSONDecoder.raw_decode` walks the values
+  themselves, and a trailing non-JSON line still returns no decode at all.
+- **An explicit `{"candidates": []}` is a quiet day, not a failed run.** The
+  runtime prompt requires that block when nothing was found and explains that a
+  *missing* block is what a failure looks like, but the extractor exited 1 for
+  the empty one — so the 2026-10-13 run, which did exactly what it was told,
+  reddened the job before the planner could record a quiet day. A block whose
+  candidates were all rejected still fails; the rejection lines say why.
 - **`runtime-daily.yml` no longer swallows a check that can never pass.** The
   `capture_transcripts.py --runner replay --from .tmp/transcript.json --check
   ... || true` line exited 2 on every run: a JSONL event stream is not the
