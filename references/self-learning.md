@@ -197,6 +197,23 @@ Three rules make this safe:
    `audit.jsonl`; the event and its history stay, which is the only way the audit
    trail survives.
 
+### Audit-regression check ids
+
+When a synthesised regression case comes from an `INCONCLUSIVE` audit of an
+event the runtime had already published as `VERIFIED`, it is graded on three
+ids. They are the vocabulary the runtime's graders match, so they are stated
+here as ids rather than left to prose:
+
+| id | Meaning in the regression case |
+|---|---|
+| `freeAccess` | `FAIL`: free access was never confirmed, so the event must not have been claiming it |
+| `verifiedClaimed` | `FAIL`: the pipeline claimed a confirmation it never had |
+| `regression` | `PASS`: the case exists to keep that overclaim from recurring — the fix is accepted only when this passes |
+
+`scripts/synthesise_eval_case.py` emits exactly this trio for the
+`INCONCLUSIVE`-on-`VERIFIED` fault, and `evals/evals.json` cases 44–45 are the
+worked examples.
+
 `INCONCLUSIVE` rows are recorded too. "We checked and could not tell" is itself
 evidence — it is what distinguishes a quiet day from a day the audit silently
 did nothing.

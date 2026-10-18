@@ -29,7 +29,7 @@ The supporting files are part of the same artifact, not extras:
 - `references/` — the domain knowledge the contract points at (the 7-check
   pipeline, the magenta.tv fetch ladder, the YouTube live-only gate, the
   calendar event schema, the approved-source list, the self-learning loop).
-- `evals/evals.json` — 43 eval cases the contract must satisfy; the count is
+- `evals/evals.json` — 45 eval cases the contract must satisfy; the count is
   checked against the file itself by the `product-contract` sensor, so adding a
   case without updating this line fails the gate.
 - `config/` — the approved/disallowed source registry, the calendar
