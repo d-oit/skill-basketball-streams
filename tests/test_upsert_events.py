@@ -709,13 +709,49 @@ class TestCli:
         assert result.returncode == 2
         assert "not found" in result.stderr
 
-    def test_no_candidates_exits_one(self, tmp_path):
+    def test_no_candidates_is_a_quiet_day(self, tmp_path):
+        """The runtime's explicit empty block must reach the planner.
+
+        An empty candidate list is the contract's "no games today", not a
+        broken pipeline. A malformed candidates file is still exit 2 (pinned
+        below), so this branch only sees a well-formed empty list.
+        """
         existing_file, candidate_file = self._write(tmp_path, [], [])
         result = _run(
             ["--existing", str(existing_file), "--candidates", str(candidate_file)]
         )
-        assert result.returncode == 1
-        assert "no candidates" in result.stderr
+        assert result.returncode == 0, result.stderr
+        assert "no candidates this run" in result.stdout
+
+    def test_an_empty_candidates_object_still_emits_a_plan_summary(self, tmp_path):
+        existing_file, candidate_file = self._write(tmp_path, [], [])
+        result = _run(
+            [
+                "--existing", str(existing_file),
+                "--candidates", str(candidate_file),
+                "--json",
+            ]
+        )
+        assert result.returncode == 0, result.stderr
+        payload = json.loads(result.stdout)
+        assert payload["plan"] == []
+        assert payload["summary"]["create"] == 0
+
+    def test_a_candidates_object_without_the_key_is_a_usage_error(self, tmp_path):
+        """`{}` is malformed, not a quiet day.
+
+        Before this check the missing key defaulted to `[]`, so a producer typo
+        produced the same document as a real empty result and could green a run
+        that never loaded a single candidate.
+        """
+        existing_file, _ = self._write(tmp_path, [], [])
+        candidate_file = tmp_path / "candidates.json"
+        candidate_file.write_text(json.dumps({"rows": []}), encoding="utf-8")
+        result = _run(
+            ["--existing", str(existing_file), "--candidates", str(candidate_file)]
+        )
+        assert result.returncode == 2
+        assert 'expected "candidates"' in result.stderr
 
     def test_missing_file_is_a_usage_error(self, tmp_path):
         _, candidate_file = self._write(tmp_path, [], [_candidate()])

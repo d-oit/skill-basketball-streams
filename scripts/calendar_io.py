@@ -1009,6 +1009,10 @@ def main() -> None:
         print("FAIL: calendar_io: apply requires --plan", file=sys.stderr)
         sys.exit(2)
     payload = _load_json(Path(args.plan), "plan")
+    # `upsert_events.py --json` emits `{"plan": [...], "summary": {...}}`. The
+    # summary is the producer's own statement that it ran and counted; a bare
+    # `{"plan": []}` has no such statement and is still treated as a fault below.
+    planned_empty = isinstance(payload, dict) and isinstance(payload.get("summary"), dict)
     plan = payload.get("plan") if isinstance(payload, dict) else payload
     if not isinstance(plan, list):
         print(
@@ -1080,6 +1084,18 @@ def main() -> None:
         + result["skipped"]
     )
     if not decided:
+        if planned_empty:
+            # A quiet day: the planner ran, counted zero candidates, and wrote
+            # that count into the same document. Failing here is what reddened
+            # the 2026-10-13 run after the model emitted the explicit empty
+            # block the contract asks for. A plan file without a summary has no
+            # such evidence and keeps the fault below.
+            print(
+                "OK: calendar_io: the planner produced an empty plan — no "
+                "candidates this run, so there is nothing to write",
+                file=sys.stderr,
+            )
+            return
         print(
             "FAIL: calendar_io: the plan contained no rows at all — the planner "
             "produced nothing, which is not the same as 'nothing to write'",

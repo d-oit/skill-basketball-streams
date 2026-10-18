@@ -650,7 +650,17 @@ def _load(path: Path, key: str) -> list:
         print(f"FAIL: upsert_events: {path}: invalid JSON ({exc})", file=sys.stderr)
         sys.exit(2)
     if isinstance(payload, dict):
-        payload = payload.get(key, [])
+        if key not in payload:
+            # An absent key is a malformed input, not "zero candidates". The
+            # default to `[]` here made `{}` or `{"rows": []}` indistinguishable
+            # from a real quiet day, so a typo in the producer could green a run
+            # that never had any candidates at all.
+            print(
+                f'FAIL: upsert_events: {path}: expected "{key}" in the object',
+                file=sys.stderr,
+            )
+            sys.exit(2)
+        payload = payload[key]
     if not isinstance(payload, list):
         print(
             f'FAIL: upsert_events: {path}: expected a list or {{"{key}": [...]}}',
@@ -710,8 +720,17 @@ def main() -> None:
     counts = summarise(plan)
 
     if not plan:
-        print("FAIL: upsert_events: no candidates to plan", file=sys.stderr)
-        sys.exit(1)
+        # Zero candidates is a **quiet day**, not a broken planner. The runtime
+        # contract requires the model to emit `{"candidates": []}` when it found
+        # nothing, and the 2026-10-13 run did exactly that; failing here meant a
+        # correct quiet day could never reach `calendar_io`, so the job reddened.
+        # A malformed input is a different fault and `_load` rejects it with exit
+        # 2 — this branch only sees a well-formed list that happens to be empty.
+        if args.json:
+            print(json.dumps({"plan": [], "summary": counts, "candidates": 0}, indent=2))
+        else:
+            print("OK: upsert_events: no candidates this run (0 planned)")
+        return
 
     # `--json` prints the payload and nothing else, so stdout stays parseable
     # (the repo-wide convention; see scripts/README.md).

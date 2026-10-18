@@ -733,11 +733,11 @@ class TestCli:
         assert "result rather than a failure" in result.stderr
 
     def test_an_empty_plan_is_still_a_failure(self, tmp_path):
-        """The other half, and the reason the distinction is worth making.
+        """A *bare* empty plan, with no statement that the planner ran.
 
-        No rows at all means the planner produced nothing — not "it decided
-        nothing to do". Those read identically in a workflow log if only the exit
-        code distinguishes them, and the second one is a broken pipeline.
+        No rows and no summary means nothing here says a planner ever counted,
+        which is a broken pipeline. The producer's own empty plan — see the next
+        test — carries a `summary` and is a quiet day instead.
         """
         plan = tmp_path / "plan.json"
         plan.write_text(json.dumps({"plan": []}), encoding="utf-8")
@@ -745,6 +745,34 @@ class TestCli:
         assert result.returncode == 1
         assert "no rows at all" in result.stderr
         assert "not the same as" in result.stderr
+
+    def test_the_producers_empty_plan_is_a_quiet_day(self, tmp_path):
+        """`upsert_events --json` writes `{"plan": [], "summary": {...}}`.
+
+        That summary is the planner's own evidence that it ran and counted zero
+        candidates. Without this branch the 2026-10-13 run — where the model
+        emitted the explicit empty block the contract asks for — still reddened
+        at apply, so a correct quiet day could never finish.
+        """
+        plan = tmp_path / "plan.json"
+        plan.write_text(
+            json.dumps(
+                {
+                    "plan": [],
+                    "summary": {
+                        "create": 0,
+                        "update": 0,
+                        "unchanged": 0,
+                        "skip": 0,
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+        result = _run(["apply", "--plan", str(plan)])
+        assert result.returncode == 0, result.stderr
+        assert "empty plan" in result.stderr
+        assert "nothing to write" in result.stderr
 
     def test_a_mixed_plan_that_writes_nothing_is_not_an_empty_plan(self, tmp_path):
         """One create row is a decision even if every write failed — that is
