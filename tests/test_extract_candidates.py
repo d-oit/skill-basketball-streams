@@ -114,6 +114,45 @@ class TestTheRealTranscriptShape:
         mixed = lines[0] + "\nnot json at all\n"
         assert transcript_text(mixed) == mixed
 
+    def test_a_line_separator_inside_a_tool_result_does_not_split_the_stream(self):
+        """U+2028 is legal inside a JSON string; `splitlines()` is not a decoder.
+
+        The 2026-10-13 transcript contains 15 of these inside `webfetch` output.
+        `splitlines()` split there, every fragment after the first failed to
+        parse, and the stream fell back to raw text — so the model's correct
+        `{"candidates": []}` could not be read. `raw_decode` walks values, not
+        lines.
+        """
+        raw = "\n".join(
+            [
+                json.dumps(
+                    {
+                        "type": "tool_use",
+                        "part": {
+                            "type": "tool",
+                            "state": {"output": "before\u2028after"},
+                        },
+                    },
+                    ensure_ascii=False,
+                ),
+                json.dumps(
+                    {
+                        "type": "text",
+                        "part": {
+                            "type": "text",
+                            "text": "```json\n" + json.dumps([CANDIDATE]) + "\n```",
+                        },
+                    }
+                ),
+            ]
+        )
+        assert "\u2028" in raw
+        # The shape that broke it: more pieces than there are events.
+        assert len(raw.splitlines()) > 2
+        accepted, rejected = extract(raw)
+        assert rejected == [], rejected
+        assert len(accepted) == 1, accepted
+
 
 class TestAFenceInAToolResult:
     """A page quoted in a tool result must not swallow the model's answer.
@@ -482,6 +521,29 @@ class TestCli:
         result = _run(["--transcript", str(transcript)])
         assert result.returncode == 1
         assert "no usable candidates" in result.stderr
+
+    def test_an_explicit_empty_block_is_a_quiet_day_not_a_failure(self, tmp_path):
+        """The prompt's `{"candidates": []}` means "no games", not "broken run".
+
+        The 2026-10-13 runtime emitted exactly that and the step exited 1, so a
+        legitimate quiet day never reached the planner. An explicit block is an
+        answer; a missing block is still the failure the diagnosis names.
+        """
+        transcript = self._write(
+            tmp_path, json.dumps({"candidates": [], "source_leads": []})
+        )
+        out = tmp_path / "candidates.json"
+        result = _run(["--transcript", str(transcript), "--out", str(out)])
+        assert result.returncode == 0, result.stderr
+        assert "explicit empty block" in result.stdout
+        assert json.loads(out.read_text(encoding="utf-8")) == {"candidates": []}
+
+    def test_a_block_of_only_rejected_candidates_still_fails(self, tmp_path):
+        """An explicit empty list is a quiet day; a malformed one is not."""
+        transcript = self._write(tmp_path, json.dumps([{"league": "BBL"}]))
+        result = _run(["--transcript", str(transcript)])
+        assert result.returncode == 1
+        assert "rejected" in result.stderr
 
     def test_rejections_warn_on_stderr_but_still_succeed(self, tmp_path):
         transcript = self._write(

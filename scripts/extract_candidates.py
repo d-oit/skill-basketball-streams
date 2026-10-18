@@ -36,8 +36,10 @@ Usage:
     python3 scripts/extract_candidates.py --transcript run.json --json
 
 Exit codes:
-    0  PASS — at least one usable candidate
-    1  FAIL — no usable candidates (reported with the reason, never silent)
+    0  PASS — at least one usable candidate, or an explicit empty block
+       (`{"candidates": []}`, the contract's "no games today")
+    1  FAIL — no candidates and no explicit empty block (reported with the
+       reason, never silent)
     2  USAGE — bad arguments or unreadable input
 """
 from __future__ import annotations
@@ -103,8 +105,43 @@ def _collect(node: object, into: list[str], *, only_text_keys: bool) -> None:
             _collect(item, into, only_text_keys=only_text_keys)
 
 
+def _decode_values(text: str) -> list[object] | None:
+    """Decode one or more JSON values separated by whitespace.
+
+    This replaces a `text.splitlines()` loop, and the replacement is not
+    cosmetic: Python's `splitlines()` splits on more than `\\n`, including
+    U+2028 LINE SEPARATOR. JSON allows that character *inside a string*, and the
+    2026-10-13 `opencode` transcript contains 15 of them inside `webfetch`
+    results. Line splitting therefore cut valid events in half, every line
+    after the first fragment failed to parse, and the whole stream fell back to
+    raw text — so a correct `{"candidates": []}` answer was unreadable.
+    `JSONDecoder.raw_decode` walks the values themselves and does not care what
+    whitespace separates them.
+
+    Every non-whitespace character must belong to a value. A file that merely
+    starts with valid JSON and then becomes prose still returns `None`, so a
+    partial decode cannot look like a complete candidate list.
+    """
+    decoder = json.JSONDecoder()
+    values: list[object] = []
+    pos = 0
+    length = len(text)
+    while pos < length:
+        while pos < length and text[pos] in " \t\r\n":
+            pos += 1
+        if pos >= length:
+            break
+        try:
+            value, end = decoder.raw_decode(text, pos)
+        except json.JSONDecodeError:
+            return None
+        values.append(value)
+        pos = end
+    return values or None
+
+
 def _decode_jsonl(text: str) -> object | None:
-    """`text` decoded as JSON — one document, else one event per line.
+    """`text` decoded as JSON — one document, else one or more values.
 
     Returns the **document**, not a list wrapper, and `None` when the text is not
     JSON in either shape. `json_blocks` already knows how to read a bare
@@ -113,9 +150,8 @@ def _decode_jsonl(text: str) -> object | None:
     strings — the same zero-candidate outcome, from the other direction.
 
     The whole document is tried **first**, because a single-document transcript
-    is also "text". In the line-by-line case *every* non-blank line must parse: a
-    file that merely starts with valid JSON lines is a different document, and
-    half-decoding it would produce a partial candidate list that looks complete.
+    is also "text". The multi-value case is delegated to `_decode_values`; see
+    there for why `splitlines()` was the wrong separator.
     """
     stripped = text.strip()
     if not stripped:
@@ -124,16 +160,7 @@ def _decode_jsonl(text: str) -> object | None:
         return json.loads(stripped)
     except json.JSONDecodeError:
         pass
-
-    events: list[object] = []
-    for line in stripped.splitlines():
-        if not line.strip():
-            continue
-        try:
-            events.append(json.loads(line))
-        except json.JSONDecodeError:
-            return None
-    return events or None
+    return _decode_values(stripped)
 
 
 
@@ -338,6 +365,26 @@ def extract_source_leads(payload: object) -> list[dict]:
                     lead[key] = value
             leads.append(lead)
     return leads
+
+
+def has_explicit_empty_result(payload: object) -> bool:
+    """True when the model emitted a block that says "no games today".
+
+    The runtime prompt requires exactly `{"candidates": [], "source_leads": []}`
+    when nothing was found, and says why: "a missing block is what a failed run
+    looks like". The extractor nevertheless exited 1 for the explicit empty
+    block, so the 2026-10-13 run — which had done exactly what it was told —
+    reddened the whole job and never reached the planner. An explicit empty list
+    is an answer; a transcript with no block at all is still a failure, and a
+    block whose candidates were all *rejected* is still a failure (the rejection
+    lines name why).
+    """
+    for block in transcript_blocks(payload):
+        if isinstance(block, dict) and block.get("candidates") == []:
+            return True
+        if isinstance(block, list) and not block:
+            return True
+    return False
 
 
 def normalise_candidate(raw: dict) -> dict:
@@ -630,6 +677,20 @@ def main() -> None:
         print(f"WARN: extract_candidates: rejected {reason}", file=sys.stderr)
 
     if not candidates:
+        # An explicit empty block is the contract's "no games today", not a
+        # failure. It only passes when nothing was *rejected*: a block full of
+        # malformed candidates must still red, and the rejection lines say why.
+        if not rejected and has_explicit_empty_result(payload):
+            if args.out:
+                target = Path(args.out)
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(
+                    json.dumps({"candidates": []}, indent=2) + "\n", encoding="utf-8"
+                )
+            print("OK: extract_candidates: explicit empty block - no games this run")
+            if args.json:
+                print(json.dumps({"candidates": [], "rejected": rejected}, indent=2))
+            return
         # One message for three different faults sent every investigation to
         # the wrong place: a degenerate model was reported as a contract miss,
         # and the response was to edit a contract the model never read. So the
