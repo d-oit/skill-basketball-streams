@@ -1,10 +1,10 @@
 {
   "audit": {
-    "inconclusive": 2,
-    "judged": 0,
-    "precision": null,
-    "rows": 2,
-    "verified": 0,
+    "inconclusive": 3,
+    "judged": 1,
+    "precision": 1.0,
+    "rows": 4,
+    "verified": 1,
     "wrong": 0
   },
   "derived": true,
@@ -12,10 +12,10 @@
     "dropped": 0,
     "duplicates": 0,
     "fixture_recall": 0.016,
-    "fixtures": 61,
-    "rows": 61,
+    "fixtures": 62,
+    "rows": 62,
     "surfaced": 1,
-    "unseen": 60,
+    "unseen": 61,
     "unseen_keys": [
       "BBL|ALBA BERLIN|BMA365 Bamberg Baskets|2026-10-19T18:00Z",
       "BBL|ALBA BERLIN|VET-CONCEPT Gladiators Trier|2026-10-10T18:00Z",
@@ -30,6 +30,7 @@
       "BBL|EWE Baskets Oldenburg|Telekom Baskets Bonn|2026-10-16T18:00Z",
       "BBL|FC Bayern München Basketball|Veolia Towers Hamburg|2026-10-18T16:00Z",
       "BBL|FC Bayern München Basketball|Veolia Towers Hamburg|2026-10-25T15:30Z",
+      "BBL|Fitness First Würzburg Baskets|NINERS Chemnitz|2026-10-26T19:00Z",
       "BBL|Fitness First Würzburg Baskets|ROSTOCK SEAWOLVES|2026-10-10T16:30Z",
       "BBL|Fitness First Würzburg Baskets|SYNTAINICS MBC|2026-10-18T13:00Z",
       "BBL|MHP RIESEN Ludwigsburg|RASTA Vechta|2026-10-18T14:30Z",
@@ -81,8 +82,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 763,
-    "missed": 763,
+    "eligible": 773,
+    "missed": 773,
     "missed_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -304,6 +305,7 @@
       "https://sports.justwatch.com/de/basketball/kk-fmp-0",
       "https://sports.justwatch.com/de/basketball/sk-slavia-prague",
       "https://sports.justwatch.com/us/basketball/alba-berlin",
+      "https://sports.justwatch.com/us/basketball/champions-league",
       "https://sports.justwatch.com/us/basketball/euroleague",
       "https://sports.justwatch.com/us/basketball/euroleague/kk-crvena-zvezda-belgrade-anadolu-efes-sk-26-27",
       "https://sports.justwatch.com/us/basketball/euroleague/kk-crvena-zvezda-belgrade-hapoel-tel-aviv-26-27",
@@ -367,8 +369,10 @@
       "https://www.basketball-world.news/artikel/euroleague-diese-spiele-laufen-im-free-tv-und-kostenlosen-livestream-1056001",
       "https://www.basketball-world.news/artikel/hier-laufen-die-euroleague-spiele-des-fc-bayern-im-tv-und-stream-1151087",
       "https://www.basketball-world.news/artikel/wer-zeigt-das-bcl-achtelfinale-mit-berlin-und-wuerzburg-live-1153261",
+      "https://www.basketball-world.news/artikel/wer-zeigt-die-bbl-play-offs-im-free-tv-und-stream-1151710",
       "https://www.basketball-world.news/artikel/wer-zeigt-die-bcl-mit-berlin-heidelberg-und-wuerzburg-live-1153261",
       "https://www.basketball-world.news/artikel/wer-zeigt-fc-bayern-basketball-bei-fenerbahce-heute-live-im-free-tv-und-stream-1256853",
+      "https://www.basketball-world.news/artikel/wer-zeigt-fc-bayern-basketball-bei-hapoel-tel-aviv-heute-live-im-free-tv-und-stream-1255541",
       "https://www.basketball-world.news/artikel/wer-zeigt-fc-bayern-basketball-gegen-virtus-bologna-heute-live-im-free-tv-und-stream-1259340",
       "https://www.basketball-world.news/artikel/wo-laeuft-die-pro-a-live-im-tv-und-stream-1150305",
       "https://www.basketballontv.com/de/competitions/",
@@ -403,6 +407,7 @@
       "https://www.dazn.com/de-DE/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
       "https://www.dazn.com/en-DE/competition/Competition:dqu2u44uhtdj7qai48q72box5",
       "https://www.dazn.com/en-ES/home/9lbg14lt0szi46zzkru59oa38/1mcc2ychxf6crz7pfdxg7ii01",
+      "https://www.dazn.com/en-GB/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
       "https://www.dazn.com/en-GB/welcome/courtside1891",
       "https://www.dazn.com/en-IT/competitor/Competitor:33zimca2ldsxw1vx5qib7cu2j",
       "https://www.dazn.com/en-IT/competitor/Competitor:tq7d8ghyhv0v1ornsbywdvpd",
@@ -574,6 +579,7 @@
       "https://www.mz.de/live/basketball-livestream-europapokal-syntainics-mbc-taltech-alexela-tallinn-im-kostenlosen-stream-4119474",
       "https://www.nba.com/watch/featured",
       "https://www.nba.com/watch/nba-tv",
+      "https://www.ncaa.com/march-madness-live/ways-to-watch",
       "https://www.nchclive.com/nchbclivestream/",
       "https://www.netzwelt.de/",
       "https://www.netzwelt.de/news/228201-alba-berlin-gegen-ewe-baskets-oldenburg-so-verfolgt-bbl-spiel-kostenlos-tv-live-stream.html",
@@ -722,6 +728,7 @@
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-fc-bayern-alba-berlin-uebertragung-live-im-tv-stream",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-fc-bayern-bologna-uebertragung-im-tv-und-stream",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-gladiators-trier-vs-rostock-seawolves-uebertragung-im-tv-stream",
+      "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-hamburg-fc-bayern-uebertragung-im-tv-stream",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-jena-bayern-muenchen-uebertragung-im-tv-stream",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-towers-loewen-uebertragung-live-im-free-tv-stream",
       "https://www.tntsports.co.uk/basketball/easycredit-bbl/2025-2026/live-fc-bayern-muenchen-fitness-first-wuerzburg-baskets_mtc1633869/live.shtml",
@@ -735,6 +742,7 @@
       "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/maccabi-rapyd-tel-aviv-armani-olimpia-milano_mtc22011183/live.shtml",
       "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/olympiacos-anadolu-efes_mtc22011286/live.shtml",
       "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/paris-zalgiris-kaunas_mtc22011293/live.shtml",
+      "https://www.tod.tv/sports/basketball/fiba-americup-fiba-americup-5005233",
       "https://www.tomsguide.com/entertainment/sports/how-to-watch-germany-vs-turkiye-eurobasket-final-2025-live",
       "https://www.topfreizeit.de/am-mittwoch-startet-die-bbl-mit-berlin-hamburg-kostenlos-bei-magentasport-lust-auf-mehr-basketball-ber-700-spiele-aus-bbl-euroleague-eurocup-und-vom-der-deutschen-national-mannschaft-live-2010051.html",
       "https://www.trendyone.de/news/bbl-finale-live-im-free-tv-fc-bayern-basketball-vs-ratiopharm-ulm",
@@ -779,6 +787,7 @@
       "https://www.youtube.com/watch?v=2_-HGISapYU",
       "https://www.youtube.com/watch?v=3I83ko1eP9c",
       "https://www.youtube.com/watch?v=3I83ko1eP9c&xstg=CAMSBhUDzO3xHw%3D%3D",
+      "https://www.youtube.com/watch?v=3SqiRQIW3nc",
       "https://www.youtube.com/watch?v=3pdKSJU9Ah8",
       "https://www.youtube.com/watch?v=5k2WMXDZxtg",
       "https://www.youtube.com/watch?v=6PdBBlANCWU",
@@ -796,6 +805,7 @@
       "https://www.youtube.com/watch?v=Hh5YEuoreug",
       "https://www.youtube.com/watch?v=JPavyF_vMXw",
       "https://www.youtube.com/watch?v=K5zuonU-hHo&xstg=CAMSBhUDzO3xHw%3D%3D",
+      "https://www.youtube.com/watch?v=L7scag65uD8",
       "https://www.youtube.com/watch?v=LOvngOSlqEo",
       "https://www.youtube.com/watch?v=MLgGYhYyUjQ",
       "https://www.youtube.com/watch?v=MNNLKYurqBI",
@@ -819,6 +829,7 @@
       "https://www.youtube.com/watch?v=bv99RMJBclw",
       "https://www.youtube.com/watch?v=c3NuYGiqcrY",
       "https://www.youtube.com/watch?v=d09k5v6efx4",
+      "https://www.youtube.com/watch?v=efhJOkhKPSk",
       "https://www.youtube.com/watch?v=fi6ylJuJ_ro",
       "https://www.youtube.com/watch?v=gJDCCMjcEDc",
       "https://www.youtube.com/watch?v=gQZ7xd2i8rw&xstg=CAMSBhUDzO3xHw%3D%3D",
@@ -849,9 +860,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 11730,
-    "unique_games": 1159,
-    "unverifiable": 763,
+    "rows": 12007,
+    "unique_games": 1177,
+    "unverifiable": 773,
     "unverifiable_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -1073,6 +1084,7 @@
       "https://sports.justwatch.com/de/basketball/kk-fmp-0",
       "https://sports.justwatch.com/de/basketball/sk-slavia-prague",
       "https://sports.justwatch.com/us/basketball/alba-berlin",
+      "https://sports.justwatch.com/us/basketball/champions-league",
       "https://sports.justwatch.com/us/basketball/euroleague",
       "https://sports.justwatch.com/us/basketball/euroleague/kk-crvena-zvezda-belgrade-anadolu-efes-sk-26-27",
       "https://sports.justwatch.com/us/basketball/euroleague/kk-crvena-zvezda-belgrade-hapoel-tel-aviv-26-27",
@@ -1136,8 +1148,10 @@
       "https://www.basketball-world.news/artikel/euroleague-diese-spiele-laufen-im-free-tv-und-kostenlosen-livestream-1056001",
       "https://www.basketball-world.news/artikel/hier-laufen-die-euroleague-spiele-des-fc-bayern-im-tv-und-stream-1151087",
       "https://www.basketball-world.news/artikel/wer-zeigt-das-bcl-achtelfinale-mit-berlin-und-wuerzburg-live-1153261",
+      "https://www.basketball-world.news/artikel/wer-zeigt-die-bbl-play-offs-im-free-tv-und-stream-1151710",
       "https://www.basketball-world.news/artikel/wer-zeigt-die-bcl-mit-berlin-heidelberg-und-wuerzburg-live-1153261",
       "https://www.basketball-world.news/artikel/wer-zeigt-fc-bayern-basketball-bei-fenerbahce-heute-live-im-free-tv-und-stream-1256853",
+      "https://www.basketball-world.news/artikel/wer-zeigt-fc-bayern-basketball-bei-hapoel-tel-aviv-heute-live-im-free-tv-und-stream-1255541",
       "https://www.basketball-world.news/artikel/wer-zeigt-fc-bayern-basketball-gegen-virtus-bologna-heute-live-im-free-tv-und-stream-1259340",
       "https://www.basketball-world.news/artikel/wo-laeuft-die-pro-a-live-im-tv-und-stream-1150305",
       "https://www.basketballontv.com/de/competitions/",
@@ -1172,6 +1186,7 @@
       "https://www.dazn.com/de-DE/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
       "https://www.dazn.com/en-DE/competition/Competition:dqu2u44uhtdj7qai48q72box5",
       "https://www.dazn.com/en-ES/home/9lbg14lt0szi46zzkru59oa38/1mcc2ychxf6crz7pfdxg7ii01",
+      "https://www.dazn.com/en-GB/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
       "https://www.dazn.com/en-GB/welcome/courtside1891",
       "https://www.dazn.com/en-IT/competitor/Competitor:33zimca2ldsxw1vx5qib7cu2j",
       "https://www.dazn.com/en-IT/competitor/Competitor:tq7d8ghyhv0v1ornsbywdvpd",
@@ -1343,6 +1358,7 @@
       "https://www.mz.de/live/basketball-livestream-europapokal-syntainics-mbc-taltech-alexela-tallinn-im-kostenlosen-stream-4119474",
       "https://www.nba.com/watch/featured",
       "https://www.nba.com/watch/nba-tv",
+      "https://www.ncaa.com/march-madness-live/ways-to-watch",
       "https://www.nchclive.com/nchbclivestream/",
       "https://www.netzwelt.de/",
       "https://www.netzwelt.de/news/228201-alba-berlin-gegen-ewe-baskets-oldenburg-so-verfolgt-bbl-spiel-kostenlos-tv-live-stream.html",
@@ -1491,6 +1507,7 @@
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-fc-bayern-alba-berlin-uebertragung-live-im-tv-stream",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-fc-bayern-bologna-uebertragung-im-tv-und-stream",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-gladiators-trier-vs-rostock-seawolves-uebertragung-im-tv-stream",
+      "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-hamburg-fc-bayern-uebertragung-im-tv-stream",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-jena-bayern-muenchen-uebertragung-im-tv-stream",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-towers-loewen-uebertragung-live-im-free-tv-stream",
       "https://www.tntsports.co.uk/basketball/easycredit-bbl/2025-2026/live-fc-bayern-muenchen-fitness-first-wuerzburg-baskets_mtc1633869/live.shtml",
@@ -1504,6 +1521,7 @@
       "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/maccabi-rapyd-tel-aviv-armani-olimpia-milano_mtc22011183/live.shtml",
       "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/olympiacos-anadolu-efes_mtc22011286/live.shtml",
       "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/paris-zalgiris-kaunas_mtc22011293/live.shtml",
+      "https://www.tod.tv/sports/basketball/fiba-americup-fiba-americup-5005233",
       "https://www.tomsguide.com/entertainment/sports/how-to-watch-germany-vs-turkiye-eurobasket-final-2025-live",
       "https://www.topfreizeit.de/am-mittwoch-startet-die-bbl-mit-berlin-hamburg-kostenlos-bei-magentasport-lust-auf-mehr-basketball-ber-700-spiele-aus-bbl-euroleague-eurocup-und-vom-der-deutschen-national-mannschaft-live-2010051.html",
       "https://www.trendyone.de/news/bbl-finale-live-im-free-tv-fc-bayern-basketball-vs-ratiopharm-ulm",
@@ -1548,6 +1566,7 @@
       "https://www.youtube.com/watch?v=2_-HGISapYU",
       "https://www.youtube.com/watch?v=3I83ko1eP9c",
       "https://www.youtube.com/watch?v=3I83ko1eP9c&xstg=CAMSBhUDzO3xHw%3D%3D",
+      "https://www.youtube.com/watch?v=3SqiRQIW3nc",
       "https://www.youtube.com/watch?v=3pdKSJU9Ah8",
       "https://www.youtube.com/watch?v=5k2WMXDZxtg",
       "https://www.youtube.com/watch?v=6PdBBlANCWU",
@@ -1565,6 +1584,7 @@
       "https://www.youtube.com/watch?v=Hh5YEuoreug",
       "https://www.youtube.com/watch?v=JPavyF_vMXw",
       "https://www.youtube.com/watch?v=K5zuonU-hHo&xstg=CAMSBhUDzO3xHw%3D%3D",
+      "https://www.youtube.com/watch?v=L7scag65uD8",
       "https://www.youtube.com/watch?v=LOvngOSlqEo",
       "https://www.youtube.com/watch?v=MLgGYhYyUjQ",
       "https://www.youtube.com/watch?v=MNNLKYurqBI",
@@ -1588,6 +1608,7 @@
       "https://www.youtube.com/watch?v=bv99RMJBclw",
       "https://www.youtube.com/watch?v=c3NuYGiqcrY",
       "https://www.youtube.com/watch?v=d09k5v6efx4",
+      "https://www.youtube.com/watch?v=efhJOkhKPSk",
       "https://www.youtube.com/watch?v=fi6ylJuJ_ro",
       "https://www.youtube.com/watch?v=gJDCCMjcEDc",
       "https://www.youtube.com/watch?v=gQZ7xd2i8rw&xstg=CAMSBhUDzO3xHw%3D%3D",
@@ -1618,47 +1639,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-10-18T12:44Z",
+  "run_id": "2026-10-19T15:48Z",
   "source": {
-    "audit_rows": 2,
-    "candidates_rows": 11730,
-    "fixtures_rows": 61
+    "audit_rows": 4,
+    "candidates_rows": 12007,
+    "fixtures_rows": 62
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 122,
-      "missed": 122,
-      "recall": 0.0,
-      "rows": 210,
-      "run_id": "2026-10-13T16:11Z",
-      "unique_games": 180
-    },
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 173,
-      "missed": 173,
-      "recall": 0.0,
-      "rows": 310,
-      "run_id": "2026-10-13T18:39Z",
-      "unique_games": 271
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -1862,7 +1849,41 @@
       "rows": 281,
       "run_id": "2026-10-18T12:41Z",
       "unique_games": 243
+    },
+    {
+      "audit": {
+        "inconclusive": 1,
+        "judged": 1,
+        "precision": 1.0,
+        "rows": 2,
+        "verified": 1,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-10-18T12:59Z",
+      "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 130,
+      "missed": 130,
+      "recall": 0.0,
+      "rows": 277,
+      "run_id": "2026-10-19T15:46Z",
+      "unique_games": 241
     }
   ],
-  "ts": "2026-10-18T12:44:01.591328+00:00"
+  "ts": "2026-10-19T15:48:39.438284+00:00"
 }
