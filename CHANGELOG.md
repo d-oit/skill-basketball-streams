@@ -1175,6 +1175,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   spellings, and they are written `transparency: transparent` so a stream
   listing does not mark subscribers busy. Failed rows now name the `tool`,
   `attempts` and Composio `request_id`.
+- **A time-varying page is no longer treated as a permanent corpus control.**
+  The 2026-10-19 weekly refresh reported `youtube-channel-live` as
+  `lost-evidence`, but the gate had not changed: `@FIBA/live` carries a
+  broadcast only while that channel is live. The page is now a **frozen**
+  fixture (`RecordedPage.frozen`), recorded once and preserved verbatim on
+  every refresh; its bytes are still hash-checked and its game-anchor tests
+  still run. The first refresh against a corpus without it seeds it once.
 - **`runtime-daily.yml` no longer swallows a check that can never pass.** The
   `capture_transcripts.py --runner replay --from .tmp/transcript.json --check
   ... || true` line exited 2 on every run: a JSONL event stream is not the

@@ -51,7 +51,7 @@ quietly "simplified" into passing for the wrong reason.
 | `clb-home.html.gz` | `https://www.championsleague.basketball/` | no-evidence | whole |
 | `youtube-watch-recorded.html.gz` | `https://www.youtube.com/watch?v=dQw4w9WgXcQ` | no-evidence | extract |
 | `youtube-watch-live.html.gz` | a real live broadcast found via the Live filter | **evidence** | extract |
-| `youtube-channel-live.html.gz` | `https://www.youtube.com/@FIBA/live` | **evidence** | extract |
+| `youtube-channel-live.html.gz` | `https://www.youtube.com/@FIBA/live` | **evidence** | extract, **frozen** |
 | *(not stored)* | `https://www.youtube.com/` | no-evidence | verify-only |
 | *(not stored)* | the Live-filtered results page | no-evidence | verify-only |
 
@@ -71,6 +71,17 @@ disk *is* that response, so this is re-checkable.
 outright (`not the recorded bytes`). Without it, a fixture could be quietly
 tweaked into agreeing with a weakened gate — the file would still classify
 correctly, so nothing else would notice.
+
+### Why one page is frozen
+
+`youtube-channel-live` is a **frozen** fixture: it is recorded once and never
+re-fetched by `--refresh`. A channel's `/live` tab carries a broadcast only
+while that channel is live, so the weekly refresh saw `no-evidence` on
+2026-10-19 and filed a `lost-evidence` issue even though the gate had not
+changed. Freezing keeps the real response as a control for the gate and the
+game-anchor tests without turning “is FIBA live right now?” into a regression
+signal. Its stored hash is still checked by `--check`; only the re-fetch is
+skipped.
 
 ### Why some pages are extracts and two are not stored at all
 
