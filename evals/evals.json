@@ -584,6 +584,36 @@
         "references/validation-workflow.md",
         "scripts/upsert_events.py"
       ]
+    },
+    {
+      "id": 44,
+      "prompt": "Audit regression (synthesised from t4jmjopbhbf7iuv2ei3d8bi688, audited 2026-10-19T16:24:08.061676+00:00): an event was presented as VERIFIED even though the audit could not confirm free access. Input: url=https://sporteurope.tv/vr-bank-wuerzburg-baskets-akademie-jbbl/jbbl-nbbl-doppelspieltag; backend=agent; game_key=NBBL|Bamberg Baskets|VR-Bank Würzburg Baskets Akademie|2026-10-18T13:30Z; prior_state=VERIFIED; audit_reason=broadcast has not finished yet; audited_at=2026-10-17T12:34:53.581407+00:00.",
+      "expected_output": "Decision=SKIP; reason=free access was never confirmed, so the event must not have been claiming VERIFIED; checks: freeAccess=FAIL, verifiedClaimed=FAIL, regression=PASS",
+      "assertions": [
+        "freeAccess expected FAIL",
+        "verifiedClaimed expected FAIL",
+        "regression expected PASS"
+      ],
+      "files": [
+        "references/calendar-setup.md",
+        "references/self-learning.md"
+      ],
+      "synthesised_from": "t4jmjopbhbf7iuv2ei3d8bi688"
+    },
+    {
+      "id": 45,
+      "prompt": "Audit regression (synthesised from m69adlps8fnuvgi1osnpjrlvjk, audited 2026-10-19T16:24:08.061676+00:00): an event was presented as VERIFIED even though the audit could not confirm free access. Input: url=https://sporteurope.tv/vr-bank-wuerzburg-baskets-akademie-jbbl/jbbl-nbbl-doppelspieltag; backend=agent; game_key=JBBL|Nürnberg Falcons|VR-Bank Würzburg Baskets Akademie|2026-10-18T10:00Z; prior_state=VERIFIED; audit_reason=broadcast has not finished yet; audited_at=2026-10-17T12:34:53.581407+00:00.",
+      "expected_output": "Decision=SKIP; reason=free access was never confirmed, so the event must not have been claiming VERIFIED; checks: freeAccess=FAIL, verifiedClaimed=FAIL, regression=PASS",
+      "assertions": [
+        "freeAccess expected FAIL",
+        "verifiedClaimed expected FAIL",
+        "regression expected PASS"
+      ],
+      "files": [
+        "references/calendar-setup.md",
+        "references/self-learning.md"
+      ],
+      "synthesised_from": "m69adlps8fnuvgi1osnpjrlvjk"
     }
   ]
 }
