@@ -31,6 +31,7 @@ from scripts.run_daily import (
     host_of,
     is_plumbing,
     looks_live,
+    unique_queries,
 )
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -330,6 +331,149 @@ class TestTheFailureNamesItsCause:
         assert " — " not in err
 
 
+class TestSearchIsRetriedAndMeasured:
+    """A transient transport fault must not end a rung for the whole run.
+
+    Before this, one 429 from the free Exa tier discarded every remaining query
+    for that backend. The retry is bounded and limited to statuses that prove the
+    request was not served, so a retried query cannot duplicate a row.
+    """
+
+    class _Response:
+        def __init__(self, body: str):
+            self._body = body
+
+        def read(self) -> bytes:
+            return self._body.encode("utf-8")
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+    def _respond(self, monkeypatch, run_daily, sequence):
+        calls: list[int] = []
+        import urllib.error
+
+        def fake(request, timeout=None):
+            calls.append(1)
+            item = sequence[min(len(calls) - 1, len(sequence) - 1)]
+            if isinstance(item, BaseException):
+                raise item
+            return self._Response(item)
+
+        monkeypatch.setattr(run_daily.urllib.request, "urlopen", fake)
+        monkeypatch.setattr(run_daily.time, "sleep", lambda seconds: None)
+        return calls
+
+    def test_a_429_is_retried_and_the_query_still_answers(self, monkeypatch):
+        import urllib.error
+
+        import scripts.run_daily as run_daily
+        from scripts.run_daily import ExaBackend
+
+        monkeypatch.setenv("EXA_API_KEY", "dummy")
+        calls = self._respond(
+            monkeypatch,
+            run_daily,
+            [
+                urllib.error.HTTPError(
+                    "https://api.exa.ai/search", 429, "slow down", {"Retry-After": "0"}, None
+                ),
+                json.dumps({"results": [{"url": "https://sport1.de/live", "title": "live"}]}),
+            ],
+        )
+        backend = ExaBackend()
+        assert backend.search("q", 5) == [{"url": "https://sport1.de/live", "title": "live"}]
+        assert len(calls) == 2
+        assert backend.requests == 2
+        assert backend.retries == 1
+        assert backend.last_error == ""
+
+    def test_a_401_is_not_retried(self, monkeypatch):
+        import urllib.error
+
+        import scripts.run_daily as run_daily
+        from scripts.run_daily import ExaBackend
+
+        monkeypatch.setenv("EXA_API_KEY", "dummy")
+        calls = self._respond(
+            monkeypatch,
+            run_daily,
+            [urllib.error.HTTPError("https://api.exa.ai/search", 401, "no", {}, None)],
+        )
+        backend = ExaBackend()
+        assert backend.search("q", 5) == []
+        assert len(calls) == 1
+        assert backend.last_error == "HTTP 401"
+
+    def test_retries_are_bounded(self, monkeypatch):
+        import urllib.error
+
+        import scripts.run_daily as run_daily
+        from scripts.run_daily import MAX_RETRIES, ExaBackend
+
+        monkeypatch.setenv("EXA_API_KEY", "dummy")
+        calls = self._respond(
+            monkeypatch,
+            run_daily,
+            [urllib.error.HTTPError("https://api.exa.ai/search", 503, "down", {}, None)],
+        )
+        backend = ExaBackend()
+        assert backend.search("q", 5) == []
+        assert len(calls) == MAX_RETRIES + 1
+        assert backend.retries == MAX_RETRIES
+        assert backend.last_error == "HTTP 503"
+
+
+class TestUniqueQueries:
+    def test_case_and_whitespace_duplicates_are_dropped(self):
+        assert unique_queries(
+            ["BBL live", "  bbl   LIVE ", "NBBL live", "", "   "]
+        ) == ["BBL live", "NBBL live"]
+
+    def test_order_is_preserved_and_nothing_is_reordered(self):
+        assert unique_queries(["b", "a", "b", "c"]) == ["b", "a", "c"]
+
+    def test_the_ladder_runs_a_repeated_query_once(self):
+        backend = FakeBackend("fake", [{"url": "https://sport1.de/live"}])
+        rows, _, _ = collect_candidates(
+            ["q", "Q", " q "],
+            backends=[backend],
+            limit=5,
+            run_id=RUN_ID,
+            ts=TS,
+        )
+        assert len(rows) == 1
+        assert backend.queries == 1
+
+
+class TestRenderArenaErrorIsNamed:
+    """A broken renderer must not look like "nothing free today"."""
+
+    def test_a_render_failure_names_the_error_not_just_the_marker(self, monkeypatch):
+        import scripts.run_daily as run_daily
+
+        monkeypatch.setattr(
+            run_daily,
+            "_render_once",
+            lambda url: ("", "Error: browser closed unexpectedly"),
+        )
+        backend = run_daily.RenderArenaBackend()
+        assert backend.search("q", 5) == []
+        assert backend.last_error == "render failed: Error: browser closed unexpectedly"
+        assert backend.failures == 1
+
+    def test_a_page_without_the_marker_is_still_a_transport_failure(self, monkeypatch):
+        import scripts.run_daily as run_daily
+
+        monkeypatch.setattr(run_daily, "_render_once", lambda url: ("an app shell", ""))
+        backend = run_daily.RenderArenaBackend()
+        assert backend.search("q", 5) == []
+        assert "lacks 'KOSTENLOS'" in backend.last_error
+
+
 class TestCliContracts:
     def test_check_backends_fails_with_no_credentials(self, tmp_path):
         # The free keyless rung is always configured, so the ladder can only be
@@ -447,9 +591,13 @@ class TestJsonStdoutIsParseable:
 
         captured = capsys.readouterr()
         payload = json.loads(captured.out)
-        assert set(payload) == {"metrics", "backends", "attempted"}
+        assert set(payload) == {"metrics", "backends", "attempted", "backend_stats"}
         assert payload["backends"] == ["fake"]
         assert payload["attempted"] == ["fake"]
+        stats = payload["backend_stats"]["fake"]
+        assert stats["queries"] == len(DEFAULT_QUERIES)
+        assert stats["failures"] == 0
+        assert stats["last_error"] == ""
         # The human line still exists — on stderr, where it belongs.
         assert "OK: run_daily" in captured.err
 

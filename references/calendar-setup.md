@@ -265,6 +265,12 @@ one place — `create_arguments()` and `patch_arguments()` in `scripts/calendar_
 rather than being re-derived at each call site.
 4. **`visibility` must be sent explicitly.** It is valid on both tools, and it is the
 setting that decides whether a reader sees the event at all — see *Visibility* below.
+5. **Metadata and retries are part of the write contract.** Every event carries the
+plan's `game_key` in `extendedProperties.private` (exact identity for the next
+dedupe) and is written `transparency: transparent` (a stream listing is not a
+meeting). 429 is retried on every tool; 5xx and dropped connections only on the
+idempotent list/get/patch/delete calls, never on `CREATE_EVENT`, where an ambiguous
+retry would duplicate a public event.
 
 ### List Events (Duplicate Check)
 
