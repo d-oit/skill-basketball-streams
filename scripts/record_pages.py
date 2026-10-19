@@ -30,6 +30,14 @@ after gzip) are stored whole, because the *whole document* is the thing that
 used to produce the false positive: the markers for `player`, `dash`, `live` and
 `läuft` live in the inline runtime bundle.
 
+A `frozen=True` page is recorded once and then **never re-fetched**. A channel's
+`/@handle/live` tab carries a broadcast only while that channel happens to be
+live, so comparing it to a permanent expectation reported `lost-evidence` on a
+quiet week and `gained-evidence` on a busy one — with the gate unchanged both
+times. The stored response still pins the gate and the game-anchor decisions;
+it is simply not a statement about today. `--check` still verifies its hash, and
+the manifest keeps its original `fetched_at`.
+
 Exit codes:
     0  PASS — stored pages classify as the manifest says (or --refresh/--list)
     1  FAIL — a page is missing, unreadable, or misclassified
@@ -69,6 +77,15 @@ class RecordedPage:
     expect: str
     store: str = "full"          # "full" | "youtube-extract" | "verify-only"
     note: str = ""
+    #: Keep the recorded bytes and do not re-fetch on `--refresh`.
+    #:
+    #: A page whose content depends on the *moment* is not a control. A
+    #: channel's `/live` tab carries a broadcast only while that channel is
+    #: live, so the weekly refresh saw "no-evidence" one week and "evidence" the
+    #: next and filed a regression issue both times. The recorded response is
+    #: still a real page and still pins the gate/anchor decisions; it is simply
+    #: not a statement about today.
+    frozen: bool = False
 
 
 PAGES: tuple[RecordedPage, ...] = (
@@ -144,7 +161,12 @@ PAGES: tuple[RecordedPage, ...] = (
         "https://www.youtube.com/@FIBA/live",
         EVIDENCE,
         store="youtube-extract",
-        note="channel live tab with a broadcast attached (URL shape is gated elsewhere)",
+        note=(
+            "channel live tab with a broadcast attached (URL shape is gated "
+            "elsewhere); frozen because the tab only carries a broadcast while "
+            "the channel happens to be live"
+        ),
+        frozen=True,
     ),
 )
 
@@ -233,11 +255,11 @@ def _load(path: Path) -> bytes:
     return gzip.decompress(raw) if path.suffix == ".gz" else raw
 
 
-def baseline_verdicts(corpus_dir: Path) -> dict[str, bool]:
-    """The verdict each page carried in a previous manifest.
+def _baseline_entries(corpus_dir: Path) -> dict[str, dict]:
+    """The manifest's own entries, keyed by page name.
 
-    A missing or unreadable manifest is not an error: `--refresh` has to be able
-to *start* a corpus, and the flip report is a statement about change over time.
+    `--refresh` rewrites the manifest in place, so this is read before the write
+    to preserve pages that are deliberately frozen.
     """
     path = corpus_dir / "manifest.json"
     if not path.exists():
@@ -247,9 +269,21 @@ to *start* a corpus, and the flip report is a statement about change over time.
     except (OSError, json.JSONDecodeError):
         return {}
     return {
-        entry["name"]: bool(entry.get("evidence_now"))
+        entry["name"]: entry
         for entry in manifest.get("pages", [])
-        if entry.get("name")
+        if isinstance(entry, dict) and entry.get("name")
+    }
+
+
+def baseline_verdicts(corpus_dir: Path) -> dict[str, bool]:
+    """The verdict each page carried in a previous manifest.
+
+    A missing or unreadable manifest is not an error: `--refresh` has to be able
+to *start* a corpus, and the flip report is a statement about change over time.
+    """
+    return {
+        name: bool(entry.get("evidence_now"))
+        for name, entry in _baseline_entries(corpus_dir).items()
     }
 
 
@@ -363,11 +397,27 @@ def record(out_dir: Path, baseline_dir: Path | None = None) -> tuple[list[dict],
     the flips among the pages that were reduced are still returned. If any page
     failed, `UnreduciblePage` carries that partial comparison to the caller.
     """
-    baseline = baseline_verdicts(out_dir if baseline_dir is None else baseline_dir)
+    source_dir = out_dir if baseline_dir is None else baseline_dir
+    baseline = baseline_verdicts(source_dir)
+    preserved_entries = _baseline_entries(source_dir)
     entries = []
     pending: list[tuple[str, bytes]] = []
     unusable: list[dict] = []
     for page in PAGES:
+        if page.frozen:
+            # A frozen page is still part of the corpus (its stored bytes and
+            # manifest entry are checked) but is not re-fetched after its first
+            # recording: its verdict depends on the moment, not on the gate.
+            # The first `--refresh` against a corpus without it seeds it once.
+            preserved = preserved_entries.get(page.name)
+            if preserved is not None:
+                entries.append(preserved)
+                stored_name = str(preserved.get("stored") or "")
+                if stored_name:
+                    source = source_dir / stored_name
+                    if source.is_file():
+                        pending.append((stored_name, source.read_bytes()))
+                continue
         status, body = _fetch(page.url)
         reason, payload = _reduce(page, status, body)
         if reason:
@@ -573,9 +623,10 @@ def main() -> None:
 
     if args.list:
         for page in PAGES:
+            marker = " frozen" if page.frozen else ""
             print(
                 f"OK: record_pages: {page.name:26s} {page.expect:12s} "
-                f"store={page.store:16s} {page.url}"
+                f"store={page.store:16s}{marker} {page.url}"
             )
         return
 

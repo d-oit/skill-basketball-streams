@@ -304,20 +304,76 @@ class TestFlipReport:
         entries, flips = record_pages.record(tmp_path / "out", baseline_dir=baseline_dir)
 
         by_name = {flip["name"]: flip for flip in flips}
-        assert sorted(by_name) == ["clb-home", "youtube-channel-live", "youtube-watch-live"]
+        assert sorted(by_name) == ["clb-home", "youtube-watch-live"]
         lost = by_name["clb-home"]
         assert (lost["was"], lost["now"]) == (EVIDENCE, NO_EVIDENCE)
         assert lost["direction"] == "lost-evidence" and lost["agrees_with_expect"] is True
         assert lost["url"] == "https://www.championsleague.basketball/"
         gained = by_name["youtube-watch-live"]
         assert gained["direction"] == "gained-evidence" and gained["agrees_with_expect"] is True
-        # A flip towards the recorded expectation and one away from it need
-        # different fixes, so the report carries which it is rather than leaving
-        # the reader to cross-reference `PAGES`.
-        regression = by_name["youtube-channel-live"]
-        assert regression["direction"] == "lost-evidence"
-        assert regression["agrees_with_expect"] is False
+        # `youtube-channel-live` is frozen: the baseline entry is preserved
+        # verbatim and a refresh must not compare it to today's tab.
+        assert not any(flip["name"] == "youtube-channel-live" for flip in flips)
+        preserved = next(e for e in entries if e["name"] == "youtube-channel-live")
+        assert preserved["evidence_now"] is True
         assert len(entries) == len(PAGES)
+
+    def test_a_frozen_page_is_not_refetched_and_cannot_flip(self, tmp_path, monkeypatch):
+        """A channel live tab is time-varying, so it is a fixture, not a control.
+
+        The 2026-10-19 refresh saw no broadcast attached and reported
+        `lost-evidence` even though the gate was unchanged. The recorded bytes
+        are still checked, but a refresh must not re-fetch them and must not
+        compare today's page to a permanent expectation.
+        """
+        import hashlib
+
+        import record_pages
+
+        calls: list[str] = []
+
+        def fake_fetch(url: str, timeout: float = 30.0):
+            calls.append(url)
+            return 200, self.DEAD
+
+        monkeypatch.setattr(record_pages, "_fetch", fake_fetch)
+        stored = CORPUS / "youtube-channel-live.html.gz"
+        before = hashlib.sha256(stored.read_bytes()).hexdigest()
+
+        entries, flips = record_pages.record(tmp_path / "out", baseline_dir=CORPUS)
+
+        assert "https://www.youtube.com/@FIBA/live" not in calls
+        preserved = next(e for e in entries if e["name"] == "youtube-channel-live")
+        assert preserved["evidence_now"] is True
+        assert not any(flip["name"] == "youtube-channel-live" for flip in flips)
+        assert hashlib.sha256(stored.read_bytes()).hexdigest() == before
+
+    def test_a_frozen_page_is_seeded_once_then_left_alone(self, tmp_path, monkeypatch):
+        """An empty corpus seeds the fixture; the next refresh preserves it."""
+        import record_pages
+
+        calls: list[str] = []
+
+        def fake_fetch(url: str, timeout: float = 30.0):
+            calls.append(url)
+            return 200, self.LIVE
+
+        monkeypatch.setattr(record_pages, "_fetch", fake_fetch)
+        out = tmp_path / "out"
+        record_pages.record(out)
+
+        assert calls.count("https://www.youtube.com/@FIBA/live") == 1
+        seeded = json.loads((out / "manifest.json").read_text())
+        entry = next(e for e in seeded["pages"] if e["name"] == "youtube-channel-live")
+        assert entry["evidence_now"] is True
+
+        calls.clear()
+        entries, flips = record_pages.record(out)
+        assert "https://www.youtube.com/@FIBA/live" not in calls
+        preserved = next(e for e in entries if e["name"] == "youtube-channel-live")
+        assert preserved["evidence_now"] is True
+        assert preserved["fetched_at"] == entry["fetched_at"]
+        assert not any(flip["name"] == "youtube-channel-live" for flip in flips)
 
     def test_an_in_place_refresh_compares_against_what_it_is_replacing(self, tmp_path, monkeypatch):
         """The baseline is the manifest this run is about to overwrite. Read it
