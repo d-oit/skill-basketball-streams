@@ -188,6 +188,39 @@ class TestEventsMatch:
             _candidate(teams=["ALBA Berlin", "Bonn"]),
         )
 
+    def test_an_exact_game_key_matches_even_when_the_sources_spell_clubs_differently(self):
+        """The stored identity outranks the ±30-minute/teams heuristic.
+
+        A second source may call the same club "Bayern" and give a start outside
+        the slot window; the event this system wrote carries the exact game key,
+        so it is the same game rather than a duplicate.
+        """
+        key = "BBL|ALBA Berlin|FC Bayern Muenchen|2026-09-16T17:00Z"
+        assert events_match(
+            _existing(game_key=key, teams=["ALBA", "Bayern"]),
+            _candidate(
+                game_key=key,
+                teams=["ALBA Berlin", "FC Bayern Basketball"],
+                start="2026-09-16T20:10:00+02:00",
+            ),
+        )
+
+    def test_a_different_game_key_falls_back_to_the_teams_rule(self):
+        """A differing key is not proof of a different game.
+
+        Two sources may compute a key from different spellings. Falling through
+        to the existing rule keeps the alias cases matching instead of creating a
+        duplicate merely because the key text differs.
+        """
+        assert events_match(
+            _existing(game_key="BBL|ALBA Berlin|Bayern|2026-09-16T17:00Z"),
+            _candidate(game_key="BBL|ALBA|Bayern Muenchen|2026-09-16T17:00Z"),
+        )
+        assert not events_match(
+            _existing(game_key="a"),
+            _candidate(game_key="b", teams=["ALBA Berlin", "Bonn"]),
+        )
+
 
 class TestATeamslessEventIsNotAWildcard:
     """The defect, as measured on the live calendar on 2026-09-15.

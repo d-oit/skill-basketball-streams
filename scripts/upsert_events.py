@@ -218,9 +218,24 @@ def events_match(existing: dict, candidate: dict) -> bool:
     EuroBasket 2026 - Day 1` — which is why this is a fallback rather than a
     loosening: the correct game still matches, and a *different* game at the same
     time now gets created instead of vanishing.
+
+    An exact `game_key` on both sides short-circuits all of that. It is written
+    into `extendedProperties.private` by `calendar_io.build_event_body`, so a
+    later run matches the game it created even if a second source spells a club
+    differently. Equality only ever *adds* a match; a differing key still falls
+    through to the slot/teams rule so a legacy candidate is not re-created.
     """
     left = parse_dt(existing.get("start") or existing.get("startTime"))
     right = parse_dt(candidate.get("start") or candidate.get("startTime"))
+    # The exact identity, when both sides have it. New events carry
+    # `extendedProperties.private.game_key`; a match here is the same game even
+    # when the two sources would spell a club differently, and it does not need
+    # the 30-minute window to agree. Old events have no key, so the rule below
+    # remains the fallback rather than being replaced.
+    left_key = str(existing.get("game_key") or "")
+    right_key = str(candidate.get("game_key") or "")
+    if left_key and right_key and left_key == right_key:
+        return True
     if left is None or right is None:
         return False
     if abs(left - right) > MATCH_WINDOW:

@@ -1157,6 +1157,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   declare — and the count is 45 in `PRODUCT.md`, `README.md` and `SKILL.md`. The
   eval cases themselves are unchanged: this documents the vocabulary the gate
   grades, rather than re-baselining the gate.
+- **Search rungs survive a transient fault and report what they did.** A single
+  429 from the free Exa tier used to discard every remaining query for that
+  backend. 429/5xx/transport faults are now retried with bounded backoff and
+  `Retry-After` honoured (never 401/403, and never in a way that can duplicate a
+  row); duplicate queries are dropped before the ladder; and
+  `queries/requests/retries/failures/elapsed_ms` are printed per backend and
+  exposed as `backend_stats` in `--json`. The local render rung now returns the
+  renderer's error instead of an empty string, so "the browser failed" no longer
+  reads as "the arena had nothing free".
+- **Calendar writes have a capability-aware retry policy and carry exact
+  identity.** 429 is retried on every tool; 5xx and dropped connections only on
+  the idempotent list/get/patch/delete tools, never on an ambiguous
+  `CREATE_EVENT` — a second create would duplicate a public event. New events
+  store the plan's `game_key` in `extendedProperties.private`, so the next run
+  matches the game exactly instead of relying on the ±30-minute slot and club
+  spellings, and they are written `transparency: transparent` so a stream
+  listing does not mark subscribers busy. Failed rows now name the `tool`,
+  `attempts` and Composio `request_id`.
 - **`runtime-daily.yml` no longer swallows a check that can never pass.** The
   `capture_transcripts.py --runner replay --from .tmp/transcript.json --check
   ... || true` line exited 2 on every run: a JSONL event stream is not the

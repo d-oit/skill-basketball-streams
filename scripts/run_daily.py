@@ -31,6 +31,7 @@ import argparse
 import json
 import os
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -75,6 +76,77 @@ LIVE_TEXT_HINTS = ("live", "livestream", "live stream", "kostenlos live")
 TIMEOUT_SECONDS = 20
 USER_AGENT = "basketball-streams-runtime/1.0"
 
+# A search is a **retryable GET**, unlike a calendar create. 429 and the
+# gateway-family 5xx mean the request did not reach the index, so repeating it
+# cannot duplicate a result; a connection reset has the same property. 4xx
+# (except 429) is a request or credential fault and repeating it only spends the
+# remaining quota on the same refusal.
+RETRYABLE_HTTP_STATUS = (429, 500, 502, 503, 504)
+MAX_RETRIES = 2
+RETRY_BASE_SECONDS = 0.25
+
+
+def _retry_after_seconds(exc: urllib.error.HTTPError) -> float | None:
+    """A server's `Retry-After` hint, when it is a plain number of seconds."""
+    try:
+        value = str((exc.headers or {}).get("Retry-After") or "").strip()
+        if value:
+            return max(0.0, float(value))
+    except (AttributeError, TypeError, ValueError):
+        pass
+    return None
+
+
+def _open_with_retry(request: urllib.request.Request, *, backend: "Backend"):
+    """`urlopen` with bounded retries for transport faults.
+
+    Every search rung used to make exactly one attempt: a 429 from the free Exa
+    tier, a 502 from a gateway, or a dropped connection ended that backend for
+    the whole run, and the ledger lost every query it would have answered. The
+    retry is deliberately limited to failures that prove the request was not
+    served — see `RETRYABLE_HTTP_STATUS` — so this can never turn one query into
+    duplicate rows. `Retry-After` is honoured when present, because a fixed
+    exponential backoff that ignores the server's own hint keeps hammering a
+    rate limit.
+    """
+    last_exc: BaseException | None = None
+    for attempt in range(MAX_RETRIES + 1):
+        backend.requests += 1
+        try:
+            return urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS)
+        except urllib.error.HTTPError as exc:
+            last_exc = exc
+            if exc.code not in RETRYABLE_HTTP_STATUS or attempt >= MAX_RETRIES:
+                raise
+            delay = _retry_after_seconds(exc)
+        except (urllib.error.URLError, OSError) as exc:
+            last_exc = exc
+            if attempt >= MAX_RETRIES:
+                raise
+            delay = None
+        backend.retries += 1
+        time.sleep(delay if delay is not None else RETRY_BASE_SECONDS * (2**attempt))
+    raise last_exc if last_exc is not None else RuntimeError("urlopen exhausted")
+
+
+def unique_queries(queries: list[str]) -> list[str]:
+    """Queries with case/whitespace duplicates removed, first spelling kept.
+
+    The ladder is charged per query per backend. A query file that repeats a
+    line — or a generated list that spells one query two ways — used to buy the
+    same results twice and push a free tier towards its rate limit for nothing.
+    """
+    seen: set[str] = set()
+    out: list[str] = []
+    for query in queries:
+        cleaned = " ".join(str(query).split())
+        key = cleaned.casefold()
+        if not cleaned or key in seen:
+            continue
+        seen.add(key)
+        out.append(cleaned)
+    return out
+
 
 class Backend:
     name = ""
@@ -89,6 +161,32 @@ class Backend:
     # model ladder. Presence stays the preflight's question (`backend_status`);
     # this is the run's, and it never changes which exit code is reached.
     last_error = ""
+    # Per-run counters. Class-level defaults are zero so a third-party backend
+    # that does not call `super().__init__` still reports something sane; the
+    # ladder resets them at the start of every `collect_candidates`.
+    queries = 0
+    requests = 0
+    retries = 0
+    failures = 0
+    elapsed_seconds = 0.0
+
+    def reset_stats(self) -> None:
+        self.last_error = ""
+        self.queries = 0
+        self.requests = 0
+        self.retries = 0
+        self.failures = 0
+        self.elapsed_seconds = 0.0
+
+    def stats(self) -> dict:
+        return {
+            "queries": self.queries,
+            "requests": self.requests,
+            "retries": self.retries,
+            "failures": self.failures,
+            "elapsed_ms": round(self.elapsed_seconds * 1000),
+            "last_error": self.last_error,
+        }
 
     def available(self) -> bool:
         return bool(os.environ.get(self.env_var)) if self.env_var else True
@@ -102,6 +200,7 @@ class Backend:
 
     def _fail(self, reason: str) -> None:
         """Record the FIRST transport failure, so a message is deterministic."""
+        self.failures += 1
         self.last_error = self.last_error or reason
 
     def _result(self, query: str, items: list[dict]) -> list[dict]:
@@ -131,7 +230,7 @@ class ExaBackend(Backend):
             method="POST",
         )
         try:
-            with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as resp:
+            with _open_with_retry(request, backend=self) as resp:
                 body = json.loads(resp.read().decode("utf-8", "replace") or "{}")
         except urllib.error.HTTPError as exc:
             self._fail(f"HTTP {exc.code}")
@@ -200,7 +299,7 @@ class ExaMcpKeylessBackend(Backend):
             headers=headers,
             method="POST",
         )
-        with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as resp:
+        with _open_with_retry(request, backend=self) as resp:
             kept = resp.headers.get("mcp-session-id") or session
             return kept, resp.read().decode("utf-8", "replace")
 
@@ -300,7 +399,7 @@ class TinyFishSearchBackend(Backend):
             headers={"X-API-Key": key, "User-Agent": USER_AGENT},
         )
         try:
-            with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as resp:
+            with _open_with_retry(request, backend=self) as resp:
                 body = json.loads(resp.read().decode("utf-8", "replace") or "{}")
         except urllib.error.HTTPError as exc:
             self._fail(f"HTTP {exc.code}")
@@ -358,7 +457,14 @@ class RenderArenaBackend(Backend):
         return f"renders {self.arena} with patchright (marker: {self.marker!r})"
 
     def search(self, query: str, limit: int) -> list[dict]:
-        text = _render_once(self.arena)
+        text, error = _render_once(self.arena)
+        if error:
+            # Name the render failure rather than reporting only the missing
+            # marker: a browser that would not start and a page that rendered
+            # without the free-arena section need different fixes, and both used
+            # to arrive as the same empty string.
+            self._fail(f"render failed: {error}")
+            return []
         if self.marker not in text:
             # Recorded as a transport failure, not an empty result: an empty
             # result would read as "nothing free today", which is precisely the
@@ -377,17 +483,22 @@ def _patchright_importable() -> bool:
     return True
 
 
-def _render_once(url: str, wait_ms: int = 6000) -> str:
-    """Render `url` headless and return the visible text. Empty string on failure.
+def _render_once(url: str, wait_ms: int = 6000) -> tuple[str, str]:
+    """Render `url` headless. Returns `(visible_text, error_message)`.
 
     The wait is deliberate: the page is a client-rendered app shell, so its
     text does not exist at `domcontentloaded`. A shorter wait returns the shell
     again and the caller mistakes "unreadable" for "nothing free".
+
+    The error is returned rather than swallowed. Returning `""` for both a
+    missing browser and a page that loaded without the expected section made
+    "the renderer is broken" indistinguishable from "nothing free today", which
+    is the failure this rung exists to rule out.
     """
     try:
         from patchright.sync_api import sync_playwright
     except Exception as exc:  # pragma: no cover - import guarded by caller
-        return ""
+        return "", f"patchright unavailable: {type(exc).__name__}: {exc}"
     try:
         with sync_playwright() as play:
             browser = play.chromium.launch(headless=True, args=["--no-sandbox"])
@@ -395,11 +506,11 @@ def _render_once(url: str, wait_ms: int = 6000) -> str:
                 page = browser.new_page(user_agent=USER_AGENT)
                 page.goto(url, wait_until="domcontentloaded", timeout=60000)
                 page.wait_for_timeout(wait_ms)
-                return page.inner_text("body")
+                return page.inner_text("body"), ""
             finally:
                 browser.close()
-    except Exception:
-        return ""
+    except Exception as exc:
+        return "", f"{type(exc).__name__}: {exc}"
 
 
 ALL_BACKENDS: dict[str, Backend] = {
@@ -486,6 +597,9 @@ def collect_candidates(
     contributed: list[str] = []
     attempted: list[str] = []
     seen: set[tuple[str, str]] = set()
+    queries = unique_queries(queries)
+    for backend in backends:
+        backend.reset_stats()
     for query in queries:
         for backend in backends:
             if not backend.available():
@@ -493,7 +607,13 @@ def collect_candidates(
             if backend.name not in attempted:
                 attempted.append(backend.name)
             before = len(rows)
-            for item in backend.search(query, limit):
+            backend.queries += 1
+            started = time.perf_counter()
+            try:
+                items = backend.search(query, limit)
+            finally:
+                backend.elapsed_seconds += time.perf_counter() - started
+            for item in items:
                 url = str(item.get("url") or "").strip()
                 if not url or is_plumbing(url):
                     continue
@@ -603,6 +723,14 @@ def main() -> None:
     if not queries:
         print("FAIL: run_daily: no queries to run", file=sys.stderr)
         sys.exit(2)
+    unique = unique_queries(queries)
+    if len(unique) != len(queries):
+        print(
+            f"note: run_daily: dropped {len(queries) - len(unique)} duplicate "
+            f"quer{'y' if len(queries) - len(unique) == 1 else 'ies'} before the ladder",
+            file=sys.stderr,
+        )
+    queries = unique
 
     names = args.backend or list(LADDER)
     backends = [ALL_BACKENDS[name] for name in names if name in ALL_BACKENDS]
@@ -624,6 +752,23 @@ def main() -> None:
     rows, contributed, attempted = collect_candidates(
         queries, backends=backends, limit=args.limit, run_id=run_id, ts=ts
     )
+
+    # One line per rung, including the ones that answered nothing: the aggregate
+    # "surfaced no candidates" cannot say which backend was rate-limited, how
+    # many retries it needed, or how long it took. `WARN` marks a transport
+    # failure (the only kind `last_error` records); a clean rung gets `OK`.
+    for backend in backends:
+        if backend.queries == 0 and not backend.available():
+            continue
+        marker = "WARN" if backend.last_error else "OK  "
+        detail = f": {backend.last_error}" if backend.last_error else ""
+        stats = backend.stats()
+        print(
+            f"{marker} run_daily: {backend.name}: queries={stats['queries']} "
+            f"requests={stats['requests']} retries={stats['retries']} "
+            f"failures={stats['failures']} elapsed_ms={stats['elapsed_ms']}{detail}",
+            file=sys.stderr,
+        )
 
     ledger = Path(args.ledger) if args.ledger else (
         Path(args.dest) / "candidates.jsonl" if args.dest else Path(DEFAULT_LEDGER)
@@ -668,7 +813,14 @@ def main() -> None:
     if args.json:
         print(
             json.dumps(
-                {"metrics": metrics, "backends": contributed, "attempted": attempted},
+                {
+                    "metrics": metrics,
+                    "backends": contributed,
+                    "attempted": attempted,
+                    "backend_stats": {
+                        backend.name: backend.stats() for backend in backends
+                    },
+                },
                 indent=2,
             )
         )

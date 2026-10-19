@@ -74,6 +74,7 @@ import argparse
 import json
 import os
 import sys
+import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timedelta, timezone
@@ -126,6 +127,20 @@ TOOL_PATCH_EVENT = "GOOGLECALENDAR_PATCH_EVENT"
 TOOL_DELETE_EVENT = "GOOGLECALENDAR_DELETE_EVENT"
 TIMEOUT_SECONDS = 30
 DEFAULT_TIMEZONE = "Europe/Berlin"
+# A retry is only safe when it cannot create a second event. `CREATE_EVENT` is
+# therefore retried on 429 (the request was refused before it reached Google) but
+# never on a 5xx or a dropped connection: those may have created the event, and a
+# retry would produce a duplicate on a public calendar. READs, PATCHes and
+# DELETEs are idempotent, so they may be retried on the gateway family too.
+RETRYABLE_HTTP_STATUS = (429, 500, 502, 503, 504)
+IDEMPOTENT_TOOLS = (
+    "GOOGLECALENDAR_EVENTS_LIST",
+    "GOOGLECALENDAR_EVENTS_GET",
+    "GOOGLECALENDAR_PATCH_EVENT",
+    "GOOGLECALENDAR_DELETE_EVENT",
+)
+MAX_RETRIES = 2
+RETRY_BASE_SECONDS = 0.5
 # `VISIBILITY_VALUES` comes from `calendar_config.py`, which owns the field: the
 # enum `CREATE_EVENT`/`PATCH_EVENT` accept, recorded from the live tool schema.
 # Validated rather than forwarded, because an unaccepted value is rejected by
@@ -148,11 +163,27 @@ ACTION_DELETE = "delete"
 
 
 class CalendarError(RuntimeError):
-    """Raised when the API rejects a request, carrying the status and body."""
+    """Raised when the API rejects a request, carrying the status and body.
 
-    def __init__(self, status: int, message: str) -> None:
+    `slug`, `attempts` and `request_id` are for the log, not for control flow:
+    a failed create must be diagnosable from `applied.json` alone, without the
+    operator having to guess which tool or how many tries produced the row.
+    """
+
+    def __init__(
+        self,
+        status: int,
+        message: str,
+        *,
+        slug: str = "",
+        attempts: int = 1,
+        request_id: str = "",
+    ) -> None:
         super().__init__(f"HTTP {status}: {message}")
         self.status = status
+        self.slug = slug
+        self.attempts = attempts
+        self.request_id = request_id
 
 
 def _parse_dt(value: object) -> datetime | None:
@@ -224,6 +255,28 @@ def scope_arguments(user_id: str, connected_account_id: str) -> dict:
     return {"user_id": user_id}
 
 
+def _request_id(detail: str) -> str:
+    """Composio's own handle for a failed call, when the body carries one."""
+    try:
+        payload = json.loads(detail)
+    except (TypeError, ValueError):
+        return ""
+    if isinstance(payload, dict):
+        return str(payload.get("log_id") or payload.get("request_id") or "")
+    return ""
+
+
+def _retry_delay(exc: urllib.error.HTTPError, attempt: int) -> float:
+    """Honour `Retry-After`, otherwise exponential backoff."""
+    try:
+        value = str((exc.headers or {}).get("Retry-After") or "").strip()
+        if value:
+            return max(0.0, float(value))
+    except (AttributeError, TypeError, ValueError):
+        pass
+    return RETRY_BASE_SECONDS * (2**attempt)
+
+
 def _execute_tool(
     slug: str,
     arguments: dict,
@@ -232,53 +285,96 @@ def _execute_tool(
     scope: dict,
     timeout: float = TIMEOUT_SECONDS,
 ) -> dict:
-    """One Composio tool execution. Never logs the API key.
+    """One Composio tool execution, with a retry policy that cannot duplicate.
 
     Raises `CalendarError` for a transport failure **and** for a tool that
     reported `successful: false` — a 200 carrying a refusal is the failure mode
     that would otherwise be read as an empty result, and an empty result is
     indistinguishable from "no events today".
+
+    Retries exist because a single 429 or gateway 5xx used to fail the whole
+    row. They are bounded and **capability-aware**: a create is retried only on
+    429 (refused before Google saw it), while reads, patches and deletes — which
+    are idempotent — may also be retried on 5xx and dropped connections. Retrying
+    a create on an ambiguous failure is how a public calendar gets two copies of
+    the same game.
     """
     body = {**scope, "arguments": arguments, "version": COMPOSIO_TOOLKIT_VERSION}
-    request = urllib.request.Request(
-        f"{COMPOSIO_ROOT}/tools/execute/{slug}",
-        data=json.dumps(body).encode("utf-8"),
-        method="POST",
-        headers={
-            "x-api-key": api_key,
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        },
-    )
-    try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            payload = response.read().decode("utf-8", "replace")
-    except urllib.error.HTTPError as exc:
-        # `exc.read()` is `bytes` for a real HTTP response, but a *synthetic*
-        # `HTTPError` — one constructed with `fp=None`, which the test suite
-        # raises and some stdlib builds back with a `StringIO` — returns `str`.
-        # `.decode` on that is an `AttributeError` that replaces the calendar
-        # error with a crash, which is the failure the caller can least act on.
-        raw = exc.read() if exc.fp else b""
-        detail = raw.decode("utf-8", "replace") if isinstance(raw, bytes) else raw
-        # Composio's error body carries its own reason and a request id; the API
-        # key never appears in it.
-        raise CalendarError(exc.code, detail[:500] or exc.reason) from exc
-    except (urllib.error.URLError, OSError, ValueError) as exc:
-        raise CalendarError(0, f"network error: {exc}") from exc
+    last_error: CalendarError | None = None
+    for attempt in range(MAX_RETRIES + 1):
+        request = urllib.request.Request(
+            f"{COMPOSIO_ROOT}/tools/execute/{slug}",
+            data=json.dumps(body).encode("utf-8"),
+            method="POST",
+            headers={
+                "x-api-key": api_key,
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                payload = response.read().decode("utf-8", "replace")
+        except urllib.error.HTTPError as exc:
+            # `exc.read()` is `bytes` for a real HTTP response, but a *synthetic*
+            # `HTTPError` — one constructed with `fp=None`, which the test suite
+            # raises and some stdlib builds back with a `StringIO` — returns `str`.
+            # `.decode` on that is an `AttributeError` that replaces the calendar
+            # error with a crash, which is the failure the caller can least act on.
+            raw = exc.read() if exc.fp else b""
+            detail = raw.decode("utf-8", "replace") if isinstance(raw, bytes) else raw
+            detail = detail or str(exc.reason or "")
+            retryable = exc.code in RETRYABLE_HTTP_STATUS and (
+                exc.code == 429 or slug in IDEMPOTENT_TOOLS
+            )
+            last_error = CalendarError(
+                exc.code,
+                detail[:500] or exc.reason,
+                slug=slug,
+                attempts=attempt + 1,
+                request_id=_request_id(detail),
+            )
+            if retryable and attempt < MAX_RETRIES:
+                time.sleep(_retry_delay(exc, attempt))
+                continue
+            raise last_error from exc
+        except (urllib.error.URLError, OSError) as exc:
+            # A dropped connection on a create is ambiguous: the event may exist.
+            # Only idempotent tools may repeat it.
+            last_error = CalendarError(
+                0, f"network error: {exc}", slug=slug, attempts=attempt + 1
+            )
+            if slug in IDEMPOTENT_TOOLS and attempt < MAX_RETRIES:
+                time.sleep(RETRY_BASE_SECONDS * (2**attempt))
+                continue
+            raise last_error from exc
+        except ValueError as exc:
+            # A malformed URL is a programming error, not a transient one.
+            raise CalendarError(
+                0, f"network error: {exc}", slug=slug, attempts=attempt + 1
+            ) from exc
+        break
+    else:  # pragma: no cover - the loop always returns or raises
+        raise last_error or CalendarError(0, "request exhausted", slug=slug)
     if not payload.strip():
         return {}
     try:
         envelope = json.loads(payload)
     except json.JSONDecodeError as exc:
-        raise CalendarError(0, f"non-JSON response: {exc}") from exc
+        raise CalendarError(
+            0, f"non-JSON response: {exc}", slug=slug, attempts=attempt + 1
+        ) from exc
     if isinstance(envelope, dict) and envelope.get("successful") is False:
         # `log_id` is Composio's own handle for the call, so a failure that
         # needs their support does not require guessing which request it was.
+        request_id = str(envelope.get("log_id") or "")
         raise CalendarError(
             0,
             f"{slug} reported failure: {envelope.get('error') or 'no error message'} "
-            f"(log_id={envelope.get('log_id') or 'n/a'})",
+            f"(log_id={request_id or 'n/a'})",
+            slug=slug,
+            attempts=attempt + 1,
+            request_id=request_id,
         )
     return _payload(envelope)
 
@@ -391,6 +487,9 @@ def parse_event(raw: dict) -> dict:
         raise ValueError("event must be an object")
     summary = str(raw.get("summary") or "")
     description = str(raw.get("description") or "")
+    properties = raw.get("extendedProperties") or raw.get("extended_properties") or {}
+    private = properties.get("private") if isinstance(properties, dict) else {}
+    stored_key = private.get("game_key") if isinstance(private, dict) else ""
     return {
         "event_id": str(raw.get("id") or raw.get("event_id") or ""),
         "summary": summary,
@@ -402,6 +501,11 @@ def parse_event(raw: dict) -> dict:
         "state": state_from_title(summary),
         "league_color_id": str(raw.get("colorId") or raw.get("league_color_id") or ""),
         "status": str(raw.get("status") or "confirmed"),
+        # The exact identity written into private extended properties. Old
+        # events have none, so this is additive and `events_match` falls back to
+        # the slot/teams rule for them.
+        "game_key": str(stored_key or raw.get("game_key") or ""),
+        "transparency": str(raw.get("transparency") or "opaque"),
         # Read back out of the description — the round trip that makes the link
         # revalidation loop possible. `scripts/link_inventory.py` turns these into
         # the `links.json` that `link_check.py --input` has always been documented
@@ -480,6 +584,13 @@ def build_event_body(
     promise "events are public" came entirely from a reader nobody called. An
     empty value is left empty and the tool's own default applies; `visibility`
     is *not* re-derived from the row, for the same reason `summary` is not.
+
+    Two fields make the stored entry more useful than its text alone. The plan
+    row's `game_key` goes into private extended properties, so the next run can
+    match the event exactly instead of relying on the ±30-minute slot and the
+    two sources' club spellings. `transparency: transparent` keeps a public
+    stream listing from making every subscriber look busy; it is an appointment,
+    not a meeting.
     """
     start = str(row.get("start") or "")
     end = str(row.get("end") or "")
@@ -487,14 +598,25 @@ def build_event_body(
         moment = _parse_dt(start)
         if moment is not None:
             end = (moment + timedelta(hours=default_duration_hours)).isoformat()
-    return {
+    game_key = str(row.get("game_key") or "").strip()
+    body: dict = {
         "summary": str(row.get("title") or ""),
         "start": {"dateTime": start, "timeZone": timezone},
         "end": {"dateTime": end, "timeZone": timezone},
         "colorId": str(row.get("color_id") or ""),
         "description": description,
         "visibility": visibility,
+        # A stream listing is an appointment, not a meeting: marking it
+        # transparent keeps a public subscription calendar from making every
+        # subscriber look busy. CREATE and PATCH both accept the field.
+        "transparency": "transparent",
     }
+    if game_key:
+        # The identity the description only approximates. A later run can match
+        # this exactly instead of relying on the ±30-minute slot and the way two
+        # sources spell a club. It is private metadata, not shown to subscribers.
+        body["extendedProperties"] = {"private": {"game_key": game_key}}
+    return body
 
 
 def _same_instant(left: object, right: object) -> bool:
@@ -570,6 +692,28 @@ def body_matches_event(body: dict, stored: dict) -> bool:
     return True
 
 
+def _metadata_arguments(body: dict) -> dict:
+    """The write arguments that carry identity and busy-state, when present.
+
+    Kept in one place because CREATE and PATCH use different names for almost
+    everything else but agree on these two (`extended_properties` and
+    `transparency`). Omitting an empty metadata block on PATCH is deliberate:
+    PATCH replaces the fields it is given, so sending `{}` would erase an
+    identity a previous run wrote.
+    """
+    arguments: dict = {}
+    properties = body.get("extendedProperties")
+    private = properties.get("private") if isinstance(properties, dict) else None
+    if isinstance(private, dict):
+        game_key = str(private.get("game_key") or "").strip()
+        if game_key:
+            arguments["extended_properties"] = {"private": {"game_key": game_key}}
+    transparency = str(body.get("transparency") or "")
+    if transparency:
+        arguments["transparency"] = transparency
+    return arguments
+
+
 def create_arguments(body: dict, calendar_id: str, timezone: str) -> dict:
     """`build_event_body`'s output, addressed the way `CREATE_EVENT` wants it.
 
@@ -600,6 +744,7 @@ def create_arguments(body: dict, calendar_id: str, timezone: str) -> dict:
         "exclude_organizer": True,
         "send_updates": "none",
     }
+    arguments.update(_metadata_arguments(body))
     visibility = str(body.get("visibility") or "")
     if visibility:
         arguments["visibility"] = visibility
@@ -635,6 +780,7 @@ def patch_arguments(
     colour = str(body.get("colorId") or "")
     if colour:
         arguments["color_id"] = colour
+    arguments.update(_metadata_arguments(body))
     visibility = str(body.get("visibility") or "")
     if visibility:
         arguments["visibility"] = visibility
@@ -674,7 +820,16 @@ def _apply_delete(
             scope=scope,
         )
     except CalendarError as exc:
-        result["failed"].append({"game_key": game_key, "reason": str(exc), "status": exc.status})
+        result["failed"].append(
+            {
+                "game_key": game_key,
+                "reason": str(exc),
+                "status": exc.status,
+                "tool": exc.slug,
+                "attempts": exc.attempts,
+                "request_id": exc.request_id,
+            }
+        )
         return
     result["deleted"] += 1
     result["actions"].append(
@@ -822,6 +977,9 @@ def apply_plan(
                                     f"could not be set — {exc}"
                                 ),
                                 "status": exc.status,
+                                "tool": exc.slug,
+                                "attempts": exc.attempts,
+                                "request_id": exc.request_id,
                             }
                         )
             else:
@@ -858,6 +1016,9 @@ def apply_plan(
                     "game_key": str(row.get("game_key") or ""),
                     "reason": str(exc),
                     "status": exc.status,
+                    "tool": exc.slug,
+                    "attempts": exc.attempts,
+                    "request_id": exc.request_id,
                 }
             )
     return result

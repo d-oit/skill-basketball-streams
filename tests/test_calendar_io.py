@@ -252,6 +252,28 @@ class TestParseEvent:
         once = parse_event(_api_event())
         assert parse_event(once) == once
 
+    def test_private_extended_properties_carry_the_exact_game_key(self):
+        stored = parse_event(
+            _api_event(
+                extendedProperties={
+                    "private": {"game_key": "BBL|ALBA Berlin|FC Bayern|2026-09-16T17:00Z"}
+                }
+            )
+        )
+        assert stored["game_key"] == "BBL|ALBA Berlin|FC Bayern|2026-09-16T17:00Z"
+        # The export round trip still holds with the new field.
+        assert parse_event(stored) == stored
+
+    def test_a_legacy_event_has_no_game_key_and_is_opaque(self):
+        stored = parse_event(_api_event())
+        assert stored["game_key"] == ""
+        assert stored["transparency"] == "opaque"
+
+    def test_a_transparent_event_is_read_back(self):
+        assert parse_event(_api_event(transparency="transparent"))["transparency"] == (
+            "transparent"
+        )
+
 
 class TestBuildEventBody:
     def test_missing_end_is_filled_from_the_default_duration(self):
@@ -274,6 +296,34 @@ class TestBuildEventBody:
         body = build_event_body(_plan_row(start=""))
         assert body["start"]["dateTime"] == ""
         assert body["end"]["dateTime"] == ""
+
+    def test_the_game_key_travels_as_private_metadata(self):
+        body = build_event_body(_plan_row())
+        assert body["extendedProperties"] == {
+            "private": {"game_key": "BBL|A|B|2026-09-16T17:00Z"}
+        }
+        assert create_arguments(body, "cal", "Europe/Berlin")["extended_properties"] == {
+            "private": {"game_key": "BBL|A|B|2026-09-16T17:00Z"}
+        }
+        assert patch_arguments(body, "cal", "evt-1", "Europe/Berlin")[
+            "extended_properties"
+        ] == {"private": {"game_key": "BBL|A|B|2026-09-16T17:00Z"}}
+
+    def test_no_game_key_sends_no_metadata(self):
+        body = build_event_body(_plan_row(game_key=""))
+        assert "extendedProperties" not in body
+        assert "extended_properties" not in create_arguments(body, "cal", "Europe/Berlin")
+        assert "extended_properties" not in patch_arguments(
+            body, "cal", "evt-1", "Europe/Berlin"
+        )
+
+    def test_a_stream_listing_is_transparent_not_busy(self):
+        body = build_event_body(_plan_row())
+        assert body["transparency"] == "transparent"
+        assert create_arguments(body, "cal", "Europe/Berlin")["transparency"] == "transparent"
+        assert patch_arguments(body, "cal", "evt-1", "Europe/Berlin")[
+            "transparency"
+        ] == "transparent"
 
 
 class TestApplyPlanDryRun:
@@ -1222,6 +1272,87 @@ class TestExecuteTool:
         assert "user_id" not in seen["body"]
         assert "user_id" not in seen["body"]["arguments"]
 
+    def test_a_429_on_create_is_retried(self, monkeypatch):
+        """429 is a refusal before Google saw the create, so a retry is safe."""
+        import urllib.error
+
+        calls: list[int] = []
+
+        def fake(request, timeout=None):
+            calls.append(1)
+            if len(calls) == 1:
+                raise urllib.error.HTTPError(
+                    "u", 429, "slow down", {"Retry-After": "0"}, None
+                )
+            return self._response(
+                json.dumps({"successful": True, "data": {"id": "evt-1"}})
+            )
+
+        monkeypatch.setattr(calendar_io.urllib.request, "urlopen", fake)
+        monkeypatch.setattr(calendar_io.time, "sleep", lambda seconds: None)
+        payload = calendar_io._execute_tool(
+            TOOL_CREATE_EVENT, {}, api_key=API_KEY, scope=SCOPE
+        )
+        assert payload == {"id": "evt-1"}
+        assert len(calls) == 2
+
+    def test_a_5xx_on_create_is_not_retried(self, monkeypatch):
+        """A 5xx may have created the event; retrying would duplicate it."""
+        import urllib.error
+
+        calls: list[int] = []
+
+        def fake(request, timeout=None):
+            calls.append(1)
+            raise urllib.error.HTTPError("u", 500, "backend error", {}, None)
+
+        monkeypatch.setattr(calendar_io.urllib.request, "urlopen", fake)
+        monkeypatch.setattr(calendar_io.time, "sleep", lambda seconds: None)
+        with pytest.raises(CalendarError) as excinfo:
+            calendar_io._execute_tool(TOOL_CREATE_EVENT, {}, api_key=API_KEY, scope=SCOPE)
+        assert len(calls) == 1
+        assert excinfo.value.status == 500
+        assert excinfo.value.slug == TOOL_CREATE_EVENT
+        assert excinfo.value.attempts == 1
+
+    def test_a_5xx_on_a_read_is_retried_then_succeeds(self, monkeypatch):
+        import urllib.error
+
+        calls: list[int] = []
+
+        def fake(request, timeout=None):
+            calls.append(1)
+            if len(calls) == 1:
+                raise urllib.error.HTTPError("u", 503, "down", {}, None)
+            return self._response(json.dumps({"successful": True, "data": {"items": []}}))
+
+        monkeypatch.setattr(calendar_io.urllib.request, "urlopen", fake)
+        monkeypatch.setattr(calendar_io.time, "sleep", lambda seconds: None)
+        assert calendar_io._execute_tool(
+            TOOL_EVENTS_LIST, {}, api_key=API_KEY, scope=SCOPE
+        ) == {"items": []}
+        assert len(calls) == 2
+
+    def test_a_read_retries_are_bounded_and_reported(self, monkeypatch):
+        import urllib.error
+
+        from scripts.calendar_io import MAX_RETRIES
+
+        calls: list[int] = []
+
+        def fake(request, timeout=None):
+            calls.append(1)
+            raise urllib.error.HTTPError("u", 503, "down", {}, None)
+
+        monkeypatch.setattr(calendar_io.urllib.request, "urlopen", fake)
+        monkeypatch.setattr(calendar_io.time, "sleep", lambda seconds: None)
+        with pytest.raises(CalendarError) as excinfo:
+            calendar_io._execute_tool(
+                TOOL_EVENTS_LIST, {}, api_key=API_KEY, scope=SCOPE
+            )
+        assert len(calls) == MAX_RETRIES + 1
+        assert excinfo.value.attempts == MAX_RETRIES + 1
+
     def test_a_refusal_is_an_error_not_an_empty_result(self, monkeypatch):
         """Composio answers 200 with `successful: false`; that is a failure."""
         body = {
@@ -1240,6 +1371,8 @@ class TestExecuteTool:
             )
         assert "no connected account" in str(excinfo.value)
         assert "log-1" in str(excinfo.value)
+        assert excinfo.value.slug == TOOL_EVENTS_LIST
+        assert excinfo.value.request_id == "log-1"
 
     def test_a_non_json_body_is_an_error(self, monkeypatch):
         monkeypatch.setattr(
