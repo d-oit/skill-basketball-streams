@@ -85,8 +85,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 786,
-    "missed": 786,
+    "eligible": 787,
+    "missed": 787,
     "missed_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -857,6 +857,7 @@
       "https://www.youtube.com/watch?v=neWq1PECVP8",
       "https://www.youtube.com/watch?v=nvoq4smkLZU&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=owkfJIFOsfI",
+      "https://www.youtube.com/watch?v=ozC_uSyL6xM",
       "https://www.youtube.com/watch?v=qBjVtqOVv9M",
       "https://www.youtube.com/watch?v=qBjVtqOVv9M&xstg=CAMSBhUD-7L2Hw%3D%3D",
       "https://www.youtube.com/watch?v=qmYie2F_0Uk",
@@ -876,9 +877,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 13545,
-    "unique_games": 1204,
-    "unverifiable": 786,
+    "rows": 13813,
+    "unique_games": 1208,
+    "unverifiable": 787,
     "unverifiable_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -1649,6 +1650,7 @@
       "https://www.youtube.com/watch?v=neWq1PECVP8",
       "https://www.youtube.com/watch?v=nvoq4smkLZU&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=owkfJIFOsfI",
+      "https://www.youtube.com/watch?v=ozC_uSyL6xM",
       "https://www.youtube.com/watch?v=qBjVtqOVv9M",
       "https://www.youtube.com/watch?v=qBjVtqOVv9M&xstg=CAMSBhUD-7L2Hw%3D%3D",
       "https://www.youtube.com/watch?v=qmYie2F_0Uk",
@@ -1668,30 +1670,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "",
+  "run_id": "2026-10-20T17:54Z",
   "source": {
     "audit_rows": 17,
-    "candidates_rows": 13545,
+    "candidates_rows": 13813,
     "fixtures_rows": 66
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 2,
-        "precision": 1.0,
-        "rows": 2,
-        "verified": 2,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-10-20T13:53Z",
-      "unique_games": 0
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -1912,7 +1897,24 @@
       "rows": 0,
       "run_id": "2026-10-20T17:37Z",
       "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 119,
+      "missed": 119,
+      "recall": 0.0,
+      "rows": 268,
+      "run_id": "2026-10-20T17:52Z",
+      "unique_games": 230
     }
   ],
-  "ts": "2026-10-20T17:37:15.207412+00:00"
+  "ts": "2026-10-20T17:54:37.234000+00:00"
 }
