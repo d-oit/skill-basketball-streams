@@ -1,0 +1,64 @@
+name: fix-event-link
+
+# One-off repair of a single calendar event's link. Manual only: nothing
+# schedules it, and it is a dry run unless `live` is set. The script refuses
+# to write unless the old link is present verbatim in the event description.
+
+on:
+  workflow_dispatch:
+    inputs:
+      event_id:
+        description: "Calendar event id to repair"
+        required: true
+        type: string
+      day:
+        description: "Day the event starts (YYYY-MM-DD, UTC window around it)"
+        required: true
+        type: string
+      old_url:
+        description: "Dead link to replace (must appear verbatim in the description)"
+        required: true
+        type: string
+      new_url:
+        description: "Corrected https link"
+        required: true
+        type: string
+      live:
+        description: "Write the change (unchecked = dry run)"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fix-event-link
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Repair the event link
+        env:
+          EVENT_ID: ${{ inputs.event_id }}
+          DAY: ${{ inputs.day }}
+          OLD_URL: ${{ inputs.old_url }}
+          NEW_URL: ${{ inputs.new_url }}
+          LIVE: ${{ inputs.live }}
+          BASKETBALL_CALENDAR_ID: ${{ vars.BASKETBALL_CALENDAR_ID }}
+          COMPOSIO_API_KEY: ${{ secrets.COMPOSIO_API_KEY }}
+          COMPOSIO_USER_ID: ${{ secrets.COMPOSIO_USER_ID }}
+        run: |
+          set -euo pipefail
+          args=(--event-id "$EVENT_ID" --day "$DAY" --old-url "$OLD_URL" --new-url "$NEW_URL")
+          if [ "$LIVE" = "true" ]; then args+=(--live); fi
+          python3 scripts/fix_event_link.py "${args[@]}"

@@ -72,7 +72,19 @@ class TestScript:
     def test_the_script_exists_and_is_executable(self):
         # The hook is fail-closed: a missing script blocks every commit.
         assert SCRIPT.is_file()
-        assert SCRIPT.stat().st_mode & 0o111
+        # Windows has no POSIX execute bit on disk, so the mode that matters is the
+        # one git records: that is what CI checks out. Fall back to the file mode
+        # only where the path is not tracked.
+        listing = subprocess.run(
+            ["git", "ls-files", "-s", "--", SCRIPT.relative_to(REPO_ROOT).as_posix()],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+        )
+        if listing.returncode == 0 and listing.stdout.strip():
+            assert listing.stdout.startswith("100755 "), listing.stdout
+        else:
+            assert SCRIPT.stat().st_mode & 0o111
 
 
 class TestAcceptedMessages:

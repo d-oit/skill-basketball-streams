@@ -28,6 +28,7 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -135,6 +136,10 @@ class TestTheProjectConfig:
         """
         if shutil.which("opencode") is None:
             pytest.skip("opencode CLI is not installed in this environment")
+        if sys.platform == "win32":
+            # The CLI's bun launcher execs /bin/sh, which does not exist on Windows.
+            # CI runs on Linux, so the assertion still runs there.
+            pytest.skip("opencode CLI needs /bin/sh; this check runs on Linux CI")
         result = subprocess.run(
             ["opencode", "debug", "agent", "build"],
             cwd=REPO_ROOT,
