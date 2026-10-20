@@ -55,7 +55,7 @@ streams. ProB is excluded from this calendar as not free of charge.
 ## Exclusion Keywords (reject)
 
 - `kostenpflichtig`, `Abo`, `subscription`, `pay-per-view` → Check 1 fail
-- `Sky`, `DAZN`, `Prime` (unless Dyn Sport Mix free tier) → Check 3 fail
+- `Sky`, `Prime` (unless Dyn Sport Mix free tier), or a DAZN game not stated free → Check 3 fail
 - `highlights`, `replay`, `zusammenfassung`, `on demand`, `wiederholung` → Check 2 fail
 
 ## Sports Exclusion

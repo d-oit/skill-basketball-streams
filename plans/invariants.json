@@ -37,7 +37,7 @@
   },
   {
     "invariant": "Paid broadcasters are rejected even when the domain is otherwise well known",
-    "rationale": "Sky, DAZN, Prime and Sport1+ are excluded from the approved-source list. Rejecting paid content is the skill's contract, not a preference to be delegated upstream.",
+    "rationale": "Sky, Prime and Sport1+ are excluded from the approved-source list. DAZN is approved only per game: a DAZN game its page does not state is free to watch is rejected even though dazn.com is an approved domain. Rejecting paid content is the skill's contract, not a preference to be delegated upstream.",
     "sensor": "pytest",
     "category": "correctness"
   },

@@ -1,6 +1,6 @@
 ---
 name: skill-basketball-streams
-description: Search for FREE basketball live streams in Germany from approved official sources (BBL, EuroLeague, FIBA, Basketball Champions League, MagentaSport/MagentaTV, public broadcasters, clubs, YouTube channels), validate them with a 7-check pipeline (URL, page content, source allow-list, basketball-specific, date range, live proof, source reference), then add confirmed streams to Google Calendar. Renders the JS-rendered, bot-blocked magenta.tv via a fetch ladder, searches YouTube live-only under a strict start-datetime-greater-than-now gate, and revalidates stored links while discovering new sources through an append-only run log. Use when the user wants free basketball streams in Germany on a calendar, needs a stream URL validated, or reports broken links in past events. Triggers - "find basketball streams", "free BBL stream", "any free EuroLeague game today?", "validate this basketball URL", "add stream to basketball calendar". Not for paid broadcasters (Sky/DAZN/Prime), highlight reels, or non-basketball sports.
+description: Search for FREE basketball live streams in Germany from approved official sources (BBL, EuroLeague, FIBA, Basketball Champions League, MagentaSport/MagentaTV, public broadcasters, clubs, YouTube channels), validate them with a 7-check pipeline (URL, page content, source allow-list, basketball-specific, date range, live proof, source reference), then add confirmed streams to Google Calendar. Renders bot-blocked magenta.tv via a fetch ladder, searches YouTube live-only (start must be in the future), and revalidates stored links while discovering new sources through an append-only run log. Use when the user wants free basketball streams in Germany on a calendar, needs a stream URL validated, or reports broken links in past events. Triggers - "find basketball streams", "free BBL stream", "any free EuroLeague game today?", "validate this basketball URL", "add stream to basketball calendar". Not for paid broadcasters (Sky, Prime, DAZN games not free), highlights, or non-basketball sports.
 version: "1.12.3"
 category: workflow
 license: MIT
@@ -159,7 +159,7 @@ Refused rather than repaired, so get them right: exactly two teams; a `start` th
 
 1. **Only approved sources** — no exceptions, even if a search result looks official.
 2. **All 7 checks must PASS** — including Direct Stream Verification (page read).
-3. **No paid content** — Sky / DAZN / general Prime → REJECT, even if domain is on the allow-list.
+3. **No paid content** — Sky / general Prime → REJECT, even if domain is on the allow-list. DAZN is an approved source only per game: a DAZN game its page does not state is free to watch, or that needs a paid subscription, → REJECT.
 4. **No unofficial streams** — no pirate sites, third-party aggregators, fan-run YouTube.
 5. **Date accuracy** — every event must start strictly after now and no later than now + 7 days; the final planner enforces this window.
 6. **Link testing** — every direct link tested with `openUrl` and confirmed working.
@@ -255,4 +255,4 @@ All scripts are stdlib-only on Python 3.8+ and share the same exit codes: `0` PA
 - `docs/runtime.md` — daily runtime operations: cadence, secrets, telemetry schema, rung health, recovery runbook, AGPL notice
 - `references/lessons-learned.md` — incident post-mortem (broken `/user/FIBA` events), root causes, prevention checklist, validation log template and worked examples
 - `config/sources.json` — machine-readable approved-source registry + excluded sources
-- `evals/evals.json` — 45 eval cases (driving the `skill-evaluator` rubric; see `README.md` → Self-Validation)
+- `evals/evals.json` — 47 eval cases (driving the `skill-evaluator` rubric; see `README.md` → Self-Validation)
