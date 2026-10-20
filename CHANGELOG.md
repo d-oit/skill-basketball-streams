@@ -1182,20 +1182,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   fixture (`RecordedPage.frozen`), recorded once and preserved verbatim on
   every refresh; its bytes are still hash-checked and its game-anchor tests
   still run. The first refresh against a corpus without it seeds it once.
-- **`runtime-daily.yml` no longer swallows a check that can never pass.** The
-  `capture_transcripts.py --runner replay --from .tmp/transcript.json --check
-  ... || true` line exited 2 on every run: a JSONL event stream is not the
-  `{id: text}` / `{"transcripts": [...]}` document that `load_transcripts`
-  accepts, and `|| true` hid it. It is removed; `extract_candidates.py` enforces
-  the same contract and fails with a diagnosis.
-
-### Changed
-
-- **The skill step's bound is 30 minutes instead of 20.** Three 2026-10-15
-  dispatches exited 124 at exactly 1200 s, while successful runs on 2026-10-17
-  and 2026-10-18 took 13m00s and 14m21s on the free rung. 1800 s keeps the step
-  bounded inside the job's 45-minute cap without turning normal variance into a
-  red run.
 
 
 ## [Unreleased]
