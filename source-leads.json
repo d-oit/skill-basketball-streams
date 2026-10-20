@@ -1,14 +1,3 @@
 {
-  "leads": [
-    {
-      "url": "https://www.swr.de/sport",
-      "name": "SWR Sport",
-      "reason": "unapproved ARD regional broadcaster carrying the Gladiators Trier FIBA Europe Cup stream; not listed in config/sources.json"
-    },
-    {
-      "url": "https://www.youtube.com/@swrsport",
-      "name": "SWR Sport (YouTube)",
-      "reason": "unapproved YouTube handle carrying the same FIBA Europe Cup stream"
-    }
-  ]
+  "leads": []
 }
