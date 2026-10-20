@@ -640,6 +640,19 @@ jobs:
           python3 scripts/youtube_live.py \
             --queries-file config/youtube-live-queries.json \
             --out .tmp/youtube-live-searches.json
+          # Advisory hints for the agent: hosts that already produced a VERIFIED
+          # calendar event (search these first) and hosts the runtime skipped as
+          # not free (do not spend budget on them). Read from the telemetry branch
+          # with no calendar credential. Missing history yields empty lists, not a
+          # failure, so a first run is not red. Validation still decides every write.
+          mkdir -p .tmp/hints
+          if git fetch --depth=1 origin telemetry 2>/dev/null; then
+            git show origin/telemetry:calendar-log.jsonl > .tmp/hints/calendar-log.jsonl 2>/dev/null || true
+            git show origin/telemetry:run-log.jsonl      > .tmp/hints/run-log.jsonl 2>/dev/null || true
+          else
+            echo "::notice::No telemetry branch yet; the agent gets no source hints this run."
+          fi
+          python3 scripts/source_hints.py --dest .tmp/hints --out .tmp/source-hints.json
           # The prompt comes **before** the `--file` flags, and that is not
           # style. In opencode 1.18.33 `--file` is declared as an *array*, so it
           # swallows every following token: with the prompt last, the CLI read
@@ -676,7 +689,7 @@ jobs:
 
             Do NOT call bash or any shell command. It is denied, and a denied call ends the run with no answer. Research only with webfetch and websearch; the calendar is written by the workflow, not by you. Get today's date from the Europe/Berlin timezone in the prompt context, not from a shell.
 
-            YouTube discovery must use webfetch on every URL in the attached youtube-live-searches.json. Each URL already has YouTube's Live filter (sp=EgJAAQ%3D%3D). Never use generic websearch results to discover YouTube streams, and never fetch a YouTube results URL without that exact Live filter. New YouTube handles and other unapproved source URLs are quarantined source leads unless already approved. Do not omit source_leads from the final JSON: add it beside candidates and use [] when no new sources were found.
+            YouTube discovery must use webfetch on every URL in the attached youtube-live-searches.json. Each URL already has YouTube's Live filter (sp=EgJAAQ%3D%3D). Never use generic websearch results to discover YouTube streams, and never fetch a YouTube results URL without that exact Live filter. New YouTube handles and other unapproved source URLs are quarantined source leads unless already approved. The attached source-hints.json lists preferred_hosts (hosts that already streamed a VERIFIED calendar game: search them first) and deprioritized_hosts (hosts skipped as not free: do not spend budget there). Hints only change search order; every validation rule below still applies in full. Do not omit source_leads from the final JSON: add it beside candidates and use [] when no new sources were found.
 
             You are also the ONLY channel the planner has. The runtime agent is denied 'edit' and 'bash', so it cannot write a file, and scripts/extract_candidates.py reads the final answer out of your transcript. It accepts a fenced \`\`\`json block and NOTHING else - a markdown table, prose, or a tool result are all invisible to it.
 
@@ -689,6 +702,7 @@ jobs:
             Rules that are refused rather than repaired: exactly two teams, a start that parses as an ISO-8601 datetime, and a state of VERIFIED or UNVERIFIED - 'WRONG' is an audit verdict, never a proposal. Every candidate must include directLink to the actual stream, sourceReference to the official game or broadcaster page, access explicitly marked Free/Gratis/Kostenlos, validationTimestamp in ISO-8601, validationNotes describing the page evidence, and evidence.free_confirmed=true plus evidence.live_confirmed=true. Boolean claims alone never qualify. If the source says paid, subscription, pay-per-view, or Dyn-Livestream, if free access is unclear or cannot be tied to this game, or if the game is ProB, do not emit a candidate. Missing or invalid proof means the planner skips the candidate. One entry per game you decided to store, including the ones already on the calendar. If you found nothing, emit exactly {\"candidates\": [], \"source_leads\": []} - an empty array, not an omitted block, because a missing block is what a failed run looks like." \
             --file SKILL.md \
             --file .tmp/youtube-live-searches.json \
+            --file .tmp/source-hints.json \
             --file references/validation-workflow.md \
             --file references/youtube-live-search.md \
             --file references/magenta-tv.md \
