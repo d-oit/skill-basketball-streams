@@ -608,6 +608,29 @@ jobs:
           python3 -m patchright install --with-deps chromium
           python3 -c "from patchright.sync_api import sync_playwright; print('render rung: patchright ready')"
 
+      # Evidence, not a gate: probe the newest verified stream through a Tor
+      # circuit whose exit is in Germany (free; no account). A failed Tor install
+      # or bootstrap is recorded as unavailable, never as a geo block, and it does
+      # not stop the run. The verdict is written to the job summary.
+      - name: Probe the newest stream from a German Tor exit
+        run: |
+          mkdir -p .tmp/geo/data
+          if sudo apt-get install -y -qq tor >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq tor >/dev/null 2>&1); then
+            python3 scripts/geo_probe.py --write-torrc .tmp/geo/torrc --data-dir "$PWD/.tmp/geo/data"
+            tor -f .tmp/geo/torrc --RunAsDaemon 1 || echo "::notice::tor did not start; geo probe skipped"
+            for _ in $(seq 1 30); do
+              curl -s -m 10 --socks5-hostname 127.0.0.1:9050 https://ipinfo.io/country >/dev/null 2>&1 && break
+              sleep 4
+            done
+            python3 scripts/geo_probe.py --from-calendar .tmp/hints/calendar-log.jsonl --out .tmp/geo/stream-probe.json \
+              || echo "::notice::geo probe errored; no evidence this run"
+          else
+            echo "::notice::tor could not be installed; geo probe skipped this run"
+          fi
+          if [ -f .tmp/geo/stream-probe.json ]; then
+            { echo '### Geo probe (German Tor exit, evidence only)'; echo '```json'; cat .tmp/geo/stream-probe.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Run the skill
         env:
           # Read from the resolver above, so the credential the model was chosen
