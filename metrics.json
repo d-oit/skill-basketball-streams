@@ -85,8 +85,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 776,
-    "missed": 776,
+    "eligible": 782,
+    "missed": 782,
     "missed_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -220,6 +220,7 @@
       "https://nblaus.nbl.com.au/news/nbl25-blitz-how-to-watch-live-scores",
       "https://niedersachsen-aktuell.com/am-mittwoch-startet-die-bbl-mit-berlin-hamburg-kostenlos-bei-magentasport-lust-auf-mehr-basketball-ueber-700-spiele-aus-bbl-euroleague-eurocup-und-vom-der-deutschen-national-mannschaft-live/",
       "https://oneball.live/",
+      "https://playtjbl.com/live",
       "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
       "https://production360.media/dyn-media-powers-live-sports-fast-channel-with-frequency-studio-live/",
       "https://punditfeed.com/sports-news/basketball/euroleague-tv-live-stream/",
@@ -770,6 +771,7 @@
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4V8uq92kcOc5jD6755xOk2HvNraoqNRpOmiooipwHZW0hYBDo7V",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4Vyb4AE_sT4A9Kx-cZaH55StqHuQSxIyOHQM8w5m5v0U0eBOBib",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4Wiu3cOEskUkGNqEZRDN5_XqvMN0Zt-n_4SkmAPfJdrHX7wSj21",
+      "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4Ww3rRQwXLGH8wsK1BMHPKBn03vXVLcFF9W9MTdTPu07uxAA9su",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4X5Dv_ChM82W7w7kipv_Vum06LuGsxjIMJaWeKQ6kp9PQzi-75A",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XBEK2Lix8FMK_xl4Xsr-2pmcod1J_QQCzkgZNcpItsndA30iZu",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XKmED8HFkAEXKQ3wDxG2gxbGqyx46AdexhuCr4CKshPBdh2E3O",
@@ -814,6 +816,7 @@
       "https://www.youtube.com/watch?v=LOvngOSlqEo",
       "https://www.youtube.com/watch?v=MLgGYhYyUjQ",
       "https://www.youtube.com/watch?v=MNNLKYurqBI",
+      "https://www.youtube.com/watch?v=OGYdug3P1ns",
       "https://www.youtube.com/watch?v=PDTjcSK8Pdc",
       "https://www.youtube.com/watch?v=Te-umIjSnWs",
       "https://www.youtube.com/watch?v=WuV5w2L5qGw",
@@ -827,6 +830,7 @@
       "https://www.youtube.com/watch?v=ZnvIXMCtj8Q",
       "https://www.youtube.com/watch?v=ZnvIXMCtj8Q&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=ZuSRsofRXn8",
+      "https://www.youtube.com/watch?v=_bcJ5JI1v-E",
       "https://www.youtube.com/watch?v=a2eWDdRgstQ",
       "https://www.youtube.com/watch?v=aFlxU1gLk5o",
       "https://www.youtube.com/watch?v=b_NXHTk5pFc",
@@ -836,6 +840,7 @@
       "https://www.youtube.com/watch?v=c3NuYGiqcrY",
       "https://www.youtube.com/watch?v=d09k5v6efx4",
       "https://www.youtube.com/watch?v=efhJOkhKPSk",
+      "https://www.youtube.com/watch?v=f2L73usgKfE",
       "https://www.youtube.com/watch?v=fi6ylJuJ_ro",
       "https://www.youtube.com/watch?v=gJDCCMjcEDc",
       "https://www.youtube.com/watch?v=gQZ7xd2i8rw&xstg=CAMSBhUDzO3xHw%3D%3D",
@@ -860,15 +865,16 @@
       "https://www.youtube.com/watch?v=tGvsJG5JeSE",
       "https://www.youtube.com/watch?v=ueFpASwTpgw",
       "https://www.youtube.com/watch?v=wAyC8M2R3JA",
+      "https://www.youtube.com/watch?v=xiNFxDlpCpc",
       "https://www.youtube.com/watch?v=yardlrRgAnA",
       "https://www.youtube.com/watch?v=zNU44AAcyOc",
       "https://www.youtube.com/watch?v=zNU44AAcyOc&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 12278,
-    "unique_games": 1184,
-    "unverifiable": 776,
+    "rows": 12501,
+    "unique_games": 1192,
+    "unverifiable": 782,
     "unverifiable_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -1002,6 +1008,7 @@
       "https://nblaus.nbl.com.au/news/nbl25-blitz-how-to-watch-live-scores",
       "https://niedersachsen-aktuell.com/am-mittwoch-startet-die-bbl-mit-berlin-hamburg-kostenlos-bei-magentasport-lust-auf-mehr-basketball-ueber-700-spiele-aus-bbl-euroleague-eurocup-und-vom-der-deutschen-national-mannschaft-live/",
       "https://oneball.live/",
+      "https://playtjbl.com/live",
       "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
       "https://production360.media/dyn-media-powers-live-sports-fast-channel-with-frequency-studio-live/",
       "https://punditfeed.com/sports-news/basketball/euroleague-tv-live-stream/",
@@ -1552,6 +1559,7 @@
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4V8uq92kcOc5jD6755xOk2HvNraoqNRpOmiooipwHZW0hYBDo7V",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4Vyb4AE_sT4A9Kx-cZaH55StqHuQSxIyOHQM8w5m5v0U0eBOBib",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4Wiu3cOEskUkGNqEZRDN5_XqvMN0Zt-n_4SkmAPfJdrHX7wSj21",
+      "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4Ww3rRQwXLGH8wsK1BMHPKBn03vXVLcFF9W9MTdTPu07uxAA9su",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4X5Dv_ChM82W7w7kipv_Vum06LuGsxjIMJaWeKQ6kp9PQzi-75A",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XBEK2Lix8FMK_xl4Xsr-2pmcod1J_QQCzkgZNcpItsndA30iZu",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XKmED8HFkAEXKQ3wDxG2gxbGqyx46AdexhuCr4CKshPBdh2E3O",
@@ -1596,6 +1604,7 @@
       "https://www.youtube.com/watch?v=LOvngOSlqEo",
       "https://www.youtube.com/watch?v=MLgGYhYyUjQ",
       "https://www.youtube.com/watch?v=MNNLKYurqBI",
+      "https://www.youtube.com/watch?v=OGYdug3P1ns",
       "https://www.youtube.com/watch?v=PDTjcSK8Pdc",
       "https://www.youtube.com/watch?v=Te-umIjSnWs",
       "https://www.youtube.com/watch?v=WuV5w2L5qGw",
@@ -1609,6 +1618,7 @@
       "https://www.youtube.com/watch?v=ZnvIXMCtj8Q",
       "https://www.youtube.com/watch?v=ZnvIXMCtj8Q&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=ZuSRsofRXn8",
+      "https://www.youtube.com/watch?v=_bcJ5JI1v-E",
       "https://www.youtube.com/watch?v=a2eWDdRgstQ",
       "https://www.youtube.com/watch?v=aFlxU1gLk5o",
       "https://www.youtube.com/watch?v=b_NXHTk5pFc",
@@ -1618,6 +1628,7 @@
       "https://www.youtube.com/watch?v=c3NuYGiqcrY",
       "https://www.youtube.com/watch?v=d09k5v6efx4",
       "https://www.youtube.com/watch?v=efhJOkhKPSk",
+      "https://www.youtube.com/watch?v=f2L73usgKfE",
       "https://www.youtube.com/watch?v=fi6ylJuJ_ro",
       "https://www.youtube.com/watch?v=gJDCCMjcEDc",
       "https://www.youtube.com/watch?v=gQZ7xd2i8rw&xstg=CAMSBhUDzO3xHw%3D%3D",
@@ -1642,36 +1653,20 @@
       "https://www.youtube.com/watch?v=tGvsJG5JeSE",
       "https://www.youtube.com/watch?v=ueFpASwTpgw",
       "https://www.youtube.com/watch?v=wAyC8M2R3JA",
+      "https://www.youtube.com/watch?v=xiNFxDlpCpc",
       "https://www.youtube.com/watch?v=yardlrRgAnA",
       "https://www.youtube.com/watch?v=zNU44AAcyOc",
       "https://www.youtube.com/watch?v=zNU44AAcyOc&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "",
+  "run_id": "2026-10-20T15:18Z",
   "source": {
     "audit_rows": 8,
-    "candidates_rows": 12278,
+    "candidates_rows": 12501,
     "fixtures_rows": 66
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 95,
-      "missed": 95,
-      "recall": 0.0,
-      "rows": 205,
-      "run_id": "2026-10-15T08:45Z",
-      "unique_games": 178
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -1892,7 +1887,24 @@
       "rows": 0,
       "run_id": "2026-10-20T13:53Z",
       "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 115,
+      "missed": 115,
+      "recall": 0.0,
+      "rows": 223,
+      "run_id": "2026-10-20T15:16Z",
+      "unique_games": 192
     }
   ],
-  "ts": "2026-10-20T13:53:18.548583+00:00"
+  "ts": "2026-10-20T15:18:39.796749+00:00"
 }
