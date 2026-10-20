@@ -11,11 +11,11 @@
   "fixture_recall": {
     "dropped": 0,
     "duplicates": 0,
-    "fixture_recall": 0.016,
-    "fixtures": 62,
-    "rows": 62,
+    "fixture_recall": 0.015,
+    "fixtures": 66,
+    "rows": 66,
     "surfaced": 1,
-    "unseen": 61,
+    "unseen": 65,
     "unseen_keys": [
       "BBL|ALBA BERLIN|BMA365 Bamberg Baskets|2026-10-19T18:00Z",
       "BBL|ALBA BERLIN|VET-CONCEPT Gladiators Trier|2026-10-10T18:00Z",
@@ -52,6 +52,7 @@
       "Basketball Champions League|BC Juventus Utena|Unicaja|2026-10-07T17:00Z",
       "Basketball Champions League|BK KVIS Pardubice|Pallacanestro Reggiana|2026-10-06T18:00Z",
       "Basketball Champions League|BK KVIS Pardubice|Unicaja|2026-10-20T16:00Z",
+      "Basketball Champions League|BMA365 Bamberg Baskets|Itelyum Varese|2026-10-27T18:00Z",
       "Basketball Champions League|BMA365 Bamberg Baskets|Peristeri Betsson|2026-10-06T16:30Z",
       "Basketball Champions League|BMA365 Bamberg Baskets|UCAM Murcia|2026-10-14T17:00Z",
       "Basketball Champions League|Bnei Penlink Herzliya|FC Porto|2026-10-21T16:30Z",
@@ -67,13 +68,16 @@
       "Basketball Champions League|Falco-Vulcano Szombathely|Windrose Giants Antwerp|2026-10-07T18:00Z",
       "Basketball Champions League|Galatasaray MCT Technic|SIG Strasbourg|2026-10-20T17:00Z",
       "Basketball Champions League|Hapoel Maoz Daniel Holon|Spartak Office Shoes|2026-10-14T18:00Z",
+      "Basketball Champions League|Igokea m:tel|SK Slavia Praha ERA NBK|2026-10-27T19:00Z",
       "Basketball Champions League|Igokea m:tel|Surne Bilbao|2026-10-06T18:00Z",
       "Basketball Champions League|Itelyum Varese|Peristeri Betsson|2026-10-13T18:00Z",
       "Basketball Champions League|Itelyum Varese|UCAM Murcia|2026-10-07T18:30Z",
       "Basketball Champions League|Legia Warszawa|SIG Strasbourg|2026-10-06T18:00Z",
       "Basketball Champions League|Nanterre 92|Rytas Vilnius|2026-10-13T18:00Z",
+      "Basketball Champions League|Nanterre 92|Sabah BC|2026-10-27T16:00Z",
       "Basketball Champions League|Nanterre 92|Trabzonspor|2026-10-07T16:00Z",
       "Basketball Champions League|Pallacanestro Varese|UCAM Murcia|2026-10-07T18:30Z",
+      "Basketball Champions League|Peristeri Betsson|UCAM Murcia|2026-10-27T19:30Z",
       "Basketball Champions League|RASTA Vechta|Spartak Office Shoes|2026-10-07T18:00Z",
       "Basketball Champions League|Rytas Vilnius|Sabah BC|2026-10-06T16:30Z",
       "Basketball Champions League|SK Slavia Praha ERA NBK|Surne Bilbao|2026-10-14T18:00Z",
@@ -82,8 +86,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 773,
-    "missed": 773,
+    "eligible": 776,
+    "missed": 776,
     "missed_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -689,6 +693,7 @@
       "https://www.sportschau.de/live-und-ergebnisse/basketball/heute-live",
       "https://www.sportschau.de/live-und-ergebnisse/basketball/heute-live/dn2026-10-01",
       "https://www.sportschau.de/live-und-ergebnisse/basketball/heute-live/dn2026-10-13",
+      "https://www.sportschau.de/regional/swr/swr-basketball-live-die-gladiators-trier-gegen-kk-split-100.html",
       "https://www.sportsgambler.com/",
       "https://www.sportsgambler.com/live-streaming/basketball/",
       "https://www.sportsgambler.com/live-streaming/basketball/fiba-bcl/",
@@ -720,6 +725,7 @@
       "https://www.telekom.de/sport/magenta-sport?adfcd=1768474263.EZK18ZNavUGwSKPubYfMHQ.MTkzMjIyNSwxNzUyOTM1&wt_ref=https%3A%2F%2Fstatics.teams.cdn.office.net%2F%3Fsubid%3Dst_on_p_tvm_694138b1ba67575f498031b9",
       "https://www.teltarif.de/en/dyn-fastchannel-freetv-astra-streaming/news/99428.html",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-alba-berlin-bamberg-uebertragung-live-im-free-tv-stream",
+      "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-alba-berlin-bamberg-uebertragung-im-tv-stream-2",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-alba-berlin-bonn-uebertragung-im-tv-stream",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-bayern-alba-berlin-uebertragung-im-free-tv",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-bayern-belgrad-uebertragung-im-tv-stream",
@@ -826,6 +832,7 @@
       "https://www.youtube.com/watch?v=aFlxU1gLk5o",
       "https://www.youtube.com/watch?v=b_NXHTk5pFc",
       "https://www.youtube.com/watch?v=b_zRUk1LFf8",
+      "https://www.youtube.com/watch?v=bjb5qqOf3Bw",
       "https://www.youtube.com/watch?v=bv99RMJBclw",
       "https://www.youtube.com/watch?v=c3NuYGiqcrY",
       "https://www.youtube.com/watch?v=d09k5v6efx4",
@@ -860,9 +867,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 12008,
-    "unique_games": 1177,
-    "unverifiable": 773,
+    "rows": 12277,
+    "unique_games": 1183,
+    "unverifiable": 776,
     "unverifiable_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -1468,6 +1475,7 @@
       "https://www.sportschau.de/live-und-ergebnisse/basketball/heute-live",
       "https://www.sportschau.de/live-und-ergebnisse/basketball/heute-live/dn2026-10-01",
       "https://www.sportschau.de/live-und-ergebnisse/basketball/heute-live/dn2026-10-13",
+      "https://www.sportschau.de/regional/swr/swr-basketball-live-die-gladiators-trier-gegen-kk-split-100.html",
       "https://www.sportsgambler.com/",
       "https://www.sportsgambler.com/live-streaming/basketball/",
       "https://www.sportsgambler.com/live-streaming/basketball/fiba-bcl/",
@@ -1499,6 +1507,7 @@
       "https://www.telekom.de/sport/magenta-sport?adfcd=1768474263.EZK18ZNavUGwSKPubYfMHQ.MTkzMjIyNSwxNzUyOTM1&wt_ref=https%3A%2F%2Fstatics.teams.cdn.office.net%2F%3Fsubid%3Dst_on_p_tvm_694138b1ba67575f498031b9",
       "https://www.teltarif.de/en/dyn-fastchannel-freetv-astra-streaming/news/99428.html",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-alba-berlin-bamberg-uebertragung-live-im-free-tv-stream",
+      "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-alba-berlin-bamberg-uebertragung-im-tv-stream-2",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-alba-berlin-bonn-uebertragung-im-tv-stream",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-bayern-alba-berlin-uebertragung-im-free-tv",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-bayern-belgrad-uebertragung-im-tv-stream",
@@ -1605,6 +1614,7 @@
       "https://www.youtube.com/watch?v=aFlxU1gLk5o",
       "https://www.youtube.com/watch?v=b_NXHTk5pFc",
       "https://www.youtube.com/watch?v=b_zRUk1LFf8",
+      "https://www.youtube.com/watch?v=bjb5qqOf3Bw",
       "https://www.youtube.com/watch?v=bv99RMJBclw",
       "https://www.youtube.com/watch?v=c3NuYGiqcrY",
       "https://www.youtube.com/watch?v=d09k5v6efx4",
@@ -1639,30 +1649,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "",
+  "run_id": "2026-10-20T13:46Z",
   "source": {
     "audit_rows": 6,
-    "candidates_rows": 12008,
-    "fixtures_rows": 62
+    "candidates_rows": 12277,
+    "fixtures_rows": 66
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 132,
-      "missed": 132,
-      "recall": 0.0,
-      "rows": 221,
-      "run_id": "2026-10-14T13:54Z",
-      "unique_games": 196
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -1883,7 +1876,24 @@
       "rows": 0,
       "run_id": "2026-10-19T16:01Z",
       "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 123,
+      "missed": 123,
+      "recall": 0.0,
+      "rows": 269,
+      "run_id": "2026-10-20T13:44Z",
+      "unique_games": 232
     }
   ],
-  "ts": "2026-10-19T16:01:05.998443+00:00"
+  "ts": "2026-10-20T13:46:28.017743+00:00"
 }
