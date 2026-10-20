@@ -2739,6 +2739,23 @@
       "examples": [
         "https://playtjbl.com/live"
       ]
+    },
+    {
+      "domain": "swr.de",
+      "status": "quarantined",
+      "hits": 1,
+      "examples": [
+        "https://www.swr.de/sport"
+      ]
+    },
+    {
+      "domain": "youtube.com",
+      "channel": "youtube.com/@swrsport",
+      "status": "quarantined",
+      "hits": 1,
+      "examples": [
+        "https://www.youtube.com/@swrsport"
+      ]
     }
   ]
 }
