@@ -286,8 +286,9 @@ class TestCli:
         assert result.returncode == 1
         payload = json.loads(report.read_text(encoding="utf-8"))
         assert payload["summary"]["INVALID"] == 1
-        # 60 approved entries: the registry grew by the 2026-10-05 European
+        # 61 approved entries: the registry grew by the 2026-10-05 European
         # search and Tier 7 sites, the operator-approved Tampa 2 Films channel,
-        # and sporteurope.tv added on 2026-10-13. The count makes registry
-        # changes visible rather than silently changing what is probed.
-        assert payload["summary"]["OK"] == 60
+        # sporteurope.tv added on 2026-10-13, and dazn.com added 2026-10-20 as a
+        # per-game free-to-view source. The count makes registry changes visible
+        # rather than silently changing what is probed.
+        assert payload["summary"]["OK"] == 61

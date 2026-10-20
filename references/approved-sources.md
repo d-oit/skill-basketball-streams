@@ -45,6 +45,7 @@ Platforms that carry official free basketball streams.
 |----------|---------|-------|
 | Sporteurope.TV | `sporteurope.tv` | Access is competition- and game-specific. **ProA 2026/27 is paid**. NBBL/JBBL remain free under the two-season agreement for 2025/26 and 2026/27. **ProB is excluded from this calendar as not free of charge**, regardless of a candidate's free-access claim. Verified 2026-10-13; see the official [ProA pass notice](https://www.2basketballbundesliga.de/livestream-paesse-fuer-die-proa-saison-2026-27-ab-sofort-buchbar/) and [NBBL/JBBL agreement](https://www.2basketballbundesliga.de/nbbl-und-jbbl-kuenftig-auf-der-gleichen-plattform-wie-proa-und-prob-sporteurope-tv-weitet-basketball-angebot-aus/). |
 | Dyn Sport Mix | `dyn.sport` (announcement/programme), `joyn.de`, `pluto.tv`, `zattoo.com` (free-tier links), `amazon.de`, `primevideo.com` | Free tier only; NOT behind Prime paywall. **Free access is decided per game**, from the official monthly free-games list on `dyn.sport/deinsender/dyn-sport-mix/` — see "Dyn Sport Mix" in `references/validation-workflow.md`. `dyn.sport` is evidence and the `sourceReference`, never the `directLink`: its own player is behind the paid Dyn service. |
+| DAZN (free-to-view basketball) | `dazn.com` | **Free access is decided per game.** Selected basketball (e.g. BCL via Courtside 1891, selected Super League games) is free to watch without a subscription. A DAZN page is a `directLink` only when that game's page states it is free and plays without a paid subscription. Free-trial-only and paid-tier games are rejected. |
 | MagentaSport / MagentaTV | `magenta.tv` (free-access evidence **and** stream), `magentasport.de` (corroboration only) | One free EuroLeague game per matchday, decided **per game**; the free indication is read off the rendered `magenta.tv` page, and `magentasport.de` silence is **not** evidence against free access (changed 2026-09-29, operator). `magenta.tv` is a JS-rendered, bot-blocked SPA — Checks 6/7 need a browser-rendering backend. See `references/magenta-tv.md` |
 
 ### Tier 5: Official Club Websites (Medium Confidence)
@@ -183,7 +184,7 @@ The tier system prioritizes sources based on:
 | Source | Reason |
 |--------|--------|
 | Sky Sport | Paid subscription |
-| DAZN | Paid subscription |
+| DAZN paid subscription content | Paid. DAZN is an approved source **only** for games its own page states are free to watch (e.g. BCL via Courtside 1891); a paid DAZN game is rejected even though `dazn.com` is on the allow-list. See the DAZN row of the approved tiers. |
 | Sport1+ | Paid |
 | Amazon Prime (general) | Paid (Dyn Sport Mix free tier only) |
 | ProA on Sporteurope.TV (2026/27) | Paid — official season passes and pay-per-view are required. NBBL/JBBL remain free; ProB is excluded from this calendar as not free of charge. |

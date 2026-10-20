@@ -23,7 +23,7 @@ the same checks.
 - Sporteurope.TV NBBL/JBBL games are covered by the current 2025/26–2026/27 no-paywall agreement
 
 **Fail criteria**:
-- Mentions "Sky", "DAZN", "Prime" (unless Dyn Sport Mix free tier)
+- Mentions "Sky", "Prime" (unless Dyn Sport Mix free tier), or a DAZN game that is not stated free to watch (DAZN is per game, see the DAZN row of the approved tiers)
 - Requires registration/payment before viewing
 - YouTube stream is members-only or otherwise paywalled
 - Contains pricing information

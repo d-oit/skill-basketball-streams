@@ -614,6 +614,41 @@
         "references/self-learning.md"
       ],
       "synthesised_from": "m69adlps8fnuvgi1osnpjrlvjk"
+    },
+{
+      "id": 46,
+      "prompt": "A DAZN page that states a BCL game is free to watch passes Check 1 as a directLink on the approved dazn.com domain. Input: url=https://www.dazn.com/en-US/welcome/courtside1891; title=Courtside 1891 - The home of FIBA Basketball; league=Basketball Champions League; teams=UCAM Murcia vs ratiopharm ulm; date=2026-10-27T20:00:00+01:00; page_states='Watch the BCL for free. Sign up to watch all Basketball Champions League games live or on demand for free. No subscription required.'; game_marked_free=True.",
+      "expected_output": "Decision=CREATE; reason=; checks: freeAccess=PASS, liveContent=PASS, officialSource=PASS, basketballSpecific=PASS, dateTimeRange=PASS, workingLink=PASS, directStreamVerification=PASS",
+      "assertions": [
+        "freeAccess expected PASS",
+        "liveContent expected PASS",
+        "officialSource expected PASS",
+        "basketballSpecific expected PASS",
+        "dateTimeRange expected PASS",
+        "workingLink expected PASS",
+        "directStreamVerification expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md",
+        "config/sources.json"
+      ]
+    },
+{
+      "id": 47,
+      "prompt": "A DAZN basketball game that needs a paid DAZN subscription fails Check 1 even though dazn.com is an approved domain: DAZN is approved per game, never per platform. Input: url=https://www.dazn.com/en-US/home; title=DAZN | Live & On Demand Sports Streaming; league=Basketball Champions League; teams=FC Bayern Muenchen vs Anadolu Efes Istanbul; date=2026-11-03T20:45:00+01:00; page_states='Live on DAZN - Abo erforderlich'; game_marked_free=False; no free marker for this game on the page, the competition page, or any official BCL channel.",
+      "expected_output": "Decision=SKIP; reason=the game is not stated free to watch and needs a paid DAZN subscription, so the approved dazn.com domain does not make it free; checks: freeAccess=FAIL, officialSource=PASS, workingLink=PASS, liveContent=PASS",
+      "assertions": [
+        "freeAccess expected FAIL",
+        "officialSource expected PASS",
+        "workingLink expected PASS",
+        "liveContent expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "references/approved-sources.md",
+        "config/sources.json"
+      ]
     }
   ]
 }

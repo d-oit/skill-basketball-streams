@@ -270,6 +270,17 @@
       ],
       "free_access": "none",
       "notes": "Official top-division league sites, one per country (Spain acb.com, Italy legabasket.it, France lnb.fr, Adriatic aba-liga.com, Greece esake.gr, Tuerkiye bsl.org.tr, VTB vtb-league.com, Belgium/Netherlands bnxtleague.com, Austria basketball.at, Switzerland swiss.basketball, Poland plk.pl). Evidence and sourceReference for fixtures and announcements ONLY: their domestic streams are paid or geo-restricted in Germany, so they can NEVER be a directLink and a link with no free marker fails Check 1. Verified live 2026-10-05; several answer 403/connection-reset to datacenter IPs (lnb.fr, bsl.org.tr), the documented runner-IP class, so an unreachable host is a transport fact and not evidence against a game."
+    },
+    {
+      "tier": 4,
+      "name": "DAZN (free-to-view basketball)",
+      "type": "streaming_platform",
+      "domains": [
+        "dazn.com"
+      ],
+      "social": [],
+      "free_access": "selected",
+      "notes": "Free access is decided PER GAME, never per platform. DAZN offers selected basketball free to view without a subscription (for example Basketball Champions League games via Courtside 1891, which DAZN describes as 'Watch the BCL for free', and selected Super League Basketball games). A dazn.com page is a directLink ONLY when the page itself states that this game is free to watch without a subscription, the page plays the game without login-gated paid content, and the game is basketball. Any DAZN game that needs a paid subscription, a free-trial-only signup or a paid tier is REJECTED, as is any game with no explicit free marker, even if the same competition is free elsewhere. Verified 2026-10-20 against dazn.com help and BCL pages."
     }
   ],
   "excluded": [
@@ -279,10 +290,6 @@
     },
     {
       "name": "Sky Sport",
-      "reason": "paid subscription"
-    },
-    {
-      "name": "DAZN",
       "reason": "paid subscription"
     },
     {
