@@ -847,6 +847,7 @@ def apply_plan(
     live: bool = False,
     descriptions: dict | None = None,
     visibility: str = "",
+    link_gate=None,
 ) -> dict:
     """Execute a planner's create/update rows. `skip` rows send nothing.
 
@@ -917,6 +918,16 @@ def apply_plan(
             )
             result["created" if action == ACTION_CREATE else "updated"] += 1
             continue
+
+        # The pre-create gate: a stream page that renders as dead is never written
+        # as a new event. Live only, so a dry run still makes no HTTP at all.
+        if live and action == ACTION_CREATE and link_gate is not None:
+            refusal = link_gate(row)
+            if refusal:
+                result["failed"].append(
+                    {"game_key": str(row.get("game_key") or ""), "reason": refusal}
+                )
+                continue
 
         try:
             if action == ACTION_CREATE:
@@ -1047,6 +1058,15 @@ def _load_json(path: Path, key: str) -> object:
     except json.JSONDecodeError as exc:
         print(f"FAIL: calendar_io: {path}: invalid JSON ({exc})", file=sys.stderr)
         sys.exit(2)
+
+
+def _rendered_gate(row: dict) -> str | None:
+    """The browser-rendered pre-create check; see `rendered_check.py`."""
+    try:  # direct CLI execution
+        from rendered_check import reject_reason
+    except ImportError:  # imported as a package module
+        from scripts.rendered_check import reject_reason  # type: ignore[no-redef]
+    return reject_reason(row)
 
 
 def main() -> None:
@@ -1190,6 +1210,7 @@ def main() -> None:
         timezone=args.timezone,
         live=args.live,
         visibility=args.visibility,
+        link_gate=_rendered_gate if args.live else None,
     )
 
     # The applied *result* is the record of what the calendar now holds — which
