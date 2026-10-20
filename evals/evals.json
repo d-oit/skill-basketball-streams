@@ -615,7 +615,7 @@
       ],
       "synthesised_from": "m69adlps8fnuvgi1osnpjrlvjk"
     },
-{
+    {
       "id": 46,
       "prompt": "A DAZN page that states a BCL game is free to watch passes Check 1 as a directLink on the approved dazn.com domain. Input: url=https://www.dazn.com/en-US/welcome/courtside1891; title=Courtside 1891 - The home of FIBA Basketball; league=Basketball Champions League; teams=UCAM Murcia vs ratiopharm ulm; date=2026-10-27T20:00:00+01:00; page_states='Watch the BCL for free. Sign up to watch all Basketball Champions League games live or on demand for free. No subscription required.'; game_marked_free=True.",
       "expected_output": "Decision=CREATE; reason=; checks: freeAccess=PASS, liveContent=PASS, officialSource=PASS, basketballSpecific=PASS, dateTimeRange=PASS, workingLink=PASS, directStreamVerification=PASS",
@@ -634,7 +634,7 @@
         "config/sources.json"
       ]
     },
-{
+    {
       "id": 47,
       "prompt": "A DAZN basketball game that needs a paid DAZN subscription fails Check 1 even though dazn.com is an approved domain: DAZN is approved per game, never per platform. Input: url=https://www.dazn.com/en-US/home; title=DAZN | Live & On Demand Sports Streaming; league=Basketball Champions League; teams=FC Bayern Muenchen vs Anadolu Efes Istanbul; date=2026-11-03T20:45:00+01:00; page_states='Live on DAZN - Abo erforderlich'; game_marked_free=False; no free marker for this game on the page, the competition page, or any official BCL channel.",
       "expected_output": "Decision=SKIP; reason=the game is not stated free to watch and needs a paid DAZN subscription, so the approved dazn.com domain does not make it free; checks: freeAccess=FAIL, officialSource=PASS, workingLink=PASS, liveContent=PASS",
@@ -649,6 +649,36 @@
         "references/approved-sources.md",
         "config/sources.json"
       ]
+    },
+    {
+      "id": 48,
+      "prompt": "Audit regression (synthesised from dspqr1tt7fvlpq5vvcbbdtb1lk, audited 2026-10-20T18:12:40.689446+00:00): an event was presented as VERIFIED even though the audit could not confirm free access. Input: url=https://www.sporteurope.tv/en/video/nbbl-science-city-jena-vs-sg-junior-loewen-braunschweig; backend=agent; game_key=NBBL|SG Junior Löwen Braunschweig|Science City Jena|2026-10-24T11:45Z; prior_state=VERIFIED; audit_reason=broadcast has not finished yet; audited_at=2026-10-20T17:37:15.067919+00:00.",
+      "expected_output": "Decision=SKIP; reason=free access was never confirmed, so the event must not have been claiming VERIFIED; checks: freeAccess=FAIL, verifiedClaimed=FAIL, regression=PASS",
+      "assertions": [
+        "freeAccess expected FAIL",
+        "verifiedClaimed expected FAIL",
+        "regression expected PASS"
+      ],
+      "files": [
+        "references/calendar-setup.md",
+        "references/self-learning.md"
+      ],
+      "synthesised_from": "dspqr1tt7fvlpq5vvcbbdtb1lk"
+    },
+    {
+      "id": 49,
+      "prompt": "Audit regression (synthesised from peh6r34nhl51j2d3v802f638ts, audited 2026-10-20T18:12:40.689446+00:00): an event was presented as VERIFIED even though the audit could not confirm free access. Input: url=https://pluto.tv/gsa/live-tv/66c6fc06489bab0008b6f9da; backend=agent; game_key=BBL|MHP RIESEN Ludwiesburg|Telekom Baskets Bonn|2026-10-24T18:00Z; prior_state=VERIFIED; audit_reason=broadcast has not finished yet; audited_at=2026-10-20T18:12:04.209089+00:00.",
+      "expected_output": "Decision=SKIP; reason=free access was never confirmed, so the event must not have been claiming VERIFIED; checks: freeAccess=FAIL, verifiedClaimed=FAIL, regression=PASS",
+      "assertions": [
+        "freeAccess expected FAIL",
+        "verifiedClaimed expected FAIL",
+        "regression expected PASS"
+      ],
+      "files": [
+        "references/calendar-setup.md",
+        "references/self-learning.md"
+      ],
+      "synthesised_from": "peh6r34nhl51j2d3v802f638ts"
     }
   ]
 }
