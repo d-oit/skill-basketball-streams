@@ -674,6 +674,8 @@ jobs:
             --model "$LLM_MODEL" --format json \
             "Execute Steps 1-7 for today (Europe/Berlin). DRY_RUN=$DRY_RUN. Emit the Step 7 table.
 
+            Do NOT call bash or any shell command. It is denied, and a denied call ends the run with no answer. Research only with webfetch and websearch; the calendar is written by the workflow, not by you. Get today's date from the Europe/Berlin timezone in the prompt context, not from a shell.
+
             YouTube discovery must use webfetch on every URL in the attached youtube-live-searches.json. Each URL already has YouTube's Live filter (sp=EgJAAQ%3D%3D). Never use generic websearch results to discover YouTube streams, and never fetch a YouTube results URL without that exact Live filter. New YouTube handles and other unapproved source URLs are quarantined source leads unless already approved. Do not omit source_leads from the final JSON: add it beside candidates and use [] when no new sources were found.
 
             You are also the ONLY channel the planner has. The runtime agent is denied 'edit' and 'bash', so it cannot write a file, and scripts/extract_candidates.py reads the final answer out of your transcript. It accepts a fenced \`\`\`json block and NOTHING else - a markdown table, prose, or a tool result are all invisible to it.
