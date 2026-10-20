@@ -3,7 +3,7 @@
     {
       "domain": "netzwelt.de",
       "status": "quarantined",
-      "hits": 7015,
+      "hits": 7328,
       "examples": [
         "https://www.netzwelt.de/",
         "https://www.netzwelt.de/news/236459-telekom-baskets-bonn-gegen-ratiopharm-ulm-so-schaut-bbl-partie-kostenlos-tv-live-stream.html",
@@ -13,7 +13,7 @@
     {
       "domain": "dslweb.de",
       "status": "quarantined",
-      "hits": 6714,
+      "hits": 7011,
       "examples": [
         "https://www.dslweb.de/news/tv/fc-bayern-basketball-live-im-tv-bbl-playoff-spiel-gegen-gladiators-trier-kostenlos-live-streamen.php",
         "https://www.dslweb.de/news/tv/bbl-finals-live-heute-bayern-vs-alba-berlin-kostenlos-streamen.php",
@@ -23,7 +23,7 @@
     {
       "domain": "fubo.tv",
       "status": "quarantined",
-      "hits": 6097,
+      "hits": 6415,
       "examples": [
         "https://www.fubo.tv/welcome/leagues/13324137",
         "https://www.fubo.tv/welcome/leagues/3605745",
@@ -33,7 +33,7 @@
     {
       "domain": "fcbayern.com",
       "status": "quarantined",
-      "hits": 5448,
+      "hits": 5697,
       "examples": [
         "https://fcbayern.com/basketball/de/news/artikel/fc-bayern-basketball-live-tv-stream-uebertragung",
         "https://fcbayern.com/",
@@ -43,7 +43,7 @@
     {
       "domain": "flashscoreusa.com",
       "status": "quarantined",
-      "hits": 4435,
+      "hits": 4663,
       "examples": [
         "https://www.flashscoreusa.com/",
         "https://www.flashscoreusa.com/basketball/europe/champions-league/",
@@ -53,7 +53,7 @@
     {
       "domain": "basketballimtv.de",
       "status": "quarantined",
-      "hits": 4424,
+      "hits": 4612,
       "examples": [
         "https://basketballimtv.de/live/2026/alba-berlin-telekom-baskets-bonn-52990.html",
         "https://basketballimtv.de/live/2026/alba-berlin-niners-chemnitz-53005.html",
@@ -63,7 +63,7 @@
     {
       "domain": "sportbild.bild.de",
       "status": "quarantined",
-      "hits": 4395,
+      "hits": 4609,
       "examples": [
         "https://sportbild.bild.de/",
         "https://sportbild.bild.de/sportmix/basketball/sport-mix/basketball-champions-league-finale-der-telekom-baskets-bonn-hier-live-sehen-83912432.sport.html",
@@ -73,7 +73,7 @@
     {
       "domain": "basketball-world.news",
       "status": "quarantined",
-      "hits": 4331,
+      "hits": 4546,
       "examples": [
         "https://www.basketball-world.news/",
         "https://www.basketball-world.news/artikel/wer-zeigt-das-bcl-achtelfinale-mit-berlin-und-wuerzburg-live-1153261",
@@ -83,7 +83,7 @@
     {
       "domain": "liveimtv.de",
       "status": "quarantined",
-      "hits": 3855,
+      "hits": 4035,
       "examples": [
         "https://liveimtv.de/live/basketball/alba-berlin---niners-chemnitz-64897",
         "https://liveimtv.de/live/basketball/alba-berlin---skyliners-frankfurt-64906",
@@ -93,7 +93,7 @@
     {
       "domain": "sports.justwatch.com",
       "status": "quarantined",
-      "hits": 3676,
+      "hits": 3875,
       "examples": [
         "https://sports.justwatch.com/de/basketball/kk-fmp-0",
         "https://sports.justwatch.com/de/basketball/alba-berlin",
@@ -103,7 +103,7 @@
     {
       "domain": "bblprofis.de",
       "status": "quarantined",
-      "hits": 3545,
+      "hits": 3723,
       "examples": [
         "https://www.bblprofis.de/index.php/2025/09/30/kostenloser-livestream-panathinaikos-aktor-athen-gegen-den-fc-bayern-basketball/",
         "https://www.bblprofis.de/index.php/2026/01/07/kostenloser-livestream-fc-bayern-basketball-gegen-kosner-baskonia-vitoria-gasteiz/",
@@ -113,7 +113,7 @@
     {
       "domain": "sport.de",
       "status": "quarantined",
-      "hits": 3456,
+      "hits": 3619,
       "examples": [
         "https://www.sport.de/basketball/deutschland-bbl/konferenz/liveticker/dn2026-06-17/",
         "https://www.sport.de/basketball/deutschland-bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/",
@@ -123,7 +123,7 @@
     {
       "domain": "albaberlin.de",
       "status": "quarantined",
-      "hits": 3205,
+      "hits": 3370,
       "examples": [
         "https://www.albaberlin.de/news/details/erfolgreicher-auftakt-alba-schlaegt-chemnitz-im-ersten-bbl-duell-der-saison",
         "https://www.albaberlin.de/news/details/alle-alba-spiele-der-basketball-champions-league-live-bei-magentasport",
@@ -133,7 +133,7 @@
     {
       "domain": "livesportsontv.com",
       "status": "quarantined",
-      "hits": 3178,
+      "hits": 3333,
       "examples": [
         "https://www.livesportsontv.com/",
         "https://www.livesportsontv.com/league/euroleague",
@@ -143,7 +143,7 @@
     {
       "domain": "news.de",
       "status": "quarantined",
-      "hits": 2931,
+      "hits": 3102,
       "examples": [
         "https://www.news.de/sport/859955828/alba-berlin-niners-chemnitz-bbl-livestream-basketball-bundesliga-am-18-09-2026-in-berlin-anfahrt-und-tickets/1/",
         "https://www.news.de/sport/860002805/alba-berlin-niners-chemnitz-bbl-livestream-kostenlos-basketball-bundesliga-am-18-09-2026-in-berlin-anfahrt-und-tickets/1/",
@@ -151,19 +151,9 @@
       ]
     },
     {
-      "domain": "freetips.com",
-      "status": "quarantined",
-      "hits": 2880,
-      "examples": [
-        "https://www.freetips.com/basketball/how-to-watch-euroleague-final-four-tournament-2026-20260521-0024/",
-        "https://www.freetips.com/basketball/watch-olympiakos-vs-real-madrid-live-stream-euroleague-2026-finals-20260523-0009/",
-        "https://www.freetips.com/basketball/dubai-vs-real-madrid-live-stream-20260923-0013/"
-      ]
-    },
-    {
       "domain": "fibatv.com",
       "status": "quarantined",
-      "hits": 2875,
+      "hits": 2997,
       "examples": [
         "https://fibatv.com/americas/live",
         "https://fibatv.com/live",
@@ -171,9 +161,19 @@
       ]
     },
     {
+      "domain": "freetips.com",
+      "status": "quarantined",
+      "hits": 2993,
+      "examples": [
+        "https://www.freetips.com/basketball/how-to-watch-euroleague-final-four-tournament-2026-20260521-0024/",
+        "https://www.freetips.com/basketball/watch-olympiakos-vs-real-madrid-live-stream-euroleague-2026-finals-20260523-0009/",
+        "https://www.freetips.com/basketball/dubai-vs-real-madrid-live-stream-20260923-0013/"
+      ]
+    },
+    {
       "domain": "basketballsphere.com",
       "status": "quarantined",
-      "hits": 2696,
+      "hits": 2817,
       "examples": [
         "https://basketballsphere.com/en/watch-euroleague-for-free/",
         "https://basketballsphere.com/",
@@ -183,7 +183,7 @@
     {
       "domain": "telekom.de",
       "status": "quarantined",
-      "hits": 2640,
+      "hits": 2762,
       "examples": [
         "https://www.telekom.de/",
         "https://www.telekom.de/sport/magenta-sport",
@@ -193,7 +193,7 @@
     {
       "domain": "telekom.com",
       "status": "quarantined",
-      "hits": 2489,
+      "hits": 2609,
       "examples": [
         "https://www.telekom.com/de/medien/medieninformationen/detail/exklusives-basketball-angebot-1095026",
         "https://www.telekom.com/de/medien/medieninformationen/detail/21-laenderspiele-in-20-tagen-kostenlos-bei-magentasport-1086608",
@@ -203,7 +203,7 @@
     {
       "domain": "sportpresseportal.de",
       "status": "quarantined",
-      "hits": 2475,
+      "hits": 2570,
       "examples": [
         "https://www.sportpresseportal.de/news/tLdSMU/basketball-em-komplett-live-bei-magentasport-und-magentatv-deutscher-auftakt-am-mittwoch-vs-montenegro-kostenlos",
         "https://www.sportpresseportal.de/news/i9zX79/basketball-em-komplett-live-bei-magentasport-sendezeiten-fuer-die-achtelfinals-am-samstag-fixiert-deutschland-portugal-ab-1330-uhr-live-und-kostenlos-bei-magentasport",
@@ -213,7 +213,7 @@
     {
       "domain": "sportsgambler.com",
       "status": "quarantined",
-      "hits": 2413,
+      "hits": 2532,
       "examples": [
         "https://www.sportsgambler.com/",
         "https://www.sportsgambler.com/live-streaming/basketball/",
@@ -223,7 +223,7 @@
     {
       "domain": "eurosport.de",
       "status": "quarantined",
-      "hits": 2374,
+      "hits": 2475,
       "examples": [
         "https://www.eurosport.de/basketball/europameisterschaft/2025/deutschland-portugal-heute-live-tv-stream-ticker-uebertragung-achtelfinale-em_sto23218750/story.shtml",
         "https://www.eurosport.de/basketball/basketball-champions-league/2025-2026/live-trieste-canarias_mtc1641460/live.shtml",
@@ -233,7 +233,7 @@
     {
       "domain": "gestreamt.de",
       "status": "quarantined",
-      "hits": 2355,
+      "hits": 2446,
       "examples": [
         "https://www.gestreamt.de/streaming-dienste/magenta-sport/magenta-sport-kostenlos/",
         "https://www.gestreamt.de/streaming-dienste/magenta-sport/magenta-sport-basketball/"
@@ -242,7 +242,7 @@
     {
       "domain": "tipico.de",
       "status": "quarantined",
-      "hits": 2125,
+      "hits": 2233,
       "examples": [
         "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-jena-bayern-muenchen-uebertragung-im-tv-stream",
         "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-alba-berlin-bonn-uebertragung-im-tv-stream",
@@ -252,7 +252,7 @@
     {
       "domain": "spox.com",
       "status": "quarantined",
-      "hits": 2111,
+      "hits": 2216,
       "examples": [
         "https://www.spox.com/basketball/listen/alba-berlin-vs-fc-bayern-muenchen-basketball-finale-heute-live-im-free-tv-wer-zeigt-uebertraegt-spiel-3-der-bbl-finals-im-tv-und-livestream/blt22bba66a434f7a6b",
         "https://www.spox.com/",
@@ -262,7 +262,7 @@
     {
       "domain": "de.headtopics.com",
       "status": "quarantined",
-      "hits": 2042,
+      "hits": 2120,
       "examples": [
         "https://de.headtopics.com/news/sportbild-de-und-dyn-starten-gro-e-live-sport-offensive-87881735",
         "https://de.headtopics.com/news/basketball-bbl-alba-gegen-chemnitz-liveticker-1-87894725",
@@ -272,7 +272,7 @@
     {
       "domain": "presseportal.de",
       "status": "quarantined",
-      "hits": 1840,
+      "hits": 1936,
       "examples": [
         "https://www.presseportal.de/pm/147981/6354099",
         "https://www.presseportal.de/pm/147981/6359013",
@@ -282,7 +282,7 @@
     {
       "domain": "sport-tv-guide.live",
       "status": "quarantined",
-      "hits": 1778,
+      "hits": 1850,
       "examples": [
         "https://sport-tv-guide.live/event/watch-live-sport-on-tv/1628233",
         "https://sport-tv-guide.live/event/watch-live-sport-on-tv/1628234",
@@ -292,7 +292,7 @@
     {
       "domain": "apps.apple.com",
       "status": "quarantined",
-      "hits": 1709,
+      "hits": 1795,
       "examples": [
         "https://apps.apple.com/at/app/dyn-sport/id6450751305",
         "https://apps.apple.com/",
@@ -302,7 +302,7 @@
     {
       "domain": "forums.vmix.com",
       "status": "quarantined",
-      "hits": 1565,
+      "hits": 1623,
       "examples": [
         "https://forums.vmix.com/posts/t1908-Live-Stream-Basketball-Beko-BBL--professional-league----Bayern-Munich"
       ]
@@ -310,36 +310,16 @@
     {
       "domain": "web.playsight.com",
       "status": "quarantined",
-      "hits": 1522,
+      "hits": 1605,
       "examples": [
         "https://web.playsight.com/",
         "https://web.playsight.com/facility/alba-berlin-basketball"
       ]
     },
     {
-      "domain": "waipu.tv",
-      "status": "quarantined",
-      "hits": 1450,
-      "examples": [
-        "https://www.waipu.tv/",
-        "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/",
-        "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XBEK2Lix8FMK_xl4Xsr-2pmcod1J_QQCzkgZNcpItsndA30iZu"
-      ]
-    },
-    {
-      "domain": "leon.bet",
-      "status": "quarantined",
-      "hits": 1444,
-      "examples": [
-        "https://leon.bet/blog/matches/barcelona-efes-anadolu-istanbul-24-09-2026",
-        "https://leon.bet/blog/matches/crvena-zvezda-zalgiris-kaunas-24-09-2026",
-        "https://leon.bet/blog/matches/cd-saski-baskonia-olympiacos-24-09-2026"
-      ]
-    },
-    {
       "domain": "swp.de",
       "status": "quarantined",
-      "hits": 1443,
+      "hits": 1521,
       "examples": [
         "https://www.swp.de/sport/sport-mix/bayern-muenchen-gegen-alba-berlin-live-wer-uebertraegt-gratis-im-tv-und-stream-79502348.html",
         "https://www.swp.de/sport/sport-mix/bayern-muenchen-gegen-alba-berlin-heute-live-wer-uebertraegt-gratis-im-tv-und-stream-79502317.html",
@@ -347,18 +327,38 @@
       ]
     },
     {
+      "domain": "waipu.tv",
+      "status": "quarantined",
+      "hits": 1516,
+      "examples": [
+        "https://www.waipu.tv/",
+        "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/",
+        "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XBEK2Lix8FMK_xl4Xsr-2pmcod1J_QQCzkgZNcpItsndA30iZu"
+      ]
+    },
+    {
       "domain": "go3.lt",
       "status": "quarantined",
-      "hits": 1429,
+      "hits": 1498,
       "examples": [
         "https://go3.lt/",
         "https://go3.lt/en/sports"
       ]
     },
     {
+      "domain": "leon.bet",
+      "status": "quarantined",
+      "hits": 1498,
+      "examples": [
+        "https://leon.bet/blog/matches/barcelona-efes-anadolu-istanbul-24-09-2026",
+        "https://leon.bet/blog/matches/crvena-zvezda-zalgiris-kaunas-24-09-2026",
+        "https://leon.bet/blog/matches/cd-saski-baskonia-olympiacos-24-09-2026"
+      ]
+    },
+    {
       "domain": "sports.yahoo.com",
       "status": "quarantined",
-      "hits": 1402,
+      "hits": 1457,
       "examples": [
         "https://sports.yahoo.com/wnba/article/fiba-womens-world-cup-how-to-watch-the-2026-basketball-tournament-where-to-stream-schedule-and-more-125000949.html",
         "https://sports.yahoo.com/wnba/article/fiba-womens-world-cup-how-to-watch-team-usa-at-the-2026-basketball-tournament-where-to-stream-schedule-and-more-125000949.html",
@@ -366,26 +366,36 @@
       ]
     },
     {
-      "domain": "wetten.com",
-      "status": "quarantined",
-      "hits": 1335,
-      "examples": [
-        "https://wetten.com/sportwetten/sportuebertragung-im-tv/basketball/"
-      ]
-    },
-    {
       "domain": "flohoops.com",
       "status": "quarantined",
-      "hits": 1321,
+      "hits": 1392,
       "examples": [
         "https://www.flohoops.com/live/12916-alba-alba-berlin-vs-ratiopharm-ulm-easycredit-bbl",
         "https://www.flohoops.com/live/13984-alba-berlin-vs-fc-bayern-munchen-semifinal-2-easycredit-bbl"
       ]
     },
     {
+      "domain": "wetten.com",
+      "status": "quarantined",
+      "hits": 1388,
+      "examples": [
+        "https://wetten.com/sportwetten/sportuebertragung-im-tv/basketball/"
+      ]
+    },
+    {
+      "domain": "twitch.tv",
+      "status": "quarantined",
+      "hits": 1324,
+      "examples": [
+        "https://www.twitch.tv/fcbayernbasketball",
+        "https://www.twitch.tv/directory/all/tags/euroleague",
+        "https://www.twitch.tv/fiba"
+      ]
+    },
+    {
       "domain": "ggaz.de",
       "status": "quarantined",
-      "hits": 1268,
+      "hits": 1318,
       "examples": [
         "https://www.ggaz.de/22-09-2025-dyn-sport-mix-ab-sofort-empfangbar/",
         "https://www.ggaz.de/tag/dyn-sport-mix/"
@@ -394,26 +404,16 @@
     {
       "domain": "teltarif.de",
       "status": "quarantined",
-      "hits": 1267,
+      "hits": 1317,
       "examples": [
         "https://www.teltarif.de/en/dyn-fastchannel-freetv-astra-streaming/news/99428.html",
         "https://www.teltarif.de/en/sport-fernsehen-streaming-dyn-pluto/news/99145.html"
       ]
     },
     {
-      "domain": "twitch.tv",
-      "status": "quarantined",
-      "hits": 1253,
-      "examples": [
-        "https://www.twitch.tv/fcbayernbasketball",
-        "https://www.twitch.tv/directory/all/tags/euroleague",
-        "https://www.twitch.tv/fiba"
-      ]
-    },
-    {
       "domain": "nbabox.co",
       "status": "quarantined",
-      "hits": 1219,
+      "hits": 1279,
       "examples": [
         "https://nbabox.co/watch-euroleague-online",
         "https://nbabox.co/watch-nbl-online"
@@ -422,7 +422,7 @@
     {
       "domain": "tomsguide.com",
       "status": "quarantined",
-      "hits": 1132,
+      "hits": 1177,
       "examples": [
         "https://www.tomsguide.com/entertainment/sports/watch-fiba-world-cup-2027-european-qualifiers-free",
         "https://www.tomsguide.com/entertainment/sports/how-to-watch-germany-vs-turkiye-eurobasket-final-2025-live"
@@ -431,7 +431,7 @@
     {
       "domain": "wowi.astra.de",
       "status": "quarantined",
-      "hits": 1108,
+      "hits": 1153,
       "examples": [
         "https://wowi.astra.de/presse/neu-ueber-astra-satellit-dyn-sport-mix",
         "https://wowi.astra.de/sites/default/files/2025-09/Pressemeldung_DYN.pdf"
@@ -440,7 +440,7 @@
     {
       "domain": "areadvd.de",
       "status": "quarantined",
-      "hits": 1105,
+      "hits": 1149,
       "examples": [
         "https://www.areadvd.de/news/dyn-sport-mix-hd-via-satellit-auf-astra-19-2-empfangbar/"
       ]
@@ -448,7 +448,7 @@
     {
       "domain": "digitalfernsehen.de",
       "status": "quarantined",
-      "hits": 1102,
+      "hits": 1149,
       "examples": [
         "https://www.digitalfernsehen.de/news/inhalte/streaming/magentasport-21-kostenlose-laenderspiele-in-20-tagen-1133343/",
         "https://www.digitalfernsehen.de/news/inhalte/streaming/basketball-wm-telekomdeutschland-spiel-heute-kostenlos-alles-live-bei-magentasport-1102358/",
@@ -458,7 +458,7 @@
     {
       "domain": "bild.de",
       "status": "quarantined",
-      "hits": 1099,
+      "hits": 1141,
       "examples": [
         "https://www.bild.de/sport/mehr-sport/playoff-halbfinale-alba-bamberg-bild-de-zeigt-basketball-live-6a280aed2f1d399245057caf",
         "https://www.bild.de/sport/mehr-sport/alba-gegen-chemnitz-bbl-auftaktspiel-jetzt-hier-im-live-stream-6aacdf2cb1857e86757a5aa7",
@@ -468,7 +468,7 @@
     {
       "domain": "ga.de",
       "status": "quarantined",
-      "hits": 1066,
+      "hits": 1107,
       "examples": [
         "https://ga.de/sport/telekom-baskets-bonn/livestream-telekom-baskets-bonn-gegen-hapoel-jerusalem_aid-90349947"
       ]
@@ -476,23 +476,15 @@
     {
       "domain": "t-online.de",
       "status": "quarantined",
-      "hits": 1051,
+      "hits": 1093,
       "examples": [
         "https://www.t-online.de/sport/mehr-sport/id_100899022/dyn-sport-mix-im-free-tv-neuer-sportsender-ist-jetzt-empfangbar.html"
       ]
     },
     {
-      "domain": "basketnews.com",
-      "status": "quarantined",
-      "hits": 1007,
-      "examples": [
-        "https://basketnews.com/news-254411-where-to-watch-wembanyama-jokic-live-in-fiba-basketball.html"
-      ]
-    },
-    {
       "domain": "euroleague.tv",
       "status": "quarantined",
-      "hits": 1007,
+      "hits": 1058,
       "examples": [
         "https://euroleague.tv/home",
         "https://euroleague.tv/live/124437",
@@ -500,9 +492,17 @@
       ]
     },
     {
+      "domain": "basketnews.com",
+      "status": "quarantined",
+      "hits": 1047,
+      "examples": [
+        "https://basketnews.com/news-254411-where-to-watch-wembanyama-jokic-live-in-fiba-basketball.html"
+      ]
+    },
+    {
       "domain": "chip.de",
       "status": "quarantined",
-      "hits": 992,
+      "hits": 1031,
       "examples": [
         "https://www.chip.de/downloads/webapp-FC-Bayern-vs.-Ulm-Basketball-Play-off-Finale-Live-Stream_186071881.html",
         "https://www.chip.de/downloads/FC-Bayern-Basketball-Live-Stream_67553512.html"
@@ -512,7 +512,7 @@
       "domain": "youtube.com",
       "channel": "youtube.com/@fcbayernbasketball",
       "status": "quarantined",
-      "hits": 984,
+      "hits": 1030,
       "examples": [
         "https://www.youtube.com/@fcbayernbasketball/streams"
       ]
@@ -520,7 +520,7 @@
     {
       "domain": "sofascore.com",
       "status": "quarantined",
-      "hits": 973,
+      "hits": 1027,
       "examples": [
         "https://www.sofascore.com/news/sofascore-and-euroleague-tv-renew-fan-discount-deal-for-2026-27",
         "https://www.sofascore.com/basketball/team/alba-berlin/3516",
@@ -530,7 +530,7 @@
     {
       "domain": "squawka.com",
       "status": "quarantined",
-      "hits": 963,
+      "hits": 1015,
       "examples": [
         "https://www.squawka.com/",
         "https://www.squawka.com/en/other-sport/bayern-munich-alba-berlin-live-stream-watch-online-basketball-bundesliga/"
@@ -539,15 +539,23 @@
     {
       "domain": "mebucom.de",
       "status": "quarantined",
-      "hits": 956,
+      "hits": 993,
       "examples": [
         "https://mebucom.de/business/dyn-startet-mit-dyn-sport-mix-eigenen-free-tv-kanal/"
       ]
     },
     {
+      "domain": "dyn-sport-live-auf-abruf.en.softonic.com",
+      "status": "quarantined",
+      "hits": 988,
+      "examples": [
+        "https://dyn-sport-live-auf-abruf.en.softonic.com/android"
+      ]
+    },
+    {
       "domain": "freestreams-live1.watch",
       "status": "quarantined",
-      "hits": 952,
+      "hits": 988,
       "examples": [
         "https://freestreams-live1.watch/league/euroleague.html"
       ]
@@ -555,7 +563,7 @@
     {
       "domain": "watch-live-stream.com",
       "status": "quarantined",
-      "hits": 945,
+      "hits": 980,
       "examples": [
         "https://watch-live-stream.com/basketball/olympiacos-pireus-fenerbahce-beko-stambul",
         "https://watch-live-stream.com/category/basketball/euroleague",
@@ -563,17 +571,9 @@
       ]
     },
     {
-      "domain": "dyn-sport-live-auf-abruf.en.softonic.com",
-      "status": "quarantined",
-      "hits": 942,
-      "examples": [
-        "https://dyn-sport-live-auf-abruf.en.softonic.com/android"
-      ]
-    },
-    {
       "domain": "techradar.com",
       "status": "quarantined",
-      "hits": 917,
+      "hits": 951,
       "examples": [
         "https://www.techradar.com/how-to-watch/basketball/fiba-womens-basketball-world-cup-2026-free"
       ]
@@ -581,7 +581,7 @@
     {
       "domain": "hakro-merlins.com",
       "status": "quarantined",
-      "hits": 902,
+      "hits": 950,
       "examples": [
         "https://hakro-merlins.com/",
         "https://hakro-merlins.com/news/barmer-proa/alle-spiele-der-barmer-2-basketball-bundesliga-proa-live-und-kostenlos-auf-sportdeutschlandtv/"
@@ -590,7 +590,7 @@
     {
       "domain": "espn.com",
       "status": "quarantined",
-      "hits": 900,
+      "hits": 944,
       "examples": [
         "https://www.espn.com/watch/",
         "https://www.espn.com/fiba/",
@@ -600,7 +600,7 @@
     {
       "domain": "de2.sportplus.tv",
       "status": "quarantined",
-      "hits": 865,
+      "hits": 912,
       "examples": [
         "https://de2.sportplus.tv/basketball/euroleague/",
         "https://de2.sportplus.tv/basketball/24593/",
@@ -608,9 +608,18 @@
       ]
     },
     {
+      "domain": "kurierverlag.de",
+      "status": "quarantined",
+      "hits": 896,
+      "examples": [
+        "https://www.kurierverlag.de/na-pressemitteilungen/magentasport-und-magentatv-zeigen-alle-spiele-der-eurobasket-2025-live-die-deutschen-spiele-kostenlos-telekom-vergibt-sublizenz-an-rtl-deutschland-zr-93650895.html",
+        "https://www.kurierverlag.de/na-pressemitteilungen/europas-bester-basketball-mit-neun-deutschen-klubs-live-nur-bei-magentasport-morgen-startet-die-basketball-champions-league-berlin-bamberg-bonn-und-zr-94525224.html"
+      ]
+    },
+    {
       "domain": "tvinfo.de",
       "status": "quarantined",
-      "hits": 864,
+      "hits": 896,
       "examples": [
         "https://www.tvinfo.de/fernsehprogramm/2115529203-basketball-bundesliga-live-fc-bayern-muenchen-mhp-riesen-ludwigsburg",
         "https://www.tvinfo.de/fernsehprogramm/2115529196-basketball-bundesliga-live-fc-bayern-muenchen-mhp-riesen-ludwigsburg",
@@ -618,18 +627,9 @@
       ]
     },
     {
-      "domain": "kurierverlag.de",
-      "status": "quarantined",
-      "hits": 863,
-      "examples": [
-        "https://www.kurierverlag.de/na-pressemitteilungen/magentasport-und-magentatv-zeigen-alle-spiele-der-eurobasket-2025-live-die-deutschen-spiele-kostenlos-telekom-vergibt-sublizenz-an-rtl-deutschland-zr-93650895.html",
-        "https://www.kurierverlag.de/na-pressemitteilungen/europas-bester-basketball-mit-neun-deutschen-klubs-live-nur-bei-magentasport-morgen-startet-die-basketball-champions-league-berlin-bamberg-bonn-und-zr-94525224.html"
-      ]
-    },
-    {
       "domain": "livetvworld.net",
       "status": "quarantined",
-      "hits": 810,
+      "hits": 840,
       "examples": [
         "https://livetvworld.net/euroleague-basketball-tv"
       ]
@@ -637,7 +637,7 @@
     {
       "domain": "telecompaper.com",
       "status": "quarantined",
-      "hits": 809,
+      "hits": 839,
       "examples": [
         "https://www.telecompaper.com/news/dyn-sport-starts-broadcasting-via-astra-to-reach-over-16-mln-homes-in-germany--1548444"
       ]
@@ -645,7 +645,7 @@
     {
       "domain": "meedia.de",
       "status": "quarantined",
-      "hits": 756,
+      "hits": 784,
       "examples": [
         "https://meedia.de/news/beitrag/19929-paid-streamingdienst-dyn-startet-free-tv-sender.html"
       ]
@@ -653,25 +653,15 @@
     {
       "domain": "rnd.de",
       "status": "quarantined",
-      "hits": 729,
+      "hits": 756,
       "examples": [
         "https://www.rnd.de/sport/deutschland-litauen-live-basketball-em-im-free-tv-und-stream-sehen-VWZKAORLUBC2VKTFRE75QXRG2M.html"
       ]
     },
     {
-      "domain": "liveticker.morgenpost.de",
-      "status": "quarantined",
-      "hits": 689,
-      "examples": [
-        "https://liveticker.morgenpost.de/basketball/bbl/ma11487260/telekom-baskets-bonn_fitness-first-wuerzburg-baskets/liveticker/",
-        "https://liveticker.morgenpost.de/basketball/bbl/ma12415672/fc-bayern-muenchen_bamberg-baskets/liveticker/",
-        "https://liveticker.morgenpost.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/"
-      ]
-    },
-    {
       "domain": "ran.de",
       "status": "quarantined",
-      "hits": 685,
+      "hits": 719,
       "examples": [
         "https://www.ran.de/sports/basketball/europameisterschaft/news/deutschland-vs-finnland-live-basketball-em2025-uebertragung-des-halbfinals-im-tv-livestream-und-ticker-588049",
         "https://www.ran.de/sports/basketball/bbl/news/bbl202526-loewen-braunschweig-gegen-rostock-seawolves-ausgewaehlte-topspiele-jede-woche-im-livestream-auf-joyn-596107",
@@ -679,9 +669,19 @@
       ]
     },
     {
+      "domain": "liveticker.morgenpost.de",
+      "status": "quarantined",
+      "hits": 715,
+      "examples": [
+        "https://liveticker.morgenpost.de/basketball/bbl/ma11487260/telekom-baskets-bonn_fitness-first-wuerzburg-baskets/liveticker/",
+        "https://liveticker.morgenpost.de/basketball/bbl/ma12415672/fc-bayern-muenchen_bamberg-baskets/liveticker/",
+        "https://liveticker.morgenpost.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/"
+      ]
+    },
+    {
       "domain": "de.droidinformer.org",
       "status": "quarantined",
-      "hits": 675,
+      "hits": 700,
       "examples": [
         "https://de.droidinformer.org/sports/basketball-champions-league/"
       ]
@@ -689,7 +689,7 @@
     {
       "domain": "euroleague.pro",
       "status": "quarantined",
-      "hits": 665,
+      "hits": 691,
       "examples": [
         "https://euroleague.pro/euroleague-tv-schedule-this-week",
         "https://euroleague.pro/navigating-the-euroleague-streaming-landscape-what-fans-need"
@@ -698,7 +698,7 @@
     {
       "domain": "firmenpresse.de",
       "status": "quarantined",
-      "hits": 649,
+      "hits": 675,
       "examples": [
         "https://www.firmenpresse.de/pressinfo2179572-frauen-em-und-3x3-turnier-mit-der-weltspitze-spektakel-basketball-live-und-kostenlos-magentasport-nimmt-den-3x3-world-cup-ins-programm.html",
         "https://www.firmenpresse.de/pressinfo2110918-basketball-live-und-kostenlos-bei-magentasport-am-samstag-15-30-uhr-deutschland-testet-gegen-frankreich-herberts-abschiedsmission-f-r-eine-olympia-medaille-startet-mit-allen-weltmeistern.html"
@@ -707,7 +707,7 @@
     {
       "domain": "apkfab.com",
       "status": "quarantined",
-      "hits": 621,
+      "hits": 644,
       "examples": [
         "https://apkfab.com/de/basketball-champions-league/com.fiba.bcl"
       ]
@@ -715,7 +715,7 @@
     {
       "domain": "sportingnews.com",
       "status": "quarantined",
-      "hits": 612,
+      "hits": 638,
       "examples": [
         "https://www.sportingnews.com/ca/nba/news/courtside-1891-subscription-price-cost-fiba-streaming-dazn/682afdd839a8baeca8780a5a",
         "https://www.sportingnews.com/in/tsn/news/fiba-basketball-live-streams-watch-olympic-qualifiers-online/52da829c5af8eae93de16d99",
@@ -725,7 +725,7 @@
     {
       "domain": "finanznachrichten.de",
       "status": "quarantined",
-      "hits": 587,
+      "hits": 615,
       "examples": [
         "https://www.finanznachrichten.de/nachrichten-2026-09/69607380-bayern-will-zurueck-in-die-playoffs-europas-bester-basketball-bei-magentasport-und-magentatv-euroleague-ab-24-09-supercup-premiere-morgen-eurocup-007.htm",
         "https://www.finanznachrichten.de/nachrichten-2026-03/67906017-live-kostenlos-bei-magentasport-deutsche-basketball-frauen-mit-5-haertetests-fuer-die-heim-wm-2026-geiselsoeder-ueber-wm-ziele-es-ist-kein-geheimni-007.htm",
@@ -735,7 +735,7 @@
     {
       "domain": "converseer.com",
       "status": "quarantined",
-      "hits": 513,
+      "hits": 532,
       "examples": [
         "https://converseer.com/live-stream-kosner-baskonia-vs-olympiacos-piraeus-2026-euroleague/"
       ]
@@ -743,7 +743,7 @@
     {
       "domain": "khelnow.com",
       "status": "quarantined",
-      "hits": 459,
+      "hits": 476,
       "examples": [
         "https://khelnow.com/basketball/where-to-watch-fiba-basketball-world-cup-2027-asian-qualifiers-india-vs-lebanon-202606"
       ]
@@ -751,7 +751,7 @@
     {
       "domain": "freestreams-live1h.pk",
       "status": "quarantined",
-      "hits": 432,
+      "hits": 448,
       "examples": [
         "https://freestreams-live1h.pk/euroleague-stream95/"
       ]
@@ -759,7 +759,7 @@
     {
       "domain": "telekom-baskets-bonn.de",
       "status": "quarantined",
-      "hits": 409,
+      "hits": 440,
       "examples": [
         "https://www.telekom-baskets-bonn.de/presse/newsarchiv/die-basketball-champions-league-ab-jetzt-bei-magentasport",
         "https://www.telekom-baskets-bonn.de/verein/teams/livestreams/livestreams-jbbl"
@@ -768,7 +768,7 @@
     {
       "domain": "livesport.com",
       "status": "quarantined",
-      "hits": 391,
+      "hits": 406,
       "examples": [
         "https://www.livesport.com/basketball/germany/bbl/",
         "https://www.livesport.com/basketball/europe/champions-league/",
@@ -776,19 +776,10 @@
       ]
     },
     {
-      "domain": "kulturigo.de",
-      "status": "quarantined",
-      "hits": 382,
-      "examples": [
-        "https://www.kulturigo.de/magentasport-mit-exklusivem-basketball-angebot-mission-em-gewinn-startet-am-08-august-per-g-nther-und-marie-g-lich-als-experten-dabei-alle-76-spiele-und-alle-tests-live-deutsche-partien-kostenlos-2189882.html/",
-        "https://www.kulturigo.de/mehr-von-europas-bestem-basketball-telekom-erwirbt-exklusiv-rechte-an-der-basketball-champions-league-2275298.html/"
-      ]
-    },
-    {
       "domain": "youtube.com",
       "channel": "youtube.com/@dynbasketball",
       "status": "quarantined",
-      "hits": 372,
+      "hits": 401,
       "examples": [
         "https://www.youtube.com/@dynbasketball/streams",
         "https://www.youtube.com/@dynbasketball",
@@ -796,9 +787,27 @@
       ]
     },
     {
+      "domain": "kulturigo.de",
+      "status": "quarantined",
+      "hits": 400,
+      "examples": [
+        "https://www.kulturigo.de/magentasport-mit-exklusivem-basketball-angebot-mission-em-gewinn-startet-am-08-august-per-g-nther-und-marie-g-lich-als-experten-dabei-alle-76-spiele-und-alle-tests-live-deutsche-partien-kostenlos-2189882.html/",
+        "https://www.kulturigo.de/mehr-von-europas-bestem-basketball-telekom-erwirbt-exklusiv-rechte-an-der-basketball-champions-league-2275298.html/"
+      ]
+    },
+    {
+      "domain": "nbbl-basketball.de",
+      "status": "quarantined",
+      "hits": 342,
+      "examples": [
+        "https://www.nbbl-basketball.de/",
+        "https://nbbl-basketball.de/"
+      ]
+    },
+    {
       "domain": "beinsports.com",
       "status": "quarantined",
-      "hits": 324,
+      "hits": 336,
       "examples": [
         "https://www.beinsports.com/",
         "https://www.beinsports.com/en-us/articles-video/fiba-bcl-on-bein-sports-xtra"
@@ -807,7 +816,7 @@
     {
       "domain": "visoon.de",
       "status": "quarantined",
-      "hits": 311,
+      "hits": 323,
       "examples": [
         "https://visoon.de/neu-dyn-sport-mix/"
       ]
@@ -815,24 +824,15 @@
     {
       "domain": "id.euroleague.net",
       "status": "quarantined",
-      "hits": 309,
+      "hits": 322,
       "examples": [
         "https://id.euroleague.net/legal/euroleaguetv"
       ]
     },
     {
-      "domain": "nbbl-basketball.de",
-      "status": "quarantined",
-      "hits": 305,
-      "examples": [
-        "https://www.nbbl-basketball.de/",
-        "https://nbbl-basketball.de/"
-      ]
-    },
-    {
       "domain": "tips.gg",
       "status": "quarantined",
-      "hits": 296,
+      "hits": 313,
       "examples": [
         "https://tips.gg/matches/basketball/08-10-2026/maccabi-tel-aviv-vs-olimpia-milano/05-00/streams/",
         "https://tips.gg/matches/basketball/08-10-2026/panathinaikos-vs-fenerbahce-beko/07-15/streams/",
@@ -840,26 +840,26 @@
       ]
     },
     {
-      "domain": "viewgrid.tv",
-      "status": "quarantined",
-      "hits": 288,
-      "examples": [
-        "https://viewgrid.tv/events/fiba-womens-basketball-world-cup-2026"
-      ]
-    },
-    {
       "domain": "directv.com",
       "status": "quarantined",
-      "hits": 287,
+      "hits": 307,
       "examples": [
         "https://www.directv.com/guide/tv-shows/Bundesliga-Basketball-b2b62789-81b7-dd86-7518-3af4df67e704",
         "https://www.directv.com/guide/tv-shows/EuroLeague-Basketball-de810041-c2c8-c9ad-9f0b-3406768ce371"
       ]
     },
     {
+      "domain": "dosbnewmedia.de",
+      "status": "quarantined",
+      "hits": 301,
+      "examples": [
+        "https://dosbnewmedia.de/news/new-media-partnership-nbbl-and-jbbl-games-to-be-broadcast-live-and-free-of-charge-on-sporteurope-tv-in-future"
+      ]
+    },
+    {
       "domain": "matchcast.tv",
       "status": "quarantined",
-      "hits": 284,
+      "hits": 301,
       "examples": [
         "https://matchcast.tv/match/real-madrid-vs-kk-partizan-nis-euroleague-2026-10-08",
         "https://matchcast.tv/match/fenerbahce-sk-vs-algiris-euroleague-2026-10-13",
@@ -867,9 +867,17 @@
       ]
     },
     {
+      "domain": "viewgrid.tv",
+      "status": "quarantined",
+      "hits": 299,
+      "examples": [
+        "https://viewgrid.tv/events/fiba-womens-basketball-world-cup-2026"
+      ]
+    },
+    {
       "domain": "tntsports.co.uk",
       "status": "quarantined",
-      "hits": 283,
+      "hits": 298,
       "examples": [
         "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/crvena-zvezda-anadolu-efes_mtc22011163/live.shtml",
         "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/paris-zalgiris-kaunas_mtc22011293/live.shtml",
@@ -877,33 +885,9 @@
       ]
     },
     {
-      "domain": "ariva.de",
-      "status": "quarantined",
-      "hits": 270,
-      "examples": [
-        "https://www.ariva.de/aktien/deutsche-telekom-ag-aktie/news/magentasport-der-telekom-erhaelt-exklusivrechte-an-basketball-12148432"
-      ]
-    },
-    {
-      "domain": "nord24.de",
-      "status": "quarantined",
-      "hits": 270,
-      "examples": [
-        "https://www.nord24.de/verbraucher/sportfans-aufgepasst-neuer-tv-sender-bringt-action-ins-wohnzimmer-318590.html"
-      ]
-    },
-    {
-      "domain": "dosbnewmedia.de",
-      "status": "quarantined",
-      "hits": 268,
-      "examples": [
-        "https://dosbnewmedia.de/news/new-media-partnership-nbbl-and-jbbl-games-to-be-broadcast-live-and-free-of-charge-on-sporteurope-tv-in-future"
-      ]
-    },
-    {
       "domain": "calovo.de",
       "status": "quarantined",
-      "hits": 264,
+      "hits": 294,
       "examples": [
         "https://calovo.de/f/fcbbasketball/spielplan",
         "https://calovo.de/sport/basketball/regionalliga/2-rl",
@@ -913,15 +897,40 @@
     {
       "domain": "belarus.basketball",
       "status": "quarantined",
-      "hits": 254,
+      "hits": 286,
       "examples": [
         "https://belarus.basketball/en/videos-en/online"
       ]
     },
     {
+      "domain": "ariva.de",
+      "status": "quarantined",
+      "hits": 280,
+      "examples": [
+        "https://www.ariva.de/aktien/deutsche-telekom-ag-aktie/news/magentasport-der-telekom-erhaelt-exklusivrechte-an-basketball-12148432"
+      ]
+    },
+    {
+      "domain": "nord24.de",
+      "status": "quarantined",
+      "hits": 280,
+      "examples": [
+        "https://www.nord24.de/verbraucher/sportfans-aufgepasst-neuer-tv-sender-bringt-action-ins-wohnzimmer-318590.html"
+      ]
+    },
+    {
+      "domain": "youtube.com",
+      "channel": "youtube.com/user/dienbbl",
+      "status": "quarantined",
+      "hits": 260,
+      "examples": [
+        "https://www.youtube.com/user/dieNBBL"
+      ]
+    },
+    {
       "domain": "ttbl.de",
       "status": "quarantined",
-      "hits": 248,
+      "hits": 259,
       "examples": [
         "https://www.ttbl.de/en/news/post/68a6ceb863c5160001e1e58b",
         "https://www.ttbl.de/news/post/68a6ceb863c5160001e1e58b"
@@ -930,7 +939,7 @@
     {
       "domain": "hom-sistaxon-int.ibama.gov.br",
       "status": "quarantined",
-      "hits": 237,
+      "hits": 249,
       "examples": [
         "https://hom-sistaxon-int.ibama.gov.br/base/store.php/free-basketball-tv-live-streaming-euroleague/tl"
       ]
@@ -938,24 +947,15 @@
     {
       "domain": "broadbandtvnews.com",
       "status": "quarantined",
-      "hits": 233,
+      "hits": 244,
       "examples": [
         "https://www.broadbandtvnews.com/2025/08/20/dyn-launches-free-sports-channel-dyn-sport-mix/"
       ]
     },
     {
-      "domain": "youtube.com",
-      "channel": "youtube.com/user/dienbbl",
-      "status": "quarantined",
-      "hits": 233,
-      "examples": [
-        "https://www.youtube.com/user/dieNBBL"
-      ]
-    },
-    {
       "domain": "buffsports.io",
       "status": "quarantined",
-      "hits": 225,
+      "hits": 236,
       "examples": [
         "https://buffsports.io/watch-fiba-stream",
         "https://buffsports.io/euroleague/live-olympiacos-vs-anadolu-efes",
@@ -963,33 +963,25 @@
       ]
     },
     {
-      "domain": "privateinternetaccess.com",
-      "status": "quarantined",
-      "hits": 200,
-      "examples": [
-        "https://www.privateinternetaccess.com/stream-sports/euroleague-vpn"
-      ]
-    },
-    {
       "domain": "calovo.com",
       "status": "quarantined",
-      "hits": 195,
+      "hits": 222,
       "examples": [
         "https://calovo.com/sport/basketball/regionalliga"
       ]
     },
     {
-      "domain": "live.allsportdb.com",
+      "domain": "privateinternetaccess.com",
       "status": "quarantined",
-      "hits": 192,
+      "hits": 218,
       "examples": [
-        "https://live.allsportdb.com/"
+        "https://www.privateinternetaccess.com/stream-sports/euroleague-vpn"
       ]
     },
     {
       "domain": "linkedin.com",
       "status": "quarantined",
-      "hits": 190,
+      "hits": 216,
       "examples": [
         "https://www.linkedin.com/posts/jasper-fischer_im-excited-to-announce-the-launch-of-dyn-activity-7363934349588660225-V_Dc",
         "https://linkedin.com/company/dienbbl",
@@ -997,9 +989,26 @@
       ]
     },
     {
+      "domain": "eurobasket.com",
+      "status": "quarantined",
+      "hits": 200,
+      "examples": [
+        "https://www.eurobasket.com/Germany/news/991553/My-Diary-As-A-Bit-Of-Old-As-Usual-With-Alba-Berlin-And-Something-New-And-Refreshing-With-Bonn/Koln-Sparkled-At-The-2026-NBBL/JBBL-Top-4",
+        "https://www.eurobasket.com/Germany/basketball-Regionalliga.aspx"
+      ]
+    },
+    {
+      "domain": "live.allsportdb.com",
+      "status": "quarantined",
+      "hits": 200,
+      "examples": [
+        "https://live.allsportdb.com/"
+      ]
+    },
+    {
       "domain": "sportstar.thehindu.com",
       "status": "quarantined",
-      "hits": 189,
+      "hits": 196,
       "examples": [
         "https://sportstar.thehindu.com/basketball/fiba-women-basketball-world-cup-2026-semifinal-schedule-teams-timing-live-streaming-info/article71459410.ece"
       ]
@@ -1007,7 +1016,7 @@
     {
       "domain": "it-boltwise.de",
       "status": "quarantined",
-      "hits": 185,
+      "hits": 195,
       "examples": [
         "https://www.it-boltwise.de/basketball-bundesliga-playoffs-wfcrzburg-vs-bonn-live-auf-dyn-und-joyn.html",
         "https://www.it-boltwise.de/bbl-saison-2025-26-fc-bayern-muenchen-auf-titeljagd-im-livestream.html",
@@ -1015,18 +1024,29 @@
       ]
     },
     {
-      "domain": "eurobasket.com",
+      "domain": "astra.de",
       "status": "quarantined",
-      "hits": 177,
+      "hits": 193,
       "examples": [
-        "https://www.eurobasket.com/Germany/news/991553/My-Diary-As-A-Bit-Of-Old-As-Usual-With-Alba-Berlin-And-Something-New-And-Refreshing-With-Bonn/Koln-Sparkled-At-The-2026-NBBL/JBBL-Top-4",
-        "https://www.eurobasket.com/Germany/basketball-Regionalliga.aspx"
+        "https://astra.de/aktuelles/neu-ueber-astra-dyn-sport-mix",
+        "https://astra.de/presse/neu-ueber-astra-satellit-dyn-sport-mix",
+        "https://astra.de/sites/default/files/2025-09/Pressemeldung_DYN.pdf"
+      ]
+    },
+    {
+      "domain": "web.basketball.scb.world",
+      "status": "quarantined",
+      "hits": 191,
+      "examples": [
+        "https://web.basketball.scb.world/nbbl/live",
+        "https://web.basketball.scb.world/live",
+        "https://web.basketball.scb.world/jbbl/downloads"
       ]
     },
     {
       "domain": "nba.com",
       "status": "quarantined",
-      "hits": 174,
+      "hits": 185,
       "examples": [
         "https://www.nba.com/watch/nba-tv",
         "https://www.nba.com/watch/featured",
@@ -1036,7 +1056,7 @@
     {
       "domain": "flashscore.com",
       "status": "quarantined",
-      "hits": 170,
+      "hits": 181,
       "examples": [
         "https://www.flashscore.com/",
         "https://www.flashscore.com/team/bayern/6LstMRPo/",
@@ -1046,7 +1066,7 @@
     {
       "domain": "creatainmentbase.de",
       "status": "quarantined",
-      "hits": 166,
+      "hits": 175,
       "examples": [
         "https://creatainmentbase.de/dyn-sport-mix-kostenlos-empfangen-anleitung/"
       ]
@@ -1054,36 +1074,26 @@
     {
       "domain": "stream2watch.me",
       "status": "quarantined",
-      "hits": 166,
+      "hits": 174,
       "examples": [
         "https://www.stream2watch.me/league/euroleague-basketball/",
         "https://www.stream2watch.me/league/german-bbl/"
       ]
     },
     {
-      "domain": "web.basketball.scb.world",
+      "domain": "ruhrnachrichten.de",
       "status": "quarantined",
-      "hits": 166,
+      "hits": 169,
       "examples": [
-        "https://web.basketball.scb.world/nbbl/live",
-        "https://web.basketball.scb.world/live",
-        "https://web.basketball.scb.world/jbbl/downloads"
-      ]
-    },
-    {
-      "domain": "astra.de",
-      "status": "quarantined",
-      "hits": 164,
-      "examples": [
-        "https://astra.de/aktuelles/neu-ueber-astra-dyn-sport-mix",
-        "https://astra.de/presse/neu-ueber-astra-satellit-dyn-sport-mix",
-        "https://astra.de/sites/default/files/2025-09/Pressemeldung_DYN.pdf"
+        "https://www.ruhrnachrichten.de/werne-sport/basketball-lippebaskets-werne-bsv-wulfen-13-dezember-livestream-regionalliga-w1118728-2001904345/",
+        "https://www.ruhrnachrichten.de/dortmund-sport/basketball-svd-49-dortmund-tv-gerthe-livestream-2-regionalliga-samstag-w1168343-2002006664/",
+        "https://www.ruhrnachrichten.de/werne-sport/regionalliga-basketball-lippebaskets-werne-dtv-koeln-samstag-19-30-uhr-live-w1262381-2002266544/"
       ]
     },
     {
       "domain": "satvision.de",
       "status": "quarantined",
-      "hits": 162,
+      "hits": 168,
       "examples": [
         "https://satvision.de/aktuelles-und-news/telekom-erwirbt-exklusiv-rechte-an-der-basketball-champions-league/"
       ]
@@ -1092,7 +1102,7 @@
       "domain": "youtube.com",
       "channel": "youtube.com/@magentasport",
       "status": "quarantined",
-      "hits": 162,
+      "hits": 168,
       "examples": [
         "https://www.youtube.com/@MAGENTASPORT"
       ]
@@ -1100,23 +1110,23 @@
     {
       "domain": "ca.pcmag.com",
       "status": "quarantined",
-      "hits": 158,
+      "hits": 164,
       "examples": [
         "https://ca.pcmag.com/video-streaming-services/17805/how-to-watch-the-2026-fiba-womens-basketball-world-cup-live-even-without-cable"
       ]
     },
     {
-      "domain": "mainsports.me",
+      "domain": "basketballireland.tv",
       "status": "quarantined",
-      "hits": 152,
+      "hits": 161,
       "examples": [
-        "https://mainsports.me/euroleague/stream/lyon-villeurbanne-vs-valencia/live"
+        "https://basketballireland.tv/home"
       ]
     },
     {
       "domain": "bba-46ers.de",
       "status": "quarantined",
-      "hits": 149,
+      "hits": 160,
       "examples": [
         "https://bba-46ers.de/nbbl-reist-zu-ungeschlagenen-franken-livestream/",
         "https://bba-46ers.de/livestream-nbbl-gegen-crailsheim/"
@@ -1125,25 +1135,31 @@
     {
       "domain": "aiscore.com",
       "status": "quarantined",
-      "hits": 146,
+      "hits": 158,
       "examples": [
         "https://www.aiscore.com/basketball/tournament-basketball-champions-league/0m2q19srgipk6xw"
       ]
     },
     {
-      "domain": "ruhrnachrichten.de",
+      "domain": "mainsports.me",
       "status": "quarantined",
-      "hits": 145,
+      "hits": 158,
       "examples": [
-        "https://www.ruhrnachrichten.de/werne-sport/basketball-lippebaskets-werne-bsv-wulfen-13-dezember-livestream-regionalliga-w1118728-2001904345/",
-        "https://www.ruhrnachrichten.de/dortmund-sport/basketball-svd-49-dortmund-tv-gerthe-livestream-2-regionalliga-samstag-w1168343-2002006664/",
-        "https://www.ruhrnachrichten.de/werne-sport/regionalliga-basketball-lippebaskets-werne-dtv-koeln-samstag-19-30-uhr-live-w1262381-2002266544/"
+        "https://mainsports.me/euroleague/stream/lyon-villeurbanne-vs-valencia/live"
+      ]
+    },
+    {
+      "domain": "1xbet.com",
+      "status": "quarantined",
+      "hits": 153,
+      "examples": [
+        "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl"
       ]
     },
     {
       "domain": "scores24.live",
       "status": "quarantined",
-      "hits": 139,
+      "hits": 146,
       "examples": [
         "https://scores24.live/de/basketball/m-07-10-2026-telekom-baskets-bonn-porto",
         "https://scores24.live/de/basketball/m-10-10-2026-paderborn-baskets-epg-baskets-koblenz",
@@ -1151,25 +1167,9 @@
       ]
     },
     {
-      "domain": "basketballireland.tv",
-      "status": "quarantined",
-      "hits": 138,
-      "examples": [
-        "https://basketballireland.tv/home"
-      ]
-    },
-    {
-      "domain": "1xbet.com",
-      "status": "quarantined",
-      "hits": 136,
-      "examples": [
-        "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl"
-      ]
-    },
-    {
       "domain": "fancode.com",
       "status": "quarantined",
-      "hits": 135,
+      "hits": 140,
       "examples": [
         "https://www.fancode.com/basketball/tour/euroleague-1956300/matches/crvena-zvezda-mts-belgrade-vs-real-madrid-62569/live-match-info",
         "https://www.fancode.com/basketball/tour/euroleague-1956300/matches/real-madrid-vs-ldlc-asvel-villeurbanne-61562/live-match-info"
@@ -1178,7 +1178,7 @@
     {
       "domain": "mainpost.de",
       "status": "quarantined",
-      "hits": 135,
+      "hits": 140,
       "examples": [
         "https://www.mainpost.de/wuerzburg/sport/basketball-champions-league-liveticker-zum-spiel-der-wuerzburg-baskets-so-laeuft-die-partie-gegen-manchester-basketball-115186760",
         "https://www.mainpost.de/wuerzburg/sport/basketball-bundesliga-liveticker-zum-spiel-der-wuerzburg-baskets-so-laeuft-die-partie-gegen-oldenburg-115014394"
@@ -1187,33 +1187,50 @@
     {
       "domain": "wettfreunde.net",
       "status": "quarantined",
-      "hits": 129,
+      "hits": 135,
       "examples": [
         "https://www.wettfreunde.net/sport-im-tv-live/basketball/"
       ]
     },
     {
-      "domain": "telekom-deutschland-gmbh-basketball.en.aptoide.com",
-      "status": "quarantined",
-      "hits": 120,
-      "examples": [
-        "https://telekom-deutschland-gmbh-basketball.en.aptoide.com/app"
-      ]
-    },
-    {
       "domain": "365scores.com",
       "status": "quarantined",
-      "hits": 118,
+      "hits": 127,
       "examples": [
         "https://www.365scores.com/en-us/basketball/league/bundesliga-27",
         "https://www.365scores.com/en-us/basketball/team/bayern-munich-8648"
       ]
     },
     {
+      "domain": "telekom-deutschland-gmbh-basketball.en.aptoide.com",
+      "status": "quarantined",
+      "hits": 127,
+      "examples": [
+        "https://telekom-deutschland-gmbh-basketball.en.aptoide.com/app"
+      ]
+    },
+    {
+      "domain": "usbasket.com",
+      "status": "quarantined",
+      "hits": 127,
+      "examples": [
+        "https://usbasket.com/NBBL/basketball.aspx",
+        "https://usbasket.com/NBBL/basketball-Teams.asp"
+      ]
+    },
+    {
+      "domain": "probasket.asport.tv",
+      "status": "quarantined",
+      "hits": 121,
+      "examples": [
+        "https://probasket.asport.tv/league/607/1-liga-regional-herren?locale=en"
+      ]
+    },
+    {
       "domain": "youtube.com",
       "channel": "youtube.com/@dynsports",
       "status": "quarantined",
-      "hits": 115,
+      "hits": 120,
       "examples": [
         "https://www.youtube.com/@dynsports"
       ]
@@ -1221,24 +1238,42 @@
     {
       "domain": "sportsweek.org",
       "status": "quarantined",
-      "hits": 111,
+      "hits": 117,
       "examples": [
         "https://sportsweek.org/de/basketball/news/409028564/"
       ]
     },
     {
-      "domain": "usbasket.com",
+      "domain": "basketballengland.co.uk",
       "status": "quarantined",
-      "hits": 111,
+      "hits": 115,
       "examples": [
-        "https://usbasket.com/NBBL/basketball.aspx",
-        "https://usbasket.com/NBBL/basketball-Teams.asp"
+        "https://basketballengland.co.uk/news/playoff-finals-2026-previews-live-streams-live-stats",
+        "https://basketballengland.co.uk/news/nbl-d1-preview-24-25-jan-2026---live-stats-streaming-schedule-and-more",
+        "https://basketballengland.co.uk/leagues/nbl"
+      ]
+    },
+    {
+      "domain": "ts-jahn-basketball.de",
+      "status": "quarantined",
+      "hits": 115,
+      "examples": [
+        "https://www.ts-jahn-basketball.de/jbbl/jbbl-viertelfinale-spiel-3"
+      ]
+    },
+    {
+      "domain": "freestreams-live1i.pk",
+      "status": "quarantined",
+      "hits": 113,
+      "examples": [
+        "https://freestreams-live1i.pk/euroleague-stream90/",
+        "https://freestreams-live1i.pk/euroleague-stream91/"
       ]
     },
     {
       "domain": "de.beauty-healthy.info",
       "status": "quarantined",
-      "hits": 108,
+      "hits": 112,
       "examples": [
         "https://de.beauty-healthy.info/wie-man-nba-basketball-live-fur-freies-zusieht-9145"
       ]
@@ -1246,23 +1281,15 @@
     {
       "domain": "hockeyweb.de",
       "status": "quarantined",
-      "hits": 108,
+      "hits": 112,
       "examples": [
         "https://www.hockeyweb.de/wetten/bayern-muenchen-vs-ratiopharm-ulm-kostenlos-im-live-stream-schauen/"
       ]
     },
     {
-      "domain": "probasket.asport.tv",
-      "status": "quarantined",
-      "hits": 108,
-      "examples": [
-        "https://probasket.asport.tv/league/607/1-liga-regional-herren?locale=en"
-      ]
-    },
-    {
       "domain": "sportsvideotech.com",
       "status": "quarantined",
-      "hits": 108,
+      "hits": 112,
       "examples": [
         "https://sportsvideotech.com/dyn-media-powers-live-sports-fast-channel-with-frequency-studio-live/"
       ]
@@ -1270,7 +1297,7 @@
     {
       "domain": "trendyone.de",
       "status": "quarantined",
-      "hits": 108,
+      "hits": 112,
       "examples": [
         "https://www.trendyone.de/news/bbl-finale-live-im-free-tv-fc-bayern-basketball-vs-ratiopharm-ulm"
       ]
@@ -1278,15 +1305,24 @@
     {
       "domain": "wa.de",
       "status": "quarantined",
-      "hits": 108,
+      "hits": 112,
       "examples": [
         "https://www.wa.de/verbraucher/neuer-free-tv-sender-verfuegbar-so-empfangen-sie-den-kanal-kostenlos-zr-93916761.html"
       ]
     },
     {
+      "domain": "youtube.com",
+      "channel": "youtube.com/@fiba3x3",
+      "status": "quarantined",
+      "hits": 110,
+      "examples": [
+        "https://www.youtube.com/@FIBA3x3/streams"
+      ]
+    },
+    {
       "domain": "live-sport-online.com",
       "status": "quarantined",
-      "hits": 105,
+      "hits": 109,
       "examples": [
         "https://live-sport-online.com/category/basketball/euroleague",
         "https://live-sport-online.com/basketball/real-madrid-ea7-emporio-armani-milan",
@@ -1296,144 +1332,58 @@
     {
       "domain": "sport1.de",
       "status": "quarantined",
-      "hits": 105,
+      "hits": 109,
       "examples": [
         "https://www.sport1.de/news/basketball/bbl/2026/06/finalkracher-fc-bayern-alba-berlin-heute-live-im-gratis-stream-liveticker-entscheidung-oder-5-bbl-finale",
         "https://www.sport1.de/live/basketball"
       ]
     },
     {
-      "domain": "ts-jahn-basketball.de",
-      "status": "quarantined",
-      "hits": 103,
-      "examples": [
-        "https://www.ts-jahn-basketball.de/jbbl/jbbl-viertelfinale-spiel-3"
-      ]
-    },
-    {
-      "domain": "dzritv.com",
-      "status": "quarantined",
-      "hits": 100,
-      "examples": [
-        "https://dzritv.com/"
-      ]
-    },
-    {
-      "domain": "freestreams-live1i.pk",
-      "status": "quarantined",
-      "hits": 100,
-      "examples": [
-        "https://freestreams-live1i.pk/euroleague-stream90/",
-        "https://freestreams-live1i.pk/euroleague-stream91/"
-      ]
-    },
-    {
-      "domain": "youtube.com",
-      "channel": "youtube.com/@fiba3x3",
-      "status": "quarantined",
-      "hits": 99,
-      "examples": [
-        "https://www.youtube.com/@FIBA3x3/streams"
-      ]
-    },
-    {
-      "domain": "basketballengland.co.uk",
-      "status": "quarantined",
-      "hits": 93,
-      "examples": [
-        "https://basketballengland.co.uk/news/playoff-finals-2026-previews-live-streams-live-stats",
-        "https://basketballengland.co.uk/news/nbl-d1-preview-24-25-jan-2026---live-stats-streaming-schedule-and-more",
-        "https://basketballengland.co.uk/leagues/nbl"
-      ]
-    },
-    {
-      "domain": "nfhsnetwork.com",
-      "status": "quarantined",
-      "hits": 93,
-      "examples": [
-        "https://www.nfhsnetwork.com/sports/basketball"
-      ]
-    },
-    {
       "domain": "nbl.com.au",
       "status": "quarantined",
-      "hits": 90,
+      "hits": 108,
       "examples": [
         "https://www.nbl.com.au/how-to-watch",
         "https://www.nbl.com.au/news/watch-south-east-melbourne-phoenix-v-new-zealand-breakers"
       ]
     },
     {
+      "domain": "dzritv.com",
+      "status": "quarantined",
+      "hits": 105,
+      "examples": [
+        "https://dzritv.com/"
+      ]
+    },
+    {
+      "domain": "nfhsnetwork.com",
+      "status": "quarantined",
+      "hits": 102,
+      "examples": [
+        "https://www.nfhsnetwork.com/sports/basketball"
+      ]
+    },
+    {
       "domain": "olympics.com",
       "status": "quarantined",
-      "hits": 84,
+      "hits": 102,
       "examples": [
         "https://www.olympics.com/en/news/euroleague-basketball-2025-2026-preview",
         "https://www.olympics.com/en/news/eurobasket-2025-doncic-antetokounmpo-and-jokic-headline-the-action-how-to-watch-live"
       ]
     },
     {
-      "domain": "basketballzone.net",
-      "status": "quarantined",
-      "hits": 81,
-      "examples": [
-        "https://www.basketballzone.net/7379/euroleague-oct-17-18-preview/"
-      ]
-    },
-    {
-      "domain": "klamm.de",
-      "status": "quarantined",
-      "hits": 81,
-      "examples": [
-        "https://www.klamm.de/news/magentasport-sichert-sich-basketball-champions-league-6N175929.html"
-      ]
-    },
-    {
-      "domain": "merkur.de",
-      "status": "quarantined",
-      "hits": 81,
-      "examples": [
-        "https://www.merkur.de/verbraucher/neuer-free-tv-sender-verfuegbar-so-empfangen-sie-den-kanal-kostenlos-zr-93916761.html"
-      ]
-    },
-    {
       "domain": "remixed.nobackboard.com",
       "status": "quarantined",
-      "hits": 81,
+      "hits": 97,
       "examples": [
         "https://remixed.nobackboard.com/"
       ]
     },
     {
-      "domain": "sportdaten.nrz.de",
-      "status": "quarantined",
-      "hits": 81,
-      "examples": [
-        "https://sportdaten.nrz.de/basketball/bbl/ma11487974/fc-bayern-muenchen_alba-berlin/liveticker/",
-        "https://sportdaten.nrz.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/"
-      ]
-    },
-    {
-      "domain": "youtv.de",
-      "status": "quarantined",
-      "hits": 81,
-      "examples": [
-        "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg",
-        "https://www.youtv.de/tv-sendungen/8622804-basketball-bundesliga"
-      ]
-    },
-    {
-      "domain": "berlinmagazine.de",
-      "status": "quarantined",
-      "hits": 80,
-      "examples": [
-        "https://berlinmagazine.de/bayern-alba-berlin-2026-free-tv-uhrzeit"
-      ]
-    },
-    {
       "domain": "basketball-bargteheide.de",
       "status": "quarantined",
-      "hits": 78,
+      "hits": 91,
       "examples": [
         "https://www.basketball-bargteheide.de/news-herren/bees-starten-mit-derby-und-livestream-in-regionalliga-saison-3021/"
       ]
@@ -1441,7 +1391,7 @@
     {
       "domain": "basketball.usbasket.com",
       "status": "quarantined",
-      "hits": 78,
+      "hits": 91,
       "examples": [
         "https://basketball.usbasket.com/NBBL/basketball.aspx"
       ]
@@ -1449,23 +1399,15 @@
     {
       "domain": "ubc.ms",
       "status": "quarantined",
-      "hits": 78,
+      "hits": 91,
       "examples": [
         "https://ubc.ms/2024/02/23/regionalliga-und-nbbl-jbbl-spiele-ab-sofort-live-auf-sporttotal/"
       ]
     },
     {
-      "domain": "punditfeed.com",
-      "status": "quarantined",
-      "hits": 76,
-      "examples": [
-        "https://punditfeed.com/sports-news/basketball/euroleague-tv-live-stream/"
-      ]
-    },
-    {
       "domain": "uplay.se",
       "status": "quarantined",
-      "hits": 76,
+      "hits": 89,
       "examples": [
         "https://uplay.se/en/sports/stream-euroleague",
         "https://uplay.se/en/sport/broadcast/streama-virtus-pallacanestro-bologna-vs-baskonia-med-uplay"
@@ -1474,74 +1416,158 @@
     {
       "domain": "frequency.com",
       "status": "quarantined",
-      "hits": 74,
+      "hits": 86,
       "examples": [
         "https://www.frequency.com/news/dyn-media-powers-live-sports-fast-channel-with-frequency-studio-live"
       ]
     },
     {
+      "domain": "basketballzone.net",
+      "status": "quarantined",
+      "hits": 84,
+      "examples": [
+        "https://www.basketballzone.net/7379/euroleague-oct-17-18-preview/"
+      ]
+    },
+    {
+      "domain": "klamm.de",
+      "status": "quarantined",
+      "hits": 84,
+      "examples": [
+        "https://www.klamm.de/news/magentasport-sichert-sich-basketball-champions-league-6N175929.html"
+      ]
+    },
+    {
+      "domain": "merkur.de",
+      "status": "quarantined",
+      "hits": 84,
+      "examples": [
+        "https://www.merkur.de/verbraucher/neuer-free-tv-sender-verfuegbar-so-empfangen-sie-den-kanal-kostenlos-zr-93916761.html"
+      ]
+    },
+    {
+      "domain": "sportdaten.nrz.de",
+      "status": "quarantined",
+      "hits": 84,
+      "examples": [
+        "https://sportdaten.nrz.de/basketball/bbl/ma11487974/fc-bayern-muenchen_alba-berlin/liveticker/",
+        "https://sportdaten.nrz.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/"
+      ]
+    },
+    {
+      "domain": "youtv.de",
+      "status": "quarantined",
+      "hits": 84,
+      "examples": [
+        "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg",
+        "https://www.youtv.de/tv-sendungen/8622804-basketball-bundesliga"
+      ]
+    },
+    {
+      "domain": "berlinmagazine.de",
+      "status": "quarantined",
+      "hits": 83,
+      "examples": [
+        "https://berlinmagazine.de/bayern-alba-berlin-2026-free-tv-uhrzeit"
+      ]
+    },
+    {
+      "domain": "punditfeed.com",
+      "status": "quarantined",
+      "hits": 79,
+      "examples": [
+        "https://punditfeed.com/sports-news/basketball/euroleague-tv-live-stream/"
+      ]
+    },
+    {
       "domain": "streameaste.cc",
       "status": "quarantined",
-      "hits": 72,
+      "hits": 75,
       "examples": [
         "https://streameaste.cc/euroleague"
-      ]
-    },
-    {
-      "domain": "eurohoops.net",
-      "status": "quarantined",
-      "hits": 66,
-      "examples": [
-        "https://www.eurohoops.net/en/trademarks/1999418/where-and-how-to-watch-the-fiba-world-cup-qualifiers-live-this-week/",
-        "https://www.eurohoops.net/en/bet/1812591/how-to-watch-euroleague-like-a-local-country-specific-broadcasts/"
-      ]
-    },
-    {
-      "domain": "niedersachsen-aktuell.com",
-      "status": "quarantined",
-      "hits": 66,
-      "examples": [
-        "https://niedersachsen-aktuell.com/am-mittwoch-startet-die-bbl-mit-berlin-hamburg-kostenlos-bei-magentasport-lust-auf-mehr-basketball-ueber-700-spiele-aus-bbl-euroleague-eurocup-und-vom-der-deutschen-national-mannschaft-live/"
-      ]
-    },
-    {
-      "domain": "ruhr24.de",
-      "status": "quarantined",
-      "hits": 66,
-      "examples": [
-        "https://www.ruhr24.de/tv-streaming/tv-news/amazon-prime-sender-neu-kostenlos-zattoo-dyn-sports-plutotv-tv-joyn-verfuegbar-93892867.html"
       ]
     },
     {
       "domain": "youtube.com",
       "channel": "youtube.com/@nbl",
       "status": "quarantined",
-      "hits": 61,
+      "hits": 73,
       "examples": [
         "https://www.youtube.com/@nbl/streams",
         "https://www.youtube.com/@nbl"
       ]
     },
     {
-      "domain": "thesportscommons.com",
+      "domain": "niedersachsen-aktuell.com",
       "status": "quarantined",
-      "hits": 60,
+      "hits": 70,
       "examples": [
-        "https://thesportscommons.com/league/fiba-basketball/"
+        "https://niedersachsen-aktuell.com/am-mittwoch-startet-die-bbl-mit-berlin-hamburg-kostenlos-bei-magentasport-lust-auf-mehr-basketball-ueber-700-spiele-aus-bbl-euroleague-eurocup-und-vom-der-deutschen-national-mannschaft-live/"
       ]
     },
     {
       "domain": "oneball.live",
       "status": "quarantined",
-      "hits": 59,
+      "hits": 70,
       "examples": [
         "https://oneball.live/"
       ]
     },
     {
+      "domain": "ruhr24.de",
+      "status": "quarantined",
+      "hits": 70,
+      "examples": [
+        "https://www.ruhr24.de/tv-streaming/tv-news/amazon-prime-sender-neu-kostenlos-zattoo-dyn-sports-plutotv-tv-joyn-verfuegbar-93892867.html"
+      ]
+    },
+    {
+      "domain": "thesportscommons.com",
+      "status": "quarantined",
+      "hits": 70,
+      "examples": [
+        "https://thesportscommons.com/league/fiba-basketball/"
+      ]
+    },
+    {
+      "domain": "eurohoops.net",
+      "status": "quarantined",
+      "hits": 69,
+      "examples": [
+        "https://www.eurohoops.net/en/trademarks/1999418/where-and-how-to-watch-the-fiba-world-cup-qualifiers-live-this-week/",
+        "https://www.eurohoops.net/en/bet/1812591/how-to-watch-euroleague-like-a-local-country-specific-broadcasts/"
+      ]
+    },
+    {
+      "domain": "fillingthelane.com",
+      "status": "quarantined",
+      "hits": 65,
+      "examples": [
+        "https://www.fillingthelane.com/basketball-champions-league/aek-bc-v-rytas-vilnius-final-highlights-basketballcl-2025-26/",
+        "https://www.fillingthelane.com/basketball-champions-league/top-5-plays-of-final-four-powered-by-sunel-basketballcl-2025-26/",
+        "https://www.fillingthelane.com/basketball-champions-league/gravity-is-optional-%f0%9f%aa%90basketballcl/"
+      ]
+    },
+    {
+      "domain": "laprovincia.es",
+      "status": "quarantined",
+      "hits": 65,
+      "examples": [
+        "https://www.laprovincia.es/cb-gran-canaria/2025/10/07/sl-benfica-dramland-gran-canaria-gratis-jaka-lakovic-dv-122377104.html"
+      ]
+    },
+    {
+      "domain": "tiempodebasket.com",
+      "status": "quarantined",
+      "hits": 65,
+      "examples": [
+        "https://www.tiempodebasket.com/ver-basketball-champions-league-gratis-2025-26/"
+      ]
+    },
+    {
       "domain": "tvmovie.de",
       "status": "quarantined",
-      "hits": 59,
+      "hits": 63,
       "examples": [
         "https://www.tvmovie.de/tv/basketball-bbl-epg-234372618",
         "https://www.tvmovie.de/tv/basketball-bbl-epg-234739783",
@@ -1551,15 +1577,25 @@
     {
       "domain": "allgemeine-zeitung.de",
       "status": "quarantined",
-      "hits": 58,
+      "hits": 62,
       "examples": [
         "https://www.allgemeine-zeitung.de/sport/basketball/basketball-mainz/basketball-live-derby-wischen-asc-theresianum-mainz-vfl-bensheim-regionalliga-1-5020312"
       ]
     },
     {
+      "domain": "courtside1891.basketball",
+      "status": "quarantined",
+      "hits": 62,
+      "examples": [
+        "https://www.courtside1891.basketball/USA",
+        "https://www.courtside1891.basketball/news/3622779/nba-app-and-nbacom-to-carry-courtside-1891",
+        "https://www.courtside1891.basketball/news/3613806/what-is-courtside-1891"
+      ]
+    },
+    {
       "domain": "de.linkedin.com",
       "status": "quarantined",
-      "hits": 58,
+      "hits": 62,
       "examples": [
         "https://de.linkedin.com/posts/dienbbl_das-starterfeld-f%C3%BCr-die-saison-202627-ist-activity-7482476015198593024-eti8"
       ]
@@ -1567,7 +1603,7 @@
     {
       "domain": "dorstenerzeitung.de",
       "status": "quarantined",
-      "hits": 58,
+      "hits": 62,
       "examples": [
         "https://www.dorstenerzeitung.de/lokalsport-dorsten/basketball-livestream-bsv-wulfen-vs-citybasket-recklinghausen-regionalliga-derby-w1258297-4002249543/"
       ]
@@ -1575,7 +1611,7 @@
     {
       "domain": "frankfurt-skyliners.de",
       "status": "quarantined",
-      "hits": 58,
+      "hits": 62,
       "examples": [
         "https://www.frankfurt-skyliners.de/news-service/details/livestreams-des-jbbl-/-nbbl-top4-in-frankfurt"
       ]
@@ -1583,7 +1619,7 @@
     {
       "domain": "germanhoops.com",
       "status": "quarantined",
-      "hits": 58,
+      "hits": 62,
       "examples": [
         "https://germanhoops.com/2026/05/18/final-mvp-anton-kemmers-late-put-back-and-alba-berlins-we-got-balls-attitude-lifts-alba-berlin-to-87-83-nbbl-final-win-over-ratiopharm-ulm/"
       ]
@@ -1591,7 +1627,7 @@
     {
       "domain": "ishd.de",
       "status": "quarantined",
-      "hits": 58,
+      "hits": 62,
       "examples": [
         "https://ishd.de/news/4964"
       ]
@@ -1599,7 +1635,7 @@
     {
       "domain": "lees-corner.de",
       "status": "quarantined",
-      "hits": 58,
+      "hits": 62,
       "examples": [
         "https://lees-corner.de/calendar/index.php?event%2F7479-twitch-livestream-nbbl-playoffs%2F="
       ]
@@ -1607,7 +1643,7 @@
     {
       "domain": "nbabasketballschool.de",
       "status": "quarantined",
-      "hits": 58,
+      "hits": 62,
       "examples": [
         "https://www.nbabasketballschool.de/en/jbbl-nbbl"
       ]
@@ -1615,7 +1651,7 @@
     {
       "domain": "nobackboard.com",
       "status": "quarantined",
-      "hits": 58,
+      "hits": 62,
       "examples": [
         "https://www.nobackboard.com/nbbl-tv"
       ]
@@ -1623,7 +1659,7 @@
     {
       "domain": "rbb-muenchen.de",
       "status": "quarantined",
-      "hits": 58,
+      "hits": 62,
       "examples": [
         "https://rbb-muenchen.de/livestream.html"
       ]
@@ -1631,7 +1667,7 @@
     {
       "domain": "videoschiri.com",
       "status": "quarantined",
-      "hits": 58,
+      "hits": 62,
       "examples": [
         "https://videoschiri.com/news/regionalliga-live"
       ]
@@ -1639,31 +1675,41 @@
     {
       "domain": "drakula.stream",
       "status": "quarantined",
-      "hits": 55,
+      "hits": 61,
       "examples": [
         "https://drakula.stream/basketball"
       ]
     },
     {
-      "domain": "laprovincia.es",
+      "domain": "protipster.com",
       "status": "quarantined",
-      "hits": 55,
+      "hits": 60,
       "examples": [
-        "https://www.laprovincia.es/cb-gran-canaria/2025/10/07/sl-benfica-dramland-gran-canaria-gratis-jaka-lakovic-dv-122377104.html"
+        "https://www.protipster.com/basketball-live-stream"
       ]
     },
     {
-      "domain": "tiempodebasket.com",
+      "domain": "watchathletics.com",
       "status": "quarantined",
-      "hits": 55,
+      "hits": 60,
       "examples": [
-        "https://www.tiempodebasket.com/ver-basketball-champions-league-gratis-2025-26/"
+        "https://www.watchathletics.com/schedule/watchlive/12323",
+        "https://www.watchathletics.com/schedule/watchlive/10689",
+        "https://www.watchathletics.com/schedule/watchlive/10616"
+      ]
+    },
+    {
+      "domain": "webcatalog.io",
+      "status": "quarantined",
+      "hits": 59,
+      "examples": [
+        "https://webcatalog.io/en/apps/dyn"
       ]
     },
     {
       "domain": "audiovision.de",
       "status": "quarantined",
-      "hits": 54,
+      "hits": 56,
       "examples": [
         "https://audiovision.de/neu-ueber-astra-satellit-dyn-sport-mix/"
       ]
@@ -1671,25 +1717,25 @@
     {
       "domain": "braunschweiger-zeitung.de",
       "status": "quarantined",
-      "hits": 54,
+      "hits": 56,
       "examples": [
         "https://www.braunschweiger-zeitung.de/wirtschaft/Presseportal/article413251550/mehr-von-europas-bestem-basketball-telekom-erwirbt-exklusiv-rechte-an-der-basketball-champions-league.html"
       ]
     },
     {
-      "domain": "fillingthelane.com",
+      "domain": "goal.com",
       "status": "quarantined",
-      "hits": 54,
+      "hits": 56,
       "examples": [
-        "https://www.fillingthelane.com/basketball-champions-league/aek-bc-v-rytas-vilnius-final-highlights-basketballcl-2025-26/",
-        "https://www.fillingthelane.com/basketball-champions-league/top-5-plays-of-final-four-powered-by-sunel-basketballcl-2025-26/",
-        "https://www.fillingthelane.com/basketball-champions-league/gravity-is-optional-%f0%9f%aa%90basketballcl/"
+        "https://www.goal.com/en-us/news/watch-serbia-v-greece-live-stream-online-tv-channel/blt1cef518b1cba9415",
+        "https://www.goal.com/de/meldungen/1860-muenchen-heute-live-im-free-tv-laeuft-das-spiel-der-loewen-gegen-fv-illertissen-live-im-br-oder-bei-einem-anderen-sender-kostenlos/bltdfa8333e8060263b",
+        "https://www.goal.com/en-us/news/watch-shakhtar-donetsk-v-aek-athens-live-stream-online-tv-channel/blt0cfa9f99007e796c"
       ]
     },
     {
       "domain": "hallo-muenchen.de",
       "status": "quarantined",
-      "hits": 54,
+      "hits": 56,
       "examples": [
         "https://www.hallo-muenchen.de/na-pressemitteilungen/magentasport-und-magentatv-zeigen-alle-spiele-der-eurobasket-2025-live-die-deutschen-spiele-kostenlos-telekom-vergibt-sublizenz-an-rtl-deutschland-zr-93650895.html"
       ]
@@ -1697,7 +1743,7 @@
     {
       "domain": "hedgeout.net",
       "status": "quarantined",
-      "hits": 54,
+      "hits": 56,
       "examples": [
         "https://hedgeout.net/2026/09/30/euroleague-round-2-where-to-watch-panathinaikos-vs-asvel-villeurbanne/",
         "https://hedgeout.net/2026/09/29/how-to-watch-euroleague-round-2-game-between-olympiacos-zalgiris-kaunas/"
@@ -1706,7 +1752,7 @@
     {
       "domain": "ifun.de",
       "status": "quarantined",
-      "hits": 54,
+      "hits": 56,
       "examples": [
         "https://www.ifun.de/eurobasket-2025-magentasport-streamt-kostenlos-256875/"
       ]
@@ -1714,23 +1760,15 @@
     {
       "domain": "inbayreuth.de",
       "status": "quarantined",
-      "hits": 54,
+      "hits": 56,
       "examples": [
         "https://www.inbayreuth.de/basketball-proa-livestreams-werden-kuenftig-kostenpflichtig/cnt-id-ps-f1b82c65-0139-4c14-b0ad-73a6801d9413"
       ]
     },
     {
-      "domain": "protipster.com",
-      "status": "quarantined",
-      "hits": 54,
-      "examples": [
-        "https://www.protipster.com/basketball-live-stream"
-      ]
-    },
-    {
       "domain": "sportdaten.wr.de",
       "status": "quarantined",
-      "hits": 54,
+      "hits": 56,
       "examples": [
         "https://sportdaten.wr.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/"
       ]
@@ -1738,111 +1776,15 @@
     {
       "domain": "sportwette.net",
       "status": "quarantined",
-      "hits": 54,
+      "hits": 56,
       "examples": [
         "https://www.sportwette.net/sportwetten-live-stream/basketball"
       ]
     },
     {
-      "domain": "goal.com",
-      "status": "quarantined",
-      "hits": 53,
-      "examples": [
-        "https://www.goal.com/en-us/news/watch-serbia-v-greece-live-stream-online-tv-channel/blt1cef518b1cba9415",
-        "https://www.goal.com/de/meldungen/1860-muenchen-heute-live-im-free-tv-laeuft-das-spiel-der-loewen-gegen-fv-illertissen-live-im-br-oder-bei-einem-anderen-sender-kostenlos/bltdfa8333e8060263b",
-        "https://www.goal.com/en-us/news/watch-shakhtar-donetsk-v-aek-athens-live-stream-online-tv-channel/blt0cfa9f99007e796c"
-      ]
-    },
-    {
-      "domain": "livekick.info",
-      "status": "quarantined",
-      "hits": 53,
-      "examples": [
-        "https://livekick.info/basketball/wettbewerbe/basketball-champions-league/"
-      ]
-    },
-    {
-      "domain": "watchathletics.com",
-      "status": "quarantined",
-      "hits": 53,
-      "examples": [
-        "https://www.watchathletics.com/schedule/watchlive/12323",
-        "https://www.watchathletics.com/schedule/watchlive/10689",
-        "https://www.watchathletics.com/schedule/watchlive/10616"
-      ]
-    },
-    {
-      "domain": "livescorehunter.com",
-      "status": "quarantined",
-      "hits": 51,
-      "examples": [
-        "https://www.livescorehunter.com/basketball-germany-livescore-live-streaming-links"
-      ]
-    },
-    {
-      "domain": "tvlander.com",
-      "status": "quarantined",
-      "hits": 51,
-      "examples": [
-        "https://tvlander.com/basketball/euroleague"
-      ]
-    },
-    {
-      "domain": "courtside1891.basketball",
-      "status": "quarantined",
-      "hits": 50,
-      "examples": [
-        "https://www.courtside1891.basketball/USA",
-        "https://www.courtside1891.basketball/news/3622779/nba-app-and-nbacom-to-carry-courtside-1891",
-        "https://www.courtside1891.basketball/news/3613806/what-is-courtside-1891"
-      ]
-    },
-    {
-      "domain": "tagesschau.de",
-      "status": "quarantined",
-      "hits": 50,
-      "examples": [
-        "https://www.tagesschau.de/inland/regional/rheinlandpfalz/swr-basketball-live-die-gladiators-trier-zu-gast-bei-promitheas-patras-102.html"
-      ]
-    },
-    {
-      "domain": "webcatalog.io",
-      "status": "quarantined",
-      "hits": 50,
-      "examples": [
-        "https://webcatalog.io/en/apps/dyn"
-      ]
-    },
-    {
-      "domain": "topfreizeit.de",
-      "status": "quarantined",
-      "hits": 49,
-      "examples": [
-        "https://www.topfreizeit.de/am-mittwoch-startet-die-bbl-mit-berlin-hamburg-kostenlos-bei-magentasport-lust-auf-mehr-basketball-ber-700-spiele-aus-bbl-euroleague-eurocup-und-vom-der-deutschen-national-mannschaft-live-2010051.html"
-      ]
-    },
-    {
-      "domain": "basketballaustria.tv",
-      "status": "quarantined",
-      "hits": 47,
-      "examples": [
-        "https://www.basketballaustria.tv/",
-        "https://www.basketballaustria.tv/en/"
-      ]
-    },
-    {
-      "domain": "sueddeutsche.de",
-      "status": "quarantined",
-      "hits": 46,
-      "examples": [
-        "https://www.sueddeutsche.de/sport-liveticker/basketball/deutschland-bbl/ma12415738/alba-berlin_bamberg-baskets/liveticker/",
-        "https://www.sueddeutsche.de/sport-liveticker/basketball/deutschland-bbl/ma12415771/vet-concept-gladiators-trier_alba-berlin/liveticker/"
-      ]
-    },
-    {
       "domain": "basketballontv.com",
       "status": "quarantined",
-      "hits": 45,
+      "hits": 55,
       "examples": [
         "https://www.basketballontv.com/de/competitions/"
       ]
@@ -1850,15 +1792,23 @@
     {
       "domain": "fanduel.com",
       "status": "quarantined",
-      "hits": 45,
+      "hits": 55,
       "examples": [
         "https://www.fanduel.com/research/intro-to-euroleague-basketball-what-to-know-who-s-who-and-where-to-watch-and-bet"
       ]
     },
     {
+      "domain": "livekick.info",
+      "status": "quarantined",
+      "hits": 55,
+      "examples": [
+        "https://livekick.info/basketball/wettbewerbe/basketball-champions-league/"
+      ]
+    },
+    {
       "domain": "nbl.basketball",
       "status": "quarantined",
-      "hits": 45,
+      "hits": 55,
       "examples": [
         "https://www.nbl.basketball/jizdni-rad-35-sezony-s-prvnim-soubojem-z-ranku-ligy-mistru-v-6-kole/22910"
       ]
@@ -1866,7 +1816,7 @@
     {
       "domain": "nblaus.nbl.com.au",
       "status": "quarantined",
-      "hits": 45,
+      "hits": 55,
       "examples": [
         "https://nblaus.nbl.com.au/news/nbl25-blitz-how-to-watch-live-scores"
       ]
@@ -1874,104 +1824,170 @@
     {
       "domain": "obasketu.cz",
       "status": "quarantined",
-      "hits": 45,
+      "hits": 55,
       "examples": [
         "https://obasketu.cz/nbl-2025-2026-program-format-kde-sledovat/"
       ]
     },
     {
+      "domain": "tagesschau.de",
+      "status": "quarantined",
+      "hits": 55,
+      "examples": [
+        "https://www.tagesschau.de/inland/regional/rheinlandpfalz/swr-basketball-live-die-gladiators-trier-zu-gast-bei-promitheas-patras-102.html"
+      ]
+    },
+    {
+      "domain": "tvlander.com",
+      "status": "quarantined",
+      "hits": 54,
+      "examples": [
+        "https://tvlander.com/basketball/euroleague"
+      ]
+    },
+    {
+      "domain": "basketballaustria.tv",
+      "status": "quarantined",
+      "hits": 53,
+      "examples": [
+        "https://www.basketballaustria.tv/",
+        "https://www.basketballaustria.tv/en/"
+      ]
+    },
+    {
+      "domain": "livescorehunter.com",
+      "status": "quarantined",
+      "hits": 53,
+      "examples": [
+        "https://www.livescorehunter.com/basketball-germany-livescore-live-streaming-links"
+      ]
+    },
+    {
+      "domain": "topfreizeit.de",
+      "status": "quarantined",
+      "hits": 52,
+      "examples": [
+        "https://www.topfreizeit.de/am-mittwoch-startet-die-bbl-mit-berlin-hamburg-kostenlos-bei-magentasport-lust-auf-mehr-basketball-ber-700-spiele-aus-bbl-euroleague-eurocup-und-vom-der-deutschen-national-mannschaft-live-2010051.html"
+      ]
+    },
+    {
       "domain": "khaosod.co.th",
       "status": "quarantined",
-      "hits": 42,
+      "hits": 51,
       "examples": [
         "https://www.khaosod.co.th/sports/news_10238476"
       ]
     },
     {
-      "domain": "24zhibo-xueqiu.com",
-      "status": "quarantined",
-      "hits": 41,
-      "examples": [
-        "https://24zhibo-xueqiu.com/lanqiu/b82331.html"
-      ]
-    },
-    {
       "domain": "prosiebensat1.com",
       "status": "quarantined",
-      "hits": 41,
+      "hits": 50,
       "examples": [
         "https://www.prosiebensat1.com/files/2026/02/04/bde8e047-9848-418b-b468-7362f7ce58aa.pdf"
       ]
     },
     {
+      "domain": "sueddeutsche.de",
+      "status": "quarantined",
+      "hits": 48,
+      "examples": [
+        "https://www.sueddeutsche.de/sport-liveticker/basketball/deutschland-bbl/ma12415738/alba-berlin_bamberg-baskets/liveticker/",
+        "https://www.sueddeutsche.de/sport-liveticker/basketball/deutschland-bbl/ma12415771/vet-concept-gladiators-trier_alba-berlin/liveticker/"
+      ]
+    },
+    {
       "domain": "ws05.news.de",
       "status": "quarantined",
-      "hits": 41,
+      "hits": 48,
       "examples": [
         "https://ws05.news.de/sport/859348903/telekom-baskets-bonn-rasta-vechta-bbl-livestream-kostenlos-basketball-bundesliga-am-18-02-2026-in-bonn-anfahrt-und-tickets/1/"
+      ]
+    },
+    {
+      "domain": "24zhibo-xueqiu.com",
+      "status": "quarantined",
+      "hits": 43,
+      "examples": [
+        "https://24zhibo-xueqiu.com/lanqiu/b82331.html"
       ]
     },
     {
       "domain": "youtube.com",
       "channel": "youtube.com/user/fcbayernbasketball",
       "status": "quarantined",
-      "hits": 41,
+      "hits": 43,
       "examples": [
         "https://www.youtube.com/user/fcbayernbasketball/videos"
       ]
     },
     {
+      "domain": "eldia.es",
+      "status": "quarantined",
+      "hits": 41,
+      "examples": [
+        "https://www.eldia.es/deportes/cb-canarias/2026/01/20/laguna-tenerife-basketball-champions-league-gratis-nymburk-dv-125844347.html"
+      ]
+    },
+    {
       "domain": "live-sport-tv.fr",
       "status": "quarantined",
-      "hits": 37,
+      "hits": 41,
       "examples": [
         "https://live-sport-tv.fr/categorie/basket/champions-league"
       ]
     },
     {
-      "domain": "uk.pcmag.com",
+      "domain": "sportnews.eu",
       "status": "quarantined",
-      "hits": 37,
+      "hits": 41,
       "examples": [
-        "https://uk.pcmag.com/video-streaming-services/167068/how-to-watch-2026-fiba-womens-basketball-world-cup-semifinals-live-free"
-      ]
-    },
-    {
-      "domain": "crackstream-au.net",
-      "status": "quarantined",
-      "hits": 35,
-      "examples": [
-        "https://www.crackstream-au.net/table/europe/euroleague"
+        "https://www.sportnews.eu/2026/02/21/dove-vedere-il-basket-in-tv-2025-26-la-guida-completa-per-non-perdere-neanche-una-partita/"
       ]
     },
     {
       "domain": "thaipost.net",
       "status": "quarantined",
-      "hits": 35,
+      "hits": 41,
       "examples": [
         "https://www.thaipost.net/sport-news/1042834/"
       ]
     },
     {
+      "domain": "crackstream-au.net",
+      "status": "quarantined",
+      "hits": 39,
+      "examples": [
+        "https://www.crackstream-au.net/table/europe/euroleague"
+      ]
+    },
+    {
+      "domain": "hamburgtowers.de",
+      "status": "quarantined",
+      "hits": 39,
+      "examples": [
+        "https://www.hamburgtowers.de/news/on-the-road-fakten-berham/"
+      ]
+    },
+    {
+      "domain": "uk.pcmag.com",
+      "status": "quarantined",
+      "hits": 39,
+      "examples": [
+        "https://uk.pcmag.com/video-streaming-services/167068/how-to-watch-2026-fiba-womens-basketball-world-cup-semifinals-live-free"
+      ]
+    },
+    {
       "domain": "berlindreams.world",
       "status": "quarantined",
-      "hits": 33,
+      "hits": 36,
       "examples": [
         "https://www.berlindreams.world/team_nbbl"
       ]
     },
     {
-      "domain": "bundle.app",
-      "status": "quarantined",
-      "hits": 33,
-      "examples": [
-        "https://www.bundle.app/de/lebensstil/alba-vs-bamberg-baskets-kostenlos-im-livestream-team-vergleich-streams-und-mehr-am-samstag-DA1C5483-9798-5183-92FD-37CB42CB0FA9"
-      ]
-    },
-    {
       "domain": "decodetv.com",
       "status": "quarantined",
-      "hits": 33,
+      "hits": 36,
       "examples": [
         "https://www.decodetv.com/2025/08/20/german-streamer-dyn-launches-fast-channel/"
       ]
@@ -1979,31 +1995,15 @@
     {
       "domain": "eagles-basketball.de",
       "status": "quarantined",
-      "hits": 33,
+      "hits": 36,
       "examples": [
         "https://www.eagles-basketball.de/index.php/proa-team/livestream"
       ]
     },
     {
-      "domain": "eldia.es",
-      "status": "quarantined",
-      "hits": 33,
-      "examples": [
-        "https://www.eldia.es/deportes/cb-canarias/2026/01/20/laguna-tenerife-basketball-champions-league-gratis-nymburk-dv-125844347.html"
-      ]
-    },
-    {
-      "domain": "hamburgtowers.de",
-      "status": "quarantined",
-      "hits": 33,
-      "examples": [
-        "https://www.hamburgtowers.de/news/on-the-road-fakten-berham/"
-      ]
-    },
-    {
       "domain": "kick.com",
       "status": "quarantined",
-      "hits": 33,
+      "hits": 36,
       "examples": [
         "https://kick.com/jbballinn"
       ]
@@ -2011,7 +2011,7 @@
     {
       "domain": "m.twitch.tv",
       "status": "quarantined",
-      "hits": 33,
+      "hits": 36,
       "examples": [
         "https://m.twitch.tv/nbl/schedule"
       ]
@@ -2019,7 +2019,7 @@
     {
       "domain": "nobackboardbasketball.substack.com",
       "status": "quarantined",
-      "hits": 33,
+      "hits": 36,
       "examples": [
         "https://nobackboardbasketball.substack.com/p/the-first-high-school-no-backboard"
       ]
@@ -2027,7 +2027,7 @@
     {
       "domain": "nobackboardbasketballgym.com",
       "status": "quarantined",
-      "hits": 33,
+      "hits": 36,
       "examples": [
         "https://nobackboardbasketballgym.com/"
       ]
@@ -2035,7 +2035,7 @@
     {
       "domain": "onetz.de",
       "status": "quarantined",
-      "hits": 33,
+      "hits": 36,
       "examples": [
         "https://www.onetz.de/sport/mantel/jbbl-quali-griff-sternen-id3084382.html"
       ]
@@ -2043,7 +2043,7 @@
     {
       "domain": "schoenen-dunk.de",
       "status": "quarantined",
-      "hits": 33,
+      "hits": 36,
       "examples": [
         "https://www.schoenen-dunk.de/topic/6026/basketball-ergebnisdienst-und-liveticker-f%C3%BCr-rl-direkt-auf-dein-handy"
       ]
@@ -2051,23 +2051,23 @@
     {
       "domain": "sg-regensburg.de",
       "status": "quarantined",
-      "hits": 33,
+      "hits": 36,
       "examples": [
         "https://sg-regensburg.de/livestreams/"
       ]
     },
     {
-      "domain": "sportnews.eu",
+      "domain": "tbs.co.jp",
       "status": "quarantined",
-      "hits": 33,
+      "hits": 36,
       "examples": [
-        "https://www.sportnews.eu/2026/02/21/dove-vedere-il-basket-in-tv-2025-26-la-guida-completa-per-non-perdere-neanche-una-partita/"
+        "https://www.tbs.co.jp/jbl/broadcasting.html"
       ]
     },
     {
       "domain": "tsvbreitenguessbach.de",
       "status": "quarantined",
-      "hits": 33,
+      "hits": 36,
       "examples": [
         "https://www.tsvbreitenguessbach.de/alle-infos-zum-top-4-wochenende/"
       ]
@@ -2075,7 +2075,7 @@
     {
       "domain": "wormatia.de",
       "status": "quarantined",
-      "hits": 33,
+      "hits": 36,
       "examples": [
         "https://www.wormatia.de/oberliga/"
       ]
@@ -2083,15 +2083,39 @@
     {
       "domain": "wuerzblog.de",
       "status": "quarantined",
-      "hits": 33,
+      "hits": 36,
       "examples": [
         "https://wuerzblog.de/2025/06/12/basketball-halbfinalfinale-im-livestream/"
       ]
     },
     {
+      "domain": "bundle.app",
+      "status": "quarantined",
+      "hits": 35,
+      "examples": [
+        "https://www.bundle.app/de/lebensstil/alba-vs-bamberg-baskets-kostenlos-im-livestream-team-vergleich-streams-und-mehr-am-samstag-DA1C5483-9798-5183-92FD-37CB42CB0FA9"
+      ]
+    },
+    {
+      "domain": "admin.euroleague.net",
+      "status": "quarantined",
+      "hits": 34,
+      "examples": [
+        "https://admin.euroleague.net/"
+      ]
+    },
+    {
+      "domain": "vipleague.ro",
+      "status": "quarantined",
+      "hits": 34,
+      "examples": [
+        "https://vipleague.ro/basketball-live/"
+      ]
+    },
+    {
       "domain": "lvz.de",
       "status": "quarantined",
-      "hits": 31,
+      "hits": 33,
       "examples": [
         "https://www.lvz.de/sport/regional/regionalliga-nordost-und-sachsenpokal-hier-immer-den-aktuellen-livestream-sehen-WAA5RQBARZFKFLUQCB35XA6LRI.html"
       ]
@@ -2099,39 +2123,31 @@
     {
       "domain": "tsj-web-02.tw.de",
       "status": "quarantined",
-      "hits": 31,
+      "hits": 33,
       "examples": [
         "https://tsj-web-02.tw.de/jbbl/jbbl-viertelfinale-spiel-3"
       ]
     },
     {
-      "domain": "vipleague.ro",
+      "domain": "bfv.de",
       "status": "quarantined",
-      "hits": 31,
+      "hits": 29,
       "examples": [
-        "https://vipleague.ro/basketball-live/"
+        "https://www.bfv.de/news/sport-politik/verbandstag/regionalliga-bayern-bei-brsport24"
       ]
     },
     {
-      "domain": "admin.euroleague.net",
+      "domain": "iptvie.com",
       "status": "quarantined",
-      "hits": 30,
+      "hits": 29,
       "examples": [
-        "https://admin.euroleague.net/"
-      ]
-    },
-    {
-      "domain": "tbs.co.jp",
-      "status": "quarantined",
-      "hits": 28,
-      "examples": [
-        "https://www.tbs.co.jp/jbl/broadcasting.html"
+        "https://iptvie.com/sports/euroleague"
       ]
     },
     {
       "domain": "archynewsy.com",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://www.archynewsy.com/olympiacos-vs-fenerbahce-how-to-watch-and-stream-euroleague-playoffs/"
       ]
@@ -2139,7 +2155,7 @@
     {
       "domain": "basketball.nationalmannschaft.net",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://basketball.nationalmannschaft.net/frauen-wm-2026-uebertragung/"
       ]
@@ -2147,23 +2163,15 @@
     {
       "domain": "basketballbundesligabet.com",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://basketballbundesligabet.com/articles/bbl-live-stream-dyn/"
       ]
     },
     {
-      "domain": "bfv.de",
-      "status": "quarantined",
-      "hits": 27,
-      "examples": [
-        "https://www.bfv.de/news/sport-politik/verbandstag/regionalliga-bayern-bei-brsport24"
-      ]
-    },
-    {
       "domain": "freiepresse.de",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://www.freiepresse.de/sport/basketball/niners-chemnitz/liveticker-niners-chemnitz-starten-beim-deutschen-meister-alba-berlin-in-die-bundesligasaison-artikel14413643"
       ]
@@ -2171,7 +2179,7 @@
     {
       "domain": "kino.de",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://www.kino.de/film/spiel-ohne-regeln-2005/news/magentasport-kosten-abos-kostenlose-inhalte-und-empfang-alle-infos-zum-sportsender-der-telekom/"
       ]
@@ -2179,7 +2187,7 @@
     {
       "domain": "lite.apex-football.com",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://lite.apex-football.com/de-DE/news/729cbfc3260918de_de"
       ]
@@ -2187,7 +2195,7 @@
     {
       "domain": "livesporttv.com",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://www.livesporttv.com/basketball/competitions/international/euroleague/4D05b2KX/"
       ]
@@ -2195,7 +2203,7 @@
     {
       "domain": "livetv902.me",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://livetv902.me/enx/eventinfo/382490809_turkey_belarus/"
       ]
@@ -2203,15 +2211,23 @@
     {
       "domain": "mz.de",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://www.mz.de/live/basketball-livestream-europapokal-syntainics-mbc-taltech-alexela-tallinn-im-kostenlosen-stream-4119474"
       ]
     },
     {
+      "domain": "nchclive.com",
+      "status": "quarantined",
+      "hits": 28,
+      "examples": [
+        "https://www.nchclive.com/nchbclivestream/"
+      ]
+    },
+    {
       "domain": "pay-tv-angebote.de",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://www.pay-tv-angebote.de/dyn-programm/"
       ]
@@ -2219,7 +2235,7 @@
     {
       "domain": "production360.media",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://production360.media/dyn-media-powers-live-sports-fast-channel-with-frequency-studio-live/"
       ]
@@ -2227,7 +2243,7 @@
     {
       "domain": "sdbing.net",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://www.sdbing.net/wangluo/165307.html"
       ]
@@ -2235,7 +2251,7 @@
     {
       "domain": "sport.bild.de",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://sport.bild.de/basketball/bbl-pokal/ma11730604/fc-bayern-muenchen_bamberg-baskets/liveticker/"
       ]
@@ -2243,7 +2259,7 @@
     {
       "domain": "sportando.basketball",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://sportando.basketball/en/nextgen-euroleague-finals-free-to-watch-on-euroleague-tv/"
       ]
@@ -2251,7 +2267,7 @@
     {
       "domain": "sportdaten.ikz-online.de",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://sportdaten.ikz-online.de/basketball/bbl/ma12415654/alba-berlin_niners-chemnitz/liveticker/"
       ]
@@ -2259,7 +2275,7 @@
     {
       "domain": "sportdaten.waz.de",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://sportdaten.waz.de/basketball/bbl/live-konferenz/dn2026-09-18/"
       ]
@@ -2267,7 +2283,7 @@
     {
       "domain": "sportimtv.net",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://www.sportimtv.net/liga/basketball-champions-league"
       ]
@@ -2275,47 +2291,56 @@
     {
       "domain": "sportticker.harzkurier.de",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://sportticker.harzkurier.de/basketball/bbl/ma12415672/fc-bayern-muenchen_bamberg-baskets/liveticker/"
       ]
     },
     {
+      "domain": "usc-eisvoegel.de",
+      "status": "quarantined",
+      "hits": 28,
+      "examples": [
+        "https://www.usc-eisvoegel.de/"
+      ]
+    },
+    {
       "domain": "welt.de",
       "status": "quarantined",
-      "hits": 27,
+      "hits": 28,
       "examples": [
         "https://www.welt.de/"
       ]
     },
     {
-      "domain": "nchclive.com",
+      "domain": "eurovisionsport.com",
       "status": "quarantined",
-      "hits": 26,
+      "hits": 27,
       "examples": [
-        "https://www.nchclive.com/nchbclivestream/"
+        "https://eurovisionsport.com/en/explore/sports/basketball"
       ]
     },
     {
       "domain": "tvheute.at",
       "status": "quarantined",
-      "hits": 26,
+      "hits": 27,
       "examples": [
         "https://tvheute.at/newsticker/magentatv-zeigt-basketball-em-alle-spiele-live-und-gratis-73494"
       ]
     },
     {
-      "domain": "iptvie.com",
+      "domain": "24live.com",
       "status": "quarantined",
-      "hits": 25,
+      "hits": 26,
       "examples": [
-        "https://iptvie.com/sports/euroleague"
+        "https://24live.com/page/sport/event/basketball-5/101",
+        "https://24live.com/page/sport/event/basketball-5/101;sid=113;seasonId=89743;table=1?lang=en"
       ]
     },
     {
       "domain": "piratasdelbasket.net",
       "status": "quarantined",
-      "hits": 25,
+      "hits": 26,
       "examples": [
         "https://piratasdelbasket.net/en/euroleague-matchday-4-unbeaten-teams-face-the-reckoning"
       ]
@@ -2323,24 +2348,24 @@
     {
       "domain": "uber-arena.de",
       "status": "quarantined",
-      "hits": 25,
+      "hits": 26,
       "examples": [
         "https://www.uber-arena.de/en/premium/alba-berlin-premium-products"
       ]
     },
     {
-      "domain": "24live.com",
+      "domain": "mashable.com",
       "status": "quarantined",
-      "hits": 24,
+      "hits": 25,
       "examples": [
-        "https://24live.com/page/sport/event/basketball-5/101",
-        "https://24live.com/page/sport/event/basketball-5/101;sid=113;seasonId=89743;table=1?lang=en"
+        "https://mashable.com/article/nba-live-stream-for-free",
+        "https://mashable.com/entertainment/bundesliga-live-stream-for-free"
       ]
     },
     {
       "domain": "signalodds.com",
       "status": "quarantined",
-      "hits": 24,
+      "hits": 25,
       "examples": [
         "https://signalodds.com/events/dubai-basketball-vs-kk-crvena-zvezda-20261008/streaming"
       ]
@@ -2348,48 +2373,15 @@
     {
       "domain": "basketball.de",
       "status": "quarantined",
-      "hits": 23,
+      "hits": 24,
       "examples": [
         "https://basketball.de/basketball-livestream-tv-vorschau/"
       ]
     },
     {
-      "domain": "eurovisionsport.com",
-      "status": "quarantined",
-      "hits": 23,
-      "examples": [
-        "https://eurovisionsport.com/en/explore/sports/basketball"
-      ]
-    },
-    {
-      "domain": "mashable.com",
-      "status": "quarantined",
-      "hits": 23,
-      "examples": [
-        "https://mashable.com/article/nba-live-stream-for-free",
-        "https://mashable.com/entertainment/bundesliga-live-stream-for-free"
-      ]
-    },
-    {
-      "domain": "matchora.to",
-      "status": "quarantined",
-      "hits": 23,
-      "examples": [
-        "https://matchora.to/match/alba-berlin-vs-kk-igokea-2525243"
-      ]
-    },
-    {
-      "domain": "streamfix.io",
-      "status": "quarantined",
-      "hits": 23,
-      "examples": [
-        "https://www.streamfix.io/en/platforms/euroleague-tv"
-      ]
-    },
-    {
       "domain": "championstream.de",
       "status": "quarantined",
-      "hits": 22,
+      "hits": 24,
       "examples": [
         "https://championstream.de/dyn-basketball/"
       ]
@@ -2397,7 +2389,7 @@
     {
       "domain": "eurosport.nl",
       "status": "quarantined",
-      "hits": 22,
+      "hits": 24,
       "examples": [
         "https://www.eurosport.nl/watch/basketbal/euroleague/"
       ]
@@ -2405,7 +2397,7 @@
     {
       "domain": "gazzetta.gr",
       "status": "quarantined",
-      "hits": 22,
+      "hits": 24,
       "examples": [
         "https://www.gazzetta.gr/basketball/euroleague/2577501/euroleague-oi-ores-kai-ta-kanalia-ton-simerinon-anametriseon"
       ]
@@ -2413,15 +2405,23 @@
     {
       "domain": "liveru.eu",
       "status": "quarantined",
-      "hits": 22,
+      "hits": 24,
       "examples": [
         "https://liveru.eu/basketball"
       ]
     },
     {
+      "domain": "matchora.to",
+      "status": "quarantined",
+      "hits": 24,
+      "examples": [
+        "https://matchora.to/match/alba-berlin-vs-kk-igokea-2525243"
+      ]
+    },
+    {
       "domain": "msb.fr",
       "status": "quarantined",
-      "hits": 22,
+      "hits": 24,
       "examples": [
         "https://www.msb.fr/index.php/component/content/article/25-medias/television/6347-suivez-la-basketball-champions-league-gratuitement-sur-courtside-1891"
       ]
@@ -2429,7 +2429,7 @@
     {
       "domain": "rtve.es",
       "status": "quarantined",
-      "hits": 22,
+      "hits": 24,
       "examples": [
         "https://www.rtve.es/play/noticias/20261014/surne-bilbao-ucam-murcia-hora-donde-ver-tv-segunda-jornada-champions-league-baloncesto/17264864.shtml"
       ]
@@ -2437,31 +2437,39 @@
     {
       "domain": "shoppingvorteil.de",
       "status": "quarantined",
-      "hits": 22,
+      "hits": 24,
       "examples": [
         "https://www.shoppingvorteil.de/basketball-euroleague/"
       ]
     },
     {
+      "domain": "sport.es",
+      "status": "quarantined",
+      "hits": 24,
+      "examples": [
+        "https://www.sport.es/es/noticias/baloncesto/ver-gratis-television-kvis-pardubice-135506126"
+      ]
+    },
+    {
+      "domain": "streamfix.io",
+      "status": "quarantined",
+      "hits": 24,
+      "examples": [
+        "https://www.streamfix.io/en/platforms/euroleague-tv"
+      ]
+    },
+    {
       "domain": "support.playback.tv",
       "status": "quarantined",
-      "hits": 22,
+      "hits": 24,
       "examples": [
         "https://support.playback.tv/docs/3-streaming/stream-euroleague-games"
       ]
     },
     {
-      "domain": "usc-eisvoegel.de",
-      "status": "quarantined",
-      "hits": 22,
-      "examples": [
-        "https://www.usc-eisvoegel.de/"
-      ]
-    },
-    {
       "domain": "9now.com.au",
       "status": "quarantined",
-      "hits": 21,
+      "hits": 23,
       "examples": [
         "https://www.9now.com.au/mens-national-basketball-nbl-blitz"
       ]
@@ -2469,73 +2477,73 @@
     {
       "domain": "amazon.com",
       "status": "quarantined",
-      "hits": 21,
+      "hits": 23,
       "examples": [
         "https://www.amazon.com/Deutsche-Telekom-AG-TELEKOM-SPORT/dp/B0743F1H4F",
         "https://www.amazon.com/FIBA-World-Basketball-S0-0/dp/B0757ZHQ1Y"
       ]
     },
     {
-      "domain": "dejavu.tntdrama.com",
-      "status": "quarantined",
-      "hits": 21,
-      "examples": [
-        "https://dejavu.tntdrama.com/sports/fiba-basketball"
-      ]
-    },
-    {
       "domain": "canli-spor.com",
       "status": "quarantined",
-      "hits": 18,
+      "hits": 23,
       "examples": [
         "https://canli-spor.com/kategori/basketbol/champions-league"
       ]
     },
     {
-      "domain": "sport.es",
+      "domain": "dejavu.tntdrama.com",
       "status": "quarantined",
-      "hits": 18,
+      "hits": 23,
       "examples": [
-        "https://www.sport.es/es/noticias/baloncesto/ver-gratis-television-kvis-pardubice-135506126"
+        "https://dejavu.tntdrama.com/sports/fiba-basketball"
       ]
     },
     {
-      "domain": "weblive.info",
+      "domain": "tvsport24.fr",
       "status": "quarantined",
-      "hits": 18,
+      "hits": 21,
       "examples": [
-        "https://weblive.info/watch-live/euro-basketball/euroleague-basketball/olympiacos-bc-vs-kk-crvena-zvezda/37957"
-      ]
-    },
-    {
-      "domain": "cbssports.com",
-      "status": "quarantined",
-      "hits": 16,
-      "examples": [
-        "https://www.cbssports.com/watch/live"
-      ]
-    },
-    {
-      "domain": "ch.marketscreener.com",
-      "status": "quarantined",
-      "hits": 16,
-      "examples": [
-        "https://ch.marketscreener.com/boerse-nachrichten/deutscher-basketball-bund-und-telekom-verlaengern-vertrag-ce7858d9db80fe26"
+        "https://tvsport24.fr/categorie/basket/euroleague"
       ]
     },
     {
       "domain": "live-result.com",
       "status": "quarantined",
-      "hits": 16,
+      "hits": 19,
       "examples": [
         "https://www.live-result.com/basketball/Champions-League"
+      ]
+    },
+    {
+      "domain": "weblive.info",
+      "status": "quarantined",
+      "hits": 19,
+      "examples": [
+        "https://weblive.info/watch-live/euro-basketball/euroleague-basketball/olympiacos-bc-vs-kk-crvena-zvezda/37957"
+      ]
+    },
+    {
+      "domain": "ch.marketscreener.com",
+      "status": "quarantined",
+      "hits": 18,
+      "examples": [
+        "https://ch.marketscreener.com/boerse-nachrichten/deutscher-basketball-bund-und-telekom-verlaengern-vertrag-ce7858d9db80fe26"
+      ]
+    },
+    {
+      "domain": "cbssports.com",
+      "status": "quarantined",
+      "hits": 17,
+      "examples": [
+        "https://www.cbssports.com/watch/live"
       ]
     },
     {
       "domain": "youtube.com",
       "channel": "youtube.com/@bayergiantsleverkusenofficial",
       "status": "quarantined",
-      "hits": 16,
+      "hits": 17,
       "examples": [
         "https://www.youtube.com/@BAYERGIANTSLeverkusenOfficial/streams"
       ]
@@ -2543,7 +2551,7 @@
     {
       "domain": "zweite-basketball-bundesliga.de",
       "status": "quarantined",
-      "hits": 16,
+      "hits": 17,
       "examples": [
         "https://www.zweite-basketball-bundesliga.de/ProB/"
       ]
@@ -2551,7 +2559,7 @@
     {
       "domain": "jjbl.leagueapps.com",
       "status": "quarantined",
-      "hits": 15,
+      "hits": 16,
       "examples": [
         "https://jjbl.leagueapps.com/"
       ]
@@ -2559,7 +2567,7 @@
     {
       "domain": "linebet.com",
       "status": "quarantined",
-      "hits": 15,
+      "hits": 16,
       "examples": [
         "https://linebet.com/en/live/basketball/2414866-belarus-nbbl"
       ]
@@ -2567,23 +2575,23 @@
     {
       "domain": "m.aiscore.com",
       "status": "quarantined",
-      "hits": 15,
+      "hits": 16,
       "examples": [
         "https://m.aiscore.com/basketball/tournament-german-regionalliga/r8lk2di8xt0736d"
       ]
     },
     {
-      "domain": "tvsport24.fr",
+      "domain": "mainstreams.io",
       "status": "quarantined",
-      "hits": 15,
+      "hits": 16,
       "examples": [
-        "https://tvsport24.fr/categorie/basket/euroleague"
+        "https://mainstreams.io/euroleaguelive/streams"
       ]
     },
     {
       "domain": "liveticker.abendblatt.de",
       "status": "quarantined",
-      "hits": 14,
+      "hits": 15,
       "examples": [
         "https://liveticker.abendblatt.de/basketball/bbl/ma11487917/fc-bayern-muenchen_basketball-loewen-braunschweig/liveticker/"
       ]
@@ -2591,7 +2599,7 @@
     {
       "domain": "ballertv.com",
       "status": "quarantined",
-      "hits": 13,
+      "hits": 14,
       "examples": [
         "https://www.ballertv.com/events/map"
       ]
@@ -2599,7 +2607,7 @@
     {
       "domain": "sportsengineplay.com",
       "status": "quarantined",
-      "hits": 13,
+      "hits": 14,
       "examples": [
         "https://sportsengineplay.com/categories/Basketball"
       ]
@@ -2607,7 +2615,7 @@
     {
       "domain": "ballineurope.com",
       "status": "quarantined",
-      "hits": 12,
+      "hits": 13,
       "examples": [
         "https://www.ballineurope.com/live-streams-for-free/"
       ]
@@ -2615,7 +2623,7 @@
     {
       "domain": "servicosonline.fazenda.gov.br",
       "status": "quarantined",
-      "hits": 12,
+      "hits": 13,
       "examples": [
         "https://servicosonline.fazenda.gov.br/app.php/free-basketball-tv-live-streaming-euroleague/tl"
       ]
@@ -2623,31 +2631,31 @@
     {
       "domain": "firstsrow.eu",
       "status": "quarantined",
-      "hits": 11,
+      "hits": 12,
       "examples": [
         "https://firstsrow.eu/basketball"
       ]
     },
     {
-      "domain": "mainstreams.io",
-      "status": "quarantined",
-      "hits": 11,
-      "examples": [
-        "https://mainstreams.io/euroleaguelive/streams"
-      ]
-    },
-    {
       "domain": "foxtel.com.au",
       "status": "quarantined",
-      "hits": 10,
+      "hits": 11,
       "examples": [
         "https://www.foxtel.com.au/watch/nbl.html"
       ]
     },
     {
+      "domain": "prnewswire.com",
+      "status": "quarantined",
+      "hits": 10,
+      "examples": [
+        "https://www.prnewswire.com/news-releases/fanduel-and-euroleague-basketball-agree-to-broadcasting-agreement-302275316.html"
+      ]
+    },
+    {
       "domain": "fanseat.com",
       "status": "quarantined",
-      "hits": 8,
+      "hits": 9,
       "examples": [
         "https://www.fanseat.com/en/german-basketball-league"
       ]
@@ -2655,7 +2663,7 @@
     {
       "domain": "madeinbasket.com",
       "status": "quarantined",
-      "hits": 8,
+      "hits": 9,
       "examples": [
         "https://www.madeinbasket.com/live/"
       ]
@@ -2663,7 +2671,7 @@
     {
       "domain": "stadt-bremerhaven.de",
       "status": "quarantined",
-      "hits": 8,
+      "hits": 9,
       "examples": [
         "https://stadt-bremerhaven.de/telekom-magentasport-uebertraegt-alle-spiele-der-basketball-wm-kostenlos-live-und-in-hd/"
       ]
@@ -2671,7 +2679,7 @@
     {
       "domain": "elitegol-es.net",
       "status": "quarantined",
-      "hits": 7,
+      "hits": 8,
       "examples": [
         "https://www.elitegol-es.net/titelrace/europe/euroleague"
       ]
@@ -2679,23 +2687,15 @@
     {
       "domain": "jbl-hoops.com",
       "status": "quarantined",
-      "hits": 7,
+      "hits": 8,
       "examples": [
         "https://www.jbl-hoops.com/"
       ]
     },
     {
-      "domain": "prnewswire.com",
-      "status": "quarantined",
-      "hits": 7,
-      "examples": [
-        "https://www.prnewswire.com/news-releases/fanduel-and-euroleague-basketball-agree-to-broadcasting-agreement-302275316.html"
-      ]
-    },
-    {
       "domain": "ncaa.com",
       "status": "quarantined",
-      "hits": 6,
+      "hits": 7,
       "examples": [
         "https://www.ncaa.com/march-madness-live/ways-to-watch"
       ]
@@ -2703,7 +2703,7 @@
     {
       "domain": "oddspedia.com",
       "status": "quarantined",
-      "hits": 6,
+      "hits": 7,
       "examples": [
         "https://oddspedia.com/us/basketball/europe/euroleague"
       ]
@@ -2711,7 +2711,7 @@
     {
       "domain": "rp-online.de",
       "status": "quarantined",
-      "hits": 6,
+      "hits": 7,
       "examples": [
         "https://rp-online.de/sport/basketball-bundesliga-alle-infos-zur-saison-2026-27-der-easycredit-bbl_vid-154137459"
       ]
@@ -2719,7 +2719,7 @@
     {
       "domain": "tod.tv",
       "status": "quarantined",
-      "hits": 6,
+      "hits": 7,
       "examples": [
         "https://www.tod.tv/sports/basketball/fiba-americup-fiba-americup-5005233"
       ]
@@ -2727,7 +2727,7 @@
     {
       "domain": "sambadigital.com",
       "status": "quarantined",
-      "hits": 5,
+      "hits": 6,
       "examples": [
         "https://sambadigital.com/fiba-upgrades-ott-platform-with-courtside-1891-launch/"
       ]
@@ -2735,9 +2735,17 @@
     {
       "domain": "playtjbl.com",
       "status": "quarantined",
-      "hits": 4,
+      "hits": 5,
       "examples": [
         "https://playtjbl.com/live"
+      ]
+    },
+    {
+      "domain": "bluewin.ch",
+      "status": "quarantined",
+      "hits": 1,
+      "examples": [
+        "https://www.bluewin.ch/fr/sport/la-plus-prestigieuse-competition-europeenne-de-basket-debarque-sur-blue-sport--li.3599346"
       ]
     },
     {
