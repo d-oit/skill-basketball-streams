@@ -1064,6 +1064,13 @@ jobs:
           if-no-files-found: ignore
           retention-days: 30
 
+      # Only a LIVE run may promote a source, because a dry run decided nothing on
+      # the calendar. The copy is the handoff: the approval job reads this file,
+      # never the raw `.tmp/candidates.json`, so the gate is the write mode.
+      - name: Export live-run candidates for source approval
+        if: always() && steps.mode.outputs.dry_run == 'false' && hashFiles('.tmp/candidates.json') != ''
+        run: cp .tmp/candidates.json .tmp/approvable-candidates.json
+
       # The runtime job is the only job that knows what it wrote, and it holds
       # no `contents: write` — deliberately, because it also holds the calendar
       # credential and the two authorities are kept apart. The artifact is the
@@ -1079,6 +1086,7 @@ jobs:
             .tmp/outcomes.jsonl
             .tmp/calendar-log.jsonl
             .tmp/source-leads.json
+            .tmp/approvable-candidates.json
           if-no-files-found: ignore
           retention-days: 30
 
@@ -1357,6 +1365,69 @@ jobs:
           else
             echo "No quarantined source leads are currently recorded." >> "$GITHUB_STEP_SUMMARY"
           fi
+
+  # ---------------------------------------------------------------------------
+  # Phase 4 — promote sources the runtime verified on a live calendar write.
+  #
+  # Separate from `runtime` (no calendar credential, `contents: read`) and from
+  # `audit` (which publishes to the telemetry branch, not `main`). This job holds
+  # `contents: write` only to commit `config/sources.json` to `main`. It reads
+  # only the artifact that a LIVE run exported, and `approve_source.py` re-checks
+  # the evidence itself, so an agent's bare claim cannot widen the allow-list.
+  # Both the commit and the script refuse anything they cannot prove.
+  #
+  # The `main-sources` group serialises pushes to `main` with `queue: max`, for
+  # the same reason as `telemetry-branch`: a single-slot queue would cancel a
+  # pending approval instead of waiting for it.
+  # ---------------------------------------------------------------------------
+  approve-sources:
+    name: Source approval — promote runtime-verified hosts
+    needs: runtime
+    if: always() && needs.runtime.result != 'skipped'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: main-sources
+      cancel-in-progress: false
+      queue: max
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Fetch this run's approvable candidates
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: run-ledger
+          path: .tmp/ledger
+
+      - name: Approve runtime-verified sources
+        run: |
+          if [ ! -f .tmp/ledger/approvable-candidates.json ]; then
+            echo "OK: no live-run candidates artifact; nothing to approve."
+            exit 0
+          fi
+          python3 scripts/approve_source.py --root . \
+            --candidates .tmp/ledger/approvable-candidates.json
+
+      - name: Commit approved sources to main
+        run: |
+          if git diff --quiet -- config/sources.json; then
+            echo "OK: config/sources.json unchanged; nothing to commit."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add config/sources.json
+          git commit -m "Approve runtime-verified sources"
+          git push origin HEAD:main
 
   # ---------------------------------------------------------------------------
   # §18.4's other half: a rung parked for N consecutive days raises an issue.

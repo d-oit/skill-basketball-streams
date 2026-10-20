@@ -42,8 +42,8 @@
     "category": "correctness"
   },
   {
-    "invariant": "A newly discovered source domain stays quarantined until a human promotes it in a PR that also adds an accept and a reject eval case",
-    "rationale": "The runtime is allowed to learn, but it may not widen its own trust boundary. Quarantine keeps recall improvements from becoming an unreviewed allow-list change. Enforced on both sides of the boundary: `tests/test_source_learning.py` asserts a discovery run leaves `config/sources.json` byte-identical and writes the quarantine file instead, and the `retired-sources` gate holds the other half -- a host that was proven dead cannot come back. The two halves used to share one sensor that checked neither: `source-registry` returned 0 on every branch and read a gitignored log, so in CI it passed having asserted nothing.",
+    "invariant": "Discovery never edits the allow-list; only a verified calendar event may approve a source, and only through scripts/approve_source.py",
+    "rationale": "Discovery writes quarantine candidates and never touches config/sources.json. The owner chose auto-approval for a source whose verified calendar event proves free access and a live broadcast; approve_source.py is the one path that may add it, and it refuses excluded, evidence-only, retired, social and unverified candidates. A YouTube stream is approved by channel handle, never the youtube.com host. tests/test_approve_source.py pins each refusal and that insertion leaves the rest of the file byte-identical. Enforced on both sides of the boundary: `tests/test_source_learning.py` asserts a discovery run leaves `config/sources.json` byte-identical and writes the quarantine file instead, and the `retired-sources` gate holds the other half -- a host that was proven dead cannot come back. The two halves used to share one sensor that checked neither: `source-registry` returned 0 on every branch and read a gitignored log, so in CI it passed having asserted nothing.",
     "sensor": "retired-sources",
     "category": "security"
   },
