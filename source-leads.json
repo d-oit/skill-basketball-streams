@@ -1,3 +1,9 @@
 {
-  "leads": []
+  "leads": [
+    {
+      "url": "https://sportbild.bild.de/sportmix/handball/so-viel-live-war-noch-nie-sportbild-de-zeigt-sechs-deutsche-top-ligen-6aaa9aa0a9420481bd213abb",
+      "name": "SPORTBILD.de",
+      "reason": "Free BBL live stream for MHP RIESEN Ludwiesburg vs Telekom Baskets Bonn (24.10.2026 20:00); host is not in the approved-source registry, so it is a quarantined discovery lead, not a directLink."
+    }
+  ]
 }

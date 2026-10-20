@@ -1,16 +1,16 @@
 {
   "candidates": [
     {
-      "league": "easyCredit BBL",
+      "league": "BBL",
       "teams": [
-        "MHP RIESEN Ludwigsburg",
+        "MHP RIESEN Ludwiesburg",
         "Telekom Baskets Bonn"
       ],
       "start": "2026-10-24T20:00:00+02:00",
       "state": "VERIFIED",
-      "summary": "easyCredit BBL: MHP RIESEN Ludwigsburg vs Telekom Baskets Bonn",
-      "game_key": "easyCredit BBL|MHP RIESEN Ludwigsburg|Telekom Baskets Bonn|2026-10-24T18:00Z",
-      "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
+      "summary": "BBL: MHP RIESEN Ludwiesburg vs Telekom Baskets Bonn",
+      "game_key": "BBL|MHP RIESEN Ludwiesburg|Telekom Baskets Bonn|2026-10-24T18:00Z",
+      "url": "https://pluto.tv/gsa/live-tv/66c6fc06489bab0008b6f9da",
       "backend": "",
       "evidence": {
         "live_confirmed": true,
@@ -19,13 +19,13 @@
       "direct_links": [
         {
           "source": "",
-          "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4"
+          "url": "https://pluto.tv/gsa/live-tv/66c6fc06489bab0008b6f9da"
         }
       ],
       "source_reference": "https://www.dyn.sport/deinsender/dyn-sport-mix/",
       "access": "Free",
-      "validated_at": "2026-10-20T12:00:00+02:00",
-      "validation_notes": "Dyn Sport Mix official free-games list names this exact easyCredit BBL game as a 'Dyn Free Spiel' (Sa 24.10.2026, 20:00). Dyn Sport Mix is free on Pluto TV with no account or Abo ('Du brauchst weder ein Konto noch ein Abo ... kostenlos und rund um die Uhr'); the indexed Pluto TV channel URL is the stored directLink. dyn.sport is the announcement evidence/sourceReference only, never the directLink."
+      "validated_at": "2026-10-20T00:00:00Z",
+      "validation_notes": "Free confirmed: the game is listed in Dyn's official 'Dyn Free Spiele' list for the current month (dyn.sport/deinsender/dyn-sport-mix/) as 'Sa. 24.10.2026, 20:00 Uhr \u00b7 easyCredit BBL MHP RIESEN Ludwiesburg \u2013 Telekom Baskets Bonn', carried on the free Dyn Sport Mix FAST channel (Pluto TV, no account/Abo). Live confirmed: easyCredit BBL 6. Spieltag, Sat 24.10.2026 20:00 CEST, confirmed by easycredit-bbl.de and the SPORTBILD.de live plan."
     },
     {
       "league": "NBBL",
@@ -37,7 +37,7 @@
       "state": "VERIFIED",
       "summary": "NBBL: Science City Jena vs SG Junior L\u00f6wen Braunschweig",
       "game_key": "NBBL|SG Junior L\u00f6wen Braunschweig|Science City Jena|2026-10-24T11:45Z",
-      "url": "https://www.sporteurope.tv/en/video/nbbl-science-city-jena-vs-sg-junior-loewen-braunschweig",
+      "url": "https://sporteurope.tv/video/nbbl-science-city-jena-vs-sg-junior-loewen-braunschweig",
       "backend": "",
       "evidence": {
         "live_confirmed": true,
@@ -46,13 +46,13 @@
       "direct_links": [
         {
           "source": "",
-          "url": "https://www.sporteurope.tv/en/video/nbbl-science-city-jena-vs-sg-junior-loewen-braunschweig"
+          "url": "https://sporteurope.tv/video/nbbl-science-city-jena-vs-sg-junior-loewen-braunschweig"
         }
       ],
-      "source_reference": "https://www.sporteurope.tv/en/video/nbbl-science-city-jena-vs-sg-junior-loewen-braunschweig",
+      "source_reference": "https://sporteurope.tv/sc-jena",
       "access": "Free",
-      "validated_at": "2026-10-20T12:00:00+02:00",
-      "validation_notes": "Sporteurope.TV search API lists this as a LIVESTREAM starting 2026-10-24T11:45:00Z (13:45 CEST) with monetizations=[] and product_names=[] (no paywall), and the stream page answers HTTP 200 with a video player. NBBL/JBBL are free under the two-season agreement for 2025/26 and 2026/27."
+      "validated_at": "2026-10-20T00:00:00Z",
+      "validation_notes": "Free confirmed: NBBL/JBBL games are broadcast live and without a paywall on Sporteurope.TV under the two-season agreement (2basketballbundesliga.de, dosbnewmedia.de); the stream listing carries no monetization. Live confirmed: Sporteurope.TV LIVESTREAM scheduled Sat 24.10.2026 13:45 CEST on the official Science City Jena channel."
     }
   ]
 }
