@@ -93,7 +93,7 @@ Self-learning is conservative: the skill never promotes a source or deletes an e
 1. **Link revalidation** — `scripts/link_check.py` classifies stored links: `OK`, `BROKEN` (404/410 → quarantine the link), `BLOCKED` (401/403/429/451 → climb the fetch ladder, keep the event), `ERROR` (5xx → retry, do not delete), `UNREACHABLE`, `INVALID`. Revalidate daily for events inside today…today+7d and again ~2 h before start.
 2. **Run log** — append one row per candidate with `scripts/source_learning.py record` (outcome `create|skip|reject|blocked|error`).
 3. **Source scoring** — `scripts/source_learning.py score` reports per-source hit rate; use ≥10 attempts before re-ordering tiers.
-4. **New-source discovery** — `scripts/source_learning.py candidates` writes unapproved domains and YouTube channel identities as **quarantined**; runtime discoveries travel in the `source_leads` JSON field. Search NBBL/JBBL and Regionalliga for new leads; ProB is excluded as not free of charge. Promotion requires a PR with one accept + one reject eval case. Until then a URL from that source is rejected at Check 3.
+4. **New-source discovery** — `scripts/source_learning.py candidates` writes unapproved domains and YouTube channel identities as **quarantined**; runtime discoveries travel in the `source_leads` JSON field. Search NBBL/JBBL and Regionalliga for new leads; ProB is excluded as not free of charge. A host or `@handle` is promoted to `config/sources.json` only on evidence: the `approve-sources` job runs `scripts/approve_source.py` after a live run, and the script re-checks free and live proof. Anything discovered but not verified on a live write stays quarantined and is rejected at Check 3.
 
 ### Step 3 — Run the 7-Check Pipeline
 
@@ -172,7 +172,7 @@ Refused rather than repaired, so get them right: exactly two teams; a `start` th
 13. **BCL per-game rule** — Basketball Champions League free access is decided per game via site + `@BasketballCL` + BCL Facebook; silence is not consent.
 14. **YouTube live-only rule** — only real live broadcasts with `scheduled_start` strictly greater than now (or a live-now stream with no `actualEndTime`) may be promoted. VODs, recordings, replays and ended broadcasts never are.
 15. **Social media is evidence, not a source** — official social accounts may satisfy Check 1; they are never stored as the `directLink`.
-16. **Quarantine, never delete** — a failed revalidation removes the dead link and records the reason in `Validation Notes`; calendar events are never deleted on a link failure, and new sources stay quarantined until a human promotes them.
+16. **Quarantine, never delete** — a failed revalidation removes the dead link and records the reason in `Validation Notes`; calendar events are never deleted on a link failure, and new sources are promoted only when a live calendar write proved them free and live (see `scripts/approve_source.py`).
 17. **Verification-state rule** — every event carries `VERIFIED`/`UNVERIFIED`/`WRONG`; title prefix and colour come from `scripts/verification.py`, never from ad-hoc formatting.
 18. **Dedupe-before-write rule** — `GOOGLECALENDAR_EVENTS_LIST` over the full window runs *before* any write, and a `VERIFIED` event is never modified by a later run.
 19. **Audit-only demotion** — only `scripts/audit_events.py` may set `WRONG`, and it relabels; it never deletes an event.

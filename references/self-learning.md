@@ -8,7 +8,7 @@ loops, all backed by append-only files:
 | Run log | `scripts/record_run_outcomes.py record --dest .tmp/telemetry` (runtime) / `scripts/source_learning.py record …` or `record-leads …` | `telemetry/run-log.jsonl` on the `telemetry` branch | yes (append only) |
 | Post-hoc audit | `scripts/audit_events.py --events … --evidence …` | `logs/audit.jsonl` | yes — relabels events (§6) |
 | Source scoring | `scripts/source_learning.py score --root .` | stdout / `--json` | no — informs tier order |
-| New-source discovery | `scripts/source_learning.py candidates --root .` | `logs/source-candidates.json` (`"status": "quarantined"`) | **no** — human approval |
+| New-source discovery | `scripts/source_learning.py candidates --root .` | `logs/source-candidates.json` (`"status": "quarantined"`) | only on evidence from a live write (`approve_source.py`) |
 | Link revalidation | `scripts/link_inventory.py` → `scripts/link_check.py --input links.json` | `links.json` + report JSON | no — quarantine only |
 
 `logs/` is gitignored, so the runtime does **not** write the run log there: a
@@ -67,7 +67,7 @@ A `blocked`-heavy source (high 403/429 rate) gets a browser-rendering backend
 attached in the fetch ladder rather than being dropped — see
 `references/magenta-tv.md`.
 
-## 3. New-source discovery (quarantine, never auto-promote)
+## 3. New-source discovery (quarantine, promote only on evidence)
 
 `candidates` extracts every domain or exact YouTube channel identity that
 produced a search hit but is absent from `config/sources.json`, and writes them
@@ -85,18 +85,22 @@ quarantined:
 }
 ```
 
-Promotion requires **all four** of these, done by a human in a PR:
+Promotion is automatic, and it is gated on evidence rather than on a reviewer.
+The `approve-sources` job in `runtime-daily.yml` runs `scripts/approve_source.py`
+after a **live** run, on the candidates that run exported. The script re-checks
+each one and adds a host or `@handle` to `config/sources.json` only when all of
+these hold:
 
-1. The domain or channel is an official league / federation / club / public
-   broadcaster (never a pirate or aggregator site).
-2. Free access is documented (or "selected games" with an announcement channel).
-3. `references/approved-sources.md` gains a tier row **and** the matching entry
-   is added to `config/sources.json`.
-4. `evals/evals.json` gains one accept case and one reject case for the new
-   source (reject = its paid variant).
+1. `evidence.free_confirmed` and `evidence.live_confirmed` are both `true`.
+2. The candidate has a `validationTimestamp` and https `directLink` and
+   `sourceReference`.
+3. The host is not excluded, not social or evidence-only, and not in
+   `config/retired-sources.json`.
+4. A YouTube stream is approved by its channel handle, never by `youtube.com`.
 
-Until then the domain or channel stays quarantined and any URL from it is
-rejected at Check 3.
+The approved entry is labelled `runtime_approved` with its date and evidence, so
+a later PR can review or remove it. A domain that was discovered but not
+verified on a live write stays quarantined and is rejected at Check 3.
 
 ## 4. Link revalidation
 
