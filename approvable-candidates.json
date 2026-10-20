@@ -1,16 +1,16 @@
 {
   "candidates": [
     {
-      "league": "FIBA Europe Cup",
+      "league": "easyCredit BBL",
       "teams": [
-        "VET-CONCEPT Gladiators Trier",
-        "KK Split"
+        "MHP RIESEN Ludwigsburg",
+        "Telekom Baskets Bonn"
       ],
-      "start": "2026-10-21T20:00:00+02:00",
+      "start": "2026-10-24T20:00:00+02:00",
       "state": "VERIFIED",
-      "summary": "FIBA Europe Cup: VET-CONCEPT Gladiators Trier vs KK Split - FREE Live Stream",
-      "game_key": "FIBA Europe Cup|KK Split|VET-CONCEPT Gladiators Trier|2026-10-21T18:00Z",
-      "url": "https://www.ardmediathek.de/video/swr-sport/basketball-live-die-gladiators-trier-gegen-kk-split/swr/Y3JpZDovL3N3ci5kZS9jbGlwL2IwOTdlYzZkLTA4ZmYtNDc0Yy04M2M3LTk0Y2UwZDAwOGFlZQ",
+      "summary": "easyCredit BBL: MHP RIESEN Ludwigsburg vs Telekom Baskets Bonn",
+      "game_key": "easyCredit BBL|MHP RIESEN Ludwigsburg|Telekom Baskets Bonn|2026-10-24T18:00Z",
+      "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
       "backend": "",
       "evidence": {
         "live_confirmed": true,
@@ -19,13 +19,40 @@
       "direct_links": [
         {
           "source": "",
-          "url": "https://www.ardmediathek.de/video/swr-sport/basketball-live-die-gladiators-trier-gegen-kk-split/swr/Y3JpZDovL3N3ci5kZS9jbGlwL2IwOTdlYzZkLTA4ZmYtNDc0Yy04M2M3LTk0Y2UwZDAwOGFlZQ"
+          "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4"
         }
       ],
-      "source_reference": "https://www.sportschau.de/regional/swr/swr-basketball-live-die-gladiators-trier-gegen-kk-split-100.html",
+      "source_reference": "https://www.dyn.sport/deinsender/dyn-sport-mix/",
       "access": "Free",
-      "validated_at": "2026-10-20T18:00:00+02:00",
-      "validation_notes": "SWR Sport / sportschau.de / ARD Mediathek carry this FIBA Europe Cup game live and free (club page: 'live und kostenlos', 'kosten- und werbefrei', no Abo; SWR: 'kostenloser Livestream'). Tip-off 21.10.2026 20:00 CET, stream starts 19:55. Direct link is the SWR Sport live stream on approved ardmediathek.de."
+      "validated_at": "2026-10-20T12:00:00+02:00",
+      "validation_notes": "Dyn Sport Mix official free-games list names this exact easyCredit BBL game as a 'Dyn Free Spiel' (Sa 24.10.2026, 20:00). Dyn Sport Mix is free on Pluto TV with no account or Abo ('Du brauchst weder ein Konto noch ein Abo ... kostenlos und rund um die Uhr'); the indexed Pluto TV channel URL is the stored directLink. dyn.sport is the announcement evidence/sourceReference only, never the directLink."
+    },
+    {
+      "league": "NBBL",
+      "teams": [
+        "Science City Jena",
+        "SG Junior L\u00f6wen Braunschweig"
+      ],
+      "start": "2026-10-24T13:45:00+02:00",
+      "state": "VERIFIED",
+      "summary": "NBBL: Science City Jena vs SG Junior L\u00f6wen Braunschweig",
+      "game_key": "NBBL|SG Junior L\u00f6wen Braunschweig|Science City Jena|2026-10-24T11:45Z",
+      "url": "https://www.sporteurope.tv/en/video/nbbl-science-city-jena-vs-sg-junior-loewen-braunschweig",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.sporteurope.tv/en/video/nbbl-science-city-jena-vs-sg-junior-loewen-braunschweig"
+        }
+      ],
+      "source_reference": "https://www.sporteurope.tv/en/video/nbbl-science-city-jena-vs-sg-junior-loewen-braunschweig",
+      "access": "Free",
+      "validated_at": "2026-10-20T12:00:00+02:00",
+      "validation_notes": "Sporteurope.TV search API lists this as a LIVESTREAM starting 2026-10-24T11:45:00Z (13:45 CEST) with monetizations=[] and product_names=[] (no paywall), and the stream page answers HTTP 200 with a video player. NBBL/JBBL are free under the two-season agreement for 2025/26 and 2026/27."
     }
   ]
 }
