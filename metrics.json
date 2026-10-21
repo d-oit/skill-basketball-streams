@@ -1,9 +1,9 @@
 {
   "audit": {
-    "inconclusive": 10,
+    "inconclusive": 11,
     "judged": 13,
     "precision": 1.0,
-    "rows": 23,
+    "rows": 24,
     "verified": 13,
     "wrong": 0
   },
@@ -94,8 +94,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 805,
-    "missed": 805,
+    "eligible": 810,
+    "missed": 810,
     "missed_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -418,6 +418,7 @@
       "https://www.bfv.de/news/sport-politik/verbandstag/regionalliga-bayern-bei-brsport24",
       "https://www.bild.de/sport/mehr-sport/alba-gegen-chemnitz-bbl-auftaktspiel-jetzt-hier-im-live-stream-6aacdf2cb1857e86757a5aa7",
       "https://www.bild.de/sport/mehr-sport/basketball-jetzt-live-chemnitz-will-die-bayern-aergern-6ac8c1153b2b428232f0b10d",
+      "https://www.bild.de/sport/mehr-sport/basketball/bbl-so-sehen-sie-alba-berlin-ulm-live-kostenlos-im-tv-stream-87018436.bild.html",
       "https://www.bild.de/sport/mehr-sport/derby-gegen-bamberg-jetzt-live-bayern-muenchens-basketball-knaller-68ea6114a9f78ac9949b1061",
       "https://www.bild.de/sport/mehr-sport/playoff-halbfinale-alba-bamberg-bild-de-zeigt-basketball-live-6a280aed2f1d399245057caf",
       "https://www.bundle.app/de/lebensstil/alba-vs-bamberg-baskets-kostenlos-im-livestream-team-vergleich-streams-und-mehr-am-samstag-DA1C5483-9798-5183-92FD-37CB42CB0FA9",
@@ -609,7 +610,9 @@
       "https://www.netzwelt.de/news/229026-chemnitz-99ers-gegen-alba-berlin-so-top-partie-bbl-gratis-tv-live-stream-sehen.html",
       "https://www.netzwelt.de/news/229396-bayern-muenchen-gegen-bb-loewen-braunschweig-so-seht-bbl-spiel-kostenlos-tv-live-stream.html",
       "https://www.netzwelt.de/news/230561-bayern-muenchen-gegen-alba-berlin-so-seht-top-spiel-bbl-gratis-tv-live-stream.html",
+      "https://www.netzwelt.de/news/231292-alba-berlin-gegen-chemnitz-99ers-so-seht-bbl-halbfinal-play-off-kostenlos-tv-live-stream.html",
       "https://www.netzwelt.de/news/231417-alba-berlin-gegen-chemnitz-99ers-so-seht-halbfinale-bbl-play-offs-gratis-tv-live-stream.html",
+      "https://www.netzwelt.de/news/231608-bayern-muenchen-gegen-alba-berlin-so-seht-finale-bbl-play-offs-gratis-tv-live-stream.html",
       "https://www.netzwelt.de/news/231797-alba-berlin-gegen-bayern-muenchen-so-seht-finale-bbl-play-offs-gratis-tv-live-stream.html",
       "https://www.netzwelt.de/news/232097-ohne-teure-abos-sport-kostenlos-live-stream-tv.html",
       "https://www.netzwelt.de/news/234794-telekom-baskets-bonn-gegen-alba-berlin-so-seht-bbl-partie-kostenlos-tv-live-stream.html",
@@ -722,6 +725,7 @@
       "https://www.spox.com/basketball/listen/ard-zdf-rtl-sat-1-oder-magenta-fuer-das-dbb-team-im-viertelfinale-der-basketball-em-heute-live-auf-welchem-sender-laeuft-deutschland-vs-slowenien-im-free-tv-und-livestream/blt3ec596fb7f6f077d",
       "https://www.spox.com/basketball/listen/fc-bayern-muenchen-vs-alba-berlin-basketball-finale-heute-live-im-free-tv-wer-zeigt-uebertraegt-spiel-1-der-bbl-finals-im-tv-und-livestream/blt5f8b4981340892bc",
       "https://www.spox.com/basketball/listen/fc-bayern-muenchen-vs-alba-berlin-basketball-finale-heute-live-im-free-tv-wer-zeigt-uebertraegt-spiel-2-der-bbl-finals-im-tv-und-livestream/bltb6d6fd26ed958d82",
+      "https://www.spox.com/basketball/news/bbl-basketball-live-sehen-uebertragung-im-free-tv-und-livestream/6658572",
       "https://www.spox.com/basketball/news/fc-bayern-muenchen-vs-alba-berlin-basketball-finale-heute-live-im-free-tv-wer-zeigt-uebertraegt-spiel-5-der-bbl-finals-im-tv-und-livestream/blt72d4638b86326190",
       "https://www.squawka.com/",
       "https://www.squawka.com/en/other-sport/bayern-munich-alba-berlin-live-stream-watch-online-basketball-bundesliga/",
@@ -849,6 +853,7 @@
       "https://www.youtube.com/watch?v=X7_I_xPsLHE",
       "https://www.youtube.com/watch?v=XSd5x6-SBts",
       "https://www.youtube.com/watch?v=XUV2Z_g8wYk",
+      "https://www.youtube.com/watch?v=XoHbqIZluOk",
       "https://www.youtube.com/watch?v=YYnRLewvo-4&xstg=CAMSBhUD-7L2Hw%3D%3D",
       "https://www.youtube.com/watch?v=Z3qThjJg1ig",
       "https://www.youtube.com/watch?v=Z6EOXPfXdN4",
@@ -904,9 +909,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 15217,
-    "unique_games": 1243,
-    "unverifiable": 805,
+    "rows": 15488,
+    "unique_games": 1249,
+    "unverifiable": 810,
     "unverifiable_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -1229,6 +1234,7 @@
       "https://www.bfv.de/news/sport-politik/verbandstag/regionalliga-bayern-bei-brsport24",
       "https://www.bild.de/sport/mehr-sport/alba-gegen-chemnitz-bbl-auftaktspiel-jetzt-hier-im-live-stream-6aacdf2cb1857e86757a5aa7",
       "https://www.bild.de/sport/mehr-sport/basketball-jetzt-live-chemnitz-will-die-bayern-aergern-6ac8c1153b2b428232f0b10d",
+      "https://www.bild.de/sport/mehr-sport/basketball/bbl-so-sehen-sie-alba-berlin-ulm-live-kostenlos-im-tv-stream-87018436.bild.html",
       "https://www.bild.de/sport/mehr-sport/derby-gegen-bamberg-jetzt-live-bayern-muenchens-basketball-knaller-68ea6114a9f78ac9949b1061",
       "https://www.bild.de/sport/mehr-sport/playoff-halbfinale-alba-bamberg-bild-de-zeigt-basketball-live-6a280aed2f1d399245057caf",
       "https://www.bundle.app/de/lebensstil/alba-vs-bamberg-baskets-kostenlos-im-livestream-team-vergleich-streams-und-mehr-am-samstag-DA1C5483-9798-5183-92FD-37CB42CB0FA9",
@@ -1420,7 +1426,9 @@
       "https://www.netzwelt.de/news/229026-chemnitz-99ers-gegen-alba-berlin-so-top-partie-bbl-gratis-tv-live-stream-sehen.html",
       "https://www.netzwelt.de/news/229396-bayern-muenchen-gegen-bb-loewen-braunschweig-so-seht-bbl-spiel-kostenlos-tv-live-stream.html",
       "https://www.netzwelt.de/news/230561-bayern-muenchen-gegen-alba-berlin-so-seht-top-spiel-bbl-gratis-tv-live-stream.html",
+      "https://www.netzwelt.de/news/231292-alba-berlin-gegen-chemnitz-99ers-so-seht-bbl-halbfinal-play-off-kostenlos-tv-live-stream.html",
       "https://www.netzwelt.de/news/231417-alba-berlin-gegen-chemnitz-99ers-so-seht-halbfinale-bbl-play-offs-gratis-tv-live-stream.html",
+      "https://www.netzwelt.de/news/231608-bayern-muenchen-gegen-alba-berlin-so-seht-finale-bbl-play-offs-gratis-tv-live-stream.html",
       "https://www.netzwelt.de/news/231797-alba-berlin-gegen-bayern-muenchen-so-seht-finale-bbl-play-offs-gratis-tv-live-stream.html",
       "https://www.netzwelt.de/news/232097-ohne-teure-abos-sport-kostenlos-live-stream-tv.html",
       "https://www.netzwelt.de/news/234794-telekom-baskets-bonn-gegen-alba-berlin-so-seht-bbl-partie-kostenlos-tv-live-stream.html",
@@ -1533,6 +1541,7 @@
       "https://www.spox.com/basketball/listen/ard-zdf-rtl-sat-1-oder-magenta-fuer-das-dbb-team-im-viertelfinale-der-basketball-em-heute-live-auf-welchem-sender-laeuft-deutschland-vs-slowenien-im-free-tv-und-livestream/blt3ec596fb7f6f077d",
       "https://www.spox.com/basketball/listen/fc-bayern-muenchen-vs-alba-berlin-basketball-finale-heute-live-im-free-tv-wer-zeigt-uebertraegt-spiel-1-der-bbl-finals-im-tv-und-livestream/blt5f8b4981340892bc",
       "https://www.spox.com/basketball/listen/fc-bayern-muenchen-vs-alba-berlin-basketball-finale-heute-live-im-free-tv-wer-zeigt-uebertraegt-spiel-2-der-bbl-finals-im-tv-und-livestream/bltb6d6fd26ed958d82",
+      "https://www.spox.com/basketball/news/bbl-basketball-live-sehen-uebertragung-im-free-tv-und-livestream/6658572",
       "https://www.spox.com/basketball/news/fc-bayern-muenchen-vs-alba-berlin-basketball-finale-heute-live-im-free-tv-wer-zeigt-uebertraegt-spiel-5-der-bbl-finals-im-tv-und-livestream/blt72d4638b86326190",
       "https://www.squawka.com/",
       "https://www.squawka.com/en/other-sport/bayern-munich-alba-berlin-live-stream-watch-online-basketball-bundesliga/",
@@ -1660,6 +1669,7 @@
       "https://www.youtube.com/watch?v=X7_I_xPsLHE",
       "https://www.youtube.com/watch?v=XSd5x6-SBts",
       "https://www.youtube.com/watch?v=XUV2Z_g8wYk",
+      "https://www.youtube.com/watch?v=XoHbqIZluOk",
       "https://www.youtube.com/watch?v=YYnRLewvo-4&xstg=CAMSBhUD-7L2Hw%3D%3D",
       "https://www.youtube.com/watch?v=Z3qThjJg1ig",
       "https://www.youtube.com/watch?v=Z6EOXPfXdN4",
@@ -1715,47 +1725,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-10-21T19:00Z",
+  "run_id": "2026-10-21T19:34Z",
   "source": {
-    "audit_rows": 23,
-    "candidates_rows": 15217,
+    "audit_rows": 24,
+    "candidates_rows": 15488,
     "fixtures_rows": 75
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 1,
-        "judged": 0,
-        "precision": null,
-        "rows": 1,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-10-20T17:37Z",
-      "unique_games": 0
-    },
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 119,
-      "missed": 119,
-      "recall": 0.0,
-      "rows": 268,
-      "run_id": "2026-10-20T17:52Z",
-      "unique_games": 230
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -1959,7 +1935,41 @@
       "rows": 281,
       "run_id": "2026-10-21T18:58Z",
       "unique_games": 228
+    },
+    {
+      "audit": {
+        "inconclusive": 1,
+        "judged": 0,
+        "precision": null,
+        "rows": 1,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-10-21T19:11Z",
+      "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 117,
+      "missed": 117,
+      "recall": 0.0,
+      "rows": 271,
+      "run_id": "2026-10-21T19:33Z",
+      "unique_games": 222
     }
   ],
-  "ts": "2026-10-21T19:00:02.296814+00:00"
+  "ts": "2026-10-21T19:34:58.206356+00:00"
 }
