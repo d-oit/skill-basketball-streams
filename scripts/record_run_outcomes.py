@@ -274,7 +274,29 @@ def _namespace(spec: dict, dest: Path, *, dry_run: bool) -> SimpleNamespace:
 
 
 def record(dest: Path, *, now: str = "", dry_run: bool = False) -> int:
-    """Append one row per derived spec through `source_learning.mode_record`."""
+    """Append one row per derived spec through `source_learning.mode_record`.
+
+    Retain a bounded recent window. GitHub rejects individual files >= 100 MB;
+    this log is derived from the other ledgers and is not the canonical history.
+    """
+    log_path = dest / LOG_NAME
+    # Compact before appending so both an already oversized ledger and today's
+    # additions remain safely below GitHub's per-file limit.
+    max_bytes = 40 * 1024 * 1024
+    if not dry_run and log_path.exists() and log_path.stat().st_size > max_bytes:
+        rows = log_path.read_bytes().splitlines(keepends=True)
+        kept: list[bytes] = []
+        size = 0
+        for row in reversed(rows):
+            if size + len(row) > max_bytes:
+                break
+            kept.append(row)
+            size += len(row)
+        log_path.write_bytes(b"".join(reversed(kept)))
+        print(
+            f"OK: record_run_outcomes: compacted {LOG_NAME} to {size} bytes "
+            f"({len(kept)} complete rows)"
+        )
     specs = derive_specs(load_ledgers(dest), now=now)
     if not specs:
         print(
