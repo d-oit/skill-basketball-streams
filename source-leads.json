@@ -1,3 +1,16 @@
 {
-  "leads": []
+  "leads": [
+    {
+      "url": "https://www.youtube.com/@EuroLeagueWomen",
+      "name": "EuroLeague Women",
+      "league": "EuroLeague Women",
+      "reason": "Live basketball surfaced under an unapproved YouTube handle; quarantine pending review."
+    },
+    {
+      "url": "https://www.youtube.com/@talkSPORT",
+      "name": "talkSPORT",
+      "league": "Basketball",
+      "reason": "Unapproved YouTube handle appeared in live basketball searches; quarantine pending review."
+    }
+  ]
 }
