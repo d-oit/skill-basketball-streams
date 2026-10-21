@@ -242,7 +242,7 @@ A 200 response carrying `successful: false` — the credential is present but th
 not usable. Almost always one of: the connected account was revoked, a connected-account id
 was sent where a user id belongs, or the grant does not cover the calendar in
 `config/calendar.json`. To separate the two, list the window and read what comes back —
-`python3 scripts/calendar_io.py list --days 7 --out existing.json` succeeds with any number
+`python3 scripts/calendar_io.py list --days 10 --out existing.json` succeeds with any number
 of events, including zero, so an empty result is a *fact about the calendar* while this
 error is a fact about the credential. (For the LLM side, the equivalent probe is
 `python3 scripts/capture_transcripts.py --list-models`.)
@@ -250,7 +250,7 @@ error is a fact about the credential. (For the LLM side, the equivalent probe is
 ### "No events created"
 
 **Possible causes:**
-1. No free basketball streams available in the next 7 days
+1. No free basketball streams available in the next 10 days
 2. All found streams failed validation (check the skill's output)
 3. Calendar ID is incorrect (events are being created in the wrong calendar)
 4. Duplicate detection is too aggressive
@@ -303,7 +303,7 @@ A fork therefore needs two secrets:
 # Locally: the same two variables, and no credential at all is needed for a dry run
 export COMPOSIO_API_KEY=...
 export COMPOSIO_USER_ID=...
-python3 scripts/calendar_io.py list --days 7 --out existing.json
+python3 scripts/calendar_io.py list --days 10 --out existing.json
 python3 scripts/calendar_io.py apply --plan plan.json          # dry run, no HTTP
 ```
 

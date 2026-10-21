@@ -1,7 +1,7 @@
 ---
 name: skill-basketball-streams
 description: Search for FREE basketball live streams in Germany from approved official sources (BBL, EuroLeague, FIBA, Basketball Champions League, MagentaSport/MagentaTV, public broadcasters, clubs, YouTube channels), validate them with a 7-check pipeline (URL, page content, source allow-list, basketball-specific, date range, live proof, source reference), then add confirmed streams to Google Calendar. Renders bot-blocked magenta.tv via a fetch ladder, searches YouTube live-only (start must be in the future), and revalidates stored links while discovering new sources through an append-only run log. Use when the user wants free basketball streams in Germany on a calendar, needs a stream URL validated, or reports broken links in past events. Triggers - "find basketball streams", "free BBL stream", "any free EuroLeague game today?", "validate this basketball URL", "add stream to basketball calendar". Not for paid broadcasters (Sky, Prime, DAZN games not free), highlights, or non-basketball sports.
-version: "1.12.3"
+version: "1.13.0"
 category: workflow
 license: MIT
 allowed-tools: webSearch openUrl webFetch firecrawlScrape tinyfishFetch youtubeLiveSearch linkCheck GOOGLECALENDAR_EVENTS_LIST GOOGLECALENDAR_CREATE_EVENT GOOGLECALENDAR_PATCH_EVENT GOOGLECALENDAR_DELETE_EVENT
@@ -34,7 +34,7 @@ Full list and YouTube URL rules: `references/approved-sources.md`; machine-reada
 
 ### Step 1 — Determine Date Range
 
-Today (00:00, timezone from `config/calendar.json` default `Europe/Berlin`) through today + 7 days (23:59). Convert times to ISO 8601 with `+02:00` (CEST) or `+01:00` (CET).
+Today (00:00, timezone from `config/calendar.json` default `Europe/Berlin`) through today + 10 days (23:59). Convert times to ISO 8601 with `+02:00` (CEST) or `+01:00` (CET).
 
 ### Step 2 — Search for Streams
 
@@ -90,7 +90,7 @@ A YouTube hit is promotable only when it is a **real live broadcast** AND its st
 
 Self-learning is conservative: the skill never promotes a source or deletes an event by itself. See `references/self-learning.md`.
 
-1. **Link revalidation** — `scripts/link_check.py` classifies stored links: `OK`, `BROKEN` (404/410 → quarantine the link), `BLOCKED` (401/403/429/451 → climb the fetch ladder, keep the event), `ERROR` (5xx → retry, do not delete), `UNREACHABLE`, `INVALID`. Revalidate daily for events inside today…today+7d and again ~2 h before start.
+1. **Link revalidation** — `scripts/link_check.py` classifies stored links: `OK`, `BROKEN` (404/410 → quarantine the link), `BLOCKED` (401/403/429/451 → climb the fetch ladder, keep the event), `ERROR` (5xx → retry, do not delete), `UNREACHABLE`, `INVALID`. Revalidate daily for events inside today…today+10d and again ~2 h before start.
 2. **Run log** — append one row per candidate with `scripts/source_learning.py record` (outcome `create|skip|reject|blocked|error`).
 3. **Source scoring** — `scripts/source_learning.py score` reports per-source hit rate; use ≥10 attempts before re-ordering tiers.
 4. **New-source discovery** — `scripts/source_learning.py candidates` writes unapproved domains and YouTube channel identities as **quarantined**; runtime discoveries travel in the `source_leads` JSON field. Search NBBL/JBBL and Regionalliga for new leads; ProB is excluded as not free of charge. A host or `@handle` is promoted to `config/sources.json` only on evidence: the `approve-sources` job runs `scripts/approve_source.py` after a live run, and the script re-checks free and live proof. Anything discovered but not verified on a live write stays quarantined and is rejected at Check 3.
@@ -103,7 +103,7 @@ Full definitions in `references/validation-workflow.md`. **ANY failure → REJEC
 2. **Live Content** — page contains `live`/`Live`/`LIVE`; no `highlights`/`replay`/`zusammenfassung`/`on demand`. YouTube items must pass the Step 2.7 live/`actualEndTime` rules.
 3. **Official Source** — domain in approved list; quarantined domains fail.
 4. **Basketball-Specific** — mentions BBL, EuroLeague, FIBA, Basketball Champions League, or approved club name
-5. **Date/Time Within Range** — start strictly after the current time and no more than seven days ahead, 14:00–23:00 CET. `scripts/upsert_events.py` enforces the rolling time window immediately before any calendar write.
+5. **Date/Time Within Range** — start strictly after the current time and no more than ten days ahead, 14:00–23:00 CET. `scripts/upsert_events.py` enforces the rolling time window immediately before any calendar write.
 6. **Working Link** — HTTP 200 **with readable page content** (not 404 / 500 / paywall redirect / empty SPA shell)
 7. **Direct Stream Verification** — page content contains active video player and / or "Live" badge text; for `magenta.tv`, the Step 2.8 render markers
 
@@ -113,7 +113,7 @@ For each surviving stream: league, teams, ISO 8601 date/time in CET, direct link
 
 ### Step 5 — Check Google Calendar for Duplicates
 
-**Dedupe before any write.** Call `GOOGLECALENDAR_EVENTS_LIST` on calendarId from `config/calendar.json` (or `BASKETBALL_CALENDAR_ID` env var) over the **whole window** `today 00:00 … today+7d 23:59`, then match in memory: same ±30-min slot **and** the team pair **and** a compatible league. Short and long club names are the same club (`ALBA` = `ALBA Berlin`, `Telekom Baskets Bonn` = `Bonn`); `scripts/upsert_events.py` implements this planner and prints `create`/`update`/`unchanged`/`skip` rows **without touching the calendar**. `unchanged` means the matched event already holds exactly what this run would send — title, times, description and colour all compare equal — so send **no request at all**; `skip` means do not touch it. Any real difference, or a state change, is an `update`.
+**Dedupe before any write.** Call `GOOGLECALENDAR_EVENTS_LIST` on calendarId from `config/calendar.json` (or `BASKETBALL_CALENDAR_ID` env var) over the **whole window** `today 00:00 … today+10d 23:59`, then match in memory: same ±30-min slot **and** the team pair **and** a compatible league. Short and long club names are the same club (`ALBA` = `ALBA Berlin`, `Telekom Baskets Bonn` = `Bonn`); `scripts/upsert_events.py` implements this planner and prints `create`/`update`/`unchanged`/`skip` rows **without touching the calendar**. `unchanged` means the matched event already holds exactly what this run would send — title, times, description and colour all compare equal — so send **no request at all**; `skip` means do not touch it. Any real difference, or a state change, is an `update`.
 
 ### Step 6 — Create or Update Event (Only If No Duplicate AND All 7 Checks Passed)
 
@@ -161,7 +161,7 @@ Refused rather than repaired, so get them right: exactly two teams; a `start` th
 2. **All 7 checks must PASS** — including Direct Stream Verification (page read).
 3. **No paid content** — Sky / general Prime → REJECT, even if domain is on the allow-list. DAZN is an approved source only per game: a DAZN game its page does not state is free to watch, or that needs a paid subscription, → REJECT.
 4. **No unofficial streams** — no pirate sites, third-party aggregators, fan-run YouTube.
-5. **Date accuracy** — every event must start strictly after now and no later than now + 7 days; the final planner enforces this window.
+5. **Date accuracy** — every event must start strictly after now and no later than now + 10 days; the final planner enforces this window.
 6. **Link testing** — every direct link tested with `openUrl` and confirmed working.
 7. **Live verification** — read page content to confirm an active live stream exists.
 8. **YouTube URL rules** — only `@handle`, `@handle/live`, and `/user/TheDBBTV` are accepted.
@@ -179,7 +179,7 @@ Refused rather than repaired, so get them right: exactly two teams; a `start` th
 
 ## Output Format
 
-Always emit the Step 7 table. On total failure return `"Found [N] potential streams, but none passed validation."`. On zero hits: `"No free basketball live streams found in the next 7 days from official sources."`. On tool errors: log and continue with the next source.
+Always emit the Step 7 table. On total failure return `"Found [N] potential streams, but none passed validation."`. On zero hits: `"No free basketball live streams found in the next 10 days from official sources."`. On tool errors: log and continue with the next source.
 
 ## Available scripts
 
@@ -194,7 +194,7 @@ All scripts are stdlib-only on Python 3.8+ and share the same exit codes: `0` PA
 - **`scripts/calendar_config.py`** — reads `config/calendar.json` with the `BASKETBALL_CALENDAR_ID` override.
 - **`scripts/color_mapping.py`** — `get_color_id(league, event_type, state)` for the calendar `colorId`. The league and verification-state dimensions are orthogonal.
 - **`scripts/verification.py`** — the verification state machine (`VERIFIED`/`UNVERIFIED`/`WRONG`): prefixes, colour precedence, idempotent `title_for`.
-- **`scripts/upsert_events.py`** — dedupe-then-replace planner (Step 5/6). `--existing existing.json --candidates candidates.json --now ISO [--window-days 7] [--json]` prints the plan; it skips ProB, candidates without explicit free/live proof and source provenance, and starts outside the strict upcoming window; it never calls the calendar API.
+- **`scripts/upsert_events.py`** — dedupe-then-replace planner (Step 5/6). `--existing existing.json --candidates candidates.json --now ISO [--window-days 10] [--json]` prints the plan; it skips ProB, candidates without explicit free/live proof and source provenance, and starts outside the strict upcoming window; it never calls the calendar API.
 - **`scripts/audit_events.py`** — post-hoc verdicts and the promotion sweep (Step 6.5). `--events events.json --evidence evidence.json [--now ISO] [--out audit.jsonl]`; `--events` accepts JSONL as well as JSON.
 - **`scripts/extract_candidates.py`** — the transcript → candidate seam for Steps 5/6. The runtime agent has no file-write tool, so this is its only channel; it refuses `state=WRONG` (an audit verdict, never a proposal) and any candidate without two teams and a parseable start, and preserves the evidence and link fields the planner requires.
 - **`scripts/calendar_io.py`** — the only module that reads or writes the calendar, through Composio tool execution (`COMPOSIO_API_KEY`; no Google project). `list` recovers the verification state from the title prefix, which is what lets Step 6 honour "never touch a verified event"; `apply` makes **no HTTP request at all** unless `--live` is passed.
@@ -225,7 +225,7 @@ All scripts are stdlib-only on Python 3.8+ and share the same exit codes: `0` PA
 - [ ] Accepted `youtube.com/@FIBAWorld/...` or any `/channel/UC…` URL.
 - [ ] Skipped Check 7 (Direct Stream Verification) because the URL "looks live".
 - [ ] Created an event without a `sourceReference` and validation timestamp in the description.
-- [ ] Used a date outside the today…today+7d window.
+- [ ] Used a date outside the today…today+10d window.
 - [ ] Added an event without running `GOOGLECALENDAR_EVENTS_LIST` for duplicates first.
 - [ ] Logged a `CREATE` decision when any of the 7 checks were FAIL.
 - [ ] Used a `magenta.tv` stream URL without first finding a free-access indication for **that game** on `magenta.tv`.

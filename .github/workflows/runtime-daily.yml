@@ -773,7 +773,7 @@ jobs:
           COMPOSIO_USER_ID: ${{ secrets.COMPOSIO_USER_ID }}
         run: |
           mkdir -p .tmp
-          python3 scripts/calendar_io.py list --days 7 --out .tmp/existing.json
+          python3 scripts/calendar_io.py list --days 10 --out .tmp/existing.json
 
       - name: Extract the candidates the agent found
         id: candidates
@@ -829,14 +829,14 @@ jobs:
         run: |
           # Resolve the clock once and pass the same value through the planner
           # and summary. The planner refuses starts at/before this instant and
-          # starts more than seven days ahead.
+          # starts more than ten days ahead.
           RUN_NOW="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
           export RUN_NOW
           # `set --` rather than building a command string: the flag is added or
           # not, with no word-splitting to get wrong.
           set -- --existing .tmp/existing.json \
                  --candidates .tmp/candidates.json \
-                 --now "$RUN_NOW" --window-days 7 --json
+                 --now "$RUN_NOW" --window-days 10 --json
           if [ "$VERDICTS_READY" = "true" ]; then
             set -- "$@" --verdicts .tmp/audit.jsonl
           fi

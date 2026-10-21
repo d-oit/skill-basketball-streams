@@ -651,7 +651,7 @@ class TestCli:
         )
         assert result.returncode == 1
         assert "2 fixture(s) parsed" in result.stderr
-        assert "none inside the 7-day window" in result.stderr
+        assert "none inside the 10-day window" in result.stderr
         assert "capture a page and add a parser fixture" not in result.stderr
 
     def test_diff_mode_reports_the_unseen_game(self):

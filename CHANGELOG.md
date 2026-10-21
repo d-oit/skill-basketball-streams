@@ -5,6 +5,17 @@ All notable changes to `skill-basketball-streams` will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.0] - 2026-10-21
+
+### Changed
+
+- **The search, dedupe and calendar window is now ten days.** `SKILL.md` Step 1,
+  Check 5 (`dateTimeRange`), the planner default (`--window-days`), the calendar
+  read (`list --days`) and the fixture fetch (`--days`) all cover today through
+  today + 10 days, so free streams announced further ahead reach the calendar.
+  Eval cases 11–12 and every workflow, reference and doc that named the
+  seven-day window were updated with it.
+
 ## [1.12.1] - 2026-10-13
 
 ### Fixed

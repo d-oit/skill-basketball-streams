@@ -195,7 +195,7 @@ repository_dispatch ─┴─► job: daily-run
                           │
                           ├─ 1. auth (Composio API key — replaced WIF; see §12 correction)
                           ├─ 2. install opencode CLI + SKILL.md context
-                          ├─ 3. list existing calendar events (today … today+7d)   ← dedupe FIRST
+                          ├─ 3. list existing calendar events (today … today+10d)   ← dedupe FIRST
                           ├─ 4. search ladder:  Exa MCP free → TinyFish → Firecrawl
                           ├─ 5. gate ladder:    youtube_live.py, link_check.py, 7-check pipeline
                           ├─ 6. render ladder:  hosted backends → (flagged) self-hosted stealth rung
@@ -315,7 +315,7 @@ Because the run writes directly (round 1), the ordering is a safety property:
    unattended path, which is precisely the false-negative this spec exists to prevent.
    See `docs/runtime.md` for the precedence table.
 
-1. **Dedupe first.** `GOOGLECALENDAR_EVENTS_LIST` over `today 00:00 … today+7d 23:59`, then an
+1. **Dedupe first.** `GOOGLECALENDAR_EVENTS_LIST` over `today 00:00 … today+10d 23:59`, then an
    in-memory match on ±30 min **and** team pair **and** league substring, before any write.
 2. **Then upsert** per the round-5 rule:
    - existing **verified** event → **never touch**; log `skip (verified exists)`.
@@ -686,7 +686,7 @@ Consequences baked into the spec:
 1. **Schedule the cron at or after 08:15 UTC** so the run starts on a fresh daily quota. The
    earlier 06:30 UTC proposal is **withdrawn** — it would spend the tail of the previous day's
    quota. 08:30 UTC (10:30 CEST) still precedes typical 14:00+ tip-offs and the run covers
-   today+7d, so nothing time-critical is lost.
+   today+10d, so nothing time-critical is lost.
 2. **Budget LLM calls per run** assuming the worst credible case (~20 RPD). The design must
    therefore **batch** judgement: one call per game's free-access evidence bundle, not one call
    per candidate, and a hard cap that stops LLM use and falls back to deterministic-only

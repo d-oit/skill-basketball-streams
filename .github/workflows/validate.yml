@@ -70,7 +70,7 @@ jobs:
           python3 scripts/upsert_events.py \
             --existing tests/fixtures/upsert_existing.json \
             --candidates tests/fixtures/upsert_candidates.json \
-            --now 2026-09-15T08:30:00Z --window-days 7 --json
+            --now 2026-09-15T08:30:00Z --window-days 10 --json
 
       - name: Run audit_events (fixture audit)
         run: |
@@ -210,7 +210,7 @@ jobs:
           python3 scripts/upsert_events.py \
             --existing tests/fixtures/upsert_existing.json \
             --candidates .tmp/candidates.json \
-            --now 2026-09-15T08:30:00Z --window-days 7 \
+            --now 2026-09-15T08:30:00Z --window-days 10 \
             --json > .tmp/plan.json
           python3 scripts/calendar_io.py apply \
             --plan .tmp/plan.json --calendar-id ci@example.com \

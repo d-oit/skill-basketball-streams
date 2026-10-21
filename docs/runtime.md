@@ -122,12 +122,12 @@ python3 scripts/extract_candidates.py --transcript .tmp/transcript.json \
 
 # 2. read the calendar FIRST. `list` recovers the verification state from the
 #    title prefix, which is what makes "never touch a verified event" possible.
-python3 scripts/calendar_io.py list --days 7 --out .tmp/existing.json
+python3 scripts/calendar_io.py list --days 10 --out .tmp/existing.json
 
 # 3. plan in memory -- no API calls at all
 RUN_NOW="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 python3 scripts/upsert_events.py --existing .tmp/existing.json \
-  --candidates .tmp/candidates.json --now "$RUN_NOW" --window-days 7 \
+  --candidates .tmp/candidates.json --now "$RUN_NOW" --window-days 10 \
   --json > .tmp/plan.json
 
 # 4. dry run (no token needed), then the real writes
@@ -209,7 +209,7 @@ capturing a page as a fixture, not writing a bespoke scraper.
 
 The telemetry job writes to `telemetry/fixtures.jsonl`, and that write is
 **idempotent**: a `game_key` already in the file is skipped. The job re-observes
-the same 7-day window every day, so a blind append would write each game once per
+the same 10-day window every day, so a blind append would write each game once per
 day forever — the file would grow without bound and `fixture_recall` would end up
 measuring file length instead of coverage. The recall denominator is distinct
 games, computed at read time by `distinct_fixtures()`, so a duplicated row cannot
@@ -381,7 +381,7 @@ git fetch --depth=1 origin telemetry
 # ...then, only if the file exists:
 python3 scripts/upsert_events.py --existing .tmp/existing.json \
   --candidates .tmp/candidates.json --verdicts .tmp/audit.jsonl \
-  --now "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" --window-days 7 --json
+  --now "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" --window-days 10 --json
 ```
 
 An event whose **newest** verdict is `WRONG` is skipped regardless of its title,
@@ -433,7 +433,7 @@ a second inline expression is how the two halves of the apply step drifted apart
 
 `30 8 * * *` — 08:30 UTC (10:30 CEST), not earlier. Gemini's free-tier RPD resets at
 **midnight Pacific** (07:00–08:00 UTC depending on DST), so a 06:30 run would burn the
-previous day's quota. The run covers today…today+7d, so it still precedes typical 14:00+
+previous day's quota. The run covers today…today+10d, so it still precedes typical 14:00+
 tip-offs by hours.
 
 Also triggerable via `workflow_dispatch` (with a `dry_run` input) and
@@ -922,7 +922,7 @@ python3 scripts/rung_health.py parked --dest .tmp/telemetry --days 3 --markdown
 python3 scripts/verification.py
 python3 scripts/upsert_events.py --existing existing.json \
   --candidates candidates.json --now "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
-  --window-days 7 --json
+  --window-days 10 --json
 python3 scripts/audit_events.py --events events.jsonl --evidence evidence.json \
   --out .tmp/telemetry/audit.jsonl --dry-run
 python3 scripts/extract_candidates.py \

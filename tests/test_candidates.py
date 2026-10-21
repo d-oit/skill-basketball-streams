@@ -252,7 +252,7 @@ class TestFixtureRecall:
         assert report["unseen_keys"] == []
 
     def test_repeated_observations_do_not_inflate_the_denominator(self):
-        # The telemetry job re-observes the same 7-day window every day. If the
+        # The telemetry job re-observes the same 10-day window every day. If the
         # denominator counted rows instead of distinct games, the metric would
         # depend on how long the file happened to be rather than on coverage.
         once = fixture_recall([_row(game_key="G1")], [_fixture(game_key="G1")])

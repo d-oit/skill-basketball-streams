@@ -3,7 +3,7 @@
   "transcripts": [
     {
       "id": 1,
-      "output": "I checked the approved sources for the next 7 days.\n\n```json\n[\n  {\n    \"league\": \"BBL\",\n    \"teams\": [\"ALBA Berlin\", \"FC Bayern Muenchen\"],\n    \"start\": \"2026-09-16T19:00:00+02:00\",\n    \"state\": \"UNVERIFIED\",\n    \"summary\": \"BBL: ALBA Berlin vs FC Bayern Muenchen\",\n    \"url\": \"https://www.magenta.tv/tv/live-basketball-euroleague-88213\",\n    \"backend\": \"firecrawl\"\n  },\n  {\n    \"league\": \"Basketball Champions League\",\n    \"teams\": \"Lenovo Tenerife vs Telekom Baskets Bonn\",\n    \"start\": \"2026-09-17T20:00:00+02:00\",\n    \"state\": \"VERIFIED\",\n    \"league_color_id\": \"6\"\n  },\n  {\n    \"league\": \"BBL\",\n    \"teams\": [\"Hamburg Towers\"],\n    \"start\": \"not-a-date\"\n  }\n]\n```\n"
+      "output": "I checked the approved sources for the next 10 days.\n\n```json\n[\n  {\n    \"league\": \"BBL\",\n    \"teams\": [\"ALBA Berlin\", \"FC Bayern Muenchen\"],\n    \"start\": \"2026-09-16T19:00:00+02:00\",\n    \"state\": \"UNVERIFIED\",\n    \"summary\": \"BBL: ALBA Berlin vs FC Bayern Muenchen\",\n    \"url\": \"https://www.magenta.tv/tv/live-basketball-euroleague-88213\",\n    \"backend\": \"firecrawl\"\n  },\n  {\n    \"league\": \"Basketball Champions League\",\n    \"teams\": \"Lenovo Tenerife vs Telekom Baskets Bonn\",\n    \"start\": \"2026-09-17T20:00:00+02:00\",\n    \"state\": \"VERIFIED\",\n    \"league_color_id\": \"6\"\n  },\n  {\n    \"league\": \"BBL\",\n    \"teams\": [\"Hamburg Towers\"],\n    \"start\": \"not-a-date\"\n  }\n]\n```\n"
     }
   ]
 }

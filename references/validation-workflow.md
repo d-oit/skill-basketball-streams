@@ -75,15 +75,15 @@ the same checks.
 
 ## Check 5: Date/Time Within Range (check id: `dateTimeRange`)
 
-**Purpose**: Only add streams within the next 7 days.
+**Purpose**: Only add streams within the next 10 days.
 
 **Pass criteria**:
-- Event date is between today (00:00 CET) and today + 7 days (23:59 CET)
+- Event date is between today (00:00 CET) and today + 10 days (23:59 CET)
 - Kickoff time is reasonable for live sports (typically 14:00–23:00 CET)
 
 **Fail criteria**:
 - Event is in the past
-- Event is more than 7 days in the future
+- Event is more than 10 days in the future
 - Date/time cannot be determined
 
 ## Check 6: Working Link (check id: `workingLink`)
