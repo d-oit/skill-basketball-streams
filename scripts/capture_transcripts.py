@@ -659,6 +659,21 @@ def build_prompt(case: dict, *, root: Path | str = ".") -> str:
         "Use the check names exactly as `references/validation-workflow.md` "
         "names them.\n"
     )
+    if "synthesised_from" in case:
+        # An audit-regression case is graded on regression ids that are not
+        # 7-check names (`verifiedClaimed`, `regression`) and that
+        # `references/validation-workflow.md` never states — the case's own
+        # references state them instead, and that file is not even inlined
+        # here. Without this line the model obeys the sentence above, emits
+        # only 7-check names (or no Decision at all), and a valid case fails
+        # live grading run after run (issues #69, #71: one run graded wrong
+        # needles, the next no Decision line). Bare ids only: a verdict here
+        # would be the answer, which the prompt must never carry.
+        prompt += (
+            "For an audit-regression case, also report the regression ids "
+            "stated in the references below (`freeAccess`, `verifiedClaimed`, "
+            "`regression`).\n"
+        )
     for name in declared_files(case):
         path = root_path / name
         if not path.is_file():
