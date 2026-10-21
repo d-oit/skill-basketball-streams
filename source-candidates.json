@@ -53,7 +53,7 @@
     {
       "domain": "sportbild.bild.de",
       "status": "quarantined",
-      "hits": 5050,
+      "hits": 5051,
       "examples": [
         "https://sportbild.bild.de/",
         "https://sportbild.bild.de/sportmix/basketball/sport-mix/basketball-champions-league-finale-der-telekom-baskets-bonn-hier-live-sehen-83912432.sport.html",
@@ -2804,6 +2804,15 @@
       "hits": 1,
       "examples": [
         "https://www.swr.de/sport"
+      ]
+    },
+    {
+      "domain": "youtube.com",
+      "channel": "youtube.com/@sportbild-allesausserfussball",
+      "status": "quarantined",
+      "hits": 1,
+      "examples": [
+        "https://www.youtube.com/@sportbild-allesausserfussball"
       ]
     },
     {
