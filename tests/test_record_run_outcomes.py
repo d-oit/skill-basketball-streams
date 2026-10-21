@@ -26,7 +26,10 @@ from pathlib import Path
 
 from scripts import source_learning
 from scripts.record_run_outcomes import (
+    BOUNDED_FILES,
+    MAX_BYTES,
     check,
+    compact_logs,
     derive_specs,
     entry_for,
     load_ledgers,
@@ -219,3 +222,43 @@ class TestRecordThroughTheRealWriter:
         assert result.returncode == 0
         assert "nothing to learn" in result.stdout
         assert not (tmp_path / "run-log.jsonl").exists()
+
+
+class TestCompactRetention:
+    def test_compact_keeps_newest_complete_rows_under_bound(self, tmp_path):
+        log_path = tmp_path / "run-log.jsonl"
+        row = (json.dumps({"ts": "2026-10-01T00:00:00+00:00", "run_id": "old",
+                           "source": "old.example", "tier": 0, "url": "https://old.example/x",
+                           "outcome": "skip", "reason": "x" * 512}) + "\n").encode()
+        with log_path.open("wb") as handle:
+            for _ in range(2000):
+                handle.write(row)
+        assert compact_logs(tmp_path, max_bytes=100 * 1024) == 0
+        assert log_path.stat().st_size <= 100 * 1024
+        lines = log_path.read_text(encoding="utf-8").splitlines()
+        assert lines and all(json.loads(line)["source"] == "old.example" for line in lines)
+
+    def test_compact_bounds_candidates_too_not_only_run_log(self, tmp_path):
+        # The 2026-10-21 outage was run-log.jsonl; candidates.jsonl (4.7 MB and
+        # growing) is next. The policy must cover every append-only ledger.
+        assert "candidates.jsonl" in BOUNDED_FILES
+        cand_path = tmp_path / "candidates.jsonl"
+        row = (json.dumps({"ts": "2026-10-01T00:00:00+00:00", "url": "https://old.example/x"}) + "\n").encode()
+        with cand_path.open("wb") as handle:
+            for _ in range(2000):
+                handle.write(row)
+        assert compact_logs(tmp_path, max_bytes=50 * 1024) == 0
+        assert cand_path.stat().st_size <= 50 * 1024
+
+    def test_compact_cli_exits_zero(self, tmp_path):
+        result = _run("compact", "--dest", str(tmp_path))
+        assert result.returncode == 0, result.stderr
+
+    def test_every_commit_telemetry_step_compacts_before_push(self):
+        # The partial fix bound only rung-health; Phase 0 (the job that redded
+        # on 2026-10-21) and the audit job pushed without a bound.
+        text = (REPO_ROOT / ".github" / "workflows" / "runtime-daily.yml").read_text(encoding="utf-8")
+        commits = text.count("record_run_outcomes.py compact --dest .tmp/telemetry")
+        assert commits >= 3, f"expected compact in all 3 Commit telemetry steps, found {commits}"
+        assert "90 * 1024 * 1024" in text, "pre-push size guard missing"
+        assert text.count("- name: Commit telemetry") == 3

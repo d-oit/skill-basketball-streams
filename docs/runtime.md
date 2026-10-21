@@ -498,7 +498,7 @@ Lives on the orphan **`telemetry`** branch, never on `main`. One squashed commit
 
 ```
 telemetry/
-  run-log.jsonl        one row per candidate decision (append-only forever)
+  run-log.jsonl        one row per candidate decision (append-only within 40 MB bound, newest rows kept)
   candidates.jsonl     every surfaced candidate — the recall denominator
   audit.jsonl          post-hoc verdicts
   events.jsonl         created/updated events by event_id, one row per write

@@ -69,6 +69,25 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import source_learning  # noqa: E402  (the writer this script gives a caller to)
 
 LOG_NAME = "run-log.jsonl"
+# GitHub rejects any single file >= 100 MB on push. The telemetry branch holds
+# the 2026-10-21 outage as evidence: run-log.jsonl reached 101 MB and the daily
+# push was rejected with `GH001: Large files detected`. Keep every bounded
+# ledger comfortably below that (40 MB) by retaining only the newest complete
+# rows. Scoring only needs the recent window; full history belongs outside Git
+# (workflow artifacts / object storage), not in a pushed branch.
+MAX_BYTES = 40 * 1024 * 1024
+# Every append-only ledger that can grow without bound. run-log.jsonl is the
+# one that redded the build; candidates.jsonl (4.7 MB and growing) is next.
+BOUNDED_FILES = (
+    "run-log.jsonl",
+    "candidates.jsonl",
+    "fetch-attempts.jsonl",
+    "rung-attempts.jsonl",
+    "events.jsonl",
+    "audit.jsonl",
+    "fixtures.jsonl",
+    "calendar-log.jsonl",
+)
 LEDGER_NAMES = ("candidates", "fetch-attempts", "rung-attempts", "events")
 # The keys `source_learning.mode_record` emits only when they carry a value.
 OPTIONAL_KEYS = ("game_key", "backend", "rung", "llm", "state", "color_id", "event_id")
@@ -273,30 +292,59 @@ def _namespace(spec: dict, dest: Path, *, dry_run: bool) -> SimpleNamespace:
     )
 
 
+def compact_file(path: Path, *, max_bytes: int = MAX_BYTES) -> tuple[int, int]:
+    """Trim a JSONL ledger to the newest complete rows fitting in max_bytes.
+
+    Returns (kept_bytes, kept_rows). A no-op when the file is already small.
+    Whole rows only: the split is on line boundaries, never mid-row, so the
+    result stays parseable by `source_learning.read_log`.
+    """
+    if not path.is_file() or path.stat().st_size <= max_bytes:
+        return (path.stat().st_size if path.is_file() else 0, -1)
+    rows = path.read_bytes().splitlines(keepends=True)
+    kept: list[bytes] = []
+    size = 0
+    for row in reversed(rows):
+        if size + len(row) > max_bytes:
+            break
+        kept.append(row)
+        size += len(row)
+    path.write_bytes(b"".join(reversed(kept)))
+    return (size, len(kept))
+
+
+def compact_logs(dest: Path, *, max_bytes: int = MAX_BYTES) -> int:
+    """Bound every append-only ledger under dest. The single retention policy.
+
+    Called by `record` (before appending) and by each `Commit telemetry` step
+    in runtime-daily.yml (before `git add`), so an already-oversized checkout
+    and today's additions both stay pushable. Prints one OK line per compacted
+    file; silent when nothing exceeds the bound.
+    """
+    compacted = 0
+    for name in BOUNDED_FILES:
+        path = dest / name
+        if not path.is_file() or path.stat().st_size <= max_bytes:
+            continue
+        size, kept = compact_file(path, max_bytes=max_bytes)
+        print(
+            f"OK: record_run_outcomes: compacted {name} to {size} bytes "
+            f"({kept} complete rows)"
+        )
+        compacted += 1
+    return 0
+
+
 def record(dest: Path, *, now: str = "", dry_run: bool = False) -> int:
     """Append one row per derived spec through `source_learning.mode_record`.
 
     Retain a bounded recent window. GitHub rejects individual files >= 100 MB;
     this log is derived from the other ledgers and is not the canonical history.
     """
-    log_path = dest / LOG_NAME
     # Compact before appending so both an already oversized ledger and today's
     # additions remain safely below GitHub's per-file limit.
-    max_bytes = 40 * 1024 * 1024
-    if not dry_run and log_path.exists() and log_path.stat().st_size > max_bytes:
-        rows = log_path.read_bytes().splitlines(keepends=True)
-        kept: list[bytes] = []
-        size = 0
-        for row in reversed(rows):
-            if size + len(row) > max_bytes:
-                break
-            kept.append(row)
-            size += len(row)
-        log_path.write_bytes(b"".join(reversed(kept)))
-        print(
-            f"OK: record_run_outcomes: compacted {LOG_NAME} to {size} bytes "
-            f"({len(kept)} complete rows)"
-        )
+    if not dry_run:
+        compact_logs(dest)
     specs = derive_specs(load_ledgers(dest), now=now)
     if not specs:
         print(
@@ -410,12 +458,19 @@ def main() -> None:
                                help="report without appending")
     record_parser.add_argument("--json", action="store_true")
 
+    compact_parser = sub.add_parser("compact", help="bound append-only telemetry ledgers to newest rows")
+    compact_parser.add_argument("--dest", type=Path, required=True,
+                                help="telemetry directory holding the ledgers")
+    compact_parser.add_argument("--max-bytes", type=int, default=MAX_BYTES)
+
     check_parser = sub.add_parser("check", help="gate a committed run-log against its ledgers")
     check_parser.add_argument("--ledgers", type=Path, required=True,
                               help="directory holding the ledgers and run-log.jsonl")
     check_parser.add_argument("--root", type=Path, default=Path("."))
 
     args = parser.parse_args()
+    if args.mode == "compact":
+        sys.exit(compact_logs(args.dest, max_bytes=args.max_bytes))
     if args.mode == "record":
         if args.json:
             try:

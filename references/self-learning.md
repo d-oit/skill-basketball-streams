@@ -5,7 +5,7 @@ loops, all backed by append-only files:
 
 | Loop | Command | Artifact | Auto-applied? |
 |---|---|---|---|
-| Run log | `scripts/record_run_outcomes.py record --dest .tmp/telemetry` (runtime) / `scripts/source_learning.py record …` or `record-leads …` | `telemetry/run-log.jsonl` on the `telemetry` branch | yes (append only) |
+| Run log | `scripts/record_run_outcomes.py record --dest .tmp/telemetry` (runtime) / `scripts/source_learning.py record …` or `record-leads …` | `telemetry/run-log.jsonl` on the `telemetry` branch | yes (append only within 40 MB bound; `compact` keeps newest rows, 2026-10-21 GH001 outage) |
 | Post-hoc audit | `scripts/audit_events.py --events … --evidence …` | `logs/audit.jsonl` | yes — relabels events (§6) |
 | Source scoring | `scripts/source_learning.py score --root .` | stdout / `--json` | no — informs tier order |
 | New-source discovery | `scripts/source_learning.py candidates --root .` | `logs/source-candidates.json` (`"status": "quarantined"`) | only on evidence from a live write (`approve_source.py`) |

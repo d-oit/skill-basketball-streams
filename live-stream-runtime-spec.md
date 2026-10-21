@@ -523,7 +523,7 @@ unbounded. Resolution:
 
 | File | Policy |
 |---|---|
-| `run-log.jsonl`, `candidates.jsonl`, `events.jsonl`, `audit.jsonl`, `rung-attempts.jsonl` | **Never pruned.** Append-only forever — this is the evidence trail and it is what makes precision/recall chartable across seasons |
+| `run-log.jsonl`, `candidates.jsonl`, `events.jsonl`, `audit.jsonl`, `rung-attempts.jsonl`, `fetch-attempts.jsonl`, `fixtures.jsonl`, `calendar-log.jsonl` | **Bounded to 40 MB of newest complete rows.** Append-only within the bound — GitHub rejects any single file >= 100 MB on push (2026-10-21 outage: run-log.jsonl hit 101 MB, GH001). `scripts/record_run_outcomes.py compact` enforces it before every commit; full history belongs outside Git (artifacts / object storage) |
 | `metrics.json`, `sources.json`, `rungs.json` | **Rewritten** each run from the JSONL (current-state snapshots, not history) |
 | Growth control | **Annual roll-up**: on the first run after 1 January, full-year files are gzipped to `telemetry/archive/<year>/*.jsonl.gz` and the active file is truncated to the current year. Roll-ups keep the raw rows while bounding the hot file size |
 | Size guard | If any active JSONL exceeds ~5 MB, open an issue recommending a roll-up rather than failing the run |
