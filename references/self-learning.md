@@ -204,7 +204,9 @@ Three rules make this safe:
 ### Audit-regression check ids
 
 When a synthesised regression case comes from an `INCONCLUSIVE` audit of an
-event the runtime had already published as `VERIFIED`, it is graded on three
+event the runtime had already published as `VERIFIED` — once its broadcast had
+started, never before tip-off, when INCONCLUSIVE is the correct outcome and
+synthesises nothing — it is graded on three
 ids. They are the vocabulary the runtime's graders match, so they are stated
 here as ids rather than left to prose:
 

@@ -22,11 +22,13 @@ Three misjudgement classes are recognised:
 |---|---|---|
 | `WRONG`, reason mentions paid access | Check 1 (Free Access) passed on evidence that never proved entitlement | `freeAccess` should have been `FAIL` |
 | `WRONG`, reason mentions no live broadcast | Check 7 (Direct Stream) passed on a broadcast that never happened | `directStreamVerification` should have been `FAIL` |
-| `INCONCLUSIVE` on an event that was `VERIFIED` | the pipeline claimed confirmation it never had | `freeAccess` should have been `FAIL` and `verifiedClaimed` `FAIL` |
+| `INCONCLUSIVE` on an event that was `VERIFIED`, once the broadcast had started | the pipeline claimed confirmation it never had | `freeAccess` should have been `FAIL` and `verifiedClaimed` `FAIL` |
 
 That third class matters most: "a `WRONG` event is never shown as `VERIFIED`
 before the audit" is a 100 % requirement, so over-claiming is a hard failure
-even when the broadcast later turns out to have been fine.
+even when the broadcast later turns out to have been fine. It starts at
+tip-off: an audit that ran before the game cannot observe anything, so its
+INCONCLUSIVE is the correct outcome and synthesises nothing.
 
 Every synthesised case carries a `synthesised_from` key recording the audit
 event id, and re-running is idempotent: a case whose prompt already exists is
@@ -136,9 +138,50 @@ def classify(verdict: dict) -> str | None:
         # confirm. Over-claiming is the failure, regardless of what the truth
         # later turned out to be.
         if prior == "VERIFIED":
+            if _is_pregame_inconclusive(verdict):
+                # The audit ran before tip-off: nothing was observable yet, so
+                # INCONCLUSIVE is the correct outcome, not a misjudgement.
+                # Synthesising an overclaim from it asserts a fault nobody
+                # demonstrated — absence of evidence presented as evidence —
+                # and the live model then refuses the needles run after run
+                # while the loop files an issue a day instead of learning.
+                return None
             return CLASS_OVERCLAIM
         return None
     return None
+
+
+def _moment_utc(value: object) -> datetime | None:
+    """Parse one ISO-8601 timestamp, or None rather than a guess."""
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        moment = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if moment.tzinfo is None:
+        moment = moment.replace(tzinfo=timezone.utc)
+    return moment.astimezone(timezone.utc)
+
+
+def _game_start_utc(verdict: dict) -> datetime | None:
+    """Tip-off from the trailing `|ISO` segment of `game_key` (`%Y-%m-%dT%H:%MZ`)."""
+    key = str(verdict.get("game_key") or "")
+    stamp = key.rsplit("|", 1)[-1].strip() if "|" in key else ""
+    return _moment_utc(stamp)
+
+
+def _is_pregame_inconclusive(verdict: dict) -> bool:
+    """True only on positive evidence the audit ran before tip-off.
+
+    A missing or unparseable timestamp is a data gap, not evidence of anything:
+    it keeps the current behaviour (synthesize) rather than silently dropping a
+    misjudgement the ledger actually recorded.
+    """
+    start = _game_start_utc(verdict)
+    audited = _moment_utc(verdict.get("ts"))
+    return start is not None and audited is not None and start > audited
 
 
 def _context_for(verdict: dict, ledger_rows: list[dict]) -> dict:
