@@ -145,6 +145,54 @@ class TestBuildPrompt:
         # The check *vocabulary* is fair to point at; the verdict is not.
         assert "references/validation-workflow.md" in prompt
 
+    def test_regression_case_prompt_names_the_regression_ids(self):
+        """An audit-regression case is graded on ids that are not 7-check
+        names (`verifiedClaimed`, `regression`), which
+        `references/validation-workflow.md` never states — and that file is
+        not even inlined for these cases. The prompt told the model to use
+        validation-workflow.md's names only, so live grading failed the same
+        valid case twice (issues #69, #71: wrong needles, then no Decision
+        line at all). The prompt must name the regression ids without
+        carrying a verdict (bare ids: `name=PASS|FAIL` would be the answer).
+        """
+        prompt = build_prompt(
+            {
+                "id": 48,
+                "prompt": "some audit regression",
+                "expected_output": (
+                    "Decision=SKIP; reason=free access was never confirmed; "
+                    "checks: freeAccess=FAIL, verifiedClaimed=FAIL, "
+                    "regression=PASS"
+                ),
+                "assertions": [
+                    "freeAccess expected FAIL",
+                    "verifiedClaimed expected FAIL",
+                    "regression expected PASS",
+                ],
+                "files": [
+                    "references/calendar-setup.md",
+                    "references/self-learning.md",
+                ],
+                "synthesised_from": "evt-1",
+            }
+        )
+        assert "references/validation-workflow.md" in prompt
+        assert "`verifiedClaimed`" in prompt
+        assert "`regression`" in prompt
+        assert "verifiedClaimed=FAIL" not in prompt
+        assert "regression=PASS" not in prompt
+        assert "Decision=SKIP" not in prompt
+
+    def test_non_regression_prompt_is_unchanged(self):
+        """Hand-written cases keep the 7-check-only instruction: the
+        regression line must not leak a vocabulary those cases are not
+        graded on."""
+        prompt = build_prompt(
+            {"id": 3, "prompt": "some input", "expected_output": "Decision=SKIP"}
+        )
+        assert "audit-regression" not in prompt
+        assert "`verifiedClaimed`" not in prompt
+
     def test_the_case_references_are_inlined(self):
         """`evals[].files` is the reference a case is decided from, and it used
         to be **write-only** — `synthesise_eval_case.py` emitted it, its test
