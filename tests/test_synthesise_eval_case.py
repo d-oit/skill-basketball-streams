@@ -122,6 +122,43 @@ class TestClassify:
             _verdict(verdict="INCONCLUSIVE", prior_state="VERIFIED")
         ) == CLASS_OVERCLAIM
 
+    def test_pregame_inconclusive_is_not_a_misjudgement(self):
+        """The audit ran before tip-off: nothing was observable yet, so
+        INCONCLUSIVE is the correct outcome. Synthesising an overclaim from it
+        asserts a fault nobody demonstrated — the loop then files an issue a
+        day while the live model refuses the needles (issues #69, #71, #75-#77,
+        #80: pre-game audits of 2026-10-24 games re-synthesised daily)."""
+        assert classify(
+            _verdict(
+                verdict="INCONCLUSIVE",
+                prior_state="VERIFIED",
+                game_key="BBL|X|Y|2026-10-24T18:00Z",
+                ts="2026-10-20T18:12:04.209089+00:00",
+            )
+        ) is None
+
+    def test_inprogress_inconclusive_is_still_an_overclaim(self):
+        """Tip-off has passed: free access could and should have been confirmed."""
+        assert classify(
+            _verdict(
+                verdict="INCONCLUSIVE",
+                prior_state="VERIFIED",
+                game_key="BBL|X|Y|2026-10-24T18:00Z",
+                ts="2026-10-24T19:00:00+00:00",
+            )
+        ) == CLASS_OVERCLAIM
+
+    def test_missing_timestamps_keep_the_current_behaviour(self):
+        """A data gap is not evidence of pre-game: without both moments the
+        rule cannot fire, so synthesis proceeds as before rather than silently
+        dropping a misjudgement."""
+        assert classify(
+            _verdict(verdict="INCONCLUSIVE", prior_state="VERIFIED", ts="")
+        ) == CLASS_OVERCLAIM
+        assert classify(
+            _verdict(verdict="INCONCLUSIVE", prior_state="VERIFIED", game_key="")
+        ) == CLASS_OVERCLAIM
+
     def test_inconclusive_on_an_unverified_event_is_clean(self):
         assert classify(_verdict(verdict="INCONCLUSIVE", prior_state="UNVERIFIED")) is None
 

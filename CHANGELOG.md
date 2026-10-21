@@ -5,6 +5,19 @@ All notable changes to `skill-basketball-streams` will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.1] - 2026-10-21
+
+### Fixed
+
+- **Self-improvement no longer synthesises overclaim cases from pre-game audits.**
+  An audit that runs before tip-off cannot observe anything, so its
+  `INCONCLUSIVE` is the correct outcome — not a misjudgement. The synthesiser
+  treated every `INCONCLUSIVE`-on-`VERIFIED` row as an overclaim, re-emitted the
+  same two cases daily, and the live model refused their needles run after run
+  while the loop filed a red-gate issue a day instead of learning. Overclaim
+  synthesis now starts at tip-off (game start parsed from `game_key` versus the
+  audit timestamp); finished broadcasts are unaffected.
+
 ## [1.13.0] - 2026-10-21
 
 ### Changed
