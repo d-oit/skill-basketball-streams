@@ -409,13 +409,76 @@ class TestLadder:
         def fake_request(method, url, *, payload=None, headers=None, timeout=60):
             if "generativelanguage" in url:
                 return 429, None, "HTTP 429: RESOURCE_EXHAUSTED"
-            return 200, {"choices": [{"message": {"content": "from-openrouter"}}]}, ""
+            return (
+                200,
+                {"choices": [{"message": {"content": "Decision=SKIP; checks: a=FAIL"}}]},
+                "",
+            )
 
         monkeypatch.setattr(ct, "_request", fake_request)
         served: list[str] = []
         output = ct.run_ladder("prompt", _args(runner="ladder"), served)
-        assert output == "from-openrouter"
+        assert output == "Decision=SKIP; checks: a=FAIL"
         assert served == ["openrouter"]
+
+    def test_a_rung_without_a_decision_does_not_stop_failover(self, monkeypatch):
+        """A transcript with no `Decision=` line is a failed measurement, not
+        a judgment: the grader requires that line, so accepting the output
+        would both stop the failover and red the gate on nothing (issues #69,
+        #71: the first rung answered twice with no usable Decision, and the
+        rung that could have served was never tried)."""
+        monkeypatch.setenv("GEMINI_API_KEY", "k")
+        monkeypatch.setenv("OPENROUTER_API_KEY", "k")
+
+        def first_rung_prose(method, url, *, payload=None, headers=None, timeout=60):
+            # The ladder serves openrouter before gemini, so the prose comes
+            # from the first rung and the Decision from the second.
+            if "generativelanguage" in url:
+                body = {
+                    "candidates": [
+                        {"content": {"parts": [{"text": "Decision=SKIP; checks: a=FAIL"}]}}
+                    ]
+                }
+                return 200, body, ""
+            return (
+                200,
+                {"choices": [{"message": {"content": "some prose with no decision in it"}}]},
+                "",
+            )
+
+        monkeypatch.setattr(ct, "_request", first_rung_prose)
+        served: list[str] = []
+        output = ct.run_ladder("prompt", _args(runner="ladder"), served)
+        assert output == "Decision=SKIP; checks: a=FAIL"
+        assert served == ["gemini"]
+        assert "no Decision" in ct.LAST_ERRORS["openrouter"]
+
+    def test_all_rungs_without_a_decision_is_a_total_failure(self, monkeypatch):
+        """Every rung answering prose is every rung failing: no transcript, a
+        named reason per rung, and nothing served."""
+        monkeypatch.setenv("GEMINI_API_KEY", "k")
+        monkeypatch.setenv("OPENROUTER_API_KEY", "k")
+
+        def all_prose(method, url, *, payload=None, headers=None, timeout=60):
+            if "generativelanguage" in url:
+                body = {
+                    "candidates": [
+                        {"content": {"parts": [{"text": "gemini prose without a decision"}]}}
+                    ]
+                }
+                return 200, body, ""
+            return (
+                200,
+                {"choices": [{"message": {"content": "openrouter prose without a decision"}}]},
+                "",
+            )
+
+        monkeypatch.setattr(ct, "_request", all_prose)
+        served: list[str] = []
+        assert ct.run_ladder("prompt", _args(runner="ladder"), served) == ""
+        assert served == []
+        assert "no Decision" in ct.LAST_ERRORS["gemini"]
+        assert "no Decision" in ct.LAST_ERRORS["openrouter"]
 
     def test_total_failure_records_every_rung_with_its_own_reason(self, monkeypatch):
         monkeypatch.setenv("GEMINI_API_KEY", "k")

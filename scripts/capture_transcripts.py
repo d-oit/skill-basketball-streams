@@ -57,6 +57,11 @@ from pathlib import Path
 DEFAULT_OUT = "tests/fixtures/runtime_transcripts.json"
 RUNNERS = ("gemini", "opencode", "openrouter", "ladder", "command", "replay")
 TIMEOUT_SECONDS = 900
+
+try:  # direct CLI execution: `python3 scripts/capture_transcripts.py`
+    from runtime_eval import DECISION_MARKER  # noqa: E402
+except ImportError:  # imported as a package module, e.g. scripts.capture_transcripts
+    from scripts.runtime_eval import DECISION_MARKER  # type: ignore[no-redef]
 # $0 by construction: the /free router picks from the no-cost model list.
 OPENROUTER_DEFAULT_MODEL = "openrouter/free"
 OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
@@ -550,6 +555,14 @@ def run_ladder(prompt: str, args, served: list[str]) -> str:
 
     `opencode` is skipped without `--attach`: the CLI path needs a live backend,
     and a rung that was never reachable is not a rung that failed.
+
+    A rung whose output carries no `Decision=` line is skipped the same way:
+    the grader (`runtime_eval`) requires that line, so such an output is a
+    failed measurement rather than a judgment. Accepting it would both stop
+    the failover and red the gate on nothing (issues #69, #71: the first rung
+    answered twice with no usable Decision, and the openrouter rung that could
+    have served was never tried). The skip is recorded per rung like any other
+    rung failure, so the diagnosis still names every rung that was tried.
     """
     for rung in LADDER:
         if rung == "opencode" and not args.attach:
@@ -560,9 +573,15 @@ def run_ladder(prompt: str, args, served: list[str]) -> str:
             output = run_opencode(prompt, args)
         else:
             output = run_openrouter(prompt, args)
-        if output.strip():
-            served.append(rung)
-            return output
+        if not output.strip():
+            continue
+        if DECISION_MARKER not in output:
+            _note_error(
+                rung, "output carried no Decision= line, so the ladder moves on"
+            )
+            continue
+        served.append(rung)
+        return output
     return ""
 
 
