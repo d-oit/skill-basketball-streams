@@ -11,11 +11,11 @@
   "fixture_recall": {
     "dropped": 0,
     "duplicates": 0,
-    "fixture_recall": 0.03,
-    "fixtures": 66,
-    "rows": 66,
+    "fixture_recall": 0.029,
+    "fixtures": 70,
+    "rows": 70,
     "surfaced": 2,
-    "unseen": 64,
+    "unseen": 68,
     "unseen_keys": [
       "BBL|ALBA BERLIN|BMA365 Bamberg Baskets|2026-10-19T18:00Z",
       "BBL|ALBA BERLIN|VET-CONCEPT Gladiators Trier|2026-10-10T18:00Z",
@@ -45,6 +45,7 @@
       "Basketball Champions League|AEK BC|Windrose Giants Antwerp|2026-10-21T16:00Z",
       "Basketball Champions League|ALBA BERLIN|Igokea m:tel|2026-10-13T18:00Z",
       "Basketball Champions League|ALBA BERLIN|SK Slavia Praha ERA NBK|2026-10-07T16:00Z",
+      "Basketball Champions League|ALBA BERLIN|Surne Bilbao|2026-10-28T19:00Z",
       "Basketball Champions League|Asisa Joventut|Bnei Penlink Herzliya|2026-10-06T18:30Z",
       "Basketball Champions League|Asisa Joventut|Telekom Baskets Bonn|2026-10-21T18:00Z",
       "Basketball Champions League|BC Juventus Utena|Pallacanestro Reggiana|2026-10-21T18:00Z",
@@ -58,6 +59,7 @@
       "Basketball Champions League|Cholet Basket|Hapoel Maoz Daniel Holon|2026-10-06T15:45Z",
       "Basketball Champions League|Cholet Basket|Hapoel Maoz Daniel Holon|2026-10-06T16:30Z",
       "Basketball Champions League|Cholet Basket|RASTA Vechta|2026-10-14T18:00Z",
+      "Basketball Champions League|Cholet Basket|Spartak Office Shoes|2026-10-28T19:00Z",
       "Basketball Champions League|Cibona|Galatasaray MCT Technic|2026-10-06T16:00Z",
       "Basketball Champions League|Cibona|Galatasaray MCT Technic|2026-10-06T18:00Z",
       "Basketball Champions League|Cibona|Legia Warszawa|2026-10-20T18:00Z",
@@ -66,6 +68,7 @@
       "Basketball Champions League|Falco-Vulcano Szombathely|Salon Vilpas|2026-10-20T16:00Z",
       "Basketball Champions League|Falco-Vulcano Szombathely|Windrose Giants Antwerp|2026-10-07T18:00Z",
       "Basketball Champions League|Galatasaray MCT Technic|SIG Strasbourg|2026-10-20T17:00Z",
+      "Basketball Champions League|Hapoel Maoz Daniel Holon|RASTA Vechta|2026-10-28T18:00Z",
       "Basketball Champions League|Hapoel Maoz Daniel Holon|Spartak Office Shoes|2026-10-14T18:00Z",
       "Basketball Champions League|Igokea m:tel|SK Slavia Praha ERA NBK|2026-10-27T19:00Z",
       "Basketball Champions League|Igokea m:tel|Surne Bilbao|2026-10-06T18:00Z",
@@ -79,14 +82,15 @@
       "Basketball Champions League|Peristeri Betsson|UCAM Murcia|2026-10-27T19:30Z",
       "Basketball Champions League|RASTA Vechta|Spartak Office Shoes|2026-10-07T18:00Z",
       "Basketball Champions League|Rytas Vilnius|Sabah BC|2026-10-06T16:30Z",
+      "Basketball Champions League|Rytas Vilnius|Trabzonspor|2026-10-28T17:30Z",
       "Basketball Champions League|SK Slavia Praha ERA NBK|Surne Bilbao|2026-10-14T18:00Z",
       "Basketball Champions League|Sabah BC|Trabzonspor|2026-10-14T16:00Z"
     ]
   },
   "recall": {
     "captured": 0,
-    "eligible": 787,
-    "missed": 787,
+    "eligible": 793,
+    "missed": 793,
     "missed_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -121,6 +125,7 @@
       "https://basketballimtv.de/live/2026/telekom-baskets-bonn-science-city-jena-64950.html",
       "https://basketballimtv.de/live/2026/telekom-baskets-bonn-syntainics-mbc-64927.html",
       "https://basketballimtv.de/live/2026/wuerzburg-baskets-telekom-baskets-bonn-64932.html",
+      "https://basketballimtv.de/teams/bundesliga.html",
       "https://basketballimtv.de/tv/magentasport.html",
       "https://basketballireland.tv/home",
       "https://basketballsphere.com/en/watch-euroleague-2026-27-live-for-free/",
@@ -154,6 +159,7 @@
       "https://euroleague.tv/live/249564",
       "https://euroleague.tv/live/291818",
       "https://euroleague.tv/live/291823",
+      "https://fansided.com/posts/euroleague-live-streams-how-to-watch-the-2023-24-euroleague-season-01ha0tqg9fy0",
       "https://fcbayern.com/basketball/de/news/2023-24/08/basketball-wm-live-deutschland-australien-live-tv-livestream-sehen",
       "https://fcbayern.com/basketball/de/news/2026-27/09/free-tv-bayern-berlin",
       "https://fcbayern.com/basketball/de/news/artikel/fc-bayern-basketball-live-tv-stream-uebertragung",
@@ -265,6 +271,7 @@
       "https://sport-tv-guide.live/event/live-basketball-euroleague/1628276",
       "https://sport-tv-guide.live/event/watch-live-sport-on-tv/1628233",
       "https://sport-tv-guide.live/event/watch-live-sport-on-tv/1628234",
+      "https://sport-tv-guide.live/tournament/basketball/europe/champions-league",
       "https://sport-tv-guide.live/tournament/basketball/europe/euroleague",
       "https://sport.bild.de/basketball/bbl-pokal/ma11730604/fc-bayern-muenchen_bamberg-baskets/liveticker/",
       "https://sportbild.bild.de/sportmix/basketball/auftakt-der-bbl-so-sehen-sie-alba-berlin-niners-chemnitz-live-im-tv-stream-6aa94503176f7c20b935dc43",
@@ -347,6 +354,7 @@
       "https://www.365scores.com/en-us/basketball/league/bundesliga-27",
       "https://www.365scores.com/en-us/basketball/team/bayern-munich-8648",
       "https://www.9now.com.au/mens-national-basketball-nbl-blitz",
+      "https://www.aiscore.com/basketball/tournament-basketball-bundesliga/48vrqw9s3ij7n2o",
       "https://www.aiscore.com/basketball/tournament-basketball-champions-league/0m2q19srgipk6xw",
       "https://www.albaberlin.de/frauen/saison/liveuebertragungen",
       "https://www.albaberlin.de/frauen/saison/liveuebertragungen/",
@@ -821,6 +829,7 @@
       "https://www.youtube.com/watch?v=OGYdug3P1ns",
       "https://www.youtube.com/watch?v=PDTjcSK8Pdc",
       "https://www.youtube.com/watch?v=Te-umIjSnWs",
+      "https://www.youtube.com/watch?v=UedMqqmaP44",
       "https://www.youtube.com/watch?v=WuV5w2L5qGw",
       "https://www.youtube.com/watch?v=Wz-D_Wsr2zg",
       "https://www.youtube.com/watch?v=X7_I_xPsLHE",
@@ -870,6 +879,7 @@
       "https://www.youtube.com/watch?v=ueFpASwTpgw",
       "https://www.youtube.com/watch?v=vQ1LAiNis3k",
       "https://www.youtube.com/watch?v=wAyC8M2R3JA",
+      "https://www.youtube.com/watch?v=xGE1Qvl1aUM",
       "https://www.youtube.com/watch?v=xiNFxDlpCpc",
       "https://www.youtube.com/watch?v=yardlrRgAnA",
       "https://www.youtube.com/watch?v=zNU44AAcyOc",
@@ -877,9 +887,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 13815,
-    "unique_games": 1209,
-    "unverifiable": 787,
+    "rows": 14094,
+    "unique_games": 1219,
+    "unverifiable": 793,
     "unverifiable_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -914,6 +924,7 @@
       "https://basketballimtv.de/live/2026/telekom-baskets-bonn-science-city-jena-64950.html",
       "https://basketballimtv.de/live/2026/telekom-baskets-bonn-syntainics-mbc-64927.html",
       "https://basketballimtv.de/live/2026/wuerzburg-baskets-telekom-baskets-bonn-64932.html",
+      "https://basketballimtv.de/teams/bundesliga.html",
       "https://basketballimtv.de/tv/magentasport.html",
       "https://basketballireland.tv/home",
       "https://basketballsphere.com/en/watch-euroleague-2026-27-live-for-free/",
@@ -947,6 +958,7 @@
       "https://euroleague.tv/live/249564",
       "https://euroleague.tv/live/291818",
       "https://euroleague.tv/live/291823",
+      "https://fansided.com/posts/euroleague-live-streams-how-to-watch-the-2023-24-euroleague-season-01ha0tqg9fy0",
       "https://fcbayern.com/basketball/de/news/2023-24/08/basketball-wm-live-deutschland-australien-live-tv-livestream-sehen",
       "https://fcbayern.com/basketball/de/news/2026-27/09/free-tv-bayern-berlin",
       "https://fcbayern.com/basketball/de/news/artikel/fc-bayern-basketball-live-tv-stream-uebertragung",
@@ -1058,6 +1070,7 @@
       "https://sport-tv-guide.live/event/live-basketball-euroleague/1628276",
       "https://sport-tv-guide.live/event/watch-live-sport-on-tv/1628233",
       "https://sport-tv-guide.live/event/watch-live-sport-on-tv/1628234",
+      "https://sport-tv-guide.live/tournament/basketball/europe/champions-league",
       "https://sport-tv-guide.live/tournament/basketball/europe/euroleague",
       "https://sport.bild.de/basketball/bbl-pokal/ma11730604/fc-bayern-muenchen_bamberg-baskets/liveticker/",
       "https://sportbild.bild.de/sportmix/basketball/auftakt-der-bbl-so-sehen-sie-alba-berlin-niners-chemnitz-live-im-tv-stream-6aa94503176f7c20b935dc43",
@@ -1140,6 +1153,7 @@
       "https://www.365scores.com/en-us/basketball/league/bundesliga-27",
       "https://www.365scores.com/en-us/basketball/team/bayern-munich-8648",
       "https://www.9now.com.au/mens-national-basketball-nbl-blitz",
+      "https://www.aiscore.com/basketball/tournament-basketball-bundesliga/48vrqw9s3ij7n2o",
       "https://www.aiscore.com/basketball/tournament-basketball-champions-league/0m2q19srgipk6xw",
       "https://www.albaberlin.de/frauen/saison/liveuebertragungen",
       "https://www.albaberlin.de/frauen/saison/liveuebertragungen/",
@@ -1614,6 +1628,7 @@
       "https://www.youtube.com/watch?v=OGYdug3P1ns",
       "https://www.youtube.com/watch?v=PDTjcSK8Pdc",
       "https://www.youtube.com/watch?v=Te-umIjSnWs",
+      "https://www.youtube.com/watch?v=UedMqqmaP44",
       "https://www.youtube.com/watch?v=WuV5w2L5qGw",
       "https://www.youtube.com/watch?v=Wz-D_Wsr2zg",
       "https://www.youtube.com/watch?v=X7_I_xPsLHE",
@@ -1663,6 +1678,7 @@
       "https://www.youtube.com/watch?v=ueFpASwTpgw",
       "https://www.youtube.com/watch?v=vQ1LAiNis3k",
       "https://www.youtube.com/watch?v=wAyC8M2R3JA",
+      "https://www.youtube.com/watch?v=xGE1Qvl1aUM",
       "https://www.youtube.com/watch?v=xiNFxDlpCpc",
       "https://www.youtube.com/watch?v=yardlrRgAnA",
       "https://www.youtube.com/watch?v=zNU44AAcyOc",
@@ -1670,30 +1686,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "",
+  "run_id": "2026-10-21T10:06Z",
   "source": {
     "audit_rows": 18,
-    "candidates_rows": 13815,
-    "fixtures_rows": 66
+    "candidates_rows": 14094,
+    "fixtures_rows": 70
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 2,
-        "precision": 1.0,
-        "rows": 2,
-        "verified": 2,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-10-20T15:33Z",
-      "unique_games": 0
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -1914,7 +1913,24 @@
       "rows": 0,
       "run_id": "2026-10-20T18:12Z",
       "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 130,
+      "missed": 130,
+      "recall": 0.0,
+      "rows": 279,
+      "run_id": "2026-10-21T10:04Z",
+      "unique_games": 243
     }
   ],
-  "ts": "2026-10-20T18:12:04.299468+00:00"
+  "ts": "2026-10-21T10:06:30.958975+00:00"
 }
