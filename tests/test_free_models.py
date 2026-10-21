@@ -39,6 +39,14 @@ CATALOGUE = {
     "opencode": {
         "id": "opencode",
         "models": {
+            "deepseek-v4.1-flash-free": {
+                "id": "deepseek-v4.1-flash-free",
+                "cost": {"input": 0, "output": 0, "cache_read": 0, "cache_write": 0},
+                "release_date": "2026-10-01",
+                "reasoning": True,
+                "tool_call": True,
+                "limit": {"context": 1000000},
+            },
             "longcat-2.5-preview-free": {
                 "id": "longcat-2.5-preview-free",
                 "cost": {"input": 0, "output": 0, "cache_read": 0, "cache_write": 0},
@@ -105,6 +113,7 @@ class TestFreeIsDecidedByCost:
         ids = [m["id"] for m in free_models.free_models(CATALOGUE)]
         assert "some-paid-model" not in ids
         assert ids == [
+            "deepseek-v4.1-flash-free",
             "longcat-2.5-preview-free",
             "muse-spark-1.3-contributor-free",
             "big-pickle",
@@ -116,6 +125,7 @@ class TestTheListing:
         """Most useful exactly when the pin is ageing."""
         ids = [m["id"] for m in free_models.free_models(CATALOGUE)]
         assert ids == [
+            "deepseek-v4.1-flash-free",
             "longcat-2.5-preview-free",
             "muse-spark-1.3-contributor-free",
             "big-pickle",
@@ -139,7 +149,7 @@ class TestThePinnedStatus:
     def test_it_reports_a_pin_that_is_still_free(self):
         status = free_models.pinned_status(free_models.free_models(CATALOGUE))
         assert status["status"] == "free"
-        assert status["released"] == "2026-09-25"
+        assert status["released"] == "2026-10-01"
         assert status["tool_call"] is True
 
     def test_it_reports_a_pin_that_has_gone_paid(self):
@@ -160,8 +170,10 @@ class TestThePinnedStatus:
         """One pin, in one place, checked — not two that drift.
 
         The pin changed on 2026-09-29 (`big-pickle` -> `longcat-2.5-preview-free`)
-        and this test is what makes a second copy of the id a failure rather than
-        a silent divergence.
+        and again on 2026-10-21 (`longcat-2.5-preview-free` ->
+        `deepseek-v4.1-flash-free`, free per the opencode.ai models page, after
+        longcat failed its PONG probe 3/3 on a dispatch). This test is what makes
+        a second copy of the id a failure rather than a silent divergence.
         """
         from scripts.llm_model import ZEN_DEFAULT_MODEL, resolve_model
 
@@ -209,7 +221,9 @@ class TestTheCli:
         captured = capsys.readouterr()
         parsed = json.loads(captured.out)  # raises if a human line leaked
         assert parsed["provider"] == "opencode"
-        assert len(parsed["free"]) == 3
+        # Four since deepseek-v4.1-flash-free joined the recorded fixture
+        # (2026-10-21 pin move after longcat failed its probe 3/3).
+        assert len(parsed["free"]) == 4
         assert "OK: free_models:" in captured.err
         assert "OK: free_models:" not in captured.out
 

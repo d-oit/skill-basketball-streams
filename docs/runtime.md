@@ -860,7 +860,7 @@ CLI probe and skill run read the same `steps.llm.outputs.model` value:
 | Situation | Model |
 |---|---|
 | `vars.LLM_MODEL` set | Used verbatim as the OpenCode `provider/model` id |
-| Pin unset | `opencode/longcat-2.5-preview-free` |
+| Pin unset | `opencode/deepseek-v4.1-flash-free` (fallback `opencode/big-pickle` on probe failure) |
 
 ```bash
 # What would this repository actually run? Reports rung, model and reason.

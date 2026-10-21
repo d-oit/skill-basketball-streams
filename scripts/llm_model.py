@@ -115,7 +115,7 @@ ZEN_DEFAULT_MODEL = "big-pickle"
 # extraction step that reported the fault as a missing output contract. The
 # contract was fine. The model was not.
 #
-# `longcat-2.5-preview-free` is the newest free id as of 2026-09-29 with a 1M
+# `deepseek-v4.1-flash-free` is the pin as of 2026-10-21 (free per opencode.ai models page, 2026-10-22 read). `longcat-2.5-preview-free` was the pin 2026-09-29 to 2026-10-21 with a 1M
 # context, and it answers the candidate-block contract correctly (measured).
 # `scripts/free_models.py --pinned` reports the current free catalogue and
 # whether this pin is still free, so ageing is visible without anyone
@@ -127,7 +127,13 @@ ZEN_DEFAULT_MODEL = "big-pickle"
 # rather than a selection that follows the live catalogue — if this id stops
 # answering, the failure is a red step naming a model, not a silent change of
 # model under a pinned expectation.
-ZEN_DEFAULT_MODEL = "longcat-2.5-preview-free"
+ZEN_DEFAULT_MODEL = "deepseek-v4.1-flash-free"
+# Fallback free model from the same catalogue
+# (https://opencode.ai/v2/docs/console/models/ — Big Pickle, id `big-pickle`).
+# Proven to answer the PONG probe with no credential; used only when the pin
+# fails its probe, so a dead preview id degrades to a working model instead of
+# redding Phase 1/2.
+FALLBACK_MODEL = "opencode/big-pickle"
 
 
 class Resolution(NamedTuple):
@@ -225,9 +231,13 @@ def main() -> None:
     resolution = resolve_model(pin, os.environ)
 
     # stdout is the payload: exactly the lines `>> $GITHUB_OUTPUT` will consume.
+    # `fallback_model` is the degraded-but-working id the probe tries when the
+    # pin fails (2026-10-21: longcat 3/3 PONG timeouts). A fourth line is a
+    # contract change; tests/test_llm_model.py pins the count.
     print(f"model={_output_safe(resolution.model)}")
     print(f"rung={_output_safe(resolution.rung)}")
     print(f"reason={_output_safe(resolution.reason)}")
+    print(f"fallback_model={_output_safe(FALLBACK_MODEL)}")
 
     print(
         f"OK: llm_model: rung {resolution.rung} -> {resolution.model} "

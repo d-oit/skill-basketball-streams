@@ -292,12 +292,16 @@ def _namespace(spec: dict, dest: Path, *, dry_run: bool) -> SimpleNamespace:
     )
 
 
-def compact_file(path: Path, *, max_bytes: int = MAX_BYTES) -> tuple[int, int]:
+def compact_file(
+    path: Path, *, max_bytes: int = MAX_BYTES, archive_dir: Path | None = None
+) -> tuple[int, int]:
     """Trim a JSONL ledger to the newest complete rows fitting in max_bytes.
 
     Returns (kept_bytes, kept_rows). A no-op when the file is already small.
     Whole rows only: the split is on line boundaries, never mid-row, so the
-    result stays parseable by `source_learning.read_log`.
+    result stays parseable by `source_learning.read_log`. Dropped (older) rows
+    are appended to `archive_dir/<name>` when given — outside the committed
+    worktree, so full history survives in workflow artifacts, never in a push.
     """
     if not path.is_file() or path.stat().st_size <= max_bytes:
         return (path.stat().st_size if path.is_file() else 0, -1)
@@ -309,6 +313,11 @@ def compact_file(path: Path, *, max_bytes: int = MAX_BYTES) -> tuple[int, int]:
             break
         kept.append(row)
         size += len(row)
+    dropped = rows[: len(rows) - len(kept)]
+    if archive_dir is not None and dropped:
+        archive_dir.mkdir(parents=True, exist_ok=True)
+        with (archive_dir / path.name).open("ab") as handle:
+            handle.writelines(dropped)
     path.write_bytes(b"".join(reversed(kept)))
     return (size, len(kept))
 
@@ -322,11 +331,13 @@ def compact_logs(dest: Path, *, max_bytes: int = MAX_BYTES) -> int:
     file; silent when nothing exceeds the bound.
     """
     compacted = 0
+    # Sibling of the worktree, never staged: `git add -A` runs inside dest.
+    archive_dir = dest.parent / "telemetry-archive"
     for name in BOUNDED_FILES:
         path = dest / name
         if not path.is_file() or path.stat().st_size <= max_bytes:
             continue
-        size, kept = compact_file(path, max_bytes=max_bytes)
+        size, kept = compact_file(path, max_bytes=max_bytes, archive_dir=archive_dir)
         print(
             f"OK: record_run_outcomes: compacted {name} to {size} bytes "
             f"({kept} complete rows)"

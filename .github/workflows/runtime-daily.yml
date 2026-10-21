@@ -141,6 +141,18 @@ jobs:
           git commit -m "telemetry: rung health $(date -u +%Y-%m-%dT%H:%MZ)"
           git push origin telemetry
 
+      # Dropped (older) rows land in .tmp/telemetry-archive/ (see compact_file):
+      # outside the committed worktree, uploaded here so the 40 MB bound never
+      # deletes history, it only moves it to a 30-day artifact.
+      - name: Upload trimmed telemetry archive (rung health)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: telemetry-archive-rung-health
+          path: .tmp/telemetry-archive/
+          if-no-files-found: ignore
+          retention-days: 30
+
       - name: Job summary
         if: always()
         run: |
@@ -357,6 +369,15 @@ jobs:
           git commit -m "telemetry: run $(date -u +%Y-%m-%dT%H:%MZ)"
           git push origin telemetry
 
+      - name: Upload trimmed telemetry archive (Phase 0)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: telemetry-archive-phase0
+          path: .tmp/telemetry-archive/
+          if-no-files-found: ignore
+          retention-days: 30
+
       - name: Job summary
         if: always()
         run: |
@@ -561,9 +582,13 @@ jobs:
         run: |
           python3 scripts/llm_model.py >> "$GITHUB_OUTPUT"
 
-      # Prove the exact model selected above before starting the skill. A
-      # broken CLI or model is reported here directly.
+      # Prove a model the CLI can serve before starting the skill. The primary
+      # may be dead, not flaky (2026-10-21: longcat-2.5-preview-free failed its
+      # PONG probe 3/3 on a dispatch), so after its retries the probe degrades
+      # to the fallback free id rather than redding Phase 1/2. The winner is
+      # exported as `effective-model` and the skill runs exactly that id.
       - name: Confirm the opencode CLI can run a model
+        id: probe
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
@@ -573,23 +598,40 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           LLM_MODEL: ${{ steps.llm.outputs.model }}
+          FALLBACK_MODEL: ${{ steps.llm.outputs.fallback_model }}
         run: |
-          # Free-tier models flake (2026-10-21: longcat-2.5-preview-free timed out
-          # the PONG check). Retry twice before failing so a transient 401 or
-          # cold start does not red the whole Phase 1/2 job.
+          # Primary first (2 attempts for transient flakes), then the fallback
+          # free id. Only a model that answers the PONG check serves the skill.
           set -o pipefail
-          for attempt in 1 2 3; do
+          EFFECTIVE=""
+          for attempt in 1 2; do
             if opencode run --model "$LLM_MODEL" --format json \
               "Reply with exactly: OK" \
               | tee /tmp/opencode-check.json \
               | grep -q '"text":"OK"'; then
               echo "opencode probe succeeded on attempt $attempt"
+              EFFECTIVE="$LLM_MODEL"
               break
             fi
             echo "::warning::opencode probe attempt $attempt failed for $LLM_MODEL"
-            [ "$attempt" = "3" ] && { echo "::error::the opencode CLI could not serve resolved model $LLM_MODEL — see the log above"; exit 1; }
             sleep 30
           done
+          if [ -z "$EFFECTIVE" ] && [ -n "$FALLBACK_MODEL" ]; then
+            for attempt in 1 2; do
+              if opencode run --model "$FALLBACK_MODEL" --format json \
+                "Reply with exactly: OK" \
+                | tee /tmp/opencode-check.json \
+                | grep -q '"text":"OK"'; then
+                echo "opencode probe fell back to $FALLBACK_MODEL (attempt $attempt)"
+                EFFECTIVE="$FALLBACK_MODEL"
+                break
+              fi
+              echo "::warning::opencode fallback probe attempt $attempt failed for $FALLBACK_MODEL"
+              sleep 30
+            done
+          fi
+          [ -n "$EFFECTIVE" ] || { echo "::error::the opencode CLI could not serve resolved model $LLM_MODEL nor fallback $FALLBACK_MODEL — see the log above"; exit 1; }
+          echo "effective-model=$EFFECTIVE" >> "$GITHUB_OUTPUT"
 
       # **There is no long-lived backend, and that is the fix.**
       #
@@ -657,7 +699,9 @@ jobs:
           EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
           TINYFISH_API_KEY: ${{ secrets.TINYFISH_API_KEY }}
           FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
-          LLM_MODEL: ${{ steps.llm.outputs.model }}
+          # The probe's winner, not the resolver's first choice: when the pin is
+          # dead the skill runs the fallback id that answered PONG.
+          LLM_MODEL: ${{ steps.probe.outputs.effective-model }}
           DRY_RUN: ${{ steps.mode.outputs.dry_run }}
         run: |
           # `pipefail`, because the transcript is persisted by `tee` and a pipe
@@ -782,6 +826,7 @@ jobs:
               --source-leads-only
           else
             echo "::notice::No runtime transcript was written, so there are no source leads to record."
+            mkdir -p .tmp
             python3 -c "import json,pathlib;pathlib.Path('.tmp/source-leads.json').write_text(json.dumps({'leads': []}) + '\\n', encoding='utf-8')"
           fi
 
@@ -1391,6 +1436,15 @@ jobs:
           fi
           git commit -m "telemetry: run $(date -u +%Y-%m-%dT%H:%MZ)"
           git push origin telemetry
+
+      - name: Upload trimmed telemetry archive (audit)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: telemetry-archive-audit
+          path: .tmp/telemetry-archive/
+          if-no-files-found: ignore
+          retention-days: 30
 
       - name: Job summary
         if: always()

@@ -28,12 +28,12 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
 import capture_transcripts as ct  # noqa: E402
-
 from scripts.llm_model import (  # noqa: E402
-    PIN,
-    RUNG_PROVIDERS,
-    ZEN_DEFAULT_MODEL,
-    resolve_model,
+  FALLBACK_MODEL,
+  PIN,
+  RUNG_PROVIDERS,
+  ZEN_DEFAULT_MODEL,
+  resolve_model,
 )
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -229,7 +229,14 @@ class TestCli:
         # A credential value cannot reach the reason, but the contract has to
         # hold whatever a future edit interpolates.
         result = _run(env=_clean_env(GEMINI_API_KEY="dummy"))
-        assert len(result.stdout.splitlines()) == 3
+        # Four lines since the fallback_model output was added (2026-10-21:
+        # longcat failed its probe 3/3, so the probe needs a second id).
+        assert len(result.stdout.splitlines()) == 4
+
+    def test_the_resolver_also_emits_a_fallback_model(self):
+        result = _run(env=_clean_env(GEMINI_API_KEY="dummy"))
+        assert _outputs(result.stdout)["fallback_model"] == FALLBACK_MODEL
+        assert FALLBACK_MODEL == "opencode/big-pickle"
 
     def test_no_credential_at_all_is_still_a_decision(self):
         """The strongest form: the agent runs on a repository with no secrets.
@@ -318,6 +325,27 @@ class TestWorkflowWiring:
         probe = text[probe_start:run_start]
         assert "LLM_MODEL: ${{ steps.llm.outputs.model }}" in probe
         assert 'opencode run --model "$LLM_MODEL"' in probe
+
+    def test_cli_probe_falls_back_instead_of_redding(self):
+        """2026-10-21: longcat failed its PONG probe 3/3 on a dispatch.
+
+        A dead preview id must degrade to the fallback free id, not red
+        Phase 1/2. The probe tries the pin, then the resolver's fallback, and
+        exports the winner for the skill step."""
+        text = self._without_comments(RUNTIME_DAILY.read_text(encoding="utf-8"))
+        probe_start = text.index("- name: Confirm the opencode CLI can run a model")
+        run_start = text.index("- name: Run the skill")
+        probe = text[probe_start:run_start]
+        assert "FALLBACK_MODEL: ${{ steps.llm.outputs.fallback_model }}" in probe
+        assert 'opencode run --model "$FALLBACK_MODEL"' in probe
+        assert 'effective-model=' in probe
+
+    def test_the_skill_runs_the_probe_winner(self):
+        """The skill must run the id that answered PONG, not the first choice."""
+        text = RUNTIME_DAILY.read_text(encoding="utf-8")
+        step = text[text.index("- name: Run the skill"):]
+        step = step[: step.index("─ The write path")]
+        assert "LLM_MODEL: ${{ steps.probe.outputs.effective-model }}" in step
 
     def test_runtime_uses_project_permissions_without_generating_an_agent(self):
         text = self._without_comments(RUNTIME_DAILY.read_text(encoding="utf-8"))
