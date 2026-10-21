@@ -574,12 +574,22 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           LLM_MODEL: ${{ steps.llm.outputs.model }}
         run: |
+          # Free-tier models flake (2026-10-21: longcat-2.5-preview-free timed out
+          # the PONG check). Retry twice before failing so a transient 401 or
+          # cold start does not red the whole Phase 1/2 job.
           set -o pipefail
-          opencode run --model "$LLM_MODEL" --format json \
-            "Reply with exactly: OK" \
-            | tee /tmp/opencode-check.json \
-            | grep -q '"text":"OK"' \
-            || { echo "::error::the opencode CLI could not serve resolved model $LLM_MODEL — see the log above"; exit 1; }
+          for attempt in 1 2 3; do
+            if opencode run --model "$LLM_MODEL" --format json \
+              "Reply with exactly: OK" \
+              | tee /tmp/opencode-check.json \
+              | grep -q '"text":"OK"'; then
+              echo "opencode probe succeeded on attempt $attempt"
+              break
+            fi
+            echo "::warning::opencode probe attempt $attempt failed for $LLM_MODEL"
+            [ "$attempt" = "3" ] && { echo "::error::the opencode CLI could not serve resolved model $LLM_MODEL — see the log above"; exit 1; }
+            sleep 30
+          done
 
       # **There is no long-lived backend, and that is the fix.**
       #
