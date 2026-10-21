@@ -1,9 +1,9 @@
 {
   "audit": {
-    "inconclusive": 6,
+    "inconclusive": 8,
     "judged": 13,
     "precision": 1.0,
-    "rows": 19,
+    "rows": 21,
     "verified": 13,
     "wrong": 0
   },
@@ -11,33 +11,38 @@
   "fixture_recall": {
     "dropped": 0,
     "duplicates": 0,
-    "fixture_recall": 0.029,
-    "fixtures": 70,
-    "rows": 70,
+    "fixture_recall": 0.027,
+    "fixtures": 75,
+    "rows": 75,
     "surfaced": 2,
-    "unseen": 68,
+    "unseen": 73,
     "unseen_keys": [
       "BBL|ALBA BERLIN|BMA365 Bamberg Baskets|2026-10-19T18:00Z",
       "BBL|ALBA BERLIN|VET-CONCEPT Gladiators Trier|2026-10-10T18:00Z",
       "BBL|ALBA BERLIN|ratiopharm ulm|2026-10-25T17:00Z",
       "BBL|BMA365 Bamberg Baskets|EWE Baskets Oldenburg|2026-10-23T18:00Z",
       "BBL|BMA365 Bamberg Baskets|SYNTAINICS MBC|2026-10-10T16:30Z",
+      "BBL|Basketball Löwen Braunschweig|Fitness First Würzburg Baskets|2026-10-31T17:30Z",
       "BBL|Basketball Löwen Braunschweig|MHP RIESEN Ludwigsburg|2026-10-11T13:00Z",
       "BBL|Basketball Löwen Braunschweig|NINERS Chemnitz|2026-10-18T13:00Z",
       "BBL|Basketball Löwen Braunschweig|Phoenix Hagen|2026-10-25T14:00Z",
       "BBL|Basketball Löwen Braunschweig|RASTA Vechta|2026-10-05T18:00Z",
       "BBL|EWE Baskets Oldenburg|Phoenix Hagen|2026-10-10T18:00Z",
       "BBL|EWE Baskets Oldenburg|Telekom Baskets Bonn|2026-10-16T18:00Z",
+      "BBL|EWE Baskets Oldenburg|ratiopharm ulm|2026-10-31T17:30Z",
       "BBL|FC Bayern München Basketball|Veolia Towers Hamburg|2026-10-18T16:00Z",
       "BBL|FC Bayern München Basketball|Veolia Towers Hamburg|2026-10-25T15:30Z",
       "BBL|Fitness First Würzburg Baskets|NINERS Chemnitz|2026-10-26T19:00Z",
       "BBL|Fitness First Würzburg Baskets|ROSTOCK SEAWOLVES|2026-10-10T16:30Z",
       "BBL|Fitness First Würzburg Baskets|SYNTAINICS MBC|2026-10-18T13:00Z",
+      "BBL|MHP RIESEN Ludwigsburg|NINERS Chemnitz|2026-10-31T19:00Z",
       "BBL|MHP RIESEN Ludwigsburg|RASTA Vechta|2026-10-18T14:30Z",
+      "BBL|Phoenix Hagen|RASTA Vechta|2026-10-30T19:00Z",
       "BBL|Phoenix Hagen|ratiopharm ulm|2026-10-17T18:00Z",
       "BBL|RASTA Vechta|VET-CONCEPT Gladiators Trier|2026-10-24T18:00Z",
       "BBL|RASTA Vechta|ratiopharm ulm|2026-10-10T18:00Z",
       "BBL|ROSTOCK SEAWOLVES|SYNTAINICS MBC|2026-10-24T16:30Z",
+      "BBL|SKYLINERS|Science City Jena|2026-10-30T17:30Z",
       "BBL|SKYLINERS|VET-CONCEPT Gladiators Trier|2026-10-18T14:30Z",
       "BBL|SKYLINERS|Veolia Towers Hamburg|2026-10-11T14:30Z",
       "BBL|Science City Jena|Telekom Baskets Bonn|2026-10-09T18:00Z",
@@ -89,8 +94,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 795,
-    "missed": 795,
+    "eligible": 802,
+    "missed": 802,
     "missed_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -160,6 +165,7 @@
       "https://euroleague.tv/live/291818",
       "https://euroleague.tv/live/291823",
       "https://euroleague.tv/live/309522",
+      "https://euroleague.tv/live/309527",
       "https://fansided.com/posts/euroleague-live-streams-how-to-watch-the-2023-24-euroleague-season-01ha0tqg9fy0",
       "https://fcbayern.com/basketball/de/news/2023-24/08/basketball-wm-live-deutschland-australien-live-tv-livestream-sehen",
       "https://fcbayern.com/basketball/de/news/2026-27/09/free-tv-bayern-berlin",
@@ -308,6 +314,7 @@
       "https://sporteurope.tv/videos/basketball",
       "https://sports.justwatch.com/ca/basketball/champions-league",
       "https://sports.justwatch.com/ca/basketball/euroleague",
+      "https://sports.justwatch.com/ca/basketball/euroleague/hapoel-tel-aviv-virtus-bologna-26-27",
       "https://sports.justwatch.com/de/basketball",
       "https://sports.justwatch.com/de/basketball/BBL/alba-berlin-fraport-skyliners-26-27",
       "https://sports.justwatch.com/de/basketball/alba-berlin",
@@ -336,6 +343,7 @@
       "https://tips.gg/matches/basketball/13-10-2026/olimpia-milano-vs-real-madrid-baloncesto/07-30/streams/",
       "https://toyota-dbbl.de/1-bundesliga/samstag-im-livestream-letzter-test-fuer-alba-vor-dem-dbbl-saisonstart-gegen-osnabrueck/",
       "https://tvheute.at/newsticker/magentatv-zeigt-basketball-em-alle-spiele-live-und-gratis-73494",
+      "https://tvizle.tr/en/event/euroleague-3",
       "https://tvlander.com/basketball/euroleague",
       "https://ubc.ms/2024/02/23/regionalliga-und-nbbl-jbbl-spiele-ab-sofort-live-auf-sporttotal/",
       "https://uk.pcmag.com/video-streaming-services/167068/how-to-watch-2026-fiba-womens-basketball-world-cup-semifinals-live-free",
@@ -786,6 +794,7 @@
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4X5Dv_ChM82W7w7kipv_Vum06LuGsxjIMJaWeKQ6kp9PQzi-75A",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XBEK2Lix8FMK_xl4Xsr-2pmcod1J_QQCzkgZNcpItsndA30iZu",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XKmED8HFkAEXKQ3wDxG2gxbGqyx46AdexhuCr4CKshPBdh2E3O",
+      "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4X_1-gSOqXwuW8uYFF3yJfpN2rBTDagQ4hw2Amqd2VE2VvMBSaa",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XeCRtTWOvkCkYkQXRBWE7yGgDkgNiH0fhsYTstPKr2kHH16lYF",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XfE89EyS0ldRZcW-QBTAFWiKVqHuzqBOMMut6XMvUp5SkqWNjg",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XfcBieGKZpKYlOElUW3Lh4CLgWvnc7DXlxiWLwgxRFZJ4n-cIx",
@@ -807,6 +816,7 @@
       "https://www.youtube.com/watch?v=3I83ko1eP9c&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=3SqiRQIW3nc",
       "https://www.youtube.com/watch?v=3pdKSJU9Ah8",
+      "https://www.youtube.com/watch?v=5Lh0eeNwAm4",
       "https://www.youtube.com/watch?v=5k2WMXDZxtg",
       "https://www.youtube.com/watch?v=6PdBBlANCWU",
       "https://www.youtube.com/watch?v=6x7BQSzGTQg",
@@ -851,6 +861,7 @@
       "https://www.youtube.com/watch?v=bjb5qqOf3Bw",
       "https://www.youtube.com/watch?v=bv99RMJBclw",
       "https://www.youtube.com/watch?v=c3NuYGiqcrY",
+      "https://www.youtube.com/watch?v=cMV_mFniOHM",
       "https://www.youtube.com/watch?v=d09k5v6efx4",
       "https://www.youtube.com/watch?v=dBgq2LB12Ew",
       "https://www.youtube.com/watch?v=efhJOkhKPSk",
@@ -883,15 +894,16 @@
       "https://www.youtube.com/watch?v=wAyC8M2R3JA",
       "https://www.youtube.com/watch?v=xGE1Qvl1aUM",
       "https://www.youtube.com/watch?v=xiNFxDlpCpc",
+      "https://www.youtube.com/watch?v=xsANXhEnI9U",
       "https://www.youtube.com/watch?v=yardlrRgAnA",
       "https://www.youtube.com/watch?v=zNU44AAcyOc",
       "https://www.youtube.com/watch?v=zNU44AAcyOc&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 14374,
-    "unique_games": 1222,
-    "unverifiable": 795,
+    "rows": 14655,
+    "unique_games": 1230,
+    "unverifiable": 802,
     "unverifiable_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -961,6 +973,7 @@
       "https://euroleague.tv/live/291818",
       "https://euroleague.tv/live/291823",
       "https://euroleague.tv/live/309522",
+      "https://euroleague.tv/live/309527",
       "https://fansided.com/posts/euroleague-live-streams-how-to-watch-the-2023-24-euroleague-season-01ha0tqg9fy0",
       "https://fcbayern.com/basketball/de/news/2023-24/08/basketball-wm-live-deutschland-australien-live-tv-livestream-sehen",
       "https://fcbayern.com/basketball/de/news/2026-27/09/free-tv-bayern-berlin",
@@ -1109,6 +1122,7 @@
       "https://sporteurope.tv/videos/basketball",
       "https://sports.justwatch.com/ca/basketball/champions-league",
       "https://sports.justwatch.com/ca/basketball/euroleague",
+      "https://sports.justwatch.com/ca/basketball/euroleague/hapoel-tel-aviv-virtus-bologna-26-27",
       "https://sports.justwatch.com/de/basketball",
       "https://sports.justwatch.com/de/basketball/BBL/alba-berlin-fraport-skyliners-26-27",
       "https://sports.justwatch.com/de/basketball/alba-berlin",
@@ -1137,6 +1151,7 @@
       "https://tips.gg/matches/basketball/13-10-2026/olimpia-milano-vs-real-madrid-baloncesto/07-30/streams/",
       "https://toyota-dbbl.de/1-bundesliga/samstag-im-livestream-letzter-test-fuer-alba-vor-dem-dbbl-saisonstart-gegen-osnabrueck/",
       "https://tvheute.at/newsticker/magentatv-zeigt-basketball-em-alle-spiele-live-und-gratis-73494",
+      "https://tvizle.tr/en/event/euroleague-3",
       "https://tvlander.com/basketball/euroleague",
       "https://ubc.ms/2024/02/23/regionalliga-und-nbbl-jbbl-spiele-ab-sofort-live-auf-sporttotal/",
       "https://uk.pcmag.com/video-streaming-services/167068/how-to-watch-2026-fiba-womens-basketball-world-cup-semifinals-live-free",
@@ -1587,6 +1602,7 @@
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4X5Dv_ChM82W7w7kipv_Vum06LuGsxjIMJaWeKQ6kp9PQzi-75A",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XBEK2Lix8FMK_xl4Xsr-2pmcod1J_QQCzkgZNcpItsndA30iZu",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XKmED8HFkAEXKQ3wDxG2gxbGqyx46AdexhuCr4CKshPBdh2E3O",
+      "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4X_1-gSOqXwuW8uYFF3yJfpN2rBTDagQ4hw2Amqd2VE2VvMBSaa",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XeCRtTWOvkCkYkQXRBWE7yGgDkgNiH0fhsYTstPKr2kHH16lYF",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XfE89EyS0ldRZcW-QBTAFWiKVqHuzqBOMMut6XMvUp5SkqWNjg",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AU7gw4XfcBieGKZpKYlOElUW3Lh4CLgWvnc7DXlxiWLwgxRFZJ4n-cIx",
@@ -1608,6 +1624,7 @@
       "https://www.youtube.com/watch?v=3I83ko1eP9c&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=3SqiRQIW3nc",
       "https://www.youtube.com/watch?v=3pdKSJU9Ah8",
+      "https://www.youtube.com/watch?v=5Lh0eeNwAm4",
       "https://www.youtube.com/watch?v=5k2WMXDZxtg",
       "https://www.youtube.com/watch?v=6PdBBlANCWU",
       "https://www.youtube.com/watch?v=6x7BQSzGTQg",
@@ -1652,6 +1669,7 @@
       "https://www.youtube.com/watch?v=bjb5qqOf3Bw",
       "https://www.youtube.com/watch?v=bv99RMJBclw",
       "https://www.youtube.com/watch?v=c3NuYGiqcrY",
+      "https://www.youtube.com/watch?v=cMV_mFniOHM",
       "https://www.youtube.com/watch?v=d09k5v6efx4",
       "https://www.youtube.com/watch?v=dBgq2LB12Ew",
       "https://www.youtube.com/watch?v=efhJOkhKPSk",
@@ -1684,70 +1702,20 @@
       "https://www.youtube.com/watch?v=wAyC8M2R3JA",
       "https://www.youtube.com/watch?v=xGE1Qvl1aUM",
       "https://www.youtube.com/watch?v=xiNFxDlpCpc",
+      "https://www.youtube.com/watch?v=xsANXhEnI9U",
       "https://www.youtube.com/watch?v=yardlrRgAnA",
       "https://www.youtube.com/watch?v=zNU44AAcyOc",
       "https://www.youtube.com/watch?v=zNU44AAcyOc&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-10-21T10:15Z",
+  "run_id": "2026-10-21T17:37Z",
   "source": {
-    "audit_rows": 19,
-    "candidates_rows": 14374,
-    "fixtures_rows": 70
+    "audit_rows": 21,
+    "candidates_rows": 14655,
+    "fixtures_rows": 75
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 124,
-      "missed": 124,
-      "recall": 0.0,
-      "rows": 254,
-      "run_id": "2026-10-20T16:10Z",
-      "unique_games": 220
-    },
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 2,
-      "run_id": "2026-10-20T16:22Z",
-      "unique_games": 2
-    },
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 2,
-        "precision": 1.0,
-        "rows": 2,
-        "verified": 2,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-10-20T16:23Z",
-      "unique_games": 0
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -1934,7 +1902,58 @@
       "rows": 280,
       "run_id": "2026-10-21T10:14Z",
       "unique_games": 235
+    },
+    {
+      "audit": {
+        "inconclusive": 1,
+        "judged": 0,
+        "precision": null,
+        "rows": 1,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-10-21T10:23Z",
+      "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 1,
+        "judged": 0,
+        "precision": null,
+        "rows": 1,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-10-21T14:03Z",
+      "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 124,
+      "missed": 124,
+      "recall": 0.0,
+      "rows": 281,
+      "run_id": "2026-10-21T17:36Z",
+      "unique_games": 227
     }
   ],
-  "ts": "2026-10-21T10:15:56.967013+00:00"
+  "ts": "2026-10-21T17:37:57.670400+00:00"
 }
