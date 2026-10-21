@@ -18,13 +18,18 @@ These tests pin the three things that make the caller real:
 """
 from __future__ import annotations
 
+import io
 import json
+import os
 import shutil
 import subprocess
 import sys
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
+from typing import NamedTuple
 
 from scripts import source_learning
+from scripts import record_run_outcomes as rro
 from scripts.record_run_outcomes import (
     BOUNDED_FILES,
     MAX_BYTES,
@@ -43,10 +48,52 @@ GOOD = FIXTURES / "run_outcomes_good"
 SOURCE_LEDGERS = ("candidates.jsonl", "fetch-attempts.jsonl", "rung-attempts.jsonl", "events.jsonl")
 
 
-def _run(*args: str) -> subprocess.CompletedProcess:
+class _CliResult(NamedTuple):
+    """The three `CompletedProcess` fields the call sites read."""
+    returncode: int
+    stdout: str
+    stderr: str
+
+
+def _run_inprocess(*args: str) -> _CliResult:
+    """Run the CLI entry in-process: same `main()`, no interpreter boot.
+
+    `main()` ends in `sys.exit`, so the exit code arrives as `SystemExit`.
+    stdout/stderr are captured, so an `OK:`/`FAIL:` assertion reads the same
+    text the subprocess version would have returned.
+    """
+    out, err = io.StringIO(), io.StringIO()
+    code = 0
+    old_argv = sys.argv
+    sys.argv = [str(SCRIPT), *args]
+    try:
+        with redirect_stdout(out), redirect_stderr(err):
+            try:
+                rro.main()
+            except SystemExit as exc:
+                code = int(exc.code or 0)
+    finally:
+        sys.argv = old_argv
+    return _CliResult(code, out.getvalue(), err.getvalue())
+
+
+def _run_subprocess(*args: str) -> subprocess.CompletedProcess:
+    """The real entry point: interpreter boot, shebang, argparse wiring."""
     return subprocess.run(
         [sys.executable, str(SCRIPT), *args], capture_output=True, text=True
     )
+
+
+def _run(*args: str):
+    """CLI runner for these tests — in-process by default.
+
+    Set `RECORD_RUN_OUTCOMES_SUBPROCESS=1` for the manual run: the same
+    assertions against the real subprocess entry point, for when the wiring
+    itself (shebang, `if __name__ == "__main__"`, stdio) is what changed.
+    """
+    if os.environ.get("RECORD_RUN_OUTCOMES_SUBPROCESS") == "1":
+        return _run_subprocess(*args)
+    return _run_inprocess(*args)
 
 
 class TestDerivation:
