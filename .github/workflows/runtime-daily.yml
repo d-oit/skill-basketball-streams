@@ -122,6 +122,25 @@ jobs:
       - name: Commit telemetry (one commit per run, never per row)
         run: |
           cd .tmp/telemetry
+          # An unbounded JSONL run log eventually exceeds GitHub's 100 MB file limit.
+          # Keep the recent scoring window comfortably below that limit; retain full
+          # history outside Git (e.g. workflow artifacts/object storage) if required.
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("run-log.jsonl")
+          limit = 40 * 1024 * 1024
+          if path.exists() and path.stat().st_size > limit:
+              kept = []
+              size = 0
+              for row in reversed(path.read_bytes().splitlines(keepends=True)):
+                  if size + len(row) > limit:
+                      break
+                  kept.append(row)
+                  size += len(row)
+              path.write_bytes(b"".join(reversed(kept)))
+              print(f"Bounded run-log.jsonl to {size} bytes ({len(kept)} complete rows)")
+          PY
           git add -A
           if git diff --cached --quiet; then
             echo "No new rung rows."
