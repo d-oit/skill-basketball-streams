@@ -194,6 +194,26 @@ class TestRecordThroughTheRealWriter:
         stored = source_learning.read_log(GOOD / "run-log.jsonl")
         assert stored == expected
 
+    def test_oversized_run_log_is_compacted_before_appending(self, tmp_path):
+        for name in SOURCE_LEDGERS:
+            shutil.copy(GOOD / name, tmp_path / name)
+        log_path = tmp_path / "run-log.jsonl"
+        # Large enough to cross the production threshold, with valid whole rows.
+        row = (json.dumps({"ts": "2026-10-01T00:00:00+00:00", "run_id": "old",
+                           "source": "old.example", "tier": 0, "url": "https://old.example/x",
+                           "outcome": "skip", "reason": "x" * 1024}) + "\\n").encode()
+        with log_path.open("wb") as handle:
+            for _ in range((40 * 1024 * 1024) // len(row) + 2):
+                handle.write(row)
+        assert log_path.stat().st_size > 40 * 1024 * 1024
+
+        assert record(tmp_path, now="2026-10-04T08:30:00Z") == 0
+        assert log_path.stat().st_size < 40 * 1024 * 1024 + 50_000
+        lines = log_path.read_text(encoding="utf-8").splitlines()
+        assert all(json.loads(line)["source"] for line in lines)
+        # The latest source rows were appended after compaction.
+        assert any(json.loads(line)["source"] == "newclub-basketball.tv" for line in lines)
+
     def test_record_with_no_ledgers_is_a_stated_pass(self, tmp_path):
         result = _run("record", "--dest", str(tmp_path), "--run-id", "r")
         assert result.returncode == 0
