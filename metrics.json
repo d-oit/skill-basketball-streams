@@ -1,9 +1,9 @@
 {
   "audit": {
-    "inconclusive": 5,
+    "inconclusive": 6,
     "judged": 13,
     "precision": 1.0,
-    "rows": 18,
+    "rows": 19,
     "verified": 13,
     "wrong": 0
   },
@@ -89,8 +89,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 793,
-    "missed": 793,
+    "eligible": 795,
+    "missed": 795,
     "missed_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -159,6 +159,7 @@
       "https://euroleague.tv/live/249564",
       "https://euroleague.tv/live/291818",
       "https://euroleague.tv/live/291823",
+      "https://euroleague.tv/live/309522",
       "https://fansided.com/posts/euroleague-live-streams-how-to-watch-the-2023-24-euroleague-season-01ha0tqg9fy0",
       "https://fcbayern.com/basketball/de/news/2023-24/08/basketball-wm-live-deutschland-australien-live-tv-livestream-sehen",
       "https://fcbayern.com/basketball/de/news/2026-27/09/free-tv-bayern-berlin",
@@ -821,6 +822,7 @@
       "https://www.youtube.com/watch?v=Gg4GnpJKTe8",
       "https://www.youtube.com/watch?v=Hh5YEuoreug",
       "https://www.youtube.com/watch?v=JPavyF_vMXw",
+      "https://www.youtube.com/watch?v=K5zuonU-hHo",
       "https://www.youtube.com/watch?v=K5zuonU-hHo&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=L7scag65uD8",
       "https://www.youtube.com/watch?v=LOvngOSlqEo",
@@ -887,9 +889,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 14094,
-    "unique_games": 1219,
-    "unverifiable": 793,
+    "rows": 14374,
+    "unique_games": 1222,
+    "unverifiable": 795,
     "unverifiable_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -958,6 +960,7 @@
       "https://euroleague.tv/live/249564",
       "https://euroleague.tv/live/291818",
       "https://euroleague.tv/live/291823",
+      "https://euroleague.tv/live/309522",
       "https://fansided.com/posts/euroleague-live-streams-how-to-watch-the-2023-24-euroleague-season-01ha0tqg9fy0",
       "https://fcbayern.com/basketball/de/news/2023-24/08/basketball-wm-live-deutschland-australien-live-tv-livestream-sehen",
       "https://fcbayern.com/basketball/de/news/2026-27/09/free-tv-bayern-berlin",
@@ -1620,6 +1623,7 @@
       "https://www.youtube.com/watch?v=Gg4GnpJKTe8",
       "https://www.youtube.com/watch?v=Hh5YEuoreug",
       "https://www.youtube.com/watch?v=JPavyF_vMXw",
+      "https://www.youtube.com/watch?v=K5zuonU-hHo",
       "https://www.youtube.com/watch?v=K5zuonU-hHo&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=L7scag65uD8",
       "https://www.youtube.com/watch?v=LOvngOSlqEo",
@@ -1686,47 +1690,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-10-21T10:06Z",
+  "run_id": "2026-10-21T10:15Z",
   "source": {
-    "audit_rows": 18,
-    "candidates_rows": 14094,
+    "audit_rows": 19,
+    "candidates_rows": 14374,
     "fixtures_rows": 70
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 110,
-      "missed": 110,
-      "recall": 0.0,
-      "rows": 236,
-      "run_id": "2026-10-20T15:50Z",
-      "unique_games": 204
-    },
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 2,
-        "precision": 1.0,
-        "rows": 2,
-        "verified": 2,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-10-20T15:57Z",
-      "unique_games": 0
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -1930,7 +1900,41 @@
       "rows": 279,
       "run_id": "2026-10-21T10:04Z",
       "unique_games": 243
+    },
+    {
+      "audit": {
+        "inconclusive": 1,
+        "judged": 0,
+        "precision": null,
+        "rows": 1,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-10-21T10:13Z",
+      "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 125,
+      "missed": 125,
+      "recall": 0.0,
+      "rows": 280,
+      "run_id": "2026-10-21T10:14Z",
+      "unique_games": 235
     }
   ],
-  "ts": "2026-10-21T10:06:30.958975+00:00"
+  "ts": "2026-10-21T10:15:56.967013+00:00"
 }
