@@ -889,4 +889,4 @@ def test_runtime_workflow_passes_its_resolved_clock_to_the_calendar_gate():
     plan_step = workflow.split("- name: Plan the calendar writes (no API calls)", 1)[1]
     plan_step = plan_step.split("- name: Apply the plan", 1)[0]
     assert 'RUN_NOW="$(date -u +' in plan_step
-    assert '--now "$RUN_NOW" --window-days 7' in plan_step
+    assert '--now "$RUN_NOW" --window-days 10' in plan_step

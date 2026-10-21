@@ -109,7 +109,7 @@ Calendar links rot. Revalidate on this cadence:
 | When | Action on failure | id |
 |---|---|---|
 | At creation (pre-flight) | never create the event | — |
-| Daily, for events inside today…today+7d | `BROKEN`/`INVALID` → remove the dead link from the event description, append `Validation Notes: link quarantined <ISO ts>` | `linkStatus=FAIL`, `sourceQuarantined=PASS`, `eventDeleted=FAIL` |
+| Daily, for events inside today…today+10d | `BROKEN`/`INVALID` → remove the dead link from the event description, append `Validation Notes: link quarantined <ISO ts>` | `linkStatus=FAIL`, `sourceQuarantined=PASS`, `eventDeleted=FAIL` |
 | ~2 h before start | `BROKEN` → same quarantine; `BLOCKED`/`UNREACHABLE` → retry via the fetch ladder, keep the event | `linkStatus=FAIL`, `aliveEventKept=PASS` |
 | After the event ends | YouTube `/live` URLs always 404 afterwards — expected, do **not** rewrite the event | — |
 

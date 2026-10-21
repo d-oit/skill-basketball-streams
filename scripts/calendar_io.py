@@ -1087,7 +1087,7 @@ def main() -> None:
     # the field that used to be read by everyone and written by nobody, so the
     # default has to come from the file that documents it or the loop stays open.
     parser.add_argument("--visibility", default=get_visibility())
-    parser.add_argument("--days", type=int, default=7)
+    parser.add_argument("--days", type=int, default=10)
     parser.add_argument("--time-min")
     parser.add_argument("--time-max")
     parser.add_argument("--now", help="ISO-8601 override (for tests)")

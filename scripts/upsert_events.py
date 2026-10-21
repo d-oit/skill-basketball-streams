@@ -3,12 +3,12 @@
 
 Implements the write policy from `live-stream-runtime-spec.md` §5.5 and §6. The
 ordering is a safety property, not a detail: the runtime lists existing events
-*today…today+7d* and reconciles in memory **before** any write, so it can never
+*today…today+10d* and reconciles in memory **before** any write, so it can never
 duplicate an event it is about to create.
 
 The planner's runtime entry point also enforces candidate eligibility before
 reconciliation: ProB is excluded; start time must fall strictly after the
-captured `--now` and no later than its seven-day cutoff; and free/live status
+captured `--now` and no later than its ten-day cutoff; and free/live status
 must be explicitly supported by evidence flags, a direct stream URL, a source
 reference, free-access wording, a validation timestamp and explanatory notes.
 An `UNVERIFIED` state cannot substitute for any of those facts.
@@ -67,7 +67,7 @@ Usage:
     python3 scripts/upsert_events.py --existing existing.json --candidates candidates.json --now 2026-10-13T19:00:00Z --json
     python3 scripts/upsert_events.py --existing existing.json \\
         --candidates candidates.json --verdicts telemetry/audit.jsonl \\
-        --now 2026-10-13T19:00:00Z --window-days 7
+        --now 2026-10-13T19:00:00Z --window-days 10
 
 Exit codes:
     0  PASS — a plan was produced
@@ -347,7 +347,7 @@ def eligibility_reason(
     league: str,
     *,
     now: datetime,
-    window_days: int = 7,
+    window_days: int = 10,
 ) -> str | None:
     """Return why a candidate cannot be written to the upcoming-game calendar."""
     labels = " ".join(
@@ -420,7 +420,7 @@ def plan_upsert(
     verdicts: dict | None = None,
     *,
     now: datetime | None = None,
-    window_days: int = 7,
+    window_days: int = 10,
 ) -> list[dict]:
     """Reconcile candidates against existing events. Returns one plan row each.
 
@@ -708,7 +708,7 @@ def main() -> None:
         "--window-days",
         type=int,
         default=7,
-        help="allow starts after --now through --now + this many days (default: 7)",
+        help="allow starts after --now through --now + this many days (default: 10)",
     )
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
