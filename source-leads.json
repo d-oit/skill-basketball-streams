@@ -1,14 +1,3 @@
 {
-  "leads": [
-    {
-      "url": "https://sportbild.bild.de",
-      "name": "SPORTBILD.de",
-      "reason": "Free live BBL/Handball stream (Dyn Sport Mix sub-license); unapproved host, quarantine only"
-    },
-    {
-      "url": "https://www.youtube.com/@sportbild-allesausserfussball",
-      "name": "SPORT BILD Alles au\u00dfer Fu\u00dfball",
-      "reason": "Free live BBL/Handball YouTube channel; unapproved handle, quarantine only"
-    }
-  ]
+  "leads": []
 }
