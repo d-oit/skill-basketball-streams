@@ -1,9 +1,9 @@
 {
   "audit": {
-    "inconclusive": 11,
+    "inconclusive": 12,
     "judged": 13,
     "precision": 1.0,
-    "rows": 24,
+    "rows": 25,
     "verified": 13,
     "wrong": 0
   },
@@ -11,17 +11,19 @@
   "fixture_recall": {
     "dropped": 0,
     "duplicates": 0,
-    "fixture_recall": 0.027,
-    "fixtures": 75,
-    "rows": 75,
+    "fixture_recall": 0.025,
+    "fixtures": 79,
+    "rows": 79,
     "surfaced": 2,
-    "unseen": 73,
+    "unseen": 77,
     "unseen_keys": [
       "BBL|ALBA BERLIN|BMA365 Bamberg Baskets|2026-10-19T18:00Z",
+      "BBL|ALBA BERLIN|Telekom Baskets Bonn|2026-11-01T17:00Z",
       "BBL|ALBA BERLIN|VET-CONCEPT Gladiators Trier|2026-10-10T18:00Z",
       "BBL|ALBA BERLIN|ratiopharm ulm|2026-10-25T17:00Z",
       "BBL|BMA365 Bamberg Baskets|EWE Baskets Oldenburg|2026-10-23T18:00Z",
       "BBL|BMA365 Bamberg Baskets|SYNTAINICS MBC|2026-10-10T16:30Z",
+      "BBL|BMA365 Bamberg Baskets|Science City Jena|2026-11-01T14:00Z",
       "BBL|Basketball Löwen Braunschweig|Fitness First Würzburg Baskets|2026-10-31T17:30Z",
       "BBL|Basketball Löwen Braunschweig|MHP RIESEN Ludwigsburg|2026-10-11T13:00Z",
       "BBL|Basketball Löwen Braunschweig|NINERS Chemnitz|2026-10-18T13:00Z",
@@ -30,6 +32,7 @@
       "BBL|EWE Baskets Oldenburg|Phoenix Hagen|2026-10-10T18:00Z",
       "BBL|EWE Baskets Oldenburg|Telekom Baskets Bonn|2026-10-16T18:00Z",
       "BBL|EWE Baskets Oldenburg|ratiopharm ulm|2026-10-31T17:30Z",
+      "BBL|FC Bayern München Basketball|ROSTOCK SEAWOLVES|2026-11-01T14:00Z",
       "BBL|FC Bayern München Basketball|Veolia Towers Hamburg|2026-10-18T16:00Z",
       "BBL|FC Bayern München Basketball|Veolia Towers Hamburg|2026-10-25T15:30Z",
       "BBL|Fitness First Würzburg Baskets|NINERS Chemnitz|2026-10-26T19:00Z",
@@ -45,6 +48,7 @@
       "BBL|SKYLINERS|Science City Jena|2026-10-30T17:30Z",
       "BBL|SKYLINERS|VET-CONCEPT Gladiators Trier|2026-10-18T14:30Z",
       "BBL|SKYLINERS|Veolia Towers Hamburg|2026-10-11T14:30Z",
+      "BBL|SYNTAINICS MBC|Veolia Towers Hamburg|2026-11-01T15:30Z",
       "BBL|Science City Jena|Telekom Baskets Bonn|2026-10-09T18:00Z",
       "Basketball Champions League|AEK BC|Salon Vilpas|2026-10-07T16:00Z",
       "Basketball Champions League|AEK BC|Windrose Giants Antwerp|2026-10-21T16:00Z",
@@ -94,8 +98,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 810,
-    "missed": 810,
+    "eligible": 819,
+    "missed": 819,
     "missed_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -311,6 +315,7 @@
       "https://sporteurope.tv/en/nbbl",
       "https://sporteurope.tv/en/regionalliga-suedost",
       "https://sporteurope.tv/en/videos/basketball",
+      "https://sporteurope.tv/jbbl",
       "https://sporteurope.tv/nbbl",
       "https://sporteurope.tv/videos/basketball",
       "https://sports.justwatch.com/ca/basketball/champions-league",
@@ -344,6 +349,7 @@
       "https://tips.gg/matches/basketball/13-10-2026/olimpia-milano-vs-real-madrid-baloncesto/07-30/streams/",
       "https://toyota-dbbl.de/1-bundesliga/samstag-im-livestream-letzter-test-fuer-alba-vor-dem-dbbl-saisonstart-gegen-osnabrueck/",
       "https://tvheute.at/newsticker/magentatv-zeigt-basketball-em-alle-spiele-live-und-gratis-73494",
+      "https://tvizle.tr/en/event/euroleague",
       "https://tvizle.tr/en/event/euroleague-3",
       "https://tvlander.com/basketball/euroleague",
       "https://ubc.ms/2024/02/23/regionalliga-und-nbbl-jbbl-spiele-ab-sofort-live-auf-sporttotal/",
@@ -601,6 +607,7 @@
       "https://www.mainpost.de/wuerzburg/sport/basketball-champions-league-liveticker-zum-spiel-der-wuerzburg-baskets-so-laeuft-die-partie-gegen-manchester-basketball-115186760",
       "https://www.mdr.de/video/livestreams/mdr-plus/sport-eventlivestream-mediathek-156.html",
       "https://www.mz.de/live/basketball-livestream-europapokal-syntainics-mbc-taltech-alexela-tallinn-im-kostenlosen-stream-4119474",
+      "https://www.nba.com/league-pass-purchase",
       "https://www.nba.com/watch/featured",
       "https://www.nba.com/watch/nba-tv",
       "https://www.ncaa.com/march-madness-live/ways-to-watch",
@@ -759,6 +766,7 @@
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-gladiators-trier-vs-rostock-seawolves-uebertragung-im-tv-stream",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-hamburg-fc-bayern-uebertragung-im-tv-stream",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-jena-bayern-muenchen-uebertragung-im-tv-stream",
+      "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-oldenburg-wuerzburg-uebertragung-im-tv-stream",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-towers-loewen-uebertragung-live-im-free-tv-stream",
       "https://www.tntsports.co.uk/basketball/easycredit-bbl/2025-2026/live-fc-bayern-muenchen-fitness-first-wuerzburg-baskets_mtc1633869/live.shtml",
       "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/anadolu-efes-fc-bayern-muenchen_mtc22011460/live.shtml",
@@ -818,6 +826,7 @@
       "https://www.youtube.com/watch?v=0_LV29JXaxU&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=2Aj1stTgLOk",
       "https://www.youtube.com/watch?v=2_-HGISapYU",
+      "https://www.youtube.com/watch?v=30yqTqmMGKo",
       "https://www.youtube.com/watch?v=3I83ko1eP9c",
       "https://www.youtube.com/watch?v=3I83ko1eP9c&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=3SqiRQIW3nc",
@@ -831,8 +840,10 @@
       "https://www.youtube.com/watch?v=9mpisMXeiG4",
       "https://www.youtube.com/watch?v=AD-udWSl0GE",
       "https://www.youtube.com/watch?v=AFqbDF0-Huo",
+      "https://www.youtube.com/watch?v=BUs2d_qPd7M",
       "https://www.youtube.com/watch?v=CQbozxkSjiI",
       "https://www.youtube.com/watch?v=DijKOv4xh_8",
+      "https://www.youtube.com/watch?v=EyTGrQNhCtc",
       "https://www.youtube.com/watch?v=EzwT1sT9j1k",
       "https://www.youtube.com/watch?v=FNmWY99kc8Y",
       "https://www.youtube.com/watch?v=Gg4GnpJKTe8",
@@ -840,6 +851,7 @@
       "https://www.youtube.com/watch?v=JPavyF_vMXw",
       "https://www.youtube.com/watch?v=K5zuonU-hHo",
       "https://www.youtube.com/watch?v=K5zuonU-hHo&xstg=CAMSBhUDzO3xHw%3D%3D",
+      "https://www.youtube.com/watch?v=KJH8BAv-E88",
       "https://www.youtube.com/watch?v=L7scag65uD8",
       "https://www.youtube.com/watch?v=LOvngOSlqEo",
       "https://www.youtube.com/watch?v=MLgGYhYyUjQ",
@@ -900,6 +912,7 @@
       "https://www.youtube.com/watch?v=ueFpASwTpgw",
       "https://www.youtube.com/watch?v=vQ1LAiNis3k",
       "https://www.youtube.com/watch?v=wAyC8M2R3JA",
+      "https://www.youtube.com/watch?v=wPLj_S-OFro",
       "https://www.youtube.com/watch?v=xGE1Qvl1aUM",
       "https://www.youtube.com/watch?v=xiNFxDlpCpc",
       "https://www.youtube.com/watch?v=xsANXhEnI9U",
@@ -909,9 +922,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 15488,
-    "unique_games": 1249,
-    "unverifiable": 810,
+    "rows": 15766,
+    "unique_games": 1260,
+    "unverifiable": 819,
     "unverifiable_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -1127,6 +1140,7 @@
       "https://sporteurope.tv/en/nbbl",
       "https://sporteurope.tv/en/regionalliga-suedost",
       "https://sporteurope.tv/en/videos/basketball",
+      "https://sporteurope.tv/jbbl",
       "https://sporteurope.tv/nbbl",
       "https://sporteurope.tv/videos/basketball",
       "https://sports.justwatch.com/ca/basketball/champions-league",
@@ -1160,6 +1174,7 @@
       "https://tips.gg/matches/basketball/13-10-2026/olimpia-milano-vs-real-madrid-baloncesto/07-30/streams/",
       "https://toyota-dbbl.de/1-bundesliga/samstag-im-livestream-letzter-test-fuer-alba-vor-dem-dbbl-saisonstart-gegen-osnabrueck/",
       "https://tvheute.at/newsticker/magentatv-zeigt-basketball-em-alle-spiele-live-und-gratis-73494",
+      "https://tvizle.tr/en/event/euroleague",
       "https://tvizle.tr/en/event/euroleague-3",
       "https://tvlander.com/basketball/euroleague",
       "https://ubc.ms/2024/02/23/regionalliga-und-nbbl-jbbl-spiele-ab-sofort-live-auf-sporttotal/",
@@ -1417,6 +1432,7 @@
       "https://www.mainpost.de/wuerzburg/sport/basketball-champions-league-liveticker-zum-spiel-der-wuerzburg-baskets-so-laeuft-die-partie-gegen-manchester-basketball-115186760",
       "https://www.mdr.de/video/livestreams/mdr-plus/sport-eventlivestream-mediathek-156.html",
       "https://www.mz.de/live/basketball-livestream-europapokal-syntainics-mbc-taltech-alexela-tallinn-im-kostenlosen-stream-4119474",
+      "https://www.nba.com/league-pass-purchase",
       "https://www.nba.com/watch/featured",
       "https://www.nba.com/watch/nba-tv",
       "https://www.ncaa.com/march-madness-live/ways-to-watch",
@@ -1575,6 +1591,7 @@
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-gladiators-trier-vs-rostock-seawolves-uebertragung-im-tv-stream",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-hamburg-fc-bayern-uebertragung-im-tv-stream",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-jena-bayern-muenchen-uebertragung-im-tv-stream",
+      "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-live-oldenburg-wuerzburg-uebertragung-im-tv-stream",
       "https://www.tipico.de/wett-tipps/sportwetten-news/basketball-heute-towers-loewen-uebertragung-live-im-free-tv-stream",
       "https://www.tntsports.co.uk/basketball/easycredit-bbl/2025-2026/live-fc-bayern-muenchen-fitness-first-wuerzburg-baskets_mtc1633869/live.shtml",
       "https://www.tntsports.co.uk/basketball/euroleague/2026-2027/anadolu-efes-fc-bayern-muenchen_mtc22011460/live.shtml",
@@ -1634,6 +1651,7 @@
       "https://www.youtube.com/watch?v=0_LV29JXaxU&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=2Aj1stTgLOk",
       "https://www.youtube.com/watch?v=2_-HGISapYU",
+      "https://www.youtube.com/watch?v=30yqTqmMGKo",
       "https://www.youtube.com/watch?v=3I83ko1eP9c",
       "https://www.youtube.com/watch?v=3I83ko1eP9c&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=3SqiRQIW3nc",
@@ -1647,8 +1665,10 @@
       "https://www.youtube.com/watch?v=9mpisMXeiG4",
       "https://www.youtube.com/watch?v=AD-udWSl0GE",
       "https://www.youtube.com/watch?v=AFqbDF0-Huo",
+      "https://www.youtube.com/watch?v=BUs2d_qPd7M",
       "https://www.youtube.com/watch?v=CQbozxkSjiI",
       "https://www.youtube.com/watch?v=DijKOv4xh_8",
+      "https://www.youtube.com/watch?v=EyTGrQNhCtc",
       "https://www.youtube.com/watch?v=EzwT1sT9j1k",
       "https://www.youtube.com/watch?v=FNmWY99kc8Y",
       "https://www.youtube.com/watch?v=Gg4GnpJKTe8",
@@ -1656,6 +1676,7 @@
       "https://www.youtube.com/watch?v=JPavyF_vMXw",
       "https://www.youtube.com/watch?v=K5zuonU-hHo",
       "https://www.youtube.com/watch?v=K5zuonU-hHo&xstg=CAMSBhUDzO3xHw%3D%3D",
+      "https://www.youtube.com/watch?v=KJH8BAv-E88",
       "https://www.youtube.com/watch?v=L7scag65uD8",
       "https://www.youtube.com/watch?v=LOvngOSlqEo",
       "https://www.youtube.com/watch?v=MLgGYhYyUjQ",
@@ -1716,6 +1737,7 @@
       "https://www.youtube.com/watch?v=ueFpASwTpgw",
       "https://www.youtube.com/watch?v=vQ1LAiNis3k",
       "https://www.youtube.com/watch?v=wAyC8M2R3JA",
+      "https://www.youtube.com/watch?v=wPLj_S-OFro",
       "https://www.youtube.com/watch?v=xGE1Qvl1aUM",
       "https://www.youtube.com/watch?v=xiNFxDlpCpc",
       "https://www.youtube.com/watch?v=xsANXhEnI9U",
@@ -1725,47 +1747,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-10-21T19:34Z",
+  "run_id": "2026-10-22T14:00Z",
   "source": {
-    "audit_rows": 24,
-    "candidates_rows": 15488,
-    "fixtures_rows": 75
+    "audit_rows": 25,
+    "candidates_rows": 15766,
+    "fixtures_rows": 79
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 2,
-      "run_id": "2026-10-20T18:11Z",
-      "unique_games": 2
-    },
-    {
-      "audit": {
-        "inconclusive": 1,
-        "judged": 0,
-        "precision": null,
-        "rows": 1,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-10-20T18:12Z",
-      "unique_games": 0
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -1969,7 +1957,41 @@
       "rows": 271,
       "run_id": "2026-10-21T19:33Z",
       "unique_games": 222
+    },
+    {
+      "audit": {
+        "inconclusive": 1,
+        "judged": 0,
+        "precision": null,
+        "rows": 1,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-10-21T19:40Z",
+      "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 129,
+      "missed": 129,
+      "recall": 0.0,
+      "rows": 278,
+      "run_id": "2026-10-22T13:58Z",
+      "unique_games": 231
     }
   ],
-  "ts": "2026-10-21T19:34:58.206356+00:00"
+  "ts": "2026-10-22T14:00:08.820415+00:00"
 }
