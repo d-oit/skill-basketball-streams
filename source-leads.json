@@ -1,10 +1,8 @@
 {
   "leads": [
     {
-      "url": "https://www.swr.de/sport/mehr-sport/swr-uebertraegt-basketball-europapokal-der-gladiators-trier-im-livestream-100.html",
-      "name": "SWR Sport",
-      "league": "FIBA Europe Cup",
-      "reason": "Unapproved free public-broadcaster livestream host discovered via Sportschau; quarantine pending review."
+      "url": "https://www.sportbild.de/",
+      "reason": "Official BBL sublicense lists free live games (24.10. Ludwigsburg-Bonn, 30.10. Hagen-Vechta via easycredit-bbl.de/live-tv) but sportbild.de/bild.de is not in config/sources.json \u2014 quarantined."
     }
   ]
 }

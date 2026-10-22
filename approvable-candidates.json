@@ -1,16 +1,16 @@
 {
   "candidates": [
     {
-      "league": "BBL",
+      "league": "easyCredit BBL",
       "teams": [
-        "MHP RIESEN Ludwiesburg",
+        "MHP RIESEN Ludwigsburg",
         "Telekom Baskets Bonn"
       ],
       "start": "2026-10-24T20:00:00+02:00",
       "state": "VERIFIED",
-      "summary": "BBL: MHP RIESEN Ludwiesburg vs Telekom Baskets Bonn",
-      "game_key": "BBL|MHP RIESEN Ludwiesburg|Telekom Baskets Bonn|2026-10-24T18:00Z",
-      "url": "https://pluto.tv/gsa/live-tv/66c6fc06489bab0008b6f9da",
+      "summary": "easyCredit BBL: MHP RIESEN Ludwigsburg vs Telekom Baskets Bonn",
+      "game_key": "easyCredit BBL|MHP RIESEN Ludwigsburg|Telekom Baskets Bonn|2026-10-24T18:00Z",
+      "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
       "backend": "",
       "evidence": {
         "live_confirmed": true,
@@ -19,40 +19,13 @@
       "direct_links": [
         {
           "source": "",
-          "url": "https://pluto.tv/gsa/live-tv/66c6fc06489bab0008b6f9da"
+          "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4"
         }
       ],
       "source_reference": "https://www.dyn.sport/deinsender/dyn-sport-mix/",
       "access": "Free",
-      "validated_at": "2026-10-20T00:00:00Z",
-      "validation_notes": "Free confirmed: the game is listed in Dyn's official 'Dyn Free Spiele' list for the current month (dyn.sport/deinsender/dyn-sport-mix/) as 'Sa. 24.10.2026, 20:00 Uhr \u00b7 easyCredit BBL MHP RIESEN Ludwiesburg \u2013 Telekom Baskets Bonn', carried on the free Dyn Sport Mix FAST channel (Pluto TV, no account/Abo). Live confirmed: easyCredit BBL 6. Spieltag, Sat 24.10.2026 20:00 CEST, confirmed by easycredit-bbl.de and the SPORTBILD.de live plan."
-    },
-    {
-      "league": "NBBL",
-      "teams": [
-        "Science City Jena",
-        "SG Junior L\u00f6wen Braunschweig"
-      ],
-      "start": "2026-10-24T13:45:00+02:00",
-      "state": "VERIFIED",
-      "summary": "NBBL: Science City Jena vs SG Junior L\u00f6wen Braunschweig",
-      "game_key": "NBBL|SG Junior L\u00f6wen Braunschweig|Science City Jena|2026-10-24T11:45Z",
-      "url": "https://sporteurope.tv/video/nbbl-science-city-jena-vs-sg-junior-loewen-braunschweig",
-      "backend": "",
-      "evidence": {
-        "live_confirmed": true,
-        "free_confirmed": true
-      },
-      "direct_links": [
-        {
-          "source": "",
-          "url": "https://sporteurope.tv/video/nbbl-science-city-jena-vs-sg-junior-loewen-braunschweig"
-        }
-      ],
-      "source_reference": "https://sporteurope.tv/sc-jena",
-      "access": "Free",
-      "validated_at": "2026-10-20T00:00:00Z",
-      "validation_notes": "Free confirmed: NBBL/JBBL games are broadcast live and without a paywall on Sporteurope.TV under the two-season agreement (2basketballbundesliga.de, dosbnewmedia.de); the stream listing carries no monetization. Live confirmed: Sporteurope.TV LIVESTREAM scheduled Sat 24.10.2026 13:45 CEST on the official Science City Jena channel."
+      "validated_at": "2026-10-22T13:35:00Z",
+      "validation_notes": "Official Dyn Sport Mix free-games list names this exact fixture (Sa. 24.10.2026, 20:00 Uhr, easyCredit BBL, MHP RIESEN Ludwigsburg - Telekom Baskets Bonn) and states it is live on Dyn Sport Mix and all Dyn Sport Mix partners, free without subscription. BBL iCal feed confirms 2026-10-24 20:00 Europe/Berlin. Direct link is the indexed Dyn Sport Mix channel on Pluto TV (free, no account); the GSA channel page is region-redirected from this runner IP, a transport fact, not a paywall."
     }
   ]
 }
