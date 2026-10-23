@@ -1,8 +1,3 @@
 {
-  "leads": [
-    {
-      "url": "https://www.sportbild.de/",
-      "reason": "Official BBL sublicense lists free live games (24.10. Ludwigsburg-Bonn, 30.10. Hagen-Vechta via easycredit-bbl.de/live-tv) but sportbild.de/bild.de is not in config/sources.json \u2014 quarantined."
-    }
-  ]
+  "leads": []
 }

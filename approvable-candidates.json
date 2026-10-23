@@ -1,15 +1,15 @@
 {
   "candidates": [
     {
-      "league": "easyCredit BBL",
+      "league": "BBL",
       "teams": [
         "MHP RIESEN Ludwigsburg",
         "Telekom Baskets Bonn"
       ],
       "start": "2026-10-24T20:00:00+02:00",
       "state": "VERIFIED",
-      "summary": "easyCredit BBL: MHP RIESEN Ludwigsburg vs Telekom Baskets Bonn",
-      "game_key": "easyCredit BBL|MHP RIESEN Ludwigsburg|Telekom Baskets Bonn|2026-10-24T18:00Z",
+      "summary": "BBL: MHP RIESEN Ludwigsburg vs Telekom Baskets Bonn - FREE Live Stream",
+      "game_key": "BBL|MHP RIESEN Ludwigsburg|Telekom Baskets Bonn|2026-10-24T18:00Z",
       "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
       "backend": "",
       "evidence": {
@@ -24,8 +24,8 @@
       ],
       "source_reference": "https://www.dyn.sport/deinsender/dyn-sport-mix/",
       "access": "Free",
-      "validated_at": "2026-10-22T13:35:00Z",
-      "validation_notes": "Official Dyn Sport Mix free-games list names this exact fixture (Sa. 24.10.2026, 20:00 Uhr, easyCredit BBL, MHP RIESEN Ludwigsburg - Telekom Baskets Bonn) and states it is live on Dyn Sport Mix and all Dyn Sport Mix partners, free without subscription. BBL iCal feed confirms 2026-10-24 20:00 Europe/Berlin. Direct link is the indexed Dyn Sport Mix channel on Pluto TV (free, no account); the GSA channel page is region-redirected from this runner IP, a transport fact, not a paywall."
+      "validated_at": "2026-10-23T10:00:00Z",
+      "validation_notes": "Check 1 PASS: dyn.sport 'DYN Free Spiele' basketball list names this exact fixture (Sa. 24.10.2026, 20:00, easyCredit BBL) and states Dyn Sport Mix is kostenfrei/ohne Abo. Check 6/7 PASS: Pluto TV channel API returns id 6866525c8a412a0e95c438b4 as 'Dyn Sport Mix', category Live Sports, visibility everyone; dyn.sport names Pluto TV as a free reception partner."
     }
   ]
 }
