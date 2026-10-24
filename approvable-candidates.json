@@ -1,15 +1,15 @@
 {
   "candidates": [
     {
-      "league": "BBL",
+      "league": "easyCredit BBL",
       "teams": [
         "MHP RIESEN Ludwigsburg",
         "Telekom Baskets Bonn"
       ],
       "start": "2026-10-24T20:00:00+02:00",
       "state": "VERIFIED",
-      "summary": "BBL: MHP RIESEN Ludwigsburg vs Telekom Baskets Bonn - FREE Live Stream",
-      "game_key": "BBL|MHP RIESEN Ludwigsburg|Telekom Baskets Bonn|2026-10-24T18:00Z",
+      "summary": "easyCredit BBL: MHP RIESEN Ludwigsburg vs Telekom Baskets Bonn",
+      "game_key": "easyCredit BBL|MHP RIESEN Ludwigsburg|Telekom Baskets Bonn|2026-10-24T18:00Z",
       "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
       "backend": "",
       "evidence": {
@@ -24,8 +24,35 @@
       ],
       "source_reference": "https://www.dyn.sport/deinsender/dyn-sport-mix/",
       "access": "Free",
-      "validated_at": "2026-10-23T10:00:00Z",
-      "validation_notes": "Check 1 PASS: dyn.sport 'DYN Free Spiele' basketball list names this exact fixture (Sa. 24.10.2026, 20:00, easyCredit BBL) and states Dyn Sport Mix is kostenfrei/ohne Abo. Check 6/7 PASS: Pluto TV channel API returns id 6866525c8a412a0e95c438b4 as 'Dyn Sport Mix', category Live Sports, visibility everyone; dyn.sport names Pluto TV as a free reception partner."
+      "validated_at": "2026-10-24T10:00:00+02:00",
+      "validation_notes": "Check 1 PASS \u2014 official Dyn free-games list ('Basketball bei Dyn Sport Mix') names 'Sa. 24.10.2026, 20:00 Uhr \u00b7 easyCredit BBL MHP RIESEN Ludwigsburg \u2013 Telekom Baskets Bonn' and states 'Live bei Dyn und bei allen Dyn Sport Mix Partnern'. Check 2/7 PASS \u2014 scheduled live linear broadcast on the free Dyn Sport Mix channel, carried free without account/Abo on Pluto TV. BBL league news also confirms the fixture is free in the SPORTBILD stream; sportbild is unapproved and not used as the link."
+    },
+    {
+      "league": "easyCredit BBL",
+      "teams": [
+        "FC Bayern M\u00fcnchen Basketball",
+        "Basketball L\u00f6wen Braunschweig"
+      ],
+      "start": "2026-11-03T20:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "easyCredit BBL: FC Bayern M\u00fcnchen Basketball vs Basketball L\u00f6wen Braunschweig",
+      "game_key": "easyCredit BBL|Basketball L\u00f6wen Braunschweig|FC Bayern M\u00fcnchen Basketball|2026-11-03T19:00Z",
+      "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4"
+        }
+      ],
+      "source_reference": "https://www.dyn.sport/deinsender/dyn-sport-mix/",
+      "access": "Free",
+      "validated_at": "2026-10-24T10:00:00+02:00",
+      "validation_notes": "Check 1 PASS \u2014 official Dyn free-games list ('Basketball bei Dyn Sport Mix') names 'Di. 03.11.2026, 20:00 Uhr \u00b7 easyCredit BBL FC Bayern M\u00fcnchen Basketball \u2013 Basketball L\u00f6wen Braunschweig' and states 'Live bei Dyn und bei allen Dyn Sport Mix Partnern'. Check 2/7 PASS \u2014 scheduled live linear broadcast on the free Dyn Sport Mix channel, carried free without account/Abo on Pluto TV. Fixture time cross-checked against the club schedule (fcbayern.com, 03.11.2026 20:00)."
     }
   ]
 }

@@ -1,3 +1,9 @@
 {
-  "leads": []
+  "leads": [
+    {
+      "url": "https://sport.bild.de/",
+      "name": "SPORTBILD",
+      "reason": "easycredit-bbl.de news says the 24.10.2026 Ludwigsburg\u2013Bonn game was free in the SPORTBILD stream; host is unapproved and stays quarantined"
+    }
+  ]
 }
