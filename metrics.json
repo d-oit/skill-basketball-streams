@@ -11,11 +11,11 @@
   "fixture_recall": {
     "dropped": 0,
     "duplicates": 0,
-    "fixture_recall": 0.025,
-    "fixtures": 79,
-    "rows": 79,
+    "fixture_recall": 0.024,
+    "fixtures": 85,
+    "rows": 85,
     "surfaced": 2,
-    "unseen": 77,
+    "unseen": 83,
     "unseen_keys": [
       "BBL|ALBA BERLIN|BMA365 Bamberg Baskets|2026-10-19T18:00Z",
       "BBL|ALBA BERLIN|Telekom Baskets Bonn|2026-11-01T17:00Z",
@@ -24,6 +24,7 @@
       "BBL|BMA365 Bamberg Baskets|EWE Baskets Oldenburg|2026-10-23T18:00Z",
       "BBL|BMA365 Bamberg Baskets|SYNTAINICS MBC|2026-10-10T16:30Z",
       "BBL|BMA365 Bamberg Baskets|Science City Jena|2026-11-01T14:00Z",
+      "BBL|Basketball Löwen Braunschweig|FC Bayern München Basketball|2026-11-03T19:00Z",
       "BBL|Basketball Löwen Braunschweig|Fitness First Würzburg Baskets|2026-10-31T17:30Z",
       "BBL|Basketball Löwen Braunschweig|MHP RIESEN Ludwigsburg|2026-10-11T13:00Z",
       "BBL|Basketball Löwen Braunschweig|NINERS Chemnitz|2026-10-18T13:00Z",
@@ -56,7 +57,9 @@
       "Basketball Champions League|ALBA BERLIN|SK Slavia Praha ERA NBK|2026-10-07T16:00Z",
       "Basketball Champions League|ALBA BERLIN|Surne Bilbao|2026-10-28T19:00Z",
       "Basketball Champions League|Asisa Joventut|Bnei Penlink Herzliya|2026-10-06T18:30Z",
+      "Basketball Champions League|Asisa Joventut|FC Porto|2026-11-03T19:30Z",
       "Basketball Champions League|Asisa Joventut|Telekom Baskets Bonn|2026-10-21T18:00Z",
+      "Basketball Champions League|BC Juventus Utena|BK KVIS Pardubice|2026-11-03T18:00Z",
       "Basketball Champions League|BC Juventus Utena|Pallacanestro Reggiana|2026-10-21T18:00Z",
       "Basketball Champions League|BC Juventus Utena|Unicaja|2026-10-07T17:00Z",
       "Basketball Champions League|BK KVIS Pardubice|Pallacanestro Reggiana|2026-10-06T18:00Z",
@@ -72,6 +75,7 @@
       "Basketball Champions League|Cibona|Galatasaray MCT Technic|2026-10-06T16:00Z",
       "Basketball Champions League|Cibona|Galatasaray MCT Technic|2026-10-06T18:00Z",
       "Basketball Champions League|Cibona|Legia Warszawa|2026-10-20T18:00Z",
+      "Basketball Champions League|Cibona|SIG Strasbourg|2026-11-03T19:00Z",
       "Basketball Champions League|FC Porto|Telekom Baskets Bonn|2026-10-07T18:00Z",
       "Basketball Champions League|Falco KC Szombathely|Windrose Giants Antwerp|2026-10-07T18:00Z",
       "Basketball Champions League|Falco-Vulcano Szombathely|Salon Vilpas|2026-10-20T16:00Z",
@@ -87,19 +91,21 @@
       "Basketball Champions League|Nanterre 92|Rytas Vilnius|2026-10-13T18:00Z",
       "Basketball Champions League|Nanterre 92|Sabah BC|2026-10-27T16:00Z",
       "Basketball Champions League|Nanterre 92|Trabzonspor|2026-10-07T16:00Z",
+      "Basketball Champions League|Pallacanestro Reggiana|Unicaja|2026-11-03T19:30Z",
       "Basketball Champions League|Pallacanestro Varese|UCAM Murcia|2026-10-07T18:30Z",
       "Basketball Champions League|Peristeri Betsson|UCAM Murcia|2026-10-27T19:30Z",
       "Basketball Champions League|RASTA Vechta|Spartak Office Shoes|2026-10-07T18:00Z",
       "Basketball Champions League|Rytas Vilnius|Sabah BC|2026-10-06T16:30Z",
       "Basketball Champions League|Rytas Vilnius|Trabzonspor|2026-10-28T17:30Z",
       "Basketball Champions League|SK Slavia Praha ERA NBK|Surne Bilbao|2026-10-14T18:00Z",
-      "Basketball Champions League|Sabah BC|Trabzonspor|2026-10-14T16:00Z"
+      "Basketball Champions League|Sabah BC|Trabzonspor|2026-10-14T16:00Z",
+      "Basketball Champions League|Salon Vilpas|Windrose Giants Antwerp|2026-11-03T17:30Z"
     ]
   },
   "recall": {
     "captured": 0,
-    "eligible": 832,
-    "missed": 832,
+    "eligible": 842,
+    "missed": 842,
     "missed_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -354,6 +360,7 @@
       "https://tvheute.at/newsticker/magentatv-zeigt-basketball-em-alle-spiele-live-und-gratis-73494",
       "https://tvizle.tr/en/event/euroleague",
       "https://tvizle.tr/en/event/euroleague-3",
+      "https://tvizle.tr/en/event/euroleague-5",
       "https://tvlander.com/basketball/euroleague",
       "https://ubc.ms/2024/02/23/regionalliga-und-nbbl-jbbl-spiele-ab-sofort-live-auf-sporttotal/",
       "https://uk.pcmag.com/video-streaming-services/167068/how-to-watch-2026-fiba-womens-basketball-world-cup-semifinals-live-free",
@@ -437,9 +444,11 @@
       "https://www.chip.de/downloads/FC-Bayern-Basketball-Live-Stream_67553512.html",
       "https://www.chip.de/downloads/webapp-FC-Bayern-vs.-Ulm-Basketball-Play-off-Finale-Live-Stream_186071881.html",
       "https://www.dazn.com/",
+      "https://www.dazn.com/de-CH/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
       "https://www.dazn.com/de-DE/competition/Competition:dqu2u44uhtdj7qai48q72box5",
       "https://www.dazn.com/de-DE/news/basketball/deutschland-vs-tuerkei-live-finale-der-basketball-em-heute-im-tv-und-live-stream/13tx37j6ayl2b1hgwisushk9uw",
       "https://www.dazn.com/de-DE/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
+      "https://www.dazn.com/en-AD/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
       "https://www.dazn.com/en-DE/competition/Competition:dqu2u44uhtdj7qai48q72box5",
       "https://www.dazn.com/en-ES/home/9lbg14lt0szi46zzkru59oa38/1mcc2ychxf6crz7pfdxg7ii01",
       "https://www.dazn.com/en-GB/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
@@ -447,8 +456,11 @@
       "https://www.dazn.com/en-IT/competitor/Competitor:33zimca2ldsxw1vx5qib7cu2j",
       "https://www.dazn.com/en-IT/competitor/Competitor:tq7d8ghyhv0v1ornsbywdvpd",
       "https://www.dazn.com/en-MC/competition/Competition:dqu2u44uhtdj7qai48q72box5",
+      "https://www.dazn.com/en-RW/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
+      "https://www.dazn.com/en-TV/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
       "https://www.dazn.com/en-US/competition/Competition:bwowjwcssos25g6yp5i7hgl6t",
       "https://www.dazn.com/en-US/competitor/Competitor:apoawtpvac4zqlancmvw4nk4o",
+      "https://www.dazn.com/en-US/news/soccer/national-basketball-league-on-dazn-how-to-watch-live-stream-nbl-matches/1p9n18gh9c8v01bbjjgriwdvgm",
       "https://www.dazn.com/en-US/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
       "https://www.dazn.com/en-US/welcome/courtside1891",
       "https://www.dazn.com/fr-CA/home/am3qixnn3rgsmv2bblccijc44/9u98qaudlvgf05dm6xpj7xymb",
@@ -657,6 +669,8 @@
       "https://www.news.de/sport/860079073/fc-bayern-muenchen-basketball-veolia-towers-hamburg-bbl-livestream-basketball-bundesliga-am-25-10-2026-in-muenchen-anfahrt-und-tickets/1/",
       "https://www.news.de/sport/860083003/fitness-first-wuerzburg-baskets-niners-chemnitz-bbl-livestream-basketball-bundesliga-am-26-10-2026-in-wuerzburg-anfahrt-und-tickets/1/",
       "https://www.news.de/sport/860083009/science-city-jena-skyliners-bbl-livestream-basketball-bundesliga-am-30-10-2026-in-jena-anfahrt-und-tickets/1/",
+      "https://www.news.de/sport/860125315/phoenix-hagen-rasta-vechta-bbl-livestream-kostenlos-basketball-bundesliga-am-30-10-2026-in-hagen-anfahrt-und-tickets/1/",
+      "https://www.nfhsnetwork.com/associations/ndhsaa/basketball/video/live-and-upcoming",
       "https://www.olympics.com/en/news/eurobasket-2025-doncic-antetokounmpo-and-jokic-headline-the-action-how-to-watch-live",
       "https://www.olympics.com/en/news/euroleague-basketball-2025-2026-preview",
       "https://www.presseportal.de/pm/147981/6057601",
@@ -867,6 +881,7 @@
       "https://www.youtube.com/watch?v=PDTjcSK8Pdc",
       "https://www.youtube.com/watch?v=Te-umIjSnWs",
       "https://www.youtube.com/watch?v=UedMqqmaP44",
+      "https://www.youtube.com/watch?v=WfxN-p4i9wg",
       "https://www.youtube.com/watch?v=WuV5w2L5qGw",
       "https://www.youtube.com/watch?v=Wz-D_Wsr2zg",
       "https://www.youtube.com/watch?v=X7_I_xPsLHE",
@@ -896,6 +911,7 @@
       "https://www.youtube.com/watch?v=fi6ylJuJ_ro",
       "https://www.youtube.com/watch?v=gJDCCMjcEDc",
       "https://www.youtube.com/watch?v=gQZ7xd2i8rw&xstg=CAMSBhUDzO3xHw%3D%3D",
+      "https://www.youtube.com/watch?v=gi-r9u7iB9M",
       "https://www.youtube.com/watch?v=hxbTDnJ4hgs",
       "https://www.youtube.com/watch?v=hyrWQoY4Ruo&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=jY77Owp50_E",
@@ -935,9 +951,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 16053,
-    "unique_games": 1284,
-    "unverifiable": 832,
+    "rows": 16327,
+    "unique_games": 1301,
+    "unverifiable": 842,
     "unverifiable_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -1192,6 +1208,7 @@
       "https://tvheute.at/newsticker/magentatv-zeigt-basketball-em-alle-spiele-live-und-gratis-73494",
       "https://tvizle.tr/en/event/euroleague",
       "https://tvizle.tr/en/event/euroleague-3",
+      "https://tvizle.tr/en/event/euroleague-5",
       "https://tvlander.com/basketball/euroleague",
       "https://ubc.ms/2024/02/23/regionalliga-und-nbbl-jbbl-spiele-ab-sofort-live-auf-sporttotal/",
       "https://uk.pcmag.com/video-streaming-services/167068/how-to-watch-2026-fiba-womens-basketball-world-cup-semifinals-live-free",
@@ -1275,9 +1292,11 @@
       "https://www.chip.de/downloads/FC-Bayern-Basketball-Live-Stream_67553512.html",
       "https://www.chip.de/downloads/webapp-FC-Bayern-vs.-Ulm-Basketball-Play-off-Finale-Live-Stream_186071881.html",
       "https://www.dazn.com/",
+      "https://www.dazn.com/de-CH/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
       "https://www.dazn.com/de-DE/competition/Competition:dqu2u44uhtdj7qai48q72box5",
       "https://www.dazn.com/de-DE/news/basketball/deutschland-vs-tuerkei-live-finale-der-basketball-em-heute-im-tv-und-live-stream/13tx37j6ayl2b1hgwisushk9uw",
       "https://www.dazn.com/de-DE/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
+      "https://www.dazn.com/en-AD/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
       "https://www.dazn.com/en-DE/competition/Competition:dqu2u44uhtdj7qai48q72box5",
       "https://www.dazn.com/en-ES/home/9lbg14lt0szi46zzkru59oa38/1mcc2ychxf6crz7pfdxg7ii01",
       "https://www.dazn.com/en-GB/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
@@ -1285,8 +1304,11 @@
       "https://www.dazn.com/en-IT/competitor/Competitor:33zimca2ldsxw1vx5qib7cu2j",
       "https://www.dazn.com/en-IT/competitor/Competitor:tq7d8ghyhv0v1ornsbywdvpd",
       "https://www.dazn.com/en-MC/competition/Competition:dqu2u44uhtdj7qai48q72box5",
+      "https://www.dazn.com/en-RW/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
+      "https://www.dazn.com/en-TV/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
       "https://www.dazn.com/en-US/competition/Competition:bwowjwcssos25g6yp5i7hgl6t",
       "https://www.dazn.com/en-US/competitor/Competitor:apoawtpvac4zqlancmvw4nk4o",
+      "https://www.dazn.com/en-US/news/soccer/national-basketball-league-on-dazn-how-to-watch-live-stream-nbl-matches/1p9n18gh9c8v01bbjjgriwdvgm",
       "https://www.dazn.com/en-US/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
       "https://www.dazn.com/en-US/welcome/courtside1891",
       "https://www.dazn.com/fr-CA/home/am3qixnn3rgsmv2bblccijc44/9u98qaudlvgf05dm6xpj7xymb",
@@ -1495,6 +1517,8 @@
       "https://www.news.de/sport/860079073/fc-bayern-muenchen-basketball-veolia-towers-hamburg-bbl-livestream-basketball-bundesliga-am-25-10-2026-in-muenchen-anfahrt-und-tickets/1/",
       "https://www.news.de/sport/860083003/fitness-first-wuerzburg-baskets-niners-chemnitz-bbl-livestream-basketball-bundesliga-am-26-10-2026-in-wuerzburg-anfahrt-und-tickets/1/",
       "https://www.news.de/sport/860083009/science-city-jena-skyliners-bbl-livestream-basketball-bundesliga-am-30-10-2026-in-jena-anfahrt-und-tickets/1/",
+      "https://www.news.de/sport/860125315/phoenix-hagen-rasta-vechta-bbl-livestream-kostenlos-basketball-bundesliga-am-30-10-2026-in-hagen-anfahrt-und-tickets/1/",
+      "https://www.nfhsnetwork.com/associations/ndhsaa/basketball/video/live-and-upcoming",
       "https://www.olympics.com/en/news/eurobasket-2025-doncic-antetokounmpo-and-jokic-headline-the-action-how-to-watch-live",
       "https://www.olympics.com/en/news/euroleague-basketball-2025-2026-preview",
       "https://www.presseportal.de/pm/147981/6057601",
@@ -1705,6 +1729,7 @@
       "https://www.youtube.com/watch?v=PDTjcSK8Pdc",
       "https://www.youtube.com/watch?v=Te-umIjSnWs",
       "https://www.youtube.com/watch?v=UedMqqmaP44",
+      "https://www.youtube.com/watch?v=WfxN-p4i9wg",
       "https://www.youtube.com/watch?v=WuV5w2L5qGw",
       "https://www.youtube.com/watch?v=Wz-D_Wsr2zg",
       "https://www.youtube.com/watch?v=X7_I_xPsLHE",
@@ -1734,6 +1759,7 @@
       "https://www.youtube.com/watch?v=fi6ylJuJ_ro",
       "https://www.youtube.com/watch?v=gJDCCMjcEDc",
       "https://www.youtube.com/watch?v=gQZ7xd2i8rw&xstg=CAMSBhUDzO3xHw%3D%3D",
+      "https://www.youtube.com/watch?v=gi-r9u7iB9M",
       "https://www.youtube.com/watch?v=hxbTDnJ4hgs",
       "https://www.youtube.com/watch?v=hyrWQoY4Ruo&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=jY77Owp50_E",
@@ -1773,30 +1799,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "",
+  "run_id": "2026-10-24T12:52Z",
   "source": {
     "audit_rows": 27,
-    "candidates_rows": 16053,
-    "fixtures_rows": 79
+    "candidates_rows": 16327,
+    "fixtures_rows": 85
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 1,
-        "judged": 0,
-        "precision": null,
-        "rows": 1,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-10-21T14:03Z",
-      "unique_games": 0
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -2017,7 +2026,24 @@
       "rows": 0,
       "run_id": "2026-10-23T13:47Z",
       "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 138,
+      "missed": 138,
+      "recall": 0.0,
+      "rows": 274,
+      "run_id": "2026-10-24T12:50Z",
+      "unique_games": 236
     }
   ],
-  "ts": "2026-10-23T13:47:17.886375+00:00"
+  "ts": "2026-10-24T12:52:39.400735+00:00"
 }
