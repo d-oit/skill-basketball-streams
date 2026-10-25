@@ -11,11 +11,11 @@
   "fixture_recall": {
     "dropped": 0,
     "duplicates": 0,
-    "fixture_recall": 0.024,
-    "fixtures": 85,
-    "rows": 85,
+    "fixture_recall": 0.023,
+    "fixtures": 88,
+    "rows": 88,
     "surfaced": 2,
-    "unseen": 83,
+    "unseen": 86,
     "unseen_keys": [
       "BBL|ALBA BERLIN|BMA365 Bamberg Baskets|2026-10-19T18:00Z",
       "BBL|ALBA BERLIN|Telekom Baskets Bonn|2026-11-01T17:00Z",
@@ -51,6 +51,7 @@
       "BBL|SKYLINERS|Veolia Towers Hamburg|2026-10-11T14:30Z",
       "BBL|SYNTAINICS MBC|Veolia Towers Hamburg|2026-11-01T15:30Z",
       "BBL|Science City Jena|Telekom Baskets Bonn|2026-10-09T18:00Z",
+      "Basketball Champions League|AEK BC|Falco-Vulcano Szombathely|2026-11-04T17:00Z",
       "Basketball Champions League|AEK BC|Salon Vilpas|2026-10-07T16:00Z",
       "Basketball Champions League|AEK BC|Windrose Giants Antwerp|2026-10-21T16:00Z",
       "Basketball Champions League|ALBA BERLIN|Igokea m:tel|2026-10-13T18:00Z",
@@ -68,6 +69,7 @@
       "Basketball Champions League|BMA365 Bamberg Baskets|Peristeri Betsson|2026-10-06T16:30Z",
       "Basketball Champions League|BMA365 Bamberg Baskets|UCAM Murcia|2026-10-14T17:00Z",
       "Basketball Champions League|Bnei Penlink Herzliya|FC Porto|2026-10-21T16:30Z",
+      "Basketball Champions League|Bnei Penlink Herzliya|Telekom Baskets Bonn|2026-11-04T19:00Z",
       "Basketball Champions League|Cholet Basket|Hapoel Maoz Daniel Holon|2026-10-06T15:45Z",
       "Basketball Champions League|Cholet Basket|Hapoel Maoz Daniel Holon|2026-10-06T16:30Z",
       "Basketball Champions League|Cholet Basket|RASTA Vechta|2026-10-14T18:00Z",
@@ -80,6 +82,7 @@
       "Basketball Champions League|Falco KC Szombathely|Windrose Giants Antwerp|2026-10-07T18:00Z",
       "Basketball Champions League|Falco-Vulcano Szombathely|Salon Vilpas|2026-10-20T16:00Z",
       "Basketball Champions League|Falco-Vulcano Szombathely|Windrose Giants Antwerp|2026-10-07T18:00Z",
+      "Basketball Champions League|Galatasaray MCT Technic|Legia Warszawa|2026-11-04T17:00Z",
       "Basketball Champions League|Galatasaray MCT Technic|SIG Strasbourg|2026-10-20T17:00Z",
       "Basketball Champions League|Hapoel Maoz Daniel Holon|RASTA Vechta|2026-10-28T18:00Z",
       "Basketball Champions League|Hapoel Maoz Daniel Holon|Spartak Office Shoes|2026-10-14T18:00Z",
@@ -104,8 +107,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 842,
-    "missed": 842,
+    "eligible": 848,
+    "missed": 848,
     "missed_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -116,6 +119,7 @@
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959?l=en-GB",
+      "https://apps.apple.com/us/app/nba-live-games-scores/id484672289",
       "https://basketball.de/basketball-livestream-tv-vorschau/",
       "https://basketball.nationalmannschaft.net/frauen-wm-2026-uebertragung/",
       "https://basketballbundesligabet.com/articles/bbl-live-stream-dyn/",
@@ -748,6 +752,7 @@
       "https://www.sportsgambler.com/live-streaming/basketball/",
       "https://www.sportsgambler.com/live-streaming/basketball/fiba-bcl/",
       "https://www.sportsgambler.com/live-streaming/basketball/fiba-euroleague/",
+      "https://www.sportsgambler.com/live-streaming/basketball/germany-bbl/",
       "https://www.sportwette.net/sportwetten-live-stream/basketball",
       "https://www.spox.com/basketball/listen/alba-berlin-vs-fc-bayern-muenchen-basketball-finale-heute-live-im-free-tv-wer-zeigt-uebertraegt-spiel-3-der-bbl-finals-im-tv-und-livestream/blt22bba66a434f7a6b",
       "https://www.spox.com/basketball/listen/ard-zdf-rtl-sat-1-oder-magenta-fuer-das-dbb-team-im-viertelfinale-der-basketball-em-heute-live-auf-welchem-sender-laeuft-deutschland-vs-slowenien-im-free-tv-und-livestream/blt3ec596fb7f6f077d",
@@ -846,6 +851,7 @@
       "https://www.youtube.com/watch?v=0_LV29JXaxU",
       "https://www.youtube.com/watch?v=0_LV29JXaxU&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=2Aj1stTgLOk",
+      "https://www.youtube.com/watch?v=2WOQdwS10KA",
       "https://www.youtube.com/watch?v=2_-HGISapYU",
       "https://www.youtube.com/watch?v=30yqTqmMGKo",
       "https://www.youtube.com/watch?v=3I83ko1eP9c",
@@ -870,9 +876,11 @@
       "https://www.youtube.com/watch?v=Gg4GnpJKTe8",
       "https://www.youtube.com/watch?v=Hh5YEuoreug",
       "https://www.youtube.com/watch?v=JPavyF_vMXw",
+      "https://www.youtube.com/watch?v=JsomM8ifry0",
       "https://www.youtube.com/watch?v=K5zuonU-hHo",
       "https://www.youtube.com/watch?v=K5zuonU-hHo&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=KJH8BAv-E88",
+      "https://www.youtube.com/watch?v=KqiY2Tlk7zw",
       "https://www.youtube.com/watch?v=L7scag65uD8",
       "https://www.youtube.com/watch?v=LOvngOSlqEo",
       "https://www.youtube.com/watch?v=MLgGYhYyUjQ",
@@ -912,6 +920,7 @@
       "https://www.youtube.com/watch?v=gJDCCMjcEDc",
       "https://www.youtube.com/watch?v=gQZ7xd2i8rw&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=gi-r9u7iB9M",
+      "https://www.youtube.com/watch?v=hqe72K4KOes",
       "https://www.youtube.com/watch?v=hxbTDnJ4hgs",
       "https://www.youtube.com/watch?v=hyrWQoY4Ruo&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=jY77Owp50_E",
@@ -951,9 +960,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 16329,
-    "unique_games": 1302,
-    "unverifiable": 842,
+    "rows": 16603,
+    "unique_games": 1311,
+    "unverifiable": 848,
     "unverifiable_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -964,6 +973,7 @@
       "https://apps.apple.com/",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959",
       "https://apps.apple.com/de/app/magentasport-dein-live-sport/id914912959?l=en-GB",
+      "https://apps.apple.com/us/app/nba-live-games-scores/id484672289",
       "https://basketball.de/basketball-livestream-tv-vorschau/",
       "https://basketball.nationalmannschaft.net/frauen-wm-2026-uebertragung/",
       "https://basketballbundesligabet.com/articles/bbl-live-stream-dyn/",
@@ -1596,6 +1606,7 @@
       "https://www.sportsgambler.com/live-streaming/basketball/",
       "https://www.sportsgambler.com/live-streaming/basketball/fiba-bcl/",
       "https://www.sportsgambler.com/live-streaming/basketball/fiba-euroleague/",
+      "https://www.sportsgambler.com/live-streaming/basketball/germany-bbl/",
       "https://www.sportwette.net/sportwetten-live-stream/basketball",
       "https://www.spox.com/basketball/listen/alba-berlin-vs-fc-bayern-muenchen-basketball-finale-heute-live-im-free-tv-wer-zeigt-uebertraegt-spiel-3-der-bbl-finals-im-tv-und-livestream/blt22bba66a434f7a6b",
       "https://www.spox.com/basketball/listen/ard-zdf-rtl-sat-1-oder-magenta-fuer-das-dbb-team-im-viertelfinale-der-basketball-em-heute-live-auf-welchem-sender-laeuft-deutschland-vs-slowenien-im-free-tv-und-livestream/blt3ec596fb7f6f077d",
@@ -1694,6 +1705,7 @@
       "https://www.youtube.com/watch?v=0_LV29JXaxU",
       "https://www.youtube.com/watch?v=0_LV29JXaxU&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=2Aj1stTgLOk",
+      "https://www.youtube.com/watch?v=2WOQdwS10KA",
       "https://www.youtube.com/watch?v=2_-HGISapYU",
       "https://www.youtube.com/watch?v=30yqTqmMGKo",
       "https://www.youtube.com/watch?v=3I83ko1eP9c",
@@ -1718,9 +1730,11 @@
       "https://www.youtube.com/watch?v=Gg4GnpJKTe8",
       "https://www.youtube.com/watch?v=Hh5YEuoreug",
       "https://www.youtube.com/watch?v=JPavyF_vMXw",
+      "https://www.youtube.com/watch?v=JsomM8ifry0",
       "https://www.youtube.com/watch?v=K5zuonU-hHo",
       "https://www.youtube.com/watch?v=K5zuonU-hHo&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=KJH8BAv-E88",
+      "https://www.youtube.com/watch?v=KqiY2Tlk7zw",
       "https://www.youtube.com/watch?v=L7scag65uD8",
       "https://www.youtube.com/watch?v=LOvngOSlqEo",
       "https://www.youtube.com/watch?v=MLgGYhYyUjQ",
@@ -1760,6 +1774,7 @@
       "https://www.youtube.com/watch?v=gJDCCMjcEDc",
       "https://www.youtube.com/watch?v=gQZ7xd2i8rw&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=gi-r9u7iB9M",
+      "https://www.youtube.com/watch?v=hqe72K4KOes",
       "https://www.youtube.com/watch?v=hxbTDnJ4hgs",
       "https://www.youtube.com/watch?v=hyrWQoY4Ruo&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=jY77Owp50_E",
@@ -1799,30 +1814,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "",
+  "run_id": "2026-10-25T13:18Z",
   "source": {
     "audit_rows": 28,
-    "candidates_rows": 16329,
-    "fixtures_rows": 85
+    "candidates_rows": 16603,
+    "fixtures_rows": 88
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 123,
-      "missed": 123,
-      "recall": 0.0,
-      "rows": 281,
-      "run_id": "2026-10-21T17:57Z",
-      "unique_games": 226
-    },
     {
       "audit": {
         "inconclusive": 1,
@@ -2043,7 +2041,24 @@
       "rows": 0,
       "run_id": "2026-10-24T12:56Z",
       "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 128,
+      "missed": 128,
+      "recall": 0.0,
+      "rows": 274,
+      "run_id": "2026-10-25T13:16Z",
+      "unique_games": 233
     }
   ],
-  "ts": "2026-10-24T12:56:02.856480+00:00"
+  "ts": "2026-10-25T13:18:50.616112+00:00"
 }
