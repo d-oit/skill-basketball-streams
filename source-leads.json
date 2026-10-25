@@ -1,9 +1,10 @@
 {
   "leads": [
     {
-      "url": "https://sport.bild.de/",
-      "name": "SPORTBILD",
-      "reason": "easycredit-bbl.de news says the 24.10.2026 Ludwigsburg\u2013Bonn game was free in the SPORTBILD stream; host is unapproved and stays quarantined"
+      "url": "https://www.swr.de/sport/mehr-sport/basketball-live-gladiators-trier-opava-europe-cup-100.html",
+      "name": "SWR Sport",
+      "league": "FIBA Europe Cup",
+      "reason": "Unapproved regional-broadcaster page carrying the free Opava\u2013Trier livestream; approved Sportschau page used as directLink."
     }
   ]
 }

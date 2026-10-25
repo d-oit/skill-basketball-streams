@@ -1,16 +1,16 @@
 {
   "candidates": [
     {
-      "league": "easyCredit BBL",
+      "league": "FIBA Europe Cup",
       "teams": [
-        "MHP RIESEN Ludwigsburg",
-        "Telekom Baskets Bonn"
+        "BK Opava",
+        "Gladiators Trier"
       ],
-      "start": "2026-10-24T20:00:00+02:00",
+      "start": "2026-10-28T18:00:00+01:00",
       "state": "VERIFIED",
-      "summary": "easyCredit BBL: MHP RIESEN Ludwigsburg vs Telekom Baskets Bonn",
-      "game_key": "easyCredit BBL|MHP RIESEN Ludwigsburg|Telekom Baskets Bonn|2026-10-24T18:00Z",
-      "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
+      "summary": "FIBA Europe Cup: BK Opava vs Gladiators Trier",
+      "game_key": "FIBA Europe Cup|BK Opava|Gladiators Trier|2026-10-28T17:00Z",
+      "url": "https://www.sportschau.de/basketball/gladiators-trier-gegen-bc-batumi,livestream-basketball-europecup-trier-104.html",
       "backend": "",
       "evidence": {
         "live_confirmed": true,
@@ -19,25 +19,25 @@
       "direct_links": [
         {
           "source": "",
-          "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4"
+          "url": "https://www.sportschau.de/basketball/gladiators-trier-gegen-bc-batumi,livestream-basketball-europecup-trier-104.html"
         }
       ],
-      "source_reference": "https://www.dyn.sport/deinsender/dyn-sport-mix/",
+      "source_reference": "https://www.sportschau.de/basketball/gladiators-trier-gegen-bc-batumi,livestream-basketball-europecup-trier-104.html",
       "access": "Free",
-      "validated_at": "2026-10-24T10:00:00+02:00",
-      "validation_notes": "Check 1 PASS \u2014 official Dyn free-games list ('Basketball bei Dyn Sport Mix') names 'Sa. 24.10.2026, 20:00 Uhr \u00b7 easyCredit BBL MHP RIESEN Ludwigsburg \u2013 Telekom Baskets Bonn' and states 'Live bei Dyn und bei allen Dyn Sport Mix Partnern'. Check 2/7 PASS \u2014 scheduled live linear broadcast on the free Dyn Sport Mix channel, carried free without account/Abo on Pluto TV. BBL league news also confirms the fixture is free in the SPORTBILD stream; sportbild is unapproved and not used as the link."
+      "validated_at": "2026-10-25T12:30:00Z",
+      "validation_notes": "Sportschau Livestreams lists the game; page headline 'BK Opava gegen Gladiators Trier', 28.10.2026 17:57 Uhr, with ARD/SWR live player (HLS stream, availFromDateTime 2026-10-28T16:57Z) and 'Das Spiel im Livestream des SWR.' Free public-broadcaster stream, geo-restricted to Germany."
     },
     {
-      "league": "easyCredit BBL",
+      "league": "FIBA Europe Cup",
       "teams": [
-        "FC Bayern M\u00fcnchen Basketball",
-        "Basketball L\u00f6wen Braunschweig"
+        "Gladiators Trier",
+        "KB Trepca"
       ],
-      "start": "2026-11-03T20:00:00+01:00",
+      "start": "2026-11-04T20:00:00+01:00",
       "state": "VERIFIED",
-      "summary": "easyCredit BBL: FC Bayern M\u00fcnchen Basketball vs Basketball L\u00f6wen Braunschweig",
-      "game_key": "easyCredit BBL|Basketball L\u00f6wen Braunschweig|FC Bayern M\u00fcnchen Basketball|2026-11-03T19:00Z",
-      "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
+      "summary": "FIBA Europe Cup: Gladiators Trier vs KB Trepca",
+      "game_key": "FIBA Europe Cup|Gladiators Trier|KB Trepca|2026-11-04T19:00Z",
+      "url": "https://www.sportschau.de/basketball/gladiators-trier-gegen-bc-batumi,livestream-basketball-europecup-trier-106.html",
       "backend": "",
       "evidence": {
         "live_confirmed": true,
@@ -46,13 +46,13 @@
       "direct_links": [
         {
           "source": "",
-          "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4"
+          "url": "https://www.sportschau.de/basketball/gladiators-trier-gegen-bc-batumi,livestream-basketball-europecup-trier-106.html"
         }
       ],
-      "source_reference": "https://www.dyn.sport/deinsender/dyn-sport-mix/",
+      "source_reference": "https://www.sportschau.de/basketball/gladiators-trier-gegen-bc-batumi,livestream-basketball-europecup-trier-106.html",
       "access": "Free",
-      "validated_at": "2026-10-24T10:00:00+02:00",
-      "validation_notes": "Check 1 PASS \u2014 official Dyn free-games list ('Basketball bei Dyn Sport Mix') names 'Di. 03.11.2026, 20:00 Uhr \u00b7 easyCredit BBL FC Bayern M\u00fcnchen Basketball \u2013 Basketball L\u00f6wen Braunschweig' and states 'Live bei Dyn und bei allen Dyn Sport Mix Partnern'. Check 2/7 PASS \u2014 scheduled live linear broadcast on the free Dyn Sport Mix channel, carried free without account/Abo on Pluto TV. Fixture time cross-checked against the club schedule (fcbayern.com, 03.11.2026 20:00)."
+      "validated_at": "2026-10-25T12:30:00Z",
+      "validation_notes": "Sportschau Livestreams lists the game; page headline 'Gladiators Trier gegen KB Trepca', 04.11.2026 19:57 Uhr, with ARD/SWR live player (HLS stream, availFromDateTime 2026-11-04T18:57Z) and 'Das Spiel im Livestream des SWR.' Free public-broadcaster stream, geo-restricted to Germany."
     }
   ]
 }
