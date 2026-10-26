@@ -1,21 +1,21 @@
 {
   "audit": {
     "inconclusive": 15,
-    "judged": 14,
+    "judged": 15,
     "precision": 1.0,
-    "rows": 29,
-    "verified": 14,
+    "rows": 30,
+    "verified": 15,
     "wrong": 0
   },
   "derived": true,
   "fixture_recall": {
     "dropped": 0,
     "duplicates": 0,
-    "fixture_recall": 0.023,
+    "fixture_recall": 0.034,
     "fixtures": 88,
     "rows": 88,
-    "surfaced": 2,
-    "unseen": 86,
+    "surfaced": 3,
+    "unseen": 85,
     "unseen_keys": [
       "BBL|ALBA BERLIN|BMA365 Bamberg Baskets|2026-10-19T18:00Z",
       "BBL|ALBA BERLIN|Telekom Baskets Bonn|2026-11-01T17:00Z",
@@ -24,7 +24,6 @@
       "BBL|BMA365 Bamberg Baskets|EWE Baskets Oldenburg|2026-10-23T18:00Z",
       "BBL|BMA365 Bamberg Baskets|SYNTAINICS MBC|2026-10-10T16:30Z",
       "BBL|BMA365 Bamberg Baskets|Science City Jena|2026-11-01T14:00Z",
-      "BBL|Basketball Löwen Braunschweig|FC Bayern München Basketball|2026-11-03T19:00Z",
       "BBL|Basketball Löwen Braunschweig|Fitness First Würzburg Baskets|2026-10-31T17:30Z",
       "BBL|Basketball Löwen Braunschweig|MHP RIESEN Ludwigsburg|2026-10-11T13:00Z",
       "BBL|Basketball Löwen Braunschweig|NINERS Chemnitz|2026-10-18T13:00Z",
@@ -961,8 +960,8 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 16885,
-    "unique_games": 1317,
+    "rows": 16888,
+    "unique_games": 1320,
     "unverifiable": 849,
     "unverifiable_keys": [
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
@@ -1816,30 +1815,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-10-26T15:23Z",
+  "run_id": "",
   "source": {
-    "audit_rows": 29,
-    "candidates_rows": 16885,
+    "audit_rows": 30,
+    "candidates_rows": 16888,
     "fixtures_rows": 88
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 1,
-        "judged": 0,
-        "precision": null,
-        "rows": 1,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-10-21T19:11Z",
-      "unique_games": 0
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -2060,7 +2042,24 @@
       "rows": 280,
       "run_id": "2026-10-26T15:21Z",
       "unique_games": 234
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 1,
+        "precision": 1.0,
+        "rows": 1,
+        "verified": 1,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 3,
+      "run_id": "2026-10-26T15:33Z",
+      "unique_games": 3
     }
   ],
-  "ts": "2026-10-26T15:23:20.186866+00:00"
+  "ts": "2026-10-26T15:33:38.457760+00:00"
 }
