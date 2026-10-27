@@ -4,12 +4,12 @@
       "league": "FIBA Europe Cup",
       "teams": [
         "BK Opava",
-        "VET-CONCEPT Gladiators Trier"
+        "Gladiators Trier"
       ],
       "start": "2026-10-28T18:00:00+01:00",
       "state": "VERIFIED",
-      "summary": "FIBA Europe Cup: BK Opava vs VET-CONCEPT Gladiators Trier",
-      "game_key": "FIBA Europe Cup|BK Opava|VET-CONCEPT Gladiators Trier|2026-10-28T17:00Z",
+      "summary": "FIBA Europe Cup: BK Opava vs Gladiators Trier",
+      "game_key": "FIBA Europe Cup|BK Opava|Gladiators Trier|2026-10-28T17:00Z",
       "url": "https://www.sportschau.de/basketball/gladiators-trier-gegen-bc-batumi,livestream-basketball-europecup-trier-104.html",
       "backend": "",
       "evidence": {
@@ -22,48 +22,21 @@
           "url": "https://www.sportschau.de/basketball/gladiators-trier-gegen-bc-batumi,livestream-basketball-europecup-trier-104.html"
         }
       ],
-      "source_reference": "https://vetconceptgladiators.de/spielplan/",
+      "source_reference": "https://www.fiba.basketball/en/events/fiba-europe-cup-26-27/games/135675-OPAV-TRIER",
       "access": "Free",
-      "validated_at": "2026-10-26T16:19:00Z",
-      "validation_notes": "sportschau.de livestream page 'BK Opava gegen Gladiators Trier' carries a Livestream label, broadcast metadata 'Sportschau, Das Erste, 28.10.2026 - 17:57 Uhr', and player config availFromDateTime 2026-10-28T16:57Z. Club schedule lists the game on 28.10.2026 at 18:00. Free public-broadcaster stream; the URL slug is stale (bc-batumi) but the page headline and metadata name the current opponent."
-    },
-    {
-      "league": "BBL",
-      "teams": [
-        "FC Bayern M\u00fcnchen Basketball",
-        "Basketball L\u00f6wen Braunschweig"
-      ],
-      "start": "2026-11-03T20:00:00+01:00",
-      "state": "VERIFIED",
-      "summary": "BBL: FC Bayern M\u00fcnchen Basketball vs Basketball L\u00f6wen Braunschweig",
-      "game_key": "BBL|Basketball L\u00f6wen Braunschweig|FC Bayern M\u00fcnchen Basketball|2026-11-03T19:00Z",
-      "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
-      "backend": "",
-      "evidence": {
-        "live_confirmed": true,
-        "free_confirmed": true
-      },
-      "direct_links": [
-        {
-          "source": "",
-          "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4"
-        }
-      ],
-      "source_reference": "https://www.dyn.sport/event/FC_Bayern_M%C3%BCnchen_Basketball_Basketball_L%C3%B6wen_Braunschweig_105846",
-      "access": "Free",
-      "validated_at": "2026-10-26T16:19:00Z",
-      "validation_notes": "The Dyn 'Dyn Free Spiele' list names this game on 03.11.2026 at 20:00; the Dyn event page confirms live im Stream; the BBL iCal feed confirms DTSTART 2026-11-03T20:00 CET. The directLink is the approved Dyn Sport Mix Pluto channel (Germany geo-restricted, not paid)."
+      "validated_at": "2026-10-27T16:10:00+01:00",
+      "validation_notes": "Sportschau livestream page names both clubs and states 'Das Spiel im Livestream des SWR'; slot listed as Sportschau, Das Erste, 28.10.2026 17:57 Uhr (tip-off 18:00 CET). Free public-broadcaster stream, no login. FIBA game page confirms the fixture."
     },
     {
       "league": "FIBA Europe Cup",
       "teams": [
-        "VET-CONCEPT Gladiators Trier",
+        "Gladiators Trier",
         "KB Trepca"
       ],
       "start": "2026-11-04T20:00:00+01:00",
       "state": "VERIFIED",
-      "summary": "FIBA Europe Cup: VET-CONCEPT Gladiators Trier vs KB Trepca",
-      "game_key": "FIBA Europe Cup|KB Trepca|VET-CONCEPT Gladiators Trier|2026-11-04T19:00Z",
+      "summary": "FIBA Europe Cup: Gladiators Trier vs KB Trepca",
+      "game_key": "FIBA Europe Cup|Gladiators Trier|KB Trepca|2026-11-04T19:00Z",
       "url": "https://www.sportschau.de/basketball/gladiators-trier-gegen-bc-batumi,livestream-basketball-europecup-trier-106.html",
       "backend": "",
       "evidence": {
@@ -76,10 +49,10 @@
           "url": "https://www.sportschau.de/basketball/gladiators-trier-gegen-bc-batumi,livestream-basketball-europecup-trier-106.html"
         }
       ],
-      "source_reference": "https://vetconceptgladiators.de/spielplan/",
+      "source_reference": "https://www.sportschau.de/basketball/gladiators-trier-gegen-bc-batumi,livestream-basketball-europecup-trier-106.html",
       "access": "Free",
-      "validated_at": "2026-10-26T16:19:00Z",
-      "validation_notes": "sportschau.de livestream page 'Gladiators Trier gegen KB Trepca' carries a Livestream label, broadcast metadata 'Sportschau, Das Erste, 04.11.2026 - 19:57 Uhr', and player config availFromDateTime 2026-11-04T18:57Z. Club schedule lists the game on 04.11.2026 at 20:00. Free public-broadcaster stream; the URL slug is stale (bc-batumi) but the page headline and metadata name the current opponent."
+      "validated_at": "2026-10-27T16:10:00+01:00",
+      "validation_notes": "Sportschau livestream page names both clubs and states 'Das Spiel im Livestream des SWR'; slot listed as Sportschau, Das Erste, 04.11.2026 19:57 Uhr (tip-off 20:00 CET). Free public-broadcaster stream, no login."
     }
   ]
 }

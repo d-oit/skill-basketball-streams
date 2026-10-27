@@ -1,10 +1,15 @@
 {
   "leads": [
     {
-      "url": "https://www.swr.de/sport/mehr-sport/basketball-live-trier-trepca-europe-cup-100.html",
-      "name": "SWR Sport",
+      "url": "https://www.swr.de/sport/mehr-sport/basketball-live-gladiators-trier-opava-europe-cup-100.html",
+      "name": "SWR",
       "league": "FIBA Europe Cup",
-      "reason": "Free live stream of VET-CONCEPT Gladiators Trier vs KB Trepca (04.11.2026, 19:55 CET); host is not in approved sources."
+      "reason": "Regional broadcaster preview used as corroboration for the 28.10 fixture; unapproved domain, quarantine until approved."
+    },
+    {
+      "url": "https://www.youtube.com/@4KTV10Sports",
+      "name": "4K TV10 Sports",
+      "reason": "Unapproved YouTube channel surfaced in the Live-filter results; reupload-style channel, quarantined."
     }
   ]
 }
