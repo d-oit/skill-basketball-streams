@@ -1,16 +1,16 @@
 {
   "candidates": [
     {
-      "league": "Basketball Europe Cup",
+      "league": "NBBL",
       "teams": [
-        "BK Opava",
-        "Gladiators Trier"
+        "NINERS Chemnitz Academy",
+        "Berlin Dreams"
       ],
-      "start": "2026-10-28T18:00:00+01:00",
+      "start": "2026-10-31T18:15:00+01:00",
       "state": "VERIFIED",
-      "summary": "Basketball Europe Cup: BK Opava vs Gladiators Trier",
-      "game_key": "Basketball Europe Cup|BK Opava|Gladiators Trier|2026-10-28T17:00Z",
-      "url": "https://www.sportschau.de/basketball/gladiators-trier-gegen-bc-batumi,livestream-basketball-europecup-trier-104.html",
+      "summary": "NBBL: NINERS Chemnitz Academy vs Berlin Dreams",
+      "game_key": "NBBL|Berlin Dreams|NINERS Chemnitz Academy|2026-10-31T17:15Z",
+      "url": "https://sporteurope.tv/en/sc-jena/nbbl-niners-chemnitz-academy-vs-berlin-dreams",
       "backend": "",
       "evidence": {
         "live_confirmed": true,
@@ -19,25 +19,25 @@
       "direct_links": [
         {
           "source": "",
-          "url": "https://www.sportschau.de/basketball/gladiators-trier-gegen-bc-batumi,livestream-basketball-europecup-trier-104.html"
+          "url": "https://sporteurope.tv/en/sc-jena/nbbl-niners-chemnitz-academy-vs-berlin-dreams"
         }
       ],
-      "source_reference": "https://www.sportschau.de/streams",
+      "source_reference": "https://sporteurope.tv/en/sc-jena",
       "access": "Free",
-      "validated_at": "2026-10-28T08:00:00Z",
-      "validation_notes": "sportschau.de game page VideoObject: isAccessibleForFree=true, BroadcastEvent isLiveBroadcast=true, startDate 2026-10-28T17:57+01:00, player contentUrl master.m3u8; SWR/ARD free public livestream. Club site confirms the game is live and kostenlos from 18:00."
+      "validated_at": "2026-10-31T14:47:00Z",
+      "validation_notes": "Sporteurope search API returns this asset as type LIVESTREAM with empty monetizations; the Science City Jena profile lists it under 'Schedule and Upcoming Livestreams' with this URL and German broadcast text 'startet ab 18:15 Uhr'; NBBL is free on Sporteurope under the 2025/26-2026/27 agreement."
     },
     {
-      "league": "Basketball Europe Cup",
+      "league": "NBBL",
       "teams": [
-        "Gladiators Trier",
-        "KB Trepca"
+        "SG Junior L\u00f6wen Braunschweig",
+        "NINERS Chemnitz Academy"
       ],
-      "start": "2026-11-04T20:00:00+01:00",
+      "start": "2026-11-01T14:15:00+01:00",
       "state": "VERIFIED",
-      "summary": "Basketball Europe Cup: Gladiators Trier vs KB Trepca",
-      "game_key": "Basketball Europe Cup|Gladiators Trier|KB Trepca|2026-11-04T19:00Z",
-      "url": "https://www.sportschau.de/basketball/gladiators-trier-gegen-bc-batumi,livestream-basketball-europecup-trier-106.html",
+      "summary": "NBBL: SG Junior L\u00f6wen Braunschweig vs NINERS Chemnitz Academy",
+      "game_key": "NBBL|NINERS Chemnitz Academy|SG Junior L\u00f6wen Braunschweig|2026-11-01T13:15Z",
+      "url": "https://sporteurope.tv/en/sc-jena/nbbl-sg-junior-loewen-braunschweig-vs-niners-chemnitz-academy",
       "backend": "",
       "evidence": {
         "live_confirmed": true,
@@ -46,13 +46,13 @@
       "direct_links": [
         {
           "source": "",
-          "url": "https://www.sportschau.de/basketball/gladiators-trier-gegen-bc-batumi,livestream-basketball-europecup-trier-106.html"
+          "url": "https://sporteurope.tv/en/sc-jena/nbbl-sg-junior-loewen-braunschweig-vs-niners-chemnitz-academy"
         }
       ],
-      "source_reference": "https://www.sportschau.de/streams",
+      "source_reference": "https://sporteurope.tv/en/sc-jena",
       "access": "Free",
-      "validated_at": "2026-10-28T08:00:00Z",
-      "validation_notes": "sportschau.de game page VideoObject: isAccessibleForFree=true, BroadcastEvent isLiveBroadcast=true, startDate 2026-11-04T19:57+01:00, endDate 22:15, player contentUrl master.m3u8; SWR/ARD free public livestream of the FIBA Europe Cup game."
+      "validated_at": "2026-10-31T14:47:00Z",
+      "validation_notes": "Sporteurope search API returns this asset as type LIVESTREAM with empty monetizations; the Science City Jena profile lists it under 'Schedule and Upcoming Livestreams' with this URL and German broadcast text 'startet ab 14:15 Uhr'; NBBL is free on Sporteurope under the 2025/26-2026/27 agreement."
     }
   ]
 }
