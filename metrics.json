@@ -1,10 +1,10 @@
 {
   "audit": {
     "inconclusive": 17,
-    "judged": 27,
+    "judged": 29,
     "precision": 1.0,
-    "rows": 44,
-    "verified": 27,
+    "rows": 46,
+    "verified": 29,
     "wrong": 0
   },
   "derived": true,
@@ -133,8 +133,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 986,
-    "missed": 986,
+    "eligible": 995,
+    "missed": 995,
     "missed_keys": [
       "http://live.basketball-bundesliga.de/home",
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
@@ -504,6 +504,8 @@
       "https://www.bblprofis.de/index.php/2026/05/01/easycredit-bbl-livestream-fc-bayern-basketball-gegen-alba-berlin/",
       "https://www.bblprofis.de/index.php/2026/05/03/fc-bayern-basketball-gegen-rasta-vechta-livestream-und-free-tv-details/",
       "https://www.bblprofis.de/index.php/2026/10/10/niners-chemnitz-gegen-den-fc-bayern-basketball-live-uebertragung-im-free-tv/",
+      "https://www.bblprofis.de/index.php/2026/11/02/easycredit-bbl-kostenlose-livestreams-im-november/",
+      "https://www.bcwiesbaden.de/2012/05/jbbl-und-nbbl-top-four-live-im-internet/",
       "https://www.bfv.de/news/sport-politik/verbandstag/regionalliga-bayern-bei-brsport24",
       "https://www.bild.de/sport/mehr-sport/achtelfinale-gegen-hamburg-hier-bayerns-pokal-kracher-live-schauen-6ad1edb6199dc15f1abd60cd",
       "https://www.bild.de/sport/mehr-sport/alba-gegen-chemnitz-bbl-auftaktspiel-jetzt-hier-im-live-stream-6aacdf2cb1857e86757a5aa7",
@@ -537,6 +539,7 @@
       "https://www.dazn.com/en-US/competition/Competition:4oogyu6o156iphvdvphwpck10",
       "https://www.dazn.com/en-US/competition/Competition:bwowjwcssos25g6yp5i7hgl6t",
       "https://www.dazn.com/en-US/competitor/Competitor:apoawtpvac4zqlancmvw4nk4o",
+      "https://www.dazn.com/en-US/home/2dxj6bz3d95k2v1gypuz54t2o/7oksy6hnzrsl1weq7fc129kmc",
       "https://www.dazn.com/en-US/news/basketball/super-league-basketball-how-to-watch-live-free-dazn-t3r/1frzyp208hanm1bfx5wayfqfok",
       "https://www.dazn.com/en-US/news/soccer/national-basketball-league-on-dazn-how-to-watch-live-stream-nbl-matches/1p9n18gh9c8v01bbjjgriwdvgm",
       "https://www.dazn.com/en-US/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
@@ -545,6 +548,7 @@
       "https://www.digitalfernsehen.de/news/inhalte/fernsehen/so-ist-die-basketball-em-im-tv-zu-sehen-611689/",
       "https://www.digitalfernsehen.de/news/inhalte/streaming/basketball-wm-telekomdeutschland-spiel-heute-kostenlos-alles-live-bei-magentasport-1102358/",
       "https://www.dorstenerzeitung.de/lokalsport-dorsten/basketball-livestream-bsv-wulfen-vs-citybasket-recklinghausen-regionalliga-derby-w1258297-4002249543/",
+      "https://www.dorstenerzeitung.de/lokalsport-dorsten/bsv-wulfen-vs-lippebaskets-werne-livestream-basketball-regionalliga-w1270339-4002282708/",
       "https://www.dscvolley.de/hintergrundformate-livesport-dyn-startet-free-tv-offensive/",
       "https://www.dslweb.de/",
       "https://www.dslweb.de/news/tv/basketball-bundesliga-playoffs-live-wuerzburg-vs-bonn-kostenlos-live-streamen.php",
@@ -552,6 +556,7 @@
       "https://www.dslweb.de/news/tv/bbl-finals-live-heute-bayern-vs-alba-berlin-kostenlos-streamen.php",
       "https://www.dslweb.de/news/tv/fc-bayern-basketball-live-im-tv-bbl-playoff-spiel-gegen-gladiators-trier-kostenlos-live-streamen.php",
       "https://www.dslweb.de/news/tv/mhp-riesen-ludwigsburg-fc-bayern-live-im-tv-jetzt-bbl-kostenlos-live-streamen.php",
+      "https://www.dslweb.de/news/tv/niners-chemnitz-fc-bayern-live-basketball-bundesliga-kostenlos-live-streamen-ab-16-uhr.php",
       "https://www.dyn.sport/",
       "https://www.dyn.sport/deinsender/basketball-champions-league-25-26-dyn/",
       "https://www.dyn.sport/deinsender/bayern-ulm-greifen-nach-meistertitel-dyn/",
@@ -766,6 +771,7 @@
       "https://www.news.de/sport/860134717/telekom-baskets-bonn-alba-berlin-bbl-livestream-basketball-bundesliga-am-01-11-2026-in-bonn-anfahrt-und-tickets/1/",
       "https://www.news.de/sport/860152144/rasta-vechta-niners-chemnitz-bbl-livestream-basketball-bundesliga-am-07-11-2026-in-vechta-anfahrt-und-tickets/1/",
       "https://www.news.de/sport/860152156/fitness-first-wuerzburg-baskets-fc-bayern-muenchen-basketball-bbl-livestream-kostenlos-basketball-bundesliga-am-08-11-2026-in-wuerzburg-anfahrt-und-tickets/1/",
+      "https://www.news.de/sport/860159233/science-city-jena-veolia-towers-hamburg-bbl-livestream-basketball-bundesliga-am-09-11-2026-in-jena-anfahrt-und-tickets/1/",
       "https://www.nfhsnetwork.com/associations/ndhsaa/basketball/video/live-and-upcoming",
       "https://www.olympics.com/en/news/eurobasket-2025-doncic-antetokounmpo-and-jokic-headline-the-action-how-to-watch-live",
       "https://www.olympics.com/en/news/euroleague-basketball-2025-2026-preview",
@@ -866,9 +872,11 @@
       "https://www.streaming-probemonat.de/basketball-livestream/",
       "https://www.sueddeutsche.de/sport-liveticker/basketball/deutschland-bbl/ma12415738/alba-berlin_bamberg-baskets/liveticker/",
       "https://www.sueddeutsche.de/sport-liveticker/basketball/deutschland-bbl/ma12415771/vet-concept-gladiators-trier_alba-berlin/liveticker/",
+      "https://www.sueddeutsche.de/sport-liveticker/basketball/deutschland-bbl/ma12415846/alba-berlin_phoenix-hagen/liveticker/",
       "https://www.swp.de/sport/sport-mix/bayern-muenchen-gegen-alba-berlin-heute-live-wer-uebertraegt-gratis-im-tv-und-stream-79502317.html",
       "https://www.swp.de/sport/sport-mix/bayern-muenchen-gegen-alba-berlin-live-wer-uebertraegt-gratis-im-tv-und-stream-79502348.html",
       "https://www.swp.de/sport/sport-mix/rot-weiss-erfurt-gegen-erzgebirge-aue-heute-live-wer-uebertraegt-kostenlos-im-tv-und-stream-79473732.html",
+      "https://www.swr.de/sport/mehr-sport/basketball-live-gladiators-trier-gegen-promitheas-patras-100.html",
       "https://www.tagesschau.de/inland/regional/rheinlandpfalz/swr-basketball-live-die-gladiators-trier-zu-gast-bei-promitheas-patras-102.html",
       "https://www.techradar.com/how-to-watch/basketball/fiba-womens-basketball-world-cup-2026-free",
       "https://www.telekom-baskets-bonn.de/verein/teams/livestreams/livestreams-jbbl",
@@ -1016,6 +1024,7 @@
       "https://www.youtube.com/watch?v=KqiY2Tlk7zw",
       "https://www.youtube.com/watch?v=L7scag65uD8",
       "https://www.youtube.com/watch?v=LOvngOSlqEo",
+      "https://www.youtube.com/watch?v=LbK-LqQW1cM",
       "https://www.youtube.com/watch?v=MHNT2vsvi_k",
       "https://www.youtube.com/watch?v=MLgGYhYyUjQ",
       "https://www.youtube.com/watch?v=MNNLKYurqBI",
@@ -1124,9 +1133,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 19651,
-    "unique_games": 1558,
-    "unverifiable": 986,
+    "rows": 19926,
+    "unique_games": 1571,
+    "unverifiable": 995,
     "unverifiable_keys": [
       "http://live.basketball-bundesliga.de/home",
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
@@ -1496,6 +1505,8 @@
       "https://www.bblprofis.de/index.php/2026/05/01/easycredit-bbl-livestream-fc-bayern-basketball-gegen-alba-berlin/",
       "https://www.bblprofis.de/index.php/2026/05/03/fc-bayern-basketball-gegen-rasta-vechta-livestream-und-free-tv-details/",
       "https://www.bblprofis.de/index.php/2026/10/10/niners-chemnitz-gegen-den-fc-bayern-basketball-live-uebertragung-im-free-tv/",
+      "https://www.bblprofis.de/index.php/2026/11/02/easycredit-bbl-kostenlose-livestreams-im-november/",
+      "https://www.bcwiesbaden.de/2012/05/jbbl-und-nbbl-top-four-live-im-internet/",
       "https://www.bfv.de/news/sport-politik/verbandstag/regionalliga-bayern-bei-brsport24",
       "https://www.bild.de/sport/mehr-sport/achtelfinale-gegen-hamburg-hier-bayerns-pokal-kracher-live-schauen-6ad1edb6199dc15f1abd60cd",
       "https://www.bild.de/sport/mehr-sport/alba-gegen-chemnitz-bbl-auftaktspiel-jetzt-hier-im-live-stream-6aacdf2cb1857e86757a5aa7",
@@ -1529,6 +1540,7 @@
       "https://www.dazn.com/en-US/competition/Competition:4oogyu6o156iphvdvphwpck10",
       "https://www.dazn.com/en-US/competition/Competition:bwowjwcssos25g6yp5i7hgl6t",
       "https://www.dazn.com/en-US/competitor/Competitor:apoawtpvac4zqlancmvw4nk4o",
+      "https://www.dazn.com/en-US/home/2dxj6bz3d95k2v1gypuz54t2o/7oksy6hnzrsl1weq7fc129kmc",
       "https://www.dazn.com/en-US/news/basketball/super-league-basketball-how-to-watch-live-free-dazn-t3r/1frzyp208hanm1bfx5wayfqfok",
       "https://www.dazn.com/en-US/news/soccer/national-basketball-league-on-dazn-how-to-watch-live-stream-nbl-matches/1p9n18gh9c8v01bbjjgriwdvgm",
       "https://www.dazn.com/en-US/sport/Sport:ayp4nebmprfbvzdsisazcw74y",
@@ -1537,6 +1549,7 @@
       "https://www.digitalfernsehen.de/news/inhalte/fernsehen/so-ist-die-basketball-em-im-tv-zu-sehen-611689/",
       "https://www.digitalfernsehen.de/news/inhalte/streaming/basketball-wm-telekomdeutschland-spiel-heute-kostenlos-alles-live-bei-magentasport-1102358/",
       "https://www.dorstenerzeitung.de/lokalsport-dorsten/basketball-livestream-bsv-wulfen-vs-citybasket-recklinghausen-regionalliga-derby-w1258297-4002249543/",
+      "https://www.dorstenerzeitung.de/lokalsport-dorsten/bsv-wulfen-vs-lippebaskets-werne-livestream-basketball-regionalliga-w1270339-4002282708/",
       "https://www.dscvolley.de/hintergrundformate-livesport-dyn-startet-free-tv-offensive/",
       "https://www.dslweb.de/",
       "https://www.dslweb.de/news/tv/basketball-bundesliga-playoffs-live-wuerzburg-vs-bonn-kostenlos-live-streamen.php",
@@ -1544,6 +1557,7 @@
       "https://www.dslweb.de/news/tv/bbl-finals-live-heute-bayern-vs-alba-berlin-kostenlos-streamen.php",
       "https://www.dslweb.de/news/tv/fc-bayern-basketball-live-im-tv-bbl-playoff-spiel-gegen-gladiators-trier-kostenlos-live-streamen.php",
       "https://www.dslweb.de/news/tv/mhp-riesen-ludwigsburg-fc-bayern-live-im-tv-jetzt-bbl-kostenlos-live-streamen.php",
+      "https://www.dslweb.de/news/tv/niners-chemnitz-fc-bayern-live-basketball-bundesliga-kostenlos-live-streamen-ab-16-uhr.php",
       "https://www.dyn.sport/",
       "https://www.dyn.sport/deinsender/basketball-champions-league-25-26-dyn/",
       "https://www.dyn.sport/deinsender/bayern-ulm-greifen-nach-meistertitel-dyn/",
@@ -1758,6 +1772,7 @@
       "https://www.news.de/sport/860134717/telekom-baskets-bonn-alba-berlin-bbl-livestream-basketball-bundesliga-am-01-11-2026-in-bonn-anfahrt-und-tickets/1/",
       "https://www.news.de/sport/860152144/rasta-vechta-niners-chemnitz-bbl-livestream-basketball-bundesliga-am-07-11-2026-in-vechta-anfahrt-und-tickets/1/",
       "https://www.news.de/sport/860152156/fitness-first-wuerzburg-baskets-fc-bayern-muenchen-basketball-bbl-livestream-kostenlos-basketball-bundesliga-am-08-11-2026-in-wuerzburg-anfahrt-und-tickets/1/",
+      "https://www.news.de/sport/860159233/science-city-jena-veolia-towers-hamburg-bbl-livestream-basketball-bundesliga-am-09-11-2026-in-jena-anfahrt-und-tickets/1/",
       "https://www.nfhsnetwork.com/associations/ndhsaa/basketball/video/live-and-upcoming",
       "https://www.olympics.com/en/news/eurobasket-2025-doncic-antetokounmpo-and-jokic-headline-the-action-how-to-watch-live",
       "https://www.olympics.com/en/news/euroleague-basketball-2025-2026-preview",
@@ -1858,9 +1873,11 @@
       "https://www.streaming-probemonat.de/basketball-livestream/",
       "https://www.sueddeutsche.de/sport-liveticker/basketball/deutschland-bbl/ma12415738/alba-berlin_bamberg-baskets/liveticker/",
       "https://www.sueddeutsche.de/sport-liveticker/basketball/deutschland-bbl/ma12415771/vet-concept-gladiators-trier_alba-berlin/liveticker/",
+      "https://www.sueddeutsche.de/sport-liveticker/basketball/deutschland-bbl/ma12415846/alba-berlin_phoenix-hagen/liveticker/",
       "https://www.swp.de/sport/sport-mix/bayern-muenchen-gegen-alba-berlin-heute-live-wer-uebertraegt-gratis-im-tv-und-stream-79502317.html",
       "https://www.swp.de/sport/sport-mix/bayern-muenchen-gegen-alba-berlin-live-wer-uebertraegt-gratis-im-tv-und-stream-79502348.html",
       "https://www.swp.de/sport/sport-mix/rot-weiss-erfurt-gegen-erzgebirge-aue-heute-live-wer-uebertraegt-kostenlos-im-tv-und-stream-79473732.html",
+      "https://www.swr.de/sport/mehr-sport/basketball-live-gladiators-trier-gegen-promitheas-patras-100.html",
       "https://www.tagesschau.de/inland/regional/rheinlandpfalz/swr-basketball-live-die-gladiators-trier-zu-gast-bei-promitheas-patras-102.html",
       "https://www.techradar.com/how-to-watch/basketball/fiba-womens-basketball-world-cup-2026-free",
       "https://www.telekom-baskets-bonn.de/verein/teams/livestreams/livestreams-jbbl",
@@ -2008,6 +2025,7 @@
       "https://www.youtube.com/watch?v=KqiY2Tlk7zw",
       "https://www.youtube.com/watch?v=L7scag65uD8",
       "https://www.youtube.com/watch?v=LOvngOSlqEo",
+      "https://www.youtube.com/watch?v=LbK-LqQW1cM",
       "https://www.youtube.com/watch?v=MHNT2vsvi_k",
       "https://www.youtube.com/watch?v=MLgGYhYyUjQ",
       "https://www.youtube.com/watch?v=MNNLKYurqBI",
@@ -2116,47 +2134,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-11-05T16:39Z",
+  "run_id": "2026-11-06T16:06Z",
   "source": {
-    "audit_rows": 44,
-    "candidates_rows": 19651,
+    "audit_rows": 46,
+    "candidates_rows": 19926,
     "fixtures_rows": 115
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 126,
-      "missed": 126,
-      "recall": 0.0,
-      "rows": 259,
-      "run_id": "2026-10-30T15:10Z",
-      "unique_games": 248
-    },
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 1,
-        "precision": 1.0,
-        "rows": 1,
-        "verified": 1,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-10-30T15:33Z",
-      "unique_games": 0
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -2360,7 +2344,41 @@
       "rows": 279,
       "run_id": "2026-11-05T16:38Z",
       "unique_games": 263
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 2,
+        "precision": 1.0,
+        "rows": 2,
+        "verified": 2,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-11-05T17:26Z",
+      "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 136,
+      "missed": 136,
+      "recall": 0.0,
+      "rows": 275,
+      "run_id": "2026-11-06T16:04Z",
+      "unique_games": 256
     }
   ],
-  "ts": "2026-11-05T16:39:57.030369+00:00"
+  "ts": "2026-11-06T16:06:37.282921+00:00"
 }
