@@ -475,6 +475,18 @@ def test_check_calendar_config_accepts_a_missing_visibility(tmp_path):
     assert "missing recommended fields: visibility" in result.stderr
 
 
+def test_check_calendar_config_fails_on_a_bad_window_days(tmp_path):
+    """`window_days` is sent as `--days` / `--window-days`, so a bad value is
+    caught before a run rather than at write time."""
+    for bad in (0, -3, "ten", True):
+        _write_calendar_config(tmp_path, window_days=bad)
+        result = _run(["--check", "calendar-config", "--root", str(tmp_path)])
+        assert result.returncode == 1, (bad, result.stderr)
+        assert "window_days" in result.stderr
+    _write_calendar_config(tmp_path, window_days=10)
+    assert _run(["--check", "calendar-config", "--root", str(tmp_path)]).returncode == 0
+
+
 def test_the_visibility_enum_has_one_meaning_across_both_modules():
     """`validate.py` cannot import the runtime, so the two must be tied by a test.
 
