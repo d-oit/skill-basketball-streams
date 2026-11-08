@@ -6,7 +6,7 @@ Search-query templates, time/team/vocab conventions, and code for `validateStrea
 
 - Timezone: **`Europe/Berlin`** (CEST = UTC+2 Apr–Oct, CET = UTC+1 Nov–Mar)
 - Anchor "now" with `new Date().toISOString()` then convert to CET
-- Date range: today (00:00 CET) through today + 7 days (23:59 CET)
+- Date range: today (00:00 CET) through today + 10 days (23:59 CET)
 - Emit ISO 8601 with offset, e.g. `2026-10-13T19:00:00+02:00` (CEST on 2026-10-13)
 
 ## Canonical Search Queries

@@ -180,7 +180,7 @@ times, description and colour already equal what the run would send is
 {
   "calendarId": "f8a14c4037d9ab411f93f19ee369218f0ed54be7c2d88deaf09d6b76fbe72e7f@group.calendar.google.com",
   "startTime": "[today 00:00]",
-  "endTime": "[today+7d 23:59]",
+  "endTime": "[today+10d 23:59]",
   "fullText": ""
 }
 ```

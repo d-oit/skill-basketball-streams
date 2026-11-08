@@ -1201,7 +1201,7 @@ def main() -> None:
     parser.add_argument("--fixtures", help="fixtures JSONL to diff (with --ledger)")
     parser.add_argument("--ledger", help="candidate ledger JSONL to diff against")
     parser.add_argument("--now", help="ISO-8601 override (for tests)")
-    parser.add_argument("--days", type=int, default=7, help="window size (default 7)")
+    parser.add_argument("--days", type=int, default=10, help="window size (default 10)")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument(
         "--input-kind",
@@ -1450,7 +1450,7 @@ def main() -> None:
     if args.out and not args.dry_run:
         out = Path(args.out)
         out.parent.mkdir(parents=True, exist_ok=True)
-        # Idempotent append. A daily job re-observes the same 7-day window, so a
+        # Idempotent append. A daily job re-observes the same 10-day window, so a
         # blind append would write every game seven times and grow the file
         # without bound. Skipping a `game_key` already present keeps the file a
         # growing *set* of distinct fixtures, which is what the recall

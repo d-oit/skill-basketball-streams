@@ -24,7 +24,7 @@ Search for FREE basketball live streams in Germany from approved official source
 
 ```mermaid
 flowchart TD
-    A[Step 1: Date Range<br/>today…today+7d, Europe/Berlin] --> B[Step 2: webSearch<br/>approved sources, limit:20]
+    A[Step 1: Date Range<br/>today…today+10d, Europe/Berlin] --> B[Step 2: webSearch<br/>approved sources, limit:20]
     B --> C[Step 2.5: validateStreamUrl<br/>openUrl probe + YouTube rules]
     C -->|"@FIBAWorld / non-TheDBBTV /user/ /channel/UC… / HTTP>=400"| Z1[SKIP — reject before Step 3<br/>log reason]
     C -->|accepted| D[Step 3: 7-check pipeline]
@@ -278,7 +278,7 @@ Run before each release; every item is checkable without external tooling.
 - [ ] `python3 -m pytest tests/` passes (1169 tests as of runtime Phases 1-5)
 - [ ] `plans/invariants.json` parses and every header carries only `{invariant, rationale, sensor, category}`
 - [ ] `python3 scripts/render_ladder.py --list` shows no AGPL rung with `opt_in=False`
-- [ ] `python3 scripts/upsert_events.py --existing tests/fixtures/upsert_existing.json --candidates tests/fixtures/upsert_candidates.json --now 2026-09-15T08:30:00Z --window-days 7` reports `create=1 skip=1`
+- [ ] `python3 scripts/upsert_events.py --existing tests/fixtures/upsert_existing.json --candidates tests/fixtures/upsert_candidates.json --now 2026-09-15T08:30:00Z --window-days 10` reports `create=1 skip=1`
 - [ ] `python3 scripts/audit_events.py --events tests/fixtures/audit_events.json --evidence tests/fixtures/audit_evidence.json --now 2026-09-15T08:30:00Z` reports `wrong=1 inconclusive=1`
 - [ ] `python3 scripts/synthesise_eval_case.py --verify` reports every eval case is gradeable
 - [ ] `python3 scripts/candidates.py unseen --ledger tests/fixtures/candidates_ledger.jsonl --fixtures tests/fixtures/league_fixtures.jsonl` reports `unseen=1`

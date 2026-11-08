@@ -80,7 +80,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 try:  # direct CLI execution: `python3 scripts/calendar_io.py`
-    from calendar_config import VISIBILITY_VALUES, get_visibility
+    from calendar_config import VISIBILITY_VALUES, get_visibility, get_window_days
     from stream_links import (
         links_from_description,
         render_block,
@@ -98,6 +98,7 @@ except ImportError:  # imported as a package module, e.g. scripts.calendar_io
     from scripts.calendar_config import (  # type: ignore[no-redef]
         VISIBILITY_VALUES,
         get_visibility,
+        get_window_days,
     )
     from scripts.stream_links import (  # type: ignore[no-redef]
         links_from_description,
@@ -856,7 +857,7 @@ def main() -> None:
     # the field that used to be read by everyone and written by nobody, so the
     # default has to come from the file that documents it or the loop stays open.
     parser.add_argument("--visibility", default=get_visibility())
-    parser.add_argument("--days", type=int, default=7)
+    parser.add_argument("--days", type=int, default=get_window_days())
     parser.add_argument("--time-min")
     parser.add_argument("--time-max")
     parser.add_argument("--now", help="ISO-8601 override (for tests)")

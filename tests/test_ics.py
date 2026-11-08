@@ -484,7 +484,7 @@ class TestCliReadsAFeed:
                 "--input", str(FEED),
                 "--source", "bbl",
                 "--input-kind", "ics",
-                "--now", "2026-10-01T08:30:00Z",
+                "--now", "2026-09-30T08:30:00Z",
                 "--json",
             ],
             capture_output=True, text=True,
@@ -492,7 +492,7 @@ class TestCliReadsAFeed:
         assert result.returncode == 0, result.stderr
         payload = json.loads(result.stdout)
         # Three events parse from the feed; the window keeps two. The third is
-        # 2026-10-11 and `--now` is 2026-10-01 with a 7-day default, so this also
+        # 2026-10-11 and `--now` is 2026-09-30 with a 10-day default, so this also
         # pins that a feed row outside the window is dropped rather than counted
         # as ground truth for a window it is not in.
         assert [row["game_key"] for row in payload["fixtures"]] == [
