@@ -35,10 +35,13 @@ from typing import Any
 # (`verification.py` + `color_mapping.py`), not by a setting. See
 # `references/calendar-setup.md` for why a settable colour was the defect, not the
 # missing wiring.
+DEFAULT_WINDOW_DAYS = 10
+
 DEFAULT_CONFIG = {
     "calendarId": "",  # Empty string = must be configured
     "timezone": "Europe/Berlin",
     "visibility": "public",
+    "window_days": DEFAULT_WINDOW_DAYS,
 }
 
 # Environment variable name for calendar ID override
@@ -173,6 +176,24 @@ def get_timezone(root: Path | None = None) -> str:
     """
     config = get_calendar_config(root)
     return config.get("timezone", DEFAULT_CONFIG["timezone"])
+
+
+def get_window_days(root: Path | None = None) -> int:
+    """Get the coverage window in days from config.
+
+    Args:
+        root: Optional project root path.
+
+    Returns:
+        The window size (e.g., 10). Falls back to DEFAULT_WINDOW_DAYS when
+        the config file is missing, unreadable, or carries no valid value.
+    """
+    config = get_calendar_config(root)
+    try:
+        value = int(config.get("window_days", DEFAULT_WINDOW_DAYS))
+    except (TypeError, ValueError):
+        return DEFAULT_WINDOW_DAYS
+    return value if value >= 1 else DEFAULT_WINDOW_DAYS
 
 
 def get_visibility(root: Path | None = None) -> str:

@@ -88,6 +88,7 @@ try:  # direct CLI execution
     # `latest_per_event` is shared with `audit_events.py` rather than copied: the
     # two must agree about which ledger row is current or this guarantee inverts.
     from audit_events import latest_per_event
+    from calendar_config import get_window_days
     from calendar_io import body_matches_event, build_event_body, description_for
     from evidence import coerce_evidence
     from stream_links import normalise_links
@@ -103,6 +104,7 @@ try:  # direct CLI execution
     )
 except ImportError:  # imported as a package module
     from scripts.audit_events import latest_per_event  # type: ignore
+    from scripts.calendar_config import get_window_days  # type: ignore
     from scripts.calendar_io import (  # type: ignore
         body_matches_event,
         build_event_body,
@@ -707,7 +709,7 @@ def main() -> None:
     parser.add_argument(
         "--window-days",
         type=int,
-        default=7,
+        default=get_window_days(),
         help="allow starts after --now through --now + this many days (default: 10)",
     )
     parser.add_argument("--json", action="store_true")

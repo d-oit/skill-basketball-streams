@@ -303,8 +303,23 @@ def check_calendar_config(root: Path) -> None:
             f"The runtime sends this value on every create and update."
         )
 
+    # `window_days` is optional (the scripts default to 10), but a present
+    # value must be usable: `calendar_io --days` and `upsert_events
+    # --window-days` both require a positive integer.
+    window_days = config.get("window_days")
+    if window_days is not None and (
+        isinstance(window_days, bool)
+        or not isinstance(window_days, int)
+        or window_days < 1
+    ):
+        _fail(
+            f"calendar config: {config_path.relative_to(root)}: window_days "
+            f"{window_days!r} is not a positive integer. "
+            f"The runtime reads this as the calendar coverage window in days."
+        )
+
     # Optional: check other fields exist (not required, but recommended)
-    recommended_fields = ["timezone", "visibility"]
+    recommended_fields = ["timezone", "visibility", "window_days"]
     missing_recommended = [f for f in recommended_fields if f not in config]
     if missing_recommended:
         print(

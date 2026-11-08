@@ -5,10 +5,10 @@ This repository uses do-harness for computational verification.
 ## Prerequisites
 
 The `do-harness` CLI must be on `PATH`, or `DO_HARNESS_BIN` must point at it.
-Pin the version this repository is verified against — **v0.2.0**:
+Pin the version this repository is verified against — **v0.4.2**:
 
     curl -fsSL https://raw.githubusercontent.com/d-o-hub/do-harness/main/scripts/install.sh \
-      | sh -s -- --version v0.2.0
+      | sh -s -- --version v0.4.2
 
 Rust developers can instead build from a checkout with
 `cargo install --path <do-harness>/crates/do-harness`.
