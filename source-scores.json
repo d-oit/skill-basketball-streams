@@ -1,8 +1,8 @@
 {
   "BBL": {
     "source": "BBL",
-    "attempts": 2,
-    "creates": 2,
+    "attempts": 1,
+    "creates": 1,
     "rejects": 0,
     "skips": 0,
     "blocked": 0,
@@ -10,8 +10,8 @@
   },
   "NBBL": {
     "source": "NBBL",
-    "attempts": 14,
-    "creates": 14,
+    "attempts": 16,
+    "creates": 16,
     "rejects": 0,
     "skips": 0,
     "blocked": 0,
@@ -19,28 +19,28 @@
   },
   "pluto.tv": {
     "source": "pluto.tv",
-    "attempts": 428,
-    "creates": 9,
+    "attempts": 426,
+    "creates": 8,
     "rejects": 0,
-    "skips": 419,
+    "skips": 418,
     "blocked": 0,
-    "hit_rate": 0.021
+    "hit_rate": 0.019
   },
   "sporteurope.tv": {
     "source": "sporteurope.tv",
-    "attempts": 3270,
-    "creates": 39,
+    "attempts": 3276,
+    "creates": 40,
     "rejects": 0,
-    "skips": 3231,
+    "skips": 3236,
     "blocked": 0,
     "hit_rate": 0.012
   },
   "1xbet.com": {
     "source": "1xbet.com",
-    "attempts": 300,
+    "attempts": 288,
     "creates": 0,
     "rejects": 0,
-    "skips": 300,
+    "skips": 288,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -64,37 +64,37 @@
   },
   "2basketballbundesliga.de": {
     "source": "2basketballbundesliga.de",
-    "attempts": 917,
+    "attempts": 921,
     "creates": 0,
     "rejects": 0,
-    "skips": 917,
+    "skips": 921,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "365scores.com": {
     "source": "365scores.com",
-    "attempts": 92,
+    "attempts": 93,
     "creates": 0,
     "rejects": 0,
-    "skips": 92,
+    "skips": 93,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "9now.com.au": {
     "source": "9now.com.au",
-    "attempts": 34,
+    "attempts": 39,
     "creates": 0,
     "rejects": 0,
-    "skips": 34,
+    "skips": 39,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "about.fiba.basketball": {
     "source": "about.fiba.basketball",
-    "attempts": 964,
+    "attempts": 976,
     "creates": 0,
     "rejects": 0,
-    "skips": 964,
+    "skips": 976,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -109,37 +109,37 @@
   },
   "aiscore.com": {
     "source": "aiscore.com",
-    "attempts": 166,
+    "attempts": 161,
     "creates": 0,
     "rejects": 0,
-    "skips": 166,
+    "skips": 161,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "aktionen.sporteurope.tv": {
     "source": "aktionen.sporteurope.tv",
-    "attempts": 98,
+    "attempts": 105,
     "creates": 0,
     "rejects": 0,
-    "skips": 98,
+    "skips": 105,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "albaberlin.de": {
     "source": "albaberlin.de",
-    "attempts": 2116,
+    "attempts": 2138,
     "creates": 0,
     "rejects": 0,
-    "skips": 2116,
+    "skips": 2138,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "allgemeine-zeitung.de": {
     "source": "allgemeine-zeitung.de",
-    "attempts": 109,
+    "attempts": 116,
     "creates": 0,
     "rejects": 0,
-    "skips": 109,
+    "skips": 116,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -163,19 +163,19 @@
   },
   "appbrain.com": {
     "source": "appbrain.com",
-    "attempts": 9,
+    "attempts": 10,
     "creates": 0,
     "rejects": 0,
-    "skips": 9,
+    "skips": 10,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "apps.apple.com": {
     "source": "apps.apple.com",
-    "attempts": 907,
+    "attempts": 891,
     "creates": 0,
     "rejects": 0,
-    "skips": 907,
+    "skips": 891,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -190,19 +190,19 @@
   },
   "ardmediathek.de": {
     "source": "ardmediathek.de",
-    "attempts": 311,
+    "attempts": 310,
     "creates": 0,
     "rejects": 0,
-    "skips": 311,
+    "skips": 310,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "areadvd.de": {
     "source": "areadvd.de",
-    "attempts": 358,
+    "attempts": 359,
     "creates": 0,
     "rejects": 0,
-    "skips": 358,
+    "skips": 359,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -217,10 +217,10 @@
   },
   "astra.de": {
     "source": "astra.de",
-    "attempts": 643,
+    "attempts": 641,
     "creates": 0,
     "rejects": 0,
-    "skips": 643,
+    "skips": 641,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -235,46 +235,46 @@
   },
   "ballertv.com": {
     "source": "ballertv.com",
-    "attempts": 15,
+    "attempts": 16,
     "creates": 0,
     "rejects": 0,
-    "skips": 15,
+    "skips": 16,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "ballineurope.com": {
     "source": "ballineurope.com",
-    "attempts": 26,
+    "attempts": 24,
     "creates": 0,
     "rejects": 0,
-    "skips": 26,
+    "skips": 24,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "basketball-bargteheide.de": {
     "source": "basketball-bargteheide.de",
-    "attempts": 196,
+    "attempts": 188,
     "creates": 0,
     "rejects": 0,
-    "skips": 196,
+    "skips": 188,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "basketball-bund.de": {
     "source": "basketball-bund.de",
-    "attempts": 2301,
+    "attempts": 2313,
     "creates": 0,
     "rejects": 0,
-    "skips": 2301,
+    "skips": 2313,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "basketball-nrw.com": {
     "source": "basketball-nrw.com",
-    "attempts": 13,
+    "attempts": 15,
     "creates": 0,
     "rejects": 0,
-    "skips": 13,
+    "skips": 15,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -289,10 +289,10 @@
   },
   "basketball-world.news": {
     "source": "basketball-world.news",
-    "attempts": 2618,
+    "attempts": 2610,
     "creates": 0,
     "rejects": 0,
-    "skips": 2618,
+    "skips": 2610,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -316,19 +316,19 @@
   },
   "basketball.usbasket.com": {
     "source": "basketball.usbasket.com",
-    "attempts": 205,
+    "attempts": 197,
     "creates": 0,
     "rejects": 0,
-    "skips": 205,
+    "skips": 197,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "basketballaustria.tv": {
     "source": "basketballaustria.tv",
-    "attempts": 110,
+    "attempts": 113,
     "creates": 0,
     "rejects": 0,
-    "skips": 110,
+    "skips": 113,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -343,28 +343,28 @@
   },
   "basketballengland.co.uk": {
     "source": "basketballengland.co.uk",
-    "attempts": 485,
+    "attempts": 481,
     "creates": 0,
     "rejects": 0,
-    "skips": 485,
+    "skips": 481,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "basketballimtv.de": {
     "source": "basketballimtv.de",
-    "attempts": 1956,
+    "attempts": 1974,
     "creates": 0,
     "rejects": 0,
-    "skips": 1956,
+    "skips": 1974,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "basketballireland.tv": {
     "source": "basketballireland.tv",
-    "attempts": 197,
+    "attempts": 192,
     "creates": 0,
     "rejects": 0,
-    "skips": 197,
+    "skips": 192,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -379,10 +379,10 @@
   },
   "basketballsphere.com": {
     "source": "basketballsphere.com",
-    "attempts": 1133,
+    "attempts": 1130,
     "creates": 0,
     "rejects": 0,
-    "skips": 1133,
+    "skips": 1130,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -397,10 +397,10 @@
   },
   "basketeurope.com": {
     "source": "basketeurope.com",
-    "attempts": 16,
+    "attempts": 21,
     "creates": 0,
     "rejects": 0,
-    "skips": 16,
+    "skips": 21,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -415,37 +415,37 @@
   },
   "bba-46ers.de": {
     "source": "bba-46ers.de",
-    "attempts": 100,
+    "attempts": 103,
     "creates": 0,
     "rejects": 0,
-    "skips": 100,
+    "skips": 103,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "bbcfootball.de": {
     "source": "bbcfootball.de",
-    "attempts": 10,
+    "attempts": 15,
     "creates": 0,
     "rejects": 0,
-    "skips": 10,
+    "skips": 15,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "bblprofis.de": {
     "source": "bblprofis.de",
-    "attempts": 2049,
+    "attempts": 2053,
     "creates": 0,
     "rejects": 0,
-    "skips": 2049,
+    "skips": 2053,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "bcwiesbaden.de": {
     "source": "bcwiesbaden.de",
-    "attempts": 3,
+    "attempts": 6,
     "creates": 0,
     "rejects": 0,
-    "skips": 3,
+    "skips": 6,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -460,19 +460,19 @@
   },
   "belarus.basketball": {
     "source": "belarus.basketball",
-    "attempts": 440,
+    "attempts": 425,
     "creates": 0,
     "rejects": 0,
-    "skips": 440,
+    "skips": 425,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "berlindreams.world": {
     "source": "berlindreams.world",
-    "attempts": 45,
+    "attempts": 51,
     "creates": 0,
     "rejects": 0,
-    "skips": 45,
+    "skips": 51,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -496,28 +496,28 @@
   },
   "bild.de": {
     "source": "bild.de",
-    "attempts": 451,
+    "attempts": 459,
     "creates": 0,
     "rejects": 0,
-    "skips": 451,
+    "skips": 459,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "bluewin.ch": {
     "source": "bluewin.ch",
-    "attempts": 49,
+    "attempts": 53,
     "creates": 0,
     "rejects": 0,
-    "skips": 49,
+    "skips": 53,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "br.de": {
     "source": "br.de",
-    "attempts": 4,
+    "attempts": 5,
     "creates": 0,
     "rejects": 0,
-    "skips": 4,
+    "skips": 5,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -532,10 +532,10 @@
   },
   "broadbandtvnews.com": {
     "source": "broadbandtvnews.com",
-    "attempts": 170,
+    "attempts": 175,
     "creates": 0,
     "rejects": 0,
-    "skips": 170,
+    "skips": 175,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -559,10 +559,10 @@
   },
   "bvb.de": {
     "source": "bvb.de",
-    "attempts": 4,
+    "attempts": 5,
     "creates": 0,
     "rejects": 0,
-    "skips": 4,
+    "skips": 5,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -577,55 +577,55 @@
   },
   "calovo.com": {
     "source": "calovo.com",
-    "attempts": 473,
+    "attempts": 462,
     "creates": 0,
     "rejects": 0,
-    "skips": 473,
+    "skips": 462,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "calovo.de": {
     "source": "calovo.de",
-    "attempts": 570,
+    "attempts": 574,
     "creates": 0,
     "rejects": 0,
-    "skips": 570,
+    "skips": 574,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "canli-spor.com": {
     "source": "canli-spor.com",
-    "attempts": 116,
+    "attempts": 117,
     "creates": 0,
     "rejects": 0,
-    "skips": 116,
+    "skips": 117,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "cbssports.com": {
     "source": "cbssports.com",
-    "attempts": 35,
+    "attempts": 33,
     "creates": 0,
     "rejects": 0,
-    "skips": 35,
+    "skips": 33,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "ch.marketscreener.com": {
     "source": "ch.marketscreener.com",
-    "attempts": 37,
+    "attempts": 44,
     "creates": 0,
     "rejects": 0,
-    "skips": 37,
+    "skips": 44,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "championsleague.basketball": {
     "source": "championsleague.basketball",
-    "attempts": 2007,
+    "attempts": 2010,
     "creates": 0,
     "rejects": 0,
-    "skips": 2007,
+    "skips": 2010,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -640,28 +640,28 @@
   },
   "channelslike.com": {
     "source": "channelslike.com",
-    "attempts": 1,
+    "attempts": 2,
     "creates": 0,
     "rejects": 0,
-    "skips": 1,
+    "skips": 2,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "chip.de": {
     "source": "chip.de",
-    "attempts": 357,
+    "attempts": 360,
     "creates": 0,
     "rejects": 0,
-    "skips": 357,
+    "skips": 360,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "cms.magentasport.de": {
     "source": "cms.magentasport.de",
-    "attempts": 576,
+    "attempts": 559,
     "creates": 0,
     "rejects": 0,
-    "skips": 576,
+    "skips": 559,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -676,19 +676,19 @@
   },
   "courtside1891.basketball": {
     "source": "courtside1891.basketball",
-    "attempts": 173,
+    "attempts": 164,
     "creates": 0,
     "rejects": 0,
-    "skips": 173,
+    "skips": 164,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "crackstream-au.net": {
     "source": "crackstream-au.net",
-    "attempts": 49,
+    "attempts": 50,
     "creates": 0,
     "rejects": 0,
-    "skips": 49,
+    "skips": 50,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -703,19 +703,19 @@
   },
   "cybernews.com": {
     "source": "cybernews.com",
-    "attempts": 4,
+    "attempts": 5,
     "creates": 0,
     "rejects": 0,
-    "skips": 4,
+    "skips": 5,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "dazn.com": {
     "source": "dazn.com",
-    "attempts": 4951,
+    "attempts": 4962,
     "creates": 0,
     "rejects": 0,
-    "skips": 4951,
+    "skips": 4962,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -748,28 +748,28 @@
   },
   "de.linkedin.com": {
     "source": "de.linkedin.com",
-    "attempts": 95,
+    "attempts": 104,
     "creates": 0,
     "rejects": 0,
-    "skips": 95,
+    "skips": 104,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "de2.sportplus.tv": {
     "source": "de2.sportplus.tv",
-    "attempts": 686,
+    "attempts": 682,
     "creates": 0,
     "rejects": 0,
-    "skips": 686,
+    "skips": 682,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "decodetv.com": {
     "source": "decodetv.com",
-    "attempts": 25,
+    "attempts": 26,
     "creates": 0,
     "rejects": 0,
-    "skips": 25,
+    "skips": 26,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -802,73 +802,73 @@
   },
   "directv.com": {
     "source": "directv.com",
-    "attempts": 196,
+    "attempts": 194,
     "creates": 0,
     "rejects": 0,
-    "skips": 196,
+    "skips": 194,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "dorstenerzeitung.de": {
     "source": "dorstenerzeitung.de",
-    "attempts": 35,
+    "attempts": 38,
     "creates": 0,
     "rejects": 0,
-    "skips": 35,
+    "skips": 38,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "dosbnewmedia.de": {
     "source": "dosbnewmedia.de",
-    "attempts": 620,
+    "attempts": 621,
     "creates": 0,
     "rejects": 0,
-    "skips": 620,
+    "skips": 621,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "drakula.stream": {
     "source": "drakula.stream",
-    "attempts": 98,
+    "attempts": 102,
     "creates": 0,
     "rejects": 0,
-    "skips": 98,
+    "skips": 102,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "dscvolley.de": {
     "source": "dscvolley.de",
-    "attempts": 11,
+    "attempts": 13,
     "creates": 0,
     "rejects": 0,
-    "skips": 11,
+    "skips": 13,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "dslweb.de": {
     "source": "dslweb.de",
-    "attempts": 2845,
+    "attempts": 2855,
     "creates": 0,
     "rejects": 0,
-    "skips": 2845,
+    "skips": 2855,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "dyn-sport-live-auf-abruf.en.softonic.com": {
     "source": "dyn-sport-live-auf-abruf.en.softonic.com",
-    "attempts": 452,
+    "attempts": 447,
     "creates": 0,
     "rejects": 0,
-    "skips": 452,
+    "skips": 447,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "dyn.sport": {
     "source": "dyn.sport",
-    "attempts": 12096,
+    "attempts": 12122,
     "creates": 0,
     "rejects": 0,
-    "skips": 12096,
+    "skips": 12122,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -883,19 +883,19 @@
   },
   "eagles-basketball.de": {
     "source": "eagles-basketball.de",
-    "attempts": 105,
+    "attempts": 113,
     "creates": 0,
     "rejects": 0,
-    "skips": 105,
+    "skips": 113,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "easycredit-bbl.de": {
     "source": "easycredit-bbl.de",
-    "attempts": 1945,
+    "attempts": 1939,
     "creates": 0,
     "rejects": 0,
-    "skips": 1945,
+    "skips": 1939,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -910,10 +910,10 @@
   },
   "eldia.es": {
     "source": "eldia.es",
-    "attempts": 246,
+    "attempts": 247,
     "creates": 0,
     "rejects": 0,
-    "skips": 246,
+    "skips": 247,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -923,6 +923,15 @@
     "creates": 0,
     "rejects": 0,
     "skips": 8,
+    "blocked": 0,
+    "hit_rate": 0.0
+  },
+  "en.sportplus.watch": {
+    "source": "en.sportplus.watch",
+    "attempts": 1,
+    "creates": 0,
+    "rejects": 0,
+    "skips": 1,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -937,19 +946,19 @@
   },
   "eurobasket.com": {
     "source": "eurobasket.com",
-    "attempts": 374,
+    "attempts": 369,
     "creates": 0,
     "rejects": 0,
-    "skips": 374,
+    "skips": 369,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "eurohoops.net": {
     "source": "eurohoops.net",
-    "attempts": 100,
+    "attempts": 98,
     "creates": 0,
     "rejects": 0,
-    "skips": 100,
+    "skips": 98,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -964,19 +973,19 @@
   },
   "euroleague.tv": {
     "source": "euroleague.tv",
-    "attempts": 794,
+    "attempts": 797,
     "creates": 0,
     "rejects": 0,
-    "skips": 794,
+    "skips": 797,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "euroleaguebasketball.net": {
     "source": "euroleaguebasketball.net",
-    "attempts": 1625,
+    "attempts": 1640,
     "creates": 0,
     "rejects": 0,
-    "skips": 1625,
+    "skips": 1640,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1000,19 +1009,19 @@
   },
   "eurovisionsport.com": {
     "source": "eurovisionsport.com",
-    "attempts": 43,
+    "attempts": 40,
     "creates": 0,
     "rejects": 0,
-    "skips": 43,
+    "skips": 40,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "exa.ai": {
     "source": "exa.ai",
-    "attempts": 8,
+    "attempts": 11,
     "creates": 0,
     "rejects": 0,
-    "skips": 8,
+    "skips": 11,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1027,10 +1036,10 @@
   },
   "fanduel.com": {
     "source": "fanduel.com",
-    "attempts": 252,
+    "attempts": 251,
     "creates": 0,
     "rejects": 0,
-    "skips": 252,
+    "skips": 251,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1045,15 +1054,6 @@
   },
   "fansided.com": {
     "source": "fansided.com",
-    "attempts": 18,
-    "creates": 0,
-    "rejects": 0,
-    "skips": 18,
-    "blocked": 0,
-    "hit_rate": 0.0
-  },
-  "fcb-basketball.de": {
-    "source": "fcb-basketball.de",
     "attempts": 16,
     "creates": 0,
     "rejects": 0,
@@ -1061,39 +1061,48 @@
     "blocked": 0,
     "hit_rate": 0.0
   },
-  "fcbayern.com": {
-    "source": "fcbayern.com",
-    "attempts": 2616,
+  "fcb-basketball.de": {
+    "source": "fcb-basketball.de",
+    "attempts": 18,
     "creates": 0,
     "rejects": 0,
-    "skips": 2616,
+    "skips": 18,
+    "blocked": 0,
+    "hit_rate": 0.0
+  },
+  "fcbayern.com": {
+    "source": "fcbayern.com",
+    "attempts": 2623,
+    "creates": 0,
+    "rejects": 0,
+    "skips": 2623,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "fiba.basketball": {
     "source": "fiba.basketball",
-    "attempts": 7495,
+    "attempts": 7517,
     "creates": 0,
     "rejects": 0,
-    "skips": 7495,
+    "skips": 7517,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "fibatv.com": {
     "source": "fibatv.com",
-    "attempts": 1163,
+    "attempts": 1166,
     "creates": 0,
     "rejects": 0,
-    "skips": 1163,
+    "skips": 1166,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "fillingthelane.com": {
     "source": "fillingthelane.com",
-    "attempts": 177,
+    "attempts": 176,
     "creates": 0,
     "rejects": 0,
-    "skips": 177,
+    "skips": 176,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1108,10 +1117,10 @@
   },
   "firmenpresse.de": {
     "source": "firmenpresse.de",
-    "attempts": 231,
+    "attempts": 236,
     "creates": 0,
     "rejects": 0,
-    "skips": 231,
+    "skips": 236,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1144,19 +1153,19 @@
   },
   "flashscoreusa.com": {
     "source": "flashscoreusa.com",
-    "attempts": 2454,
+    "attempts": 2440,
     "creates": 0,
     "rejects": 0,
-    "skips": 2454,
+    "skips": 2440,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "flohoops.com": {
     "source": "flohoops.com",
-    "attempts": 815,
+    "attempts": 807,
     "creates": 0,
     "rejects": 0,
-    "skips": 815,
+    "skips": 807,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1216,19 +1225,19 @@
   },
   "freestreams-live1i.pk": {
     "source": "freestreams-live1i.pk",
-    "attempts": 163,
+    "attempts": 162,
     "creates": 0,
     "rejects": 0,
-    "skips": 163,
+    "skips": 162,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "freetips.com": {
     "source": "freetips.com",
-    "attempts": 927,
+    "attempts": 928,
     "creates": 0,
     "rejects": 0,
-    "skips": 927,
+    "skips": 928,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1243,37 +1252,37 @@
   },
   "frequency.com": {
     "source": "frequency.com",
-    "attempts": 279,
+    "attempts": 280,
     "creates": 0,
     "rejects": 0,
-    "skips": 279,
+    "skips": 280,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "fubo.tv": {
     "source": "fubo.tv",
-    "attempts": 3855,
+    "attempts": 3827,
     "creates": 0,
     "rejects": 0,
-    "skips": 3855,
+    "skips": 3827,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "ga.de": {
     "source": "ga.de",
-    "attempts": 413,
+    "attempts": 412,
     "creates": 0,
     "rejects": 0,
-    "skips": 413,
+    "skips": 412,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "gazzetta.gr": {
     "source": "gazzetta.gr",
-    "attempts": 19,
+    "attempts": 20,
     "creates": 0,
     "rejects": 0,
-    "skips": 19,
+    "skips": 20,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1306,10 +1315,10 @@
   },
   "go3.lt": {
     "source": "go3.lt",
-    "attempts": 614,
+    "attempts": 621,
     "creates": 0,
     "rejects": 0,
-    "skips": 614,
+    "skips": 621,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1324,10 +1333,10 @@
   },
   "hakro-merlins.com": {
     "source": "hakro-merlins.com",
-    "attempts": 549,
+    "attempts": 544,
     "creates": 0,
     "rejects": 0,
-    "skips": 549,
+    "skips": 544,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1342,10 +1351,10 @@
   },
   "hamburgtowers.de": {
     "source": "hamburgtowers.de",
-    "attempts": 57,
+    "attempts": 56,
     "creates": 0,
     "rejects": 0,
-    "skips": 57,
+    "skips": 56,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1360,10 +1369,10 @@
   },
   "hlsports.de": {
     "source": "hlsports.de",
-    "attempts": 29,
+    "attempts": 31,
     "creates": 0,
     "rejects": 0,
-    "skips": 29,
+    "skips": 31,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1378,19 +1387,19 @@
   },
   "hom-sistaxon-int.ibama.gov.br": {
     "source": "hom-sistaxon-int.ibama.gov.br",
-    "attempts": 114,
+    "attempts": 113,
     "creates": 0,
     "rejects": 0,
-    "skips": 114,
+    "skips": 113,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "hoopbritain.co.uk": {
     "source": "hoopbritain.co.uk",
-    "attempts": 3,
+    "attempts": 4,
     "creates": 0,
     "rejects": 0,
-    "skips": 3,
+    "skips": 4,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1441,19 +1450,19 @@
   },
   "interbasket.net": {
     "source": "interbasket.net",
-    "attempts": 27,
+    "attempts": 25,
     "creates": 0,
     "rejects": 0,
-    "skips": 27,
+    "skips": 25,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "iptvie.com": {
     "source": "iptvie.com",
-    "attempts": 86,
+    "attempts": 90,
     "creates": 0,
     "rejects": 0,
-    "skips": 86,
+    "skips": 90,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1468,37 +1477,37 @@
   },
   "it-boltwise.de": {
     "source": "it-boltwise.de",
-    "attempts": 90,
+    "attempts": 93,
     "creates": 0,
     "rejects": 0,
-    "skips": 90,
+    "skips": 93,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "jbbl-koeln.de": {
     "source": "jbbl-koeln.de",
-    "attempts": 20,
+    "attempts": 23,
     "creates": 0,
     "rejects": 0,
-    "skips": 20,
+    "skips": 23,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "jbl-hoops.com": {
     "source": "jbl-hoops.com",
-    "attempts": 26,
+    "attempts": 25,
     "creates": 0,
     "rejects": 0,
-    "skips": 26,
+    "skips": 25,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "jblfl.com": {
     "source": "jblfl.com",
-    "attempts": 12,
+    "attempts": 15,
     "creates": 0,
     "rejects": 0,
-    "skips": 12,
+    "skips": 15,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1513,19 +1522,19 @@
   },
   "joyn.de": {
     "source": "joyn.de",
-    "attempts": 361,
+    "attempts": 359,
     "creates": 0,
     "rejects": 0,
-    "skips": 361,
+    "skips": 359,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "khaosod.co.th": {
     "source": "khaosod.co.th",
-    "attempts": 190,
+    "attempts": 192,
     "creates": 0,
     "rejects": 0,
-    "skips": 190,
+    "skips": 192,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1549,10 +1558,10 @@
   },
   "kickoff-hq.com": {
     "source": "kickoff-hq.com",
-    "attempts": 1,
+    "attempts": 2,
     "creates": 0,
     "rejects": 0,
-    "skips": 1,
+    "skips": 2,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1612,37 +1621,37 @@
   },
   "laprovincia.es": {
     "source": "laprovincia.es",
-    "attempts": 241,
+    "attempts": 235,
     "creates": 0,
     "rejects": 0,
-    "skips": 241,
+    "skips": 235,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "leagues.football": {
     "source": "leagues.football",
-    "attempts": 4,
+    "attempts": 5,
     "creates": 0,
     "rejects": 0,
-    "skips": 4,
+    "skips": 5,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "lees-corner.de": {
     "source": "lees-corner.de",
-    "attempts": 36,
+    "attempts": 37,
     "creates": 0,
     "rejects": 0,
-    "skips": 36,
+    "skips": 37,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "legalbet.es": {
     "source": "legalbet.es",
-    "attempts": 23,
+    "attempts": 24,
     "creates": 0,
     "rejects": 0,
-    "skips": 23,
+    "skips": 24,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1666,10 +1675,10 @@
   },
   "linkedin.com": {
     "source": "linkedin.com",
-    "attempts": 501,
+    "attempts": 503,
     "creates": 0,
     "rejects": 0,
-    "skips": 501,
+    "skips": 503,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1684,19 +1693,19 @@
   },
   "live-result.com": {
     "source": "live-result.com",
-    "attempts": 55,
+    "attempts": 60,
     "creates": 0,
     "rejects": 0,
-    "skips": 55,
+    "skips": 60,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "live-sport-online.com": {
     "source": "live-sport-online.com",
-    "attempts": 86,
+    "attempts": 81,
     "creates": 0,
     "rejects": 0,
-    "skips": 86,
+    "skips": 81,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1711,55 +1720,55 @@
   },
   "live.2basketballbundesliga.de": {
     "source": "live.2basketballbundesliga.de",
-    "attempts": 272,
+    "attempts": 278,
     "creates": 0,
     "rejects": 0,
-    "skips": 272,
+    "skips": 278,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "live.allsportdb.com": {
     "source": "live.allsportdb.com",
-    "attempts": 87,
+    "attempts": 89,
     "creates": 0,
     "rejects": 0,
-    "skips": 87,
+    "skips": 89,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "live.basketball-bundesliga.de": {
     "source": "live.basketball-bundesliga.de",
-    "attempts": 16,
+    "attempts": 18,
     "creates": 0,
     "rejects": 0,
-    "skips": 16,
+    "skips": 18,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "liveimtv.de": {
     "source": "liveimtv.de",
-    "attempts": 1882,
+    "attempts": 1881,
     "creates": 0,
     "rejects": 0,
-    "skips": 1882,
+    "skips": 1881,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "livekick.info": {
     "source": "livekick.info",
-    "attempts": 47,
+    "attempts": 50,
     "creates": 0,
     "rejects": 0,
-    "skips": 47,
+    "skips": 50,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "liveleagues.me": {
     "source": "liveleagues.me",
-    "attempts": 33,
+    "attempts": 35,
     "creates": 0,
     "rejects": 0,
-    "skips": 33,
+    "skips": 35,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1774,28 +1783,28 @@
   },
   "livescorehunter.com": {
     "source": "livescorehunter.com",
-    "attempts": 18,
+    "attempts": 19,
     "creates": 0,
     "rejects": 0,
-    "skips": 18,
+    "skips": 19,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "livesport.com": {
     "source": "livesport.com",
-    "attempts": 207,
+    "attempts": 208,
     "creates": 0,
     "rejects": 0,
-    "skips": 207,
+    "skips": 208,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "livesportsontv.com": {
     "source": "livesportsontv.com",
-    "attempts": 1718,
+    "attempts": 1708,
     "creates": 0,
     "rejects": 0,
-    "skips": 1718,
+    "skips": 1708,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1855,10 +1864,10 @@
   },
   "m.aiscore.com": {
     "source": "m.aiscore.com",
-    "attempts": 53,
+    "attempts": 49,
     "creates": 0,
     "rejects": 0,
-    "skips": 53,
+    "skips": 49,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1873,10 +1882,10 @@
   },
   "m.youtube.com": {
     "source": "m.youtube.com",
-    "attempts": 36,
+    "attempts": 33,
     "creates": 0,
     "rejects": 0,
-    "skips": 36,
+    "skips": 33,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1891,19 +1900,19 @@
   },
   "magenta.tv": {
     "source": "magenta.tv",
-    "attempts": 743,
+    "attempts": 744,
     "creates": 0,
     "rejects": 0,
-    "skips": 743,
+    "skips": 744,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "magentasport.de": {
     "source": "magentasport.de",
-    "attempts": 6435,
+    "attempts": 6446,
     "creates": 0,
     "rejects": 0,
-    "skips": 6435,
+    "skips": 6446,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1927,28 +1936,28 @@
   },
   "mainstreams.io": {
     "source": "mainstreams.io",
-    "attempts": 51,
+    "attempts": 48,
     "creates": 0,
     "rejects": 0,
-    "skips": 51,
+    "skips": 48,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "malavida.com": {
     "source": "malavida.com",
-    "attempts": 162,
+    "attempts": 161,
     "creates": 0,
     "rejects": 0,
-    "skips": 162,
+    "skips": 161,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "manchester.basketball": {
     "source": "manchester.basketball",
-    "attempts": 6,
+    "attempts": 7,
     "creates": 0,
     "rejects": 0,
-    "skips": 6,
+    "skips": 7,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1963,10 +1972,10 @@
   },
   "matchcast.tv": {
     "source": "matchcast.tv",
-    "attempts": 138,
+    "attempts": 139,
     "creates": 0,
     "rejects": 0,
-    "skips": 138,
+    "skips": 139,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -1981,10 +1990,10 @@
   },
   "mdr.de": {
     "source": "mdr.de",
-    "attempts": 69,
+    "attempts": 71,
     "creates": 0,
     "rejects": 0,
-    "skips": 69,
+    "skips": 71,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2017,19 +2026,19 @@
   },
   "mffplay.se": {
     "source": "mffplay.se",
-    "attempts": 3,
+    "attempts": 4,
     "creates": 0,
     "rejects": 0,
-    "skips": 3,
+    "skips": 4,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "msb.fr": {
     "source": "msb.fr",
-    "attempts": 29,
+    "attempts": 32,
     "creates": 0,
     "rejects": 0,
-    "skips": 29,
+    "skips": 32,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2044,10 +2053,10 @@
   },
   "nba.com": {
     "source": "nba.com",
-    "attempts": 148,
+    "attempts": 153,
     "creates": 0,
     "rejects": 0,
-    "skips": 148,
+    "skips": 153,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2062,64 +2071,64 @@
   },
   "nbabox.co": {
     "source": "nbabox.co",
-    "attempts": 554,
+    "attempts": 551,
     "creates": 0,
     "rejects": 0,
-    "skips": 554,
+    "skips": 551,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "nbabox.im": {
     "source": "nbabox.im",
-    "attempts": 10,
+    "attempts": 13,
     "creates": 0,
     "rejects": 0,
-    "skips": 10,
+    "skips": 13,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "nbbl-basketball.de": {
     "source": "nbbl-basketball.de",
-    "attempts": 660,
+    "attempts": 662,
     "creates": 0,
     "rejects": 0,
-    "skips": 660,
+    "skips": 662,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "nbl.basketball": {
     "source": "nbl.basketball",
-    "attempts": 231,
+    "attempts": 227,
     "creates": 0,
     "rejects": 0,
-    "skips": 231,
+    "skips": 227,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "nbl.com.au": {
     "source": "nbl.com.au",
-    "attempts": 460,
+    "attempts": 463,
     "creates": 0,
     "rejects": 0,
-    "skips": 460,
+    "skips": 463,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "nbl1.com.au": {
     "source": "nbl1.com.au",
-    "attempts": 7,
+    "attempts": 8,
     "creates": 0,
     "rejects": 0,
-    "skips": 7,
+    "skips": 8,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "nblaus.nbl.com.au": {
     "source": "nblaus.nbl.com.au",
-    "attempts": 220,
+    "attempts": 222,
     "creates": 0,
     "rejects": 0,
-    "skips": 220,
+    "skips": 222,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2152,19 +2161,19 @@
   },
   "netzwelt.de": {
     "source": "netzwelt.de",
-    "attempts": 3249,
+    "attempts": 3240,
     "creates": 0,
     "rejects": 0,
-    "skips": 3249,
+    "skips": 3240,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "news.de": {
     "source": "news.de",
-    "attempts": 2419,
+    "attempts": 2451,
     "creates": 0,
     "rejects": 0,
-    "skips": 2419,
+    "skips": 2451,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2179,10 +2188,10 @@
   },
   "nfhsnetwork.com": {
     "source": "nfhsnetwork.com",
-    "attempts": 158,
+    "attempts": 155,
     "creates": 0,
     "rejects": 0,
-    "skips": 158,
+    "skips": 155,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2215,10 +2224,10 @@
   },
   "nobackboardbasketballgym.com": {
     "source": "nobackboardbasketballgym.com",
-    "attempts": 37,
+    "attempts": 42,
     "creates": 0,
     "rejects": 0,
-    "skips": 37,
+    "skips": 42,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2242,10 +2251,10 @@
   },
   "nznbl.basketball": {
     "source": "nznbl.basketball",
-    "attempts": 22,
+    "attempts": 27,
     "creates": 0,
     "rejects": 0,
-    "skips": 22,
+    "skips": 27,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2260,10 +2269,10 @@
   },
   "obasketu.cz": {
     "source": "obasketu.cz",
-    "attempts": 262,
+    "attempts": 263,
     "creates": 0,
     "rejects": 0,
-    "skips": 262,
+    "skips": 263,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2278,55 +2287,64 @@
   },
   "okdiario.com": {
     "source": "okdiario.com",
-    "attempts": 7,
+    "attempts": 8,
     "creates": 0,
     "rejects": 0,
-    "skips": 7,
+    "skips": 8,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "olympics.com": {
     "source": "olympics.com",
-    "attempts": 471,
+    "attempts": 468,
     "creates": 0,
     "rejects": 0,
-    "skips": 471,
+    "skips": 468,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "oneball.live": {
     "source": "oneball.live",
-    "attempts": 127,
+    "attempts": 123,
     "creates": 0,
     "rejects": 0,
-    "skips": 127,
+    "skips": 123,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "onetz.de": {
     "source": "onetz.de",
-    "attempts": 44,
+    "attempts": 48,
     "creates": 0,
     "rejects": 0,
-    "skips": 44,
+    "skips": 48,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "parapolitika.gr": {
     "source": "parapolitika.gr",
-    "attempts": 5,
+    "attempts": 6,
     "creates": 0,
     "rejects": 0,
-    "skips": 5,
+    "skips": 6,
+    "blocked": 0,
+    "hit_rate": 0.0
+  },
+  "partidos-hoy.com": {
+    "source": "partidos-hoy.com",
+    "attempts": 1,
+    "creates": 0,
+    "rejects": 0,
+    "skips": 1,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "partiteoggi.net": {
     "source": "partiteoggi.net",
-    "attempts": 9,
+    "attempts": 8,
     "creates": 0,
     "rejects": 0,
-    "skips": 9,
+    "skips": 8,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2350,10 +2368,10 @@
   },
   "pirly.tech": {
     "source": "pirly.tech",
-    "attempts": 11,
+    "attempts": 12,
     "creates": 0,
     "rejects": 0,
-    "skips": 11,
+    "skips": 12,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2368,37 +2386,37 @@
   },
   "presseportal.de": {
     "source": "presseportal.de",
-    "attempts": 1255,
+    "attempts": 1258,
     "creates": 0,
     "rejects": 0,
-    "skips": 1255,
+    "skips": 1258,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "privateinternetaccess.com": {
     "source": "privateinternetaccess.com",
-    "attempts": 146,
+    "attempts": 144,
     "creates": 0,
     "rejects": 0,
-    "skips": 146,
+    "skips": 144,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "prnewswire.com": {
     "source": "prnewswire.com",
-    "attempts": 88,
+    "attempts": 81,
     "creates": 0,
     "rejects": 0,
-    "skips": 88,
+    "skips": 81,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "probasket.asport.tv": {
     "source": "probasket.asport.tv",
-    "attempts": 190,
+    "attempts": 191,
     "creates": 0,
     "rejects": 0,
-    "skips": 190,
+    "skips": 191,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2413,19 +2431,19 @@
   },
   "prosiebensat1.com": {
     "source": "prosiebensat1.com",
-    "attempts": 182,
+    "attempts": 180,
     "creates": 0,
     "rejects": 0,
-    "skips": 182,
+    "skips": 180,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "protipster.com": {
     "source": "protipster.com",
-    "attempts": 224,
+    "attempts": 221,
     "creates": 0,
     "rejects": 0,
-    "skips": 224,
+    "skips": 221,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2476,19 +2494,19 @@
   },
   "regionalliga-suedost.de": {
     "source": "regionalliga-suedost.de",
-    "attempts": 121,
+    "attempts": 128,
     "creates": 0,
     "rejects": 0,
-    "skips": 121,
+    "skips": 128,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "remixed.nobackboard.com": {
     "source": "remixed.nobackboard.com",
-    "attempts": 248,
+    "attempts": 240,
     "creates": 0,
     "rejects": 0,
-    "skips": 248,
+    "skips": 240,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2512,19 +2530,19 @@
   },
   "rp-online.de": {
     "source": "rp-online.de",
-    "attempts": 11,
+    "attempts": 12,
     "creates": 0,
     "rejects": 0,
-    "skips": 11,
+    "skips": 12,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "rtve.es": {
     "source": "rtve.es",
-    "attempts": 25,
+    "attempts": 27,
     "creates": 0,
     "rejects": 0,
-    "skips": 25,
+    "skips": 27,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2539,28 +2557,28 @@
   },
   "ruhrnachrichten.de": {
     "source": "ruhrnachrichten.de",
-    "attempts": 577,
+    "attempts": 582,
     "creates": 0,
     "rejects": 0,
-    "skips": 577,
+    "skips": 582,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "sambadigital.com": {
     "source": "sambadigital.com",
-    "attempts": 35,
+    "attempts": 33,
     "creates": 0,
     "rejects": 0,
-    "skips": 35,
+    "skips": 33,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "sapgarden.com": {
     "source": "sapgarden.com",
-    "attempts": 10,
+    "attempts": 15,
     "creates": 0,
     "rejects": 0,
-    "skips": 10,
+    "skips": 15,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2575,19 +2593,19 @@
   },
   "schoenen-dunk.de": {
     "source": "schoenen-dunk.de",
-    "attempts": 48,
+    "attempts": 54,
     "creates": 0,
     "rejects": 0,
-    "skips": 48,
+    "skips": 54,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "scoremondo.com": {
     "source": "scoremondo.com",
-    "attempts": 2,
+    "attempts": 3,
     "creates": 0,
     "rejects": 0,
-    "skips": 2,
+    "skips": 3,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2611,19 +2629,19 @@
   },
   "secure.fibatv.com": {
     "source": "secure.fibatv.com",
-    "attempts": 15,
+    "attempts": 21,
     "creates": 0,
     "rejects": 0,
-    "skips": 15,
+    "skips": 21,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "servicosonline.fazenda.gov.br": {
     "source": "servicosonline.fazenda.gov.br",
-    "attempts": 44,
+    "attempts": 40,
     "creates": 0,
     "rejects": 0,
-    "skips": 44,
+    "skips": 40,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2647,10 +2665,10 @@
   },
   "shoppingvorteil.de": {
     "source": "shoppingvorteil.de",
-    "attempts": 61,
+    "attempts": 64,
     "creates": 0,
     "rejects": 0,
-    "skips": 61,
+    "skips": 64,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2665,19 +2683,19 @@
   },
   "sofascore.com": {
     "source": "sofascore.com",
-    "attempts": 555,
+    "attempts": 564,
     "creates": 0,
     "rejects": 0,
-    "skips": 555,
+    "skips": 564,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "sport-tv-guide.live": {
     "source": "sport-tv-guide.live",
-    "attempts": 665,
+    "attempts": 667,
     "creates": 0,
     "rejects": 0,
-    "skips": 665,
+    "skips": 667,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2692,55 +2710,55 @@
   },
   "sport.de": {
     "source": "sport.de",
-    "attempts": 1777,
+    "attempts": 1790,
     "creates": 0,
     "rejects": 0,
-    "skips": 1777,
+    "skips": 1790,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "sport.es": {
     "source": "sport.es",
-    "attempts": 209,
+    "attempts": 203,
     "creates": 0,
     "rejects": 0,
-    "skips": 209,
+    "skips": 203,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "sport1.de": {
     "source": "sport1.de",
-    "attempts": 49,
+    "attempts": 51,
     "creates": 0,
     "rejects": 0,
-    "skips": 49,
+    "skips": 51,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "sportairtime.com": {
     "source": "sportairtime.com",
-    "attempts": 20,
+    "attempts": 30,
     "creates": 0,
     "rejects": 0,
-    "skips": 20,
+    "skips": 30,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "sportando.basketball": {
     "source": "sportando.basketball",
-    "attempts": 45,
+    "attempts": 47,
     "creates": 0,
     "rejects": 0,
-    "skips": 45,
+    "skips": 47,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "sportbild.bild.de": {
     "source": "sportbild.bild.de",
-    "attempts": 2307,
+    "attempts": 2290,
     "creates": 0,
     "rejects": 0,
-    "skips": 2307,
+    "skips": 2290,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2782,46 +2800,46 @@
   },
   "sportimtv.net": {
     "source": "sportimtv.net",
-    "attempts": 69,
+    "attempts": 80,
     "creates": 0,
     "rejects": 0,
-    "skips": 69,
+    "skips": 80,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "sportingnews.com": {
     "source": "sportingnews.com",
-    "attempts": 238,
+    "attempts": 245,
     "creates": 0,
     "rejects": 0,
-    "skips": 238,
+    "skips": 245,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "sportnews.eu": {
     "source": "sportnews.eu",
-    "attempts": 192,
+    "attempts": 198,
     "creates": 0,
     "rejects": 0,
-    "skips": 192,
+    "skips": 198,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "sportpresseportal.de": {
     "source": "sportpresseportal.de",
-    "attempts": 811,
+    "attempts": 813,
     "creates": 0,
     "rejects": 0,
-    "skips": 811,
+    "skips": 813,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "sports.justwatch.com": {
     "source": "sports.justwatch.com",
-    "attempts": 2655,
+    "attempts": 2653,
     "creates": 0,
     "rejects": 0,
-    "skips": 2655,
+    "skips": 2653,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2836,10 +2854,10 @@
   },
   "sportschau.de": {
     "source": "sportschau.de",
-    "attempts": 1241,
+    "attempts": 1224,
     "creates": 0,
     "rejects": 0,
-    "skips": 1241,
+    "skips": 1224,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2854,19 +2872,19 @@
   },
   "sportsgambler.com": {
     "source": "sportsgambler.com",
-    "attempts": 1283,
+    "attempts": 1279,
     "creates": 0,
     "rejects": 0,
-    "skips": 1283,
+    "skips": 1279,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "sportsmediawatch.com": {
     "source": "sportsmediawatch.com",
-    "attempts": 24,
+    "attempts": 28,
     "creates": 0,
     "rejects": 0,
-    "skips": 24,
+    "skips": 28,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2926,19 +2944,19 @@
   },
   "spox.com": {
     "source": "spox.com",
-    "attempts": 1186,
+    "attempts": 1167,
     "creates": 0,
     "rejects": 0,
-    "skips": 1186,
+    "skips": 1167,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "squawka.com": {
     "source": "squawka.com",
-    "attempts": 577,
+    "attempts": 572,
     "creates": 0,
     "rejects": 0,
-    "skips": 577,
+    "skips": 572,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2980,10 +2998,10 @@
   },
   "streameasti.ch": {
     "source": "streameasti.ch",
-    "attempts": 18,
+    "attempts": 24,
     "creates": 0,
     "rejects": 0,
-    "skips": 18,
+    "skips": 24,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -2998,51 +3016,15 @@
   },
   "streaming-probemonat.de": {
     "source": "streaming-probemonat.de",
-    "attempts": 15,
+    "attempts": 21,
     "creates": 0,
     "rejects": 0,
-    "skips": 15,
+    "skips": 21,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "strikeout.im": {
     "source": "strikeout.im",
-    "attempts": 1,
-    "creates": 0,
-    "rejects": 0,
-    "skips": 1,
-    "blocked": 0,
-    "hit_rate": 0.0
-  },
-  "sueddeutsche.de": {
-    "source": "sueddeutsche.de",
-    "attempts": 18,
-    "creates": 0,
-    "rejects": 0,
-    "skips": 18,
-    "blocked": 0,
-    "hit_rate": 0.0
-  },
-  "support.playback.tv": {
-    "source": "support.playback.tv",
-    "attempts": 34,
-    "creates": 0,
-    "rejects": 0,
-    "skips": 34,
-    "blocked": 0,
-    "hit_rate": 0.0
-  },
-  "swp.de": {
-    "source": "swp.de",
-    "attempts": 990,
-    "creates": 0,
-    "rejects": 0,
-    "skips": 990,
-    "blocked": 0,
-    "hit_rate": 0.0
-  },
-  "swr.de": {
-    "source": "swr.de",
     "attempts": 2,
     "creates": 0,
     "rejects": 0,
@@ -3050,12 +3032,48 @@
     "blocked": 0,
     "hit_rate": 0.0
   },
-  "t-online.de": {
-    "source": "t-online.de",
-    "attempts": 353,
+  "sueddeutsche.de": {
+    "source": "sueddeutsche.de",
+    "attempts": 19,
     "creates": 0,
     "rejects": 0,
-    "skips": 353,
+    "skips": 19,
+    "blocked": 0,
+    "hit_rate": 0.0
+  },
+  "support.playback.tv": {
+    "source": "support.playback.tv",
+    "attempts": 38,
+    "creates": 0,
+    "rejects": 0,
+    "skips": 38,
+    "blocked": 0,
+    "hit_rate": 0.0
+  },
+  "swp.de": {
+    "source": "swp.de",
+    "attempts": 991,
+    "creates": 0,
+    "rejects": 0,
+    "skips": 991,
+    "blocked": 0,
+    "hit_rate": 0.0
+  },
+  "swr.de": {
+    "source": "swr.de",
+    "attempts": 3,
+    "creates": 0,
+    "rejects": 0,
+    "skips": 3,
+    "blocked": 0,
+    "hit_rate": 0.0
+  },
+  "t-online.de": {
+    "source": "t-online.de",
+    "attempts": 354,
+    "creates": 0,
+    "rejects": 0,
+    "skips": 354,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -3070,10 +3088,10 @@
   },
   "tbs.co.jp": {
     "source": "tbs.co.jp",
-    "attempts": 93,
+    "attempts": 89,
     "creates": 0,
     "rejects": 0,
-    "skips": 93,
+    "skips": 89,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -3097,28 +3115,28 @@
   },
   "telekom-baskets-bonn.de": {
     "source": "telekom-baskets-bonn.de",
-    "attempts": 412,
+    "attempts": 413,
     "creates": 0,
     "rejects": 0,
-    "skips": 412,
+    "skips": 413,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "telekom-deutschland-gmbh-basketball.en.aptoide.com": {
     "source": "telekom-deutschland-gmbh-basketball.en.aptoide.com",
-    "attempts": 83,
+    "attempts": 81,
     "creates": 0,
     "rejects": 0,
-    "skips": 83,
+    "skips": 81,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "telekom.com": {
     "source": "telekom.com",
-    "attempts": 1426,
+    "attempts": 1433,
     "creates": 0,
     "rejects": 0,
-    "skips": 1426,
+    "skips": 1433,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -3142,28 +3160,28 @@
   },
   "thaipost.net": {
     "source": "thaipost.net",
-    "attempts": 83,
+    "attempts": 84,
     "creates": 0,
     "rejects": 0,
-    "skips": 83,
+    "skips": 84,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "thesportscommons.com": {
     "source": "thesportscommons.com",
-    "attempts": 226,
+    "attempts": 224,
     "creates": 0,
     "rejects": 0,
-    "skips": 226,
+    "skips": 224,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "tiempodebasket.com": {
     "source": "tiempodebasket.com",
-    "attempts": 262,
+    "attempts": 263,
     "creates": 0,
     "rejects": 0,
-    "skips": 262,
+    "skips": 263,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -3178,10 +3196,10 @@
   },
   "tipico.de": {
     "source": "tipico.de",
-    "attempts": 1285,
+    "attempts": 1310,
     "creates": 0,
     "rejects": 0,
-    "skips": 1285,
+    "skips": 1310,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -3232,10 +3250,10 @@
   },
   "toyota-dbbl.de": {
     "source": "toyota-dbbl.de",
-    "attempts": 219,
+    "attempts": 222,
     "creates": 0,
     "rejects": 0,
-    "skips": 219,
+    "skips": 222,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -3268,37 +3286,37 @@
   },
   "tsvbreitenguessbach.de": {
     "source": "tsvbreitenguessbach.de",
-    "attempts": 31,
+    "attempts": 33,
     "creates": 0,
     "rejects": 0,
-    "skips": 31,
+    "skips": 33,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "ttbl.de": {
     "source": "ttbl.de",
-    "attempts": 170,
+    "attempts": 174,
     "creates": 0,
     "rejects": 0,
-    "skips": 170,
+    "skips": 174,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "tur.sportplus.tv": {
     "source": "tur.sportplus.tv",
-    "attempts": 18,
+    "attempts": 23,
     "creates": 0,
     "rejects": 0,
-    "skips": 18,
+    "skips": 23,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "tv.youtube.com": {
     "source": "tv.youtube.com",
-    "attempts": 1086,
+    "attempts": 1083,
     "creates": 0,
     "rejects": 0,
-    "skips": 1086,
+    "skips": 1083,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -3322,10 +3340,10 @@
   },
   "tvizle.tr": {
     "source": "tvizle.tr",
-    "attempts": 160,
+    "attempts": 165,
     "creates": 0,
     "rejects": 0,
-    "skips": 160,
+    "skips": 165,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -3340,37 +3358,37 @@
   },
   "tvmovie.de": {
     "source": "tvmovie.de",
-    "attempts": 63,
+    "attempts": 71,
     "creates": 0,
     "rejects": 0,
-    "skips": 63,
+    "skips": 71,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "tvsport24.fr": {
     "source": "tvsport24.fr",
-    "attempts": 59,
+    "attempts": 56,
     "creates": 0,
     "rejects": 0,
-    "skips": 59,
+    "skips": 56,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "twitch.tv": {
     "source": "twitch.tv",
-    "attempts": 786,
+    "attempts": 782,
     "creates": 0,
     "rejects": 0,
-    "skips": 786,
+    "skips": 782,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "ubc.ms": {
     "source": "ubc.ms",
-    "attempts": 286,
+    "attempts": 287,
     "creates": 0,
     "rejects": 0,
-    "skips": 286,
+    "skips": 287,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -3394,10 +3412,10 @@
   },
   "uplay.se": {
     "source": "uplay.se",
-    "attempts": 286,
+    "attempts": 287,
     "creates": 0,
     "rejects": 0,
-    "skips": 286,
+    "skips": 287,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -3412,28 +3430,28 @@
   },
   "usbasket.com": {
     "source": "usbasket.com",
-    "attempts": 380,
+    "attempts": 381,
     "creates": 0,
     "rejects": 0,
-    "skips": 380,
+    "skips": 381,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "usc-eisvoegel.de": {
     "source": "usc-eisvoegel.de",
-    "attempts": 59,
+    "attempts": 56,
     "creates": 0,
     "rejects": 0,
-    "skips": 59,
+    "skips": 56,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "videoschiri.com": {
     "source": "videoschiri.com",
-    "attempts": 45,
+    "attempts": 48,
     "creates": 0,
     "rejects": 0,
-    "skips": 45,
+    "skips": 48,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -3484,10 +3502,10 @@
   },
   "waipu.tv": {
     "source": "waipu.tv",
-    "attempts": 669,
+    "attempts": 673,
     "creates": 0,
     "rejects": 0,
-    "skips": 669,
+    "skips": 673,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -3511,28 +3529,28 @@
   },
   "web.basketball.scb.world": {
     "source": "web.basketball.scb.world",
-    "attempts": 537,
+    "attempts": 543,
     "creates": 0,
     "rejects": 0,
-    "skips": 537,
+    "skips": 543,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "web.playsight.com": {
     "source": "web.playsight.com",
-    "attempts": 871,
+    "attempts": 859,
     "creates": 0,
     "rejects": 0,
-    "skips": 871,
+    "skips": 859,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "webcatalog.io": {
     "source": "webcatalog.io",
-    "attempts": 120,
+    "attempts": 112,
     "creates": 0,
     "rejects": 0,
-    "skips": 120,
+    "skips": 112,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -3556,37 +3574,37 @@
   },
   "wetten.com": {
     "source": "wetten.com",
-    "attempts": 483,
+    "attempts": 489,
     "creates": 0,
     "rejects": 0,
-    "skips": 483,
+    "skips": 489,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "wettfreunde.net": {
     "source": "wettfreunde.net",
-    "attempts": 73,
+    "attempts": 77,
     "creates": 0,
     "rejects": 0,
-    "skips": 73,
+    "skips": 77,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "wheretowatchbasketball.com": {
     "source": "wheretowatchbasketball.com",
-    "attempts": 108,
+    "attempts": 113,
     "creates": 0,
     "rejects": 0,
-    "skips": 108,
+    "skips": 113,
     "blocked": 0,
     "hit_rate": 0.0
   },
   "wormatia.de": {
     "source": "wormatia.de",
-    "attempts": 74,
+    "attempts": 81,
     "creates": 0,
     "rejects": 0,
-    "skips": 74,
+    "skips": 81,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -3601,10 +3619,10 @@
   },
   "ws05.news.de": {
     "source": "ws05.news.de",
-    "attempts": 65,
+    "attempts": 64,
     "creates": 0,
     "rejects": 0,
-    "skips": 65,
+    "skips": 64,
     "blocked": 0,
     "hit_rate": 0.0
   },
@@ -3619,19 +3637,19 @@
   },
   "www.euroleaguebasketball.net": {
     "source": "www.euroleaguebasketball.net",
-    "attempts": 432,
+    "attempts": 441,
     "creates": 0,
     "rejects": 0,
     "skips": 0,
-    "blocked": 432,
+    "blocked": 441,
     "hit_rate": 0.0
   },
   "youtube.com": {
     "source": "youtube.com",
-    "attempts": 12648,
+    "attempts": 12701,
     "creates": 0,
     "rejects": 0,
-    "skips": 12648,
+    "skips": 12701,
     "blocked": 0,
     "hit_rate": 0.0
   },
