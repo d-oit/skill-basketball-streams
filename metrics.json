@@ -1,10 +1,10 @@
 {
   "audit": {
     "inconclusive": 17,
-    "judged": 33,
+    "judged": 35,
     "precision": 1.0,
-    "rows": 50,
-    "verified": 33,
+    "rows": 52,
+    "verified": 35,
     "wrong": 0
   },
   "derived": true,
@@ -141,8 +141,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 1018,
-    "missed": 1018,
+    "eligible": 1022,
+    "missed": 1022,
     "missed_keys": [
       "http://live.basketball-bundesliga.de/home",
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
@@ -530,6 +530,7 @@
       "https://www.bild.de/sport/mehr-sport/basketball-jetzt-live-chemnitz-will-die-bayern-aergern-6ac8c1153b2b428232f0b10d",
       "https://www.bild.de/sport/mehr-sport/basketball/bbl-so-sehen-sie-alba-berlin-ulm-live-kostenlos-im-tv-stream-87018436.bild.html",
       "https://www.bild.de/sport/mehr-sport/derby-gegen-bamberg-jetzt-live-bayern-muenchens-basketball-knaller-68ea6114a9f78ac9949b1061",
+      "https://www.bild.de/sport/mehr-sport/hier-jetzt-basketball-live-gucken-haelt-wuerzburgs-siegesserie-auch-gegen-bayern-6aed99011d9d38d6d601afc1",
       "https://www.bild.de/sport/mehr-sport/hier-jetzt-bbl-live-gucken-siegt-sich-vechta-in-hagen-aus-der-liga-krise-6ae443e0aacefa08f5b98f0a",
       "https://www.bild.de/sport/mehr-sport/playoff-halbfinale-alba-bamberg-bild-de-zeigt-basketball-live-6a280aed2f1d399245057caf",
       "https://www.bundle.app/de/lebensstil/alba-vs-bamberg-baskets-kostenlos-im-livestream-team-vergleich-streams-und-mehr-am-samstag-DA1C5483-9798-5183-92FD-37CB42CB0FA9",
@@ -812,6 +813,7 @@
       "https://www.rnd.de/sport/deutschland-litauen-live-basketball-em-im-free-tv-und-stream-sehen-VWZKAORLUBC2VKTFRE75QXRG2M.html",
       "https://www.ruhrnachrichten.de/dortmund-sport/basketball-svd-49-dortmund-tv-gerthe-livestream-2-regionalliga-samstag-w1168343-2002006664/",
       "https://www.ruhrnachrichten.de/werne-sport/basketball-lippebaskets-werne-bsv-wulfen-13-dezember-livestream-regionalliga-w1118728-2001904345/",
+      "https://www.ruhrnachrichten.de/werne-sport/basketball-livestream-lippebaskets-werne-vs-new-elephants-grevenbroich-klassenerhalt-w1166023-2002001492/",
       "https://www.ruhrnachrichten.de/werne-sport/basketball-regionalliga-lippebaskets-werne-hammstars-derby-livestream-w1267020-2002279558/",
       "https://www.ruhrnachrichten.de/werne-sport/regionalliga-basketball-lippebaskets-werne-dtv-koeln-samstag-19-30-uhr-live-w1262381-2002266544/",
       "https://www.schoenen-dunk.de/topic/6026/basketball-ergebnisdienst-und-liveticker-f%C3%BCr-rl-direkt-auf-dein-handy",
@@ -982,6 +984,7 @@
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AYCX9vIe8G5DUnimcDC0K1D29NiVF4mb5bkj2w3-J2UzM5tnDMAqGq_v",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AYCX9vIqgy1Qvmdnrtt71w36vaiKds_BbV-XelAxsNZKBqnJ6uPw8dPB",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AYCX9vJClGWYHmyTSiquFWyRIWO8x5w54oAi_vnAr0jb43pfYIelVkXp",
+      "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AYCX9vK2gfIhRP__UHBBFo9m-APOuh-OOJmJ3kfFHVnV9-f68934cny0",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AYCX9vLVZ3dwyESAEyMEbKpQkGiMib0S-L5noAsiPjNKpWJ2Shhas0dk",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AYCX9vLdGki9xUh0lwhJe20J3sCWlJDyNX8K0nYNKMwjeEkNOWmkGCyZ",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AYCX9vLuHSJrjTwKamb1BBl0zprleClwmriZRx8RUxSDKf29bX-65yyD",
@@ -1143,6 +1146,7 @@
       "https://www.youtube.com/watch?v=rnPeiFEgyMA&xstg=CAMSBhUD-7L2Hw%3D%3D",
       "https://www.youtube.com/watch?v=rnPeiFEgyMA&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=sOX01RgDiBU",
+      "https://www.youtube.com/watch?v=skuEPweVMx4",
       "https://www.youtube.com/watch?v=tGvsJG5JeSE",
       "https://www.youtube.com/watch?v=tu-yac8ipjg",
       "https://www.youtube.com/watch?v=u_veP5Y9uYw",
@@ -1164,9 +1168,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 20495,
-    "unique_games": 1609,
-    "unverifiable": 1018,
+    "rows": 20775,
+    "unique_games": 1613,
+    "unverifiable": 1022,
     "unverifiable_keys": [
       "http://live.basketball-bundesliga.de/home",
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
@@ -1554,6 +1558,7 @@
       "https://www.bild.de/sport/mehr-sport/basketball-jetzt-live-chemnitz-will-die-bayern-aergern-6ac8c1153b2b428232f0b10d",
       "https://www.bild.de/sport/mehr-sport/basketball/bbl-so-sehen-sie-alba-berlin-ulm-live-kostenlos-im-tv-stream-87018436.bild.html",
       "https://www.bild.de/sport/mehr-sport/derby-gegen-bamberg-jetzt-live-bayern-muenchens-basketball-knaller-68ea6114a9f78ac9949b1061",
+      "https://www.bild.de/sport/mehr-sport/hier-jetzt-basketball-live-gucken-haelt-wuerzburgs-siegesserie-auch-gegen-bayern-6aed99011d9d38d6d601afc1",
       "https://www.bild.de/sport/mehr-sport/hier-jetzt-bbl-live-gucken-siegt-sich-vechta-in-hagen-aus-der-liga-krise-6ae443e0aacefa08f5b98f0a",
       "https://www.bild.de/sport/mehr-sport/playoff-halbfinale-alba-bamberg-bild-de-zeigt-basketball-live-6a280aed2f1d399245057caf",
       "https://www.bundle.app/de/lebensstil/alba-vs-bamberg-baskets-kostenlos-im-livestream-team-vergleich-streams-und-mehr-am-samstag-DA1C5483-9798-5183-92FD-37CB42CB0FA9",
@@ -1836,6 +1841,7 @@
       "https://www.rnd.de/sport/deutschland-litauen-live-basketball-em-im-free-tv-und-stream-sehen-VWZKAORLUBC2VKTFRE75QXRG2M.html",
       "https://www.ruhrnachrichten.de/dortmund-sport/basketball-svd-49-dortmund-tv-gerthe-livestream-2-regionalliga-samstag-w1168343-2002006664/",
       "https://www.ruhrnachrichten.de/werne-sport/basketball-lippebaskets-werne-bsv-wulfen-13-dezember-livestream-regionalliga-w1118728-2001904345/",
+      "https://www.ruhrnachrichten.de/werne-sport/basketball-livestream-lippebaskets-werne-vs-new-elephants-grevenbroich-klassenerhalt-w1166023-2002001492/",
       "https://www.ruhrnachrichten.de/werne-sport/basketball-regionalliga-lippebaskets-werne-hammstars-derby-livestream-w1267020-2002279558/",
       "https://www.ruhrnachrichten.de/werne-sport/regionalliga-basketball-lippebaskets-werne-dtv-koeln-samstag-19-30-uhr-live-w1262381-2002266544/",
       "https://www.schoenen-dunk.de/topic/6026/basketball-ergebnisdienst-und-liveticker-f%C3%BCr-rl-direkt-auf-dein-handy",
@@ -2006,6 +2012,7 @@
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AYCX9vIe8G5DUnimcDC0K1D29NiVF4mb5bkj2w3-J2UzM5tnDMAqGq_v",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AYCX9vIqgy1Qvmdnrtt71w36vaiKds_BbV-XelAxsNZKBqnJ6uPw8dPB",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AYCX9vJClGWYHmyTSiquFWyRIWO8x5w54oAi_vnAr0jb43pfYIelVkXp",
+      "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AYCX9vK2gfIhRP__UHBBFo9m-APOuh-OOJmJ3kfFHVnV9-f68934cny0",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AYCX9vLVZ3dwyESAEyMEbKpQkGiMib0S-L5noAsiPjNKpWJ2Shhas0dk",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AYCX9vLdGki9xUh0lwhJe20J3sCWlJDyNX8K0nYNKMwjeEkNOWmkGCyZ",
       "https://www.waipu.tv/sport/bbl-basketball-bundesliga-tv-livestream/?srsltid=AYCX9vLuHSJrjTwKamb1BBl0zprleClwmriZRx8RUxSDKf29bX-65yyD",
@@ -2167,6 +2174,7 @@
       "https://www.youtube.com/watch?v=rnPeiFEgyMA&xstg=CAMSBhUD-7L2Hw%3D%3D",
       "https://www.youtube.com/watch?v=rnPeiFEgyMA&xstg=CAMSBhUDzO3xHw%3D%3D",
       "https://www.youtube.com/watch?v=sOX01RgDiBU",
+      "https://www.youtube.com/watch?v=skuEPweVMx4",
       "https://www.youtube.com/watch?v=tGvsJG5JeSE",
       "https://www.youtube.com/watch?v=tu-yac8ipjg",
       "https://www.youtube.com/watch?v=u_veP5Y9uYw",
@@ -2188,47 +2196,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-11-08T15:29Z",
+  "run_id": "2026-11-08T17:28Z",
   "source": {
-    "audit_rows": 50,
-    "candidates_rows": 20495,
+    "audit_rows": 52,
+    "candidates_rows": 20775,
     "fixtures_rows": 123
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 2,
-        "precision": 1.0,
-        "rows": 2,
-        "verified": 2,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-11-01T16:09Z",
-      "unique_games": 0
-    },
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 138,
-      "missed": 138,
-      "recall": 0.0,
-      "rows": 276,
-      "run_id": "2026-11-02T18:39Z",
-      "unique_games": 237
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -2432,7 +2406,41 @@
       "rows": 281,
       "run_id": "2026-11-08T15:27Z",
       "unique_games": 266
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 2,
+        "precision": 1.0,
+        "rows": 2,
+        "verified": 2,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-11-08T16:15Z",
+      "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 129,
+      "missed": 129,
+      "recall": 0.0,
+      "rows": 280,
+      "run_id": "2026-11-08T17:26Z",
+      "unique_games": 259
     }
   ],
-  "ts": "2026-11-08T15:29:34.940647+00:00"
+  "ts": "2026-11-08T17:28:09.699675+00:00"
 }
