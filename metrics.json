@@ -1,10 +1,10 @@
 {
   "audit": {
     "inconclusive": 17,
-    "judged": 41,
+    "judged": 43,
     "precision": 1.0,
-    "rows": 58,
-    "verified": 41,
+    "rows": 60,
+    "verified": 43,
     "wrong": 0
   },
   "derived": true,
@@ -1182,8 +1182,8 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 21328,
-    "unique_games": 1645,
+    "rows": 21329,
+    "unique_games": 1646,
     "unverifiable": 1034,
     "unverifiable_keys": [
       "http://live.basketball-bundesliga.de/home",
@@ -2222,30 +2222,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-11-10T16:32Z",
+  "run_id": "",
   "source": {
-    "audit_rows": 58,
-    "candidates_rows": 21328,
+    "audit_rows": 60,
+    "candidates_rows": 21329,
     "fixtures_rows": 125
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 125,
-      "missed": 125,
-      "recall": 0.0,
-      "rows": 279,
-      "run_id": "2026-11-05T16:38Z",
-      "unique_games": 263
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -2466,7 +2449,24 @@
       "rows": 275,
       "run_id": "2026-11-10T16:31Z",
       "unique_games": 260
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 2,
+        "precision": 1.0,
+        "rows": 2,
+        "verified": 2,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 1,
+      "run_id": "2026-11-10T16:36Z",
+      "unique_games": 1
     }
   ],
-  "ts": "2026-11-10T16:32:54.891756+00:00"
+  "ts": "2026-11-10T16:36:32.367999+00:00"
 }
