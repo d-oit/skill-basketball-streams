@@ -1,10 +1,10 @@
 {
   "audit": {
     "inconclusive": 17,
-    "judged": 47,
+    "judged": 49,
     "precision": 1.0,
-    "rows": 64,
-    "verified": 47,
+    "rows": 66,
+    "verified": 49,
     "wrong": 0
   },
   "derived": true,
@@ -147,8 +147,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 1044,
-    "missed": 1044,
+    "eligible": 1048,
+    "missed": 1048,
     "missed_keys": [
       "http://live.basketball-bundesliga.de/home",
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
@@ -398,6 +398,7 @@
       "https://sporteurope.tv/basket-duisburg-jbbl",
       "https://sporteurope.tv/bayer-giants-leverkusen/live-bayer-giants-leverkusen-vs-tsv-neustadt-temps-shooters-testspiel",
       "https://sporteurope.tv/black-forest-panthers-schwenningen",
+      "https://sporteurope.tv/en/",
       "https://sporteurope.tv/en/1-basketball-regionalliga-west-maenner",
       "https://sporteurope.tv/en/2-basketball-regionalliga-nord-maenner",
       "https://sporteurope.tv/en/alba-berlin-nbbl",
@@ -725,6 +726,7 @@
       "https://www.kurierverlag.de/na-pressemitteilungen/europas-bester-basketball-mit-neun-deutschen-klubs-live-nur-bei-magentasport-morgen-startet-die-basketball-champions-league-berlin-bamberg-bonn-und-zr-94525224.html",
       "https://www.kurierverlag.de/na-pressemitteilungen/magentasport-und-magentatv-zeigen-alle-spiele-der-eurobasket-2025-live-die-deutschen-spiele-kostenlos-telekom-vergibt-sublizenz-an-rtl-deutschland-zr-93650895.html",
       "https://www.leagues.football/rlnord",
+      "https://www.leagues.football/rlwest",
       "https://www.live-result.com/basketball/Champions-League",
       "https://www.liveleagues.me/euroleague-federation-stream",
       "https://www.livescore.com/en/basketball/germany/bbl/science-city-jena-vs-hamburg-towers/1853687/",
@@ -1107,6 +1109,7 @@
       "https://www.youtube.com/watch?v=XUV2Z_g8wYk",
       "https://www.youtube.com/watch?v=XoHbqIZluOk",
       "https://www.youtube.com/watch?v=YYnRLewvo-4&xstg=CAMSBhUD-7L2Hw%3D%3D",
+      "https://www.youtube.com/watch?v=Y_C4EzDFz0g",
       "https://www.youtube.com/watch?v=Z3qThjJg1ig",
       "https://www.youtube.com/watch?v=Z6EOXPfXdN4",
       "https://www.youtube.com/watch?v=ZnvIXMCtj8Q",
@@ -1119,6 +1122,7 @@
       "https://www.youtube.com/watch?v=aFlxU1gLk5o",
       "https://www.youtube.com/watch?v=aKp3OUEEZhc",
       "https://www.youtube.com/watch?v=bEUu8Fs1duw",
+      "https://www.youtube.com/watch?v=bNKoZ2M_OvE",
       "https://www.youtube.com/watch?v=b_NXHTk5pFc",
       "https://www.youtube.com/watch?v=b_zRUk1LFf8",
       "https://www.youtube.com/watch?v=bjb5qqOf3Bw",
@@ -1196,9 +1200,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 22170,
-    "unique_games": 1668,
-    "unverifiable": 1044,
+    "rows": 22457,
+    "unique_games": 1672,
+    "unverifiable": 1048,
     "unverifiable_keys": [
       "http://live.basketball-bundesliga.de/home",
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
@@ -1448,6 +1452,7 @@
       "https://sporteurope.tv/basket-duisburg-jbbl",
       "https://sporteurope.tv/bayer-giants-leverkusen/live-bayer-giants-leverkusen-vs-tsv-neustadt-temps-shooters-testspiel",
       "https://sporteurope.tv/black-forest-panthers-schwenningen",
+      "https://sporteurope.tv/en/",
       "https://sporteurope.tv/en/1-basketball-regionalliga-west-maenner",
       "https://sporteurope.tv/en/2-basketball-regionalliga-nord-maenner",
       "https://sporteurope.tv/en/alba-berlin-nbbl",
@@ -1775,6 +1780,7 @@
       "https://www.kurierverlag.de/na-pressemitteilungen/europas-bester-basketball-mit-neun-deutschen-klubs-live-nur-bei-magentasport-morgen-startet-die-basketball-champions-league-berlin-bamberg-bonn-und-zr-94525224.html",
       "https://www.kurierverlag.de/na-pressemitteilungen/magentasport-und-magentatv-zeigen-alle-spiele-der-eurobasket-2025-live-die-deutschen-spiele-kostenlos-telekom-vergibt-sublizenz-an-rtl-deutschland-zr-93650895.html",
       "https://www.leagues.football/rlnord",
+      "https://www.leagues.football/rlwest",
       "https://www.live-result.com/basketball/Champions-League",
       "https://www.liveleagues.me/euroleague-federation-stream",
       "https://www.livescore.com/en/basketball/germany/bbl/science-city-jena-vs-hamburg-towers/1853687/",
@@ -2157,6 +2163,7 @@
       "https://www.youtube.com/watch?v=XUV2Z_g8wYk",
       "https://www.youtube.com/watch?v=XoHbqIZluOk",
       "https://www.youtube.com/watch?v=YYnRLewvo-4&xstg=CAMSBhUD-7L2Hw%3D%3D",
+      "https://www.youtube.com/watch?v=Y_C4EzDFz0g",
       "https://www.youtube.com/watch?v=Z3qThjJg1ig",
       "https://www.youtube.com/watch?v=Z6EOXPfXdN4",
       "https://www.youtube.com/watch?v=ZnvIXMCtj8Q",
@@ -2169,6 +2176,7 @@
       "https://www.youtube.com/watch?v=aFlxU1gLk5o",
       "https://www.youtube.com/watch?v=aKp3OUEEZhc",
       "https://www.youtube.com/watch?v=bEUu8Fs1duw",
+      "https://www.youtube.com/watch?v=bNKoZ2M_OvE",
       "https://www.youtube.com/watch?v=b_NXHTk5pFc",
       "https://www.youtube.com/watch?v=b_zRUk1LFf8",
       "https://www.youtube.com/watch?v=bjb5qqOf3Bw",
@@ -2246,47 +2254,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-11-11T10:23Z",
+  "run_id": "2026-11-11T10:47Z",
   "source": {
-    "audit_rows": 64,
-    "candidates_rows": 22170,
+    "audit_rows": 66,
+    "candidates_rows": 22457,
     "fixtures_rows": 129
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 129,
-      "missed": 129,
-      "recall": 0.0,
-      "rows": 281,
-      "run_id": "2026-11-08T15:27Z",
-      "unique_games": 266
-    },
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 2,
-        "precision": 1.0,
-        "rows": 2,
-        "verified": 2,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-11-08T16:15Z",
-      "unique_games": 0
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -2490,7 +2464,41 @@
       "rows": 281,
       "run_id": "2026-11-11T10:21Z",
       "unique_games": 267
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 2,
+        "precision": 1.0,
+        "rows": 2,
+        "verified": 2,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-11-11T10:30Z",
+      "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 136,
+      "missed": 136,
+      "recall": 0.0,
+      "rows": 287,
+      "run_id": "2026-11-11T10:45Z",
+      "unique_games": 271
     }
   ],
-  "ts": "2026-11-11T10:23:20.867038+00:00"
+  "ts": "2026-11-11T10:47:19.312582+00:00"
 }
