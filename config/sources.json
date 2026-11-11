@@ -252,6 +252,26 @@
       "notes": "Community channel (not a league or federation): Tom films local Berlin amateur sport as a free hobby project. Added 2026-10-10 at the operator's request. Verified live 2026-10-10: `youtube.com/@tampa2films` answers 200 (channel UCDH9pTsSYS2zJDd_Rr9xbWg) and its RSS feed lists amateur basketball — `TuS Neukölln vs. VIMODROM Baskets Jena | DBBL-POKAL`, `TuS Lichterfelde vs. BBC 90 Köpenick | BBV-Pokal Herren`, `Mitte Supersonics vs. TSV Sportuniversum | Landesliga` — alongside other local sport, so it is a source only for a game it actually carries live. Live-only, future-only: see references/youtube-live-search.md."
     },
     {
+      "tier": 6,
+      "name": "ENBL (European North Basketball League)",
+      "type": "youtube",
+      "handles": [
+        "youtube.com/@ENBLeague"
+      ],
+      "free_access": "free",
+      "notes": "Official league channel (youtube.com/c/ENBLeague): every ENBL game streams live free on YouTube — 'Catch the action LIVE on YouTube' (x.com/enbleague); per-game schedule at enbleague.eu/schedule names the YouTube watch URL. Verified live 2026-11-11: the /streams tab lists 300+ live/upcoming broadcasts, all public; in-window upcoming include Bristol Flyers v BC Dubrava, Donar Groningen v TRIA EKA AEL B.C. and TalTech/ALEXELA v BC Spartak Pleven (all 11.11.2026), Tindastoll v Pully Lausanne Foxes (12.11) and Alkar Sinj v Anwil Wloclawek (17.11). Live-only, future-only: see references/youtube-live-search.md."
+    },
+    {
+      "tier": 6,
+      "name": "LBA Serie A (Italy)",
+      "type": "youtube",
+      "handles": [
+        "youtube.com/@legabasket"
+      ],
+      "free_access": "free",
+      "notes": "Official league channel (UCKuhExlRMWgfcaD__HtN1yw) streams full Serie A games live free on YouTube. Verified live 2026-11-11: the ended broadcast 'Virtus Bologna - Scaligera Basket Verona | 7ª Giornata' is a public, embeddable 2h14 full game ('Live übertragen am 09.11.2026'); full games also for GameDay 7 (Milano-Trentino, Reggio Emilia-Venezia) and GameDay 6 (Cantù-Milano), plus pre-game shows. No upcoming scheduled at verification time — streams appear ~1-3 days before tip, so a quiet Live search is not evidence of no coverage. legabasket.it itself stays Tier 7 evidence-only. Live-only, future-only: see references/youtube-live-search.md."
+    },
+    {
       "tier": 7,
       "name": "European domestic leagues (evidence only)",
       "type": "league",

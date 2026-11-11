@@ -29,6 +29,28 @@ rendered it (10,085 chars; `KOSTENLOS` ×11, `OHNE LOGIN` ×10). Firecrawl with 
 valid key returned `SCRAPE_ALL_ENGINES_FAILED` on the same URL — the page
 blocks it — so a local rung is the working path, not the hosted one.
 
+## The free block is not EuroLeague-only (widened 2026-11-11)
+
+Since at least November 2026 the same `KOSTENLOS & OHNE LOGIN` block also
+carries **DBB national-team games** and **select EuroCup free games** — e.g. on
+11.11.2026: `FIBA Basketball Frauen EM-Qualifikation 2027 - LIVE: Deutschland -
+Ungarn` (16:30–21:00, Sport 18 - myTeamTV) and `Eurocup - LIVE: NINERS Chemnitz
+- Napoli Basketball` (17:45–21:00, Sport 2 - myTeamTV), plus the DBB away games
+`Dänemark - Deutschland` (14.11) and `Portugal - Deutschland` (17.11). Classify
+each entry, never the section.
+
+Check 1 for a DBB game does not depend on the listing: **every** DBB game is free
+on MagentaSport/MagentaTV under the Telekom–DBB media deal to 2029 (Telekom
+press release 2026-08-25: "Alle DBB-Spiele live und kostenlos bei MagentaSport
+und MagentaTV"), and `basketball-bund.de` announces each game `kostenlos bei
+MagentaSport und MagentaTV`. That pair is explicit free-access proof even before
+the per-game `magenta.tv/tv/live-…` URL exists in the listing.
+
+The listing is also partially visible without a renderer: a `webSearch` excerpt
+of `magenta.tv/sport` returned the full programme on 2026-11-11. Treat that
+excerpt as *announcement* evidence (which game is free, when, on which
+channel) — Checks 6/7 for the per-game stream URL still need the ladder.
+
 **Proven end to end, not just rendered.** Dispatch `36599529155` (2026-09-29)
 planned both games as `VERIFIED` — `Panathinaikos AKTOR Athen vs ASVEL
 Villeurbanne` (30.09. 20:00) and `FC Bayern München vs Partizan Mozzart Bet

@@ -85,6 +85,8 @@ one operator-approved community channel for local amateur basketball.
 | ALBA Berlin | Via `albaberlin.de` social links | Verify |
 | FC Bayern Basketball | Via `fcbayern.com` social links | Verify |
 | Tampa 2 Films (community) | `youtube.com/@tampa2films` | ✅ Verified live 2026-10-10 — Berlin amateur-sport channel, free. Carries local basketball (DBBL-Pokal, Landesliga, 3x3) alongside other local sport, so a stream is evidence only for the game it actually carries. Added at the operator’s request. |
+| ENBL (European North Basketball League) | `youtube.com/@ENBLeague` | ✅ Verified live 2026-11-11 — official league channel; **every** game streams live free on YouTube ("Catch the action LIVE on YouTube"), per-game schedule at `enbleague.eu/schedule` names the watch URL. A stream is evidence only for the game it actually carries. |
+| LBA Serie A (Italy) | `youtube.com/@legabasket` | ✅ Verified live 2026-11-11 — official league channel streams **full Serie A games** live free (e.g. Virtus Bologna vs Verona 09.11.2026, public 2h14 full game; GameDay 7 Milano-Trentino and Reggio Emilia-Venezia; GameDay 6 Cantù-Milano). Streams appear ~1–3 days before tip, so a quiet Live search is not evidence of no coverage. `legabasket.it` itself stays Tier 7 evidence-only. |
 
 ### Tier 7: European Domestic Leagues (evidence only — never a `directLink`)
 

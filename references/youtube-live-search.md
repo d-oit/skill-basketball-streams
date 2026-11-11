@@ -81,7 +81,14 @@ Only channels in `references/approved-sources.md` Tier 6 / `config/sources.json`
 youtube.com/@fiba           youtube.com/@basketballbundesliga
 youtube.com/@EuroLeague     youtube.com/@BasketballCL
 youtube.com/user/TheDBBTV   youtube.com/@tampa2films
+youtube.com/@ENBLeague      youtube.com/@legabasket
 ```
+
+`@ENBLeague` streams every league game live free (schedule at
+`enbleague.eu/schedule`); `@legabasket` streams full Serie A games live free,
+scheduled ~1–3 days before tip, so re-check a quiet search rather than treating
+it as no coverage. Both verified live 2026-11-11; each stream is evidence only
+for the game it actually carries.
 
 A live broadcast on an unlisted channel is a new-source **candidate**
 (`scripts/source_learning.py candidates`) — quarantined, shown in the daily
@@ -96,6 +103,8 @@ NBBL/JBBL and club channels can be reviewed without trusting them early.
 "FIBA Basketball live"            "NBBL Basketball live stream"
 "JBBL Basketball live stream"     "Basketball Regionalliga live Deutschland"
 "<club name> live"
+"ENBL live"                   "European North Basketball League live"
+"Lega Basket Serie A live"    "Serie A basket live"
 ```
 
 The workflow's complete query set is in `config/youtube-live-queries.json`.

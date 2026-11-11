@@ -117,6 +117,8 @@ DEFAULT_ALLOWED_HANDLES = (
     "euroleague",
     "basketballcl",
     "tampa2films",
+    "enbleague",
+    "legabasket",
 )
 
 
