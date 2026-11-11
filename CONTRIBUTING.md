@@ -91,6 +91,9 @@ canonical workflow:
 
 ```
 feature branch → PR → rebase-merge (`gh pr merge --rebase --admin`)
+                → verify, optionally, by hand (`gh workflow run runtime-daily --ref main`;
+                  the dispatch defaults to dry-run, so it proves the merged
+                  pipeline without touching the calendar)
                 → rehearsal (`python3 scripts/rehearse.py --env-file .env --require-all`)
                 → annotated tag (`git tag -a v<X.Y.Z>`)
                 → push tag (`git push origin v<X.Y.Z>`)

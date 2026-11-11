@@ -11,10 +11,9 @@ metadata:
   version: "0.1.0"
   tags: harness sensors feedback feedforward self-correction quality
 ---
-## Guides
-See references/heuristics.md for distilled heuristics.
-
 # Harness Skill
+
+Distilled failure patterns live in [references/heuristics.md](references/heuristics.md) — read them before changing harness-adjacent code.
 
 ## What Is the Harness
 
@@ -31,25 +30,24 @@ Two modes:
 
 | Guide | Path | Purpose |
 |-------|------|---------|
-| Agent contract | `AGENTS.md` | Operating invariants and 6-phase workflow |
-| HTN planning | `.agents/skills/htn-planner` | Task decomposition |
-| Event modeling | `.agents/skills/event-modeler` | Event-slice schemas |
-| Spike running | `.agents/skills/spike-runner` | De-risking spikes |
-| Distillation | `.agents/skills/skill-distiller` | Distillation loop |
+| Agent contract | `AGENTS.md` (repo root) | Working loop, verification gates, trap catalog |
+| Failure patterns | `references/heuristics.md` (this skill) | Distilled fixes for recurring failure shapes |
 
 ## Feedback Sensors
 
-| Sensor | Command | Stage |
-|--------|---------|-------|
-| verify | `do-harness verify` | pre-commit (subset) + pre-push + CI (full) |
-| fmt | `do-harness verify --only fmt` | pre-commit |
-| loc | `do-harness verify --only loc` | pre-commit |
-| check | `do-harness verify --only check` | pre-push + CI |
-| clippy | `do-harness verify --only clippy` | pre-push + CI |
-| test | `do-harness verify --only test` | pre-push + CI |
-| deps | `do-harness verify --only deps` | pre-push + CI |
-| migrate | `cargo run -p do-harness-db --bin init_db` | on schema change |
-| seed | `cargo run -p do-harness-db --bin seed_invariants` | when `plans/invariants.json` changes |
+The sensor list lives in `do-harness.toml` (`[[sensors]]`) — read it there,
+never from memory. It changes per repository; the rows below are this repo's
+signal sets, not sensor names:
+
+| Signal set | Command | When |
+|------------|---------|------|
+| feedback | `do-harness verify --set feedback --changed` | during implementation |
+| verification | `do-harness verify --set verification --changed --strict` | before claiming completion |
+| release | `do-harness verify --set release --strict --record` | bottom-up after the other two |
+
+Record signal sets bottom-up (`feedback`, `verification`, `release`):
+`--record` stamps each set with the policy snapshot in force, so recording a
+subset after its superset leaves the superset stale.
 
 ## Self-Correction Protocol
 
@@ -59,7 +57,7 @@ When a computational sensor fires:
 3. Apply the minimal fix — do not refactor unrelated code.
 4. Re-run the specific sensor.
 5. Only proceed when the sensor is green.
-6. Write a metrics event to `.agents/events/YYYY/MM/DD/` if the fix was non-trivial.
+6. If the fix was non-trivial, feed the pattern back via the Steering Loop below so the guide prevents its recurrence.
 
 ## Fail-Fast Policy
 
@@ -70,7 +68,7 @@ If the same subtask fails a sensor 3 consecutive times: halt, record the error s
 When any sensor fires repeatedly (>2 times in one sprint):
 1. Identify the root cause category (maintainability / architecture / behaviour).
 2. Update the corresponding feedforward guide to prevent recurrence.
-3. If no guide exists, create one in `.agents/skills/` using the `skill-distiller` skill.
+3. If no guide exists, create one in `.agents/skills/` using the `skill-creator` skill.
 4. The loop closes: sensors fire -> guides update -> sensors fire less.
 
 ## Swarm Handoff Protocol
