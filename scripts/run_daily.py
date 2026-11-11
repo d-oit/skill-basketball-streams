@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import time
 import urllib.error
@@ -48,6 +49,7 @@ try:  # direct CLI execution: `python3 scripts/run_daily.py`
         recall_metrics,
         read_ledger,
     )
+    from youtube_tab import discover_handles as _discover_youtube_tabs  # noqa: E402
 except ImportError:  # imported as a package module, e.g. scripts.run_daily
     from scripts.candidates import (  # type: ignore[no-redef]
         DEFAULT_LEDGER,
@@ -55,6 +57,9 @@ except ImportError:  # imported as a package module, e.g. scripts.run_daily
         normalise_row,
         recall_metrics,
         read_ledger,
+    )
+    from scripts.youtube_tab import (  # type: ignore[no-redef]
+        discover_handles as _discover_youtube_tabs,
     )
 
 DEFAULT_QUERIES = (
@@ -416,6 +421,40 @@ class TinyFishSearchBackend(Backend):
         )
 
 
+ARENA_GAME_LINK_RE = re.compile(
+    r'<a\b[^>]*\bhref="(/tv/[^"]+)"[^>]*>(.*?)</a>',
+    re.IGNORECASE | re.DOTALL,
+)
+_TAG_RE = re.compile(r"<[^>]+>")
+
+
+def extract_arena_links(
+    html: str, base: str = "https://www.magenta.tv"
+) -> list[dict]:
+    """Per-game program links from a rendered magenta.tv arena page.
+
+    The arena text alone proves *something* is free but names no watchable
+    game: the 2026-11-11 live run omitted Deutschland–Ungarn and
+    Chemnitz–Napoli for lack of a per-game stream URL while both were free on
+    the rendered `/sport` page. The links (`/tv/live-<slug>/<id>`) only exist
+    after rendering — the server shell carries none — so this parses the
+    rendered DOM, deduped by path, first (longest-titled) spelling kept.
+    Only `/tv/` program links: nav (`/sport`, `/magenta-sport`) is not a game.
+    """
+    import html as _html
+
+    links: list[dict] = []
+    seen: set[str] = set()
+    for match in ARENA_GAME_LINK_RE.finditer(html or ""):
+        path = match.group(1).strip()
+        if not path or path in seen:
+            continue
+        seen.add(path)
+        text = " ".join(_html.unescape(_TAG_RE.sub(" ", match.group(2))).split())
+        links.append({"url": base.rstrip("/") + path, "title": text})
+    return links
+
+
 class RenderArenaBackend(Backend):
     """Fetch a KNOWN arena URL by rendering it, not by searching for it.
 
@@ -457,7 +496,7 @@ class RenderArenaBackend(Backend):
         return f"renders {self.arena} with patchright (marker: {self.marker!r})"
 
     def search(self, query: str, limit: int) -> list[dict]:
-        text, error = _render_once(self.arena)
+        text, html, error = _render_page(self.arena)
         if error:
             # Name the render failure rather than reporting only the missing
             # marker: a browser that would not start and a page that rendered
@@ -471,7 +510,15 @@ class RenderArenaBackend(Backend):
             # conclusion this rung exists to make unprovable.
             self._fail(f"rendered page lacks {self.marker!r} ({len(text)} chars)")
             return []
-        return [{"url": self.arena, "title": f"MagentaSport free arena (rendered)"}]
+        rows = [{"url": self.arena, "title": "MagentaSport free arena (rendered)"}]
+        for link in extract_arena_links(html):
+            rows.append(
+                {
+                    "url": link["url"],
+                    "title": link["title"] or "MagentaSport free arena game",
+                }
+            )
+        return rows
 
 
 def _patchright_importable() -> bool:
@@ -483,8 +530,8 @@ def _patchright_importable() -> bool:
     return True
 
 
-def _render_once(url: str, wait_ms: int = 6000) -> tuple[str, str]:
-    """Render `url` headless. Returns `(visible_text, error_message)`.
+def _render_page(url: str, wait_ms: int = 6000) -> tuple[str, str, str]:
+    """Render `url` headless. Returns `(visible_text, html, error_message)`.
 
     The wait is deliberate: the page is a client-rendered app shell, so its
     text does not exist at `domcontentloaded`. A shorter wait returns the shell
@@ -494,11 +541,14 @@ def _render_once(url: str, wait_ms: int = 6000) -> tuple[str, str]:
     missing browser and a page that loaded without the expected section made
     "the renderer is broken" indistinguishable from "nothing free today", which
     is the failure this rung exists to rule out.
+
+    The HTML is carried alongside the text because per-game program links live
+    in the rendered DOM (`extract_arena_links`), not in the visible text.
     """
     try:
         from patchright.sync_api import sync_playwright
     except Exception as exc:  # pragma: no cover - import guarded by caller
-        return "", f"patchright unavailable: {type(exc).__name__}: {exc}"
+        return "", "", f"patchright unavailable: {type(exc).__name__}: {exc}"
     try:
         with sync_playwright() as play:
             browser = play.chromium.launch(headless=True, args=["--no-sandbox"])
@@ -506,11 +556,64 @@ def _render_once(url: str, wait_ms: int = 6000) -> tuple[str, str]:
                 page = browser.new_page(user_agent=USER_AGENT)
                 page.goto(url, wait_until="domcontentloaded", timeout=60000)
                 page.wait_for_timeout(wait_ms)
-                return page.inner_text("body"), ""
+                return page.inner_text("body"), page.content(), ""
             finally:
                 browser.close()
     except Exception as exc:
-        return "", f"{type(exc).__name__}: {exc}"
+        return "", "", f"{type(exc).__name__}: {exc}"
+
+
+def _render_once(url: str, wait_ms: int = 6000) -> tuple[str, str]:
+    """Render `url` headless. Returns `(visible_text, error_message)`."""
+    text, _, error = _render_page(url, wait_ms=wait_ms)
+    return text, error
+
+
+class YouTubeTabBackend(Backend):
+    """The approved channels' own surfaces: `/streams` tabs plus RSS.
+
+    Every other rung in this ladder is an open-ended *search*, and that is why
+    scheduled YouTube games stayed invisible: the Live-filter `results` pages
+    return boilerplate to a non-JS client, so a search for the games returned
+    nothing and the run reported a quiet day. The tab HTML and the RSS feed
+    are server-rendered (`scripts/youtube_tab.py`), so this rung fetches them
+    with stdlib `urllib` — no key, no browser, always available.
+
+    Fetch-once per run: `search` is called per query but the tab/RSS fetch
+    happens a single time, cached until `reset_stats` clears it at the next
+    `collect_candidates`. Phase 0 posture is IDs plus RSS titles only
+    (`max_watch=0`): rows here are `unverifiable` by construction, so
+    scheduled-start proof would only spend the run's request budget.
+    """
+
+    name = "youtube-tab"
+    env_var = ""  # free: nothing to configure
+
+    def available(self) -> bool:
+        return True
+
+    def status_detail(self, configured: bool) -> str:
+        return "keyless stdlib fetch of approved channel tabs + RSS (no key needed)"
+
+    def reset_stats(self) -> None:
+        super().reset_stats()
+        self._rows_cache: list[dict] | None = None
+
+    def search(self, query: str, limit: int) -> list[dict]:
+        cached = getattr(self, "_rows_cache", None)
+        if cached is None:
+            try:
+                channels = _discover_youtube_tabs(max_watch=0)
+            except Exception as exc:  # noqa: BLE001 - degraded, never fatal
+                self._fail(f"{type(exc).__name__}: {exc}")
+                return []
+            cached = [
+                {"url": video["url"], "title": video["title"]}
+                for channel in channels
+                for video in channel["videos"]
+            ]
+            self._rows_cache = cached
+        return cached
 
 
 ALL_BACKENDS: dict[str, Backend] = {
@@ -519,10 +622,11 @@ ALL_BACKENDS: dict[str, Backend] = {
         ExaBackend(),
         ExaMcpKeylessBackend(),
         TinyFishSearchBackend(),
+        YouTubeTabBackend(),
         RenderArenaBackend(),
     )
 }
-LADDER = ("exa-mcp", "exa-mcp-keyless", "tinyfish", "render-arena")
+LADDER = ("exa-mcp", "exa-mcp-keyless", "tinyfish", "youtube-tab", "render-arena")
 
 # Hosts that must never be recorded as candidate stream sources.
 NEVER_SOURCE_HOSTS = (

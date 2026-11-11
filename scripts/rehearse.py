@@ -582,6 +582,15 @@ def build_checks(*, timeout: int = 60) -> list[Check]:
             probe=_probe_search("tinyfish"),
         ),
         Check(
+            name="search:youtube-tab",
+            # Keyless like `search:exa-mcp-keyless`: no credential to be
+            # missing, so `env` stays empty and `assess` probes it directly.
+            # NOT structural: it fetches channel tabs and RSS from YouTube.
+            env=(),
+            what="Phase 0's keyless YouTube rung (approved channel tabs + RSS)",
+            probe=_probe_search("youtube-tab"),
+        ),
+        Check(
             name="search:render-arena",
             env=("FIRECRAWL_API_KEY",),
             what="Phase 0's only rung that can read magenta.tv/sport (renders it locally)",

@@ -222,6 +222,52 @@ def build_live_searches(queries: list[str]) -> list[dict[str, str]]:
     return searches
 
 
+CHANNEL_ID_RE = re.compile(r"^UC[\w-]{22}$")
+
+
+def build_channel_urls(channels: list[dict] | None) -> list[dict[str, str]]:
+    """Per-channel discovery URLs for the approved handles.
+
+    The Live-filter `results` pages return boilerplate to a non-JS client, so
+    scheduled games on approved league channels were invisible (2026-11-11:
+    8 in-window ENBL games, none on the calendar). The channel's own surfaces
+    ARE server-rendered: the `/streams` tab HTML carries every listed video
+    ID, and the RSS feed carries videoId + title + published as static XML.
+    Each row names both, so the runtime can `webfetch` them directly; a game
+    is then validated by `webfetch`ing its `watch` page, whose
+    `liveBroadcastDetails` carries the scheduled start. See
+    `scripts/youtube_tab.py` for the keyless stdlib implementation of the
+    same discovery, and `references/youtube-live-search.md` for the contract.
+    """
+    if not channels:
+        return []
+    if not isinstance(channels, list):
+        raise ValueError("channels must be a list")
+    rows = []
+    for entry in channels:
+        if not isinstance(entry, dict):
+            raise ValueError("each channel must be an object")
+        handle = str(entry.get("handle") or "").strip().lstrip("@").lower()
+        channel_id = str(entry.get("channel_id") or "").strip()
+        if not handle:
+            raise ValueError("each channel must name a handle")
+        if not CHANNEL_ID_RE.match(channel_id):
+            raise ValueError(
+                f"channel @{handle} must carry a channel_id like UC... (22 chars)"
+            )
+        rows.append(
+            {
+                "handle": handle,
+                "channel_id": channel_id,
+                "rss_url": (
+                    "https://www.youtube.com/feeds/videos.xml"
+                    f"?channel_id={channel_id}"
+                ),
+                "streams_url": f"https://www.youtube.com/@{handle}/streams",
+            }
+        )
+    return rows
+
 
 def classify_stream(
     candidate: dict,
@@ -436,10 +482,17 @@ def main() -> None:
             payload = json.loads(Path(args.queries_file).read_text(encoding="utf-8"))
             queries = payload.get("queries") if isinstance(payload, dict) else payload
             searches = build_live_searches(queries)
+            channels = (
+                build_channel_urls(payload.get("channels"))
+                if isinstance(payload, dict)
+                else []
+            )
         except (OSError, json.JSONDecodeError, ValueError) as exc:
             print(f"FAIL: youtube_live: invalid queries file: {exc}", file=sys.stderr)
             sys.exit(2)
-        rendered = json.dumps({"searches": searches}, indent=2) + "\n"
+        rendered = json.dumps(
+            {"searches": searches, "channels": channels}, indent=2
+        ) + "\n"
         if args.out:
             out_path = Path(args.out)
             out_path.parent.mkdir(parents=True, exist_ok=True)

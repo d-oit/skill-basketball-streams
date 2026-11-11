@@ -297,7 +297,7 @@ If you change the assertion grammar (e.g., add new keywords beyond
 | Run render_ladder (rung list) | `python3 scripts/render_ladder.py --list` | Rung registry + licence compliance |
 | Run link_check (offline dry-run) | `python3 scripts/link_check.py --url https://www.youtube.com/@fiba/live --dry-run` | Link-gate contract, no network |
 | Run link_inventory (fixture events) | `python3 scripts/link_inventory.py --events tests/fixtures/link_inventory_events.json --root . --now 2026-09-17T09:00:00Z --json` | The `links.json` producer: stored event links + all 23 approved domains, no network |
-| Build the daily YouTube searches | `python3 scripts/youtube_live.py --queries-file config/youtube-live-queries.json --out /tmp/youtube-live-searches.json` | Writes only URLs with YouTube's keyless Live filter |
+| Build the daily YouTube searches | `python3 scripts/youtube_live.py --queries-file config/youtube-live-queries.json --out /tmp/youtube-live-searches.json` | Writes Live-filter URLs plus per-channel RSS/`/streams` tab URLs (`channels`) |
 | Run source_learning (dry-run) | `python3 scripts/source_learning.py candidates --root . --dry-run` | Source-registry discovery, no writes |
 | Run synthesise_eval_case (--verify) | `python3 scripts/synthesise_eval_case.py --verify` | Every eval assertion needle resolves |
 | Run fixtures (both page shapes) | `python3 scripts/fixtures.py --input tests/fixtures/fixtures_page_bbl.html --source bbl --now 2026-09-14T08:30:00Z` | JSON-LD **and** microdata parsing stay working |

@@ -77,7 +77,7 @@ For every result, call `validateStreamUrl(url)` (TypeScript in `references/imple
 
 A YouTube hit is promotable only when it is a **real live broadcast** AND its start datetime is **greater than now** (or it is live at this moment with no end timestamp). Full contract: `references/youtube-live-search.md`. Gate every candidate with `scripts/youtube_live.py`.
 
-1. **Search YouTube only with its Live filter** (`sp=EgJAAQ%3D%3D`): the daily runtime fetches every URL in `.tmp/youtube-live-searches.json` with `webfetch`; interactive runs use `youtubeLiveSearch`. Never use generic `webSearch` results or the Data API for YouTube stream discovery.
+1. **Search YouTube only with its Live filter** (`sp=EgJAAQ%3D%3D`): the daily runtime fetches every URL in `.tmp/youtube-live-searches.json` with `webfetch`; interactive runs use `youtubeLiveSearch`. The same file lists per-channel RSS and `/streams` tab URLs under `channels` — fetch those too (RSS first), because the Live-filter pages return boilerplate to a non-JS client while the channel surfaces are server-rendered. Never use generic `webSearch` results or the Data API for YouTube stream discovery.
 2. **Normalize** each Live-filter hit into the candidate schema (field mapping in the reference).
 3. **Gate** with `classify_stream`: direct `/@handle/live`, `/live/<id>` or `/watch?v=<id>` URLs only; reject `liveBroadcastContent == none`, a set `actualEndTime` (ended broadcast → archived VOD), a fixed `duration_seconds` while not live now, and any `scheduled_start` that is not strictly greater than now.
 4. Only `LIVE` and `SCHEDULED` decisions continue to Step 3. Never invent or reuse a `/live` URL from a finished broadcast; unapproved handles are quarantine leads only.
