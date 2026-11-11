@@ -1,22 +1,10 @@
 {
   "leads": [
     {
-      "url": "https://www.swr.de/sport/mehr-sport/basketball-gladiators-trier-in-batumi-live-im-europe-cup-100.html",
-      "name": "SWR",
-      "league": "Basketball Europe Cup",
-      "reason": "Unapproved host swr.de: article confirms the free SWR/Sportschau livestream of BC Batumi vs Gladiators Trier but is not an approved source; directLink uses sportschau.de instead."
-    },
-    {
-      "url": "https://www.swr.de/sport/mehr-sport/basketball-live-gladiators-trier-gegen-promitheas-patras-100.html",
-      "name": "SWR",
-      "league": "Basketball Europe Cup",
-      "reason": "Unapproved host swr.de: article confirms the free SWR/Sportschau livestream of Gladiators Trier vs Promitheas Patras but is not an approved source; directLink uses sportschau.de instead."
-    },
-    {
-      "url": "https://www.swr.de/sport/live-110.html",
-      "name": "SWR Sport",
-      "league": "Basketball Europe Cup",
-      "reason": "Unapproved host swr.de: free FIBA Europe Cup live coverage index (SWR, YouTube, ARD Mediathek); kept as a quarantined lead only."
+      "url": "https://ran.joyn.de/sports/basketball/deutschland-vs-ungarn-heute-live-basketball-im-kostenlosen-joyn-stream-alle-infos-zur-frauen-basketball-em-qualifikation-213300",
+      "name": "ran / Joyn",
+      "league": "FIBA Women's EuroBasket 2027 Qualifiers",
+      "reason": "Reports a free Joyn livestream for Germany vs Hungary but the article states the game is not on free TV; joyn.de is approved only as a Dyn Sport Mix free-tier link and no direct stream URL was verifiable."
     }
   ]
 }
