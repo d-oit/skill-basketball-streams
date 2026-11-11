@@ -16,6 +16,8 @@ For non-YouTube sources, use `webSearch` with `limit: 20`:
 ```
 - "Dyn Sport Mix Basketball live stream today"
 - "MagentaSport free EuroLeague live stream"
+- "DBB Länderspiel MagentaSport kostenlos live"
+- "MagentaSport kostenlos Basketball heute"
 - "Sportschau Basketball live ARD"
 - "MDR Basketball live stream"
 - "BR24 Basketball live"

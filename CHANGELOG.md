@@ -5,6 +5,24 @@ All notable changes to `skill-basketball-streams` will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Approved the ENBLeague and LBA Serie A YouTube channels (Tier 6).**
+  `youtube.com/@ENBLeague` streams every league game live free (schedule at
+  `enbleague.eu/schedule`); `youtube.com/@legabasket` streams full Serie A
+  games live free, scheduled ~1–3 days before tip. Both verified live
+  2026-11-11 after their upcoming streams were found missing from the
+  calendar. New `config/sources.json` Tier 6 entries, `DEFAULT_ALLOWED_HANDLES`,
+  YouTube Live queries, and eval cases 48–49 (upcoming passes, ended full game
+  rejected).
+- **Magenta free block is not EuroLeague-only.** DBB national-team games (all
+  free under the Telekom–DBB deal to end of 2029) and select EuroCup free games
+  appear under `KOSTENLOS & OHNE LOGIN`; a `webSearch` excerpt of
+  `magenta.tv/sport` counts as announcement evidence. New eval case 50 (DBB
+  Check 1 without a per-game marker).
+
 ## [1.13.1] - 2026-10-21
 
 ### Fixed

@@ -615,7 +615,7 @@
       ],
       "synthesised_from": "m69adlps8fnuvgi1osnpjrlvjk"
     },
-{
+    {
       "id": 46,
       "prompt": "A DAZN page that states a BCL game is free to watch passes Check 1 as a directLink on the approved dazn.com domain. Input: url=https://www.dazn.com/en-US/welcome/courtside1891; title=Courtside 1891 - The home of FIBA Basketball; league=Basketball Champions League; teams=UCAM Murcia vs ratiopharm ulm; date=2026-10-27T20:00:00+01:00; page_states='Watch the BCL for free. Sign up to watch all Basketball Champions League games live or on demand for free. No subscription required.'; game_marked_free=True.",
       "expected_output": "Decision=CREATE; reason=; checks: freeAccess=PASS, liveContent=PASS, officialSource=PASS, basketballSpecific=PASS, dateTimeRange=PASS, workingLink=PASS, directStreamVerification=PASS",
@@ -634,7 +634,7 @@
         "config/sources.json"
       ]
     },
-{
+    {
       "id": 47,
       "prompt": "A DAZN basketball game that needs a paid DAZN subscription fails Check 1 even though dazn.com is an approved domain: DAZN is approved per game, never per platform. Input: url=https://www.dazn.com/en-US/home; title=DAZN | Live & On Demand Sports Streaming; league=Basketball Champions League; teams=FC Bayern Muenchen vs Anadolu Efes Istanbul; date=2026-11-03T20:45:00+01:00; page_states='Live on DAZN - Abo erforderlich'; game_marked_free=False; no free marker for this game on the page, the competition page, or any official BCL channel.",
       "expected_output": "Decision=SKIP; reason=the game is not stated free to watch and needs a paid DAZN subscription, so the approved dazn.com domain does not make it free; checks: freeAccess=FAIL, officialSource=PASS, workingLink=PASS, liveContent=PASS",
@@ -648,6 +648,45 @@
         "references/validation-workflow.md",
         "references/approved-sources.md",
         "config/sources.json"
+      ]
+    },
+    {
+      "id": 48,
+      "prompt": "An upcoming ENBL live broadcast on the approved @ENBLeague channel passes the live-only gate. Input: url=https://www.youtube.com/watch?v=q9-weSlJJSM; live_broadcast_content=upcoming; is_live_content=true; scheduled_start=2026-11-11T19:45:00+01:00; actual_end=null; duration_seconds=null; now=2026-11-11T12:00:00Z; title=Bristol Flyers v BC Dubrava |Nov 11, 2026, 7:45 PM | ENBLeague 2026/27; league=ENBL; teams=Bristol Flyers vs BC Dubrava; free_tier=True.",
+      "expected_output": "Decision=CREATE; reason=scheduled live broadcast starts 2026-11-11T19:45:00+01:00 (greater than now) on the approved @ENBLeague channel, which streams every league game live free; checks: liveOnly=PASS, futureDatetime=PASS, freeAccess=PASS, officialSource=PASS",
+      "assertions": [
+        "liveOnly expected PASS",
+        "futureDatetime expected PASS"
+      ],
+      "files": [
+        "references/youtube-live-search.md",
+        "references/approved-sources.md"
+      ]
+    },
+    {
+      "id": 49,
+      "prompt": "An ended LBA full-game broadcast on @legabasket must be rejected even though the title says LIVE. Input: url=https://www.youtube.com/watch?v=iiAcIi71Xmo; is_live_content=true; is_live_now=false; start_timestamp=2026-11-09T18:50:51Z; actual_end=2026-11-09T21:04:51Z; now=2026-11-11T12:00:00Z; title=LIVE | Virtus Costa Bologna vs Tezenis Verona | Serie A SisalClub 2026/27 | GameDay 7; league=LBA Serie A; teams=Virtus Bologna vs Scaligera Basket Verona; free_tier=True.",
+      "expected_output": "Decision=SKIP; reason=broadcast already ended (2026-11-09T21:04:51+00:00) — archived full game, not a live stream; a LIVE title on an ended broadcast is not upcoming; checks: liveOnly=FAIL, liveContent=FAIL",
+      "assertions": [
+        "liveOnly expected FAIL",
+        "liveContent expected FAIL"
+      ],
+      "files": [
+        "references/youtube-live-search.md",
+        "references/validation-workflow.md"
+      ]
+    },
+    {
+      "id": 50,
+      "prompt": "A DBB national-team game passes Check 1 without a per-game free marker on its magenta.tv page. Input: url=https://www.magenta.tv/tv/live-deutschland-ungarn-basketball-em-quali; title=FIBA Basketball Frauen EM-Qualifikation 2027 - LIVE: Deutschland - Ungarn; league=DBB Women EuroBasket Qualifier; teams=Deutschland vs Ungarn; date=2026-11-11T19:00:00+01:00; page_states='kostenlos bei MagentaSport und MagentaTV (basketball-bund.de); Alle DBB-Spiele live und kostenlos (Telekom-DBB deal to end of 2029)'; game_marked_free=True.",
+      "expected_output": "Decision=CREATE; reason=DBB site states this game kostenlos bei MagentaSport und MagentaTV and every DBB game is free under the Telekom-DBB deal, so Check 1 passes without a per-game marker on magenta.tv; checks: freeAccess=PASS, officialSource=PASS",
+      "assertions": [
+        "freeAccess expected PASS",
+        "officialSource expected PASS"
+      ],
+      "files": [
+        "references/magenta-tv.md",
+        "references/validation-workflow.md"
       ]
     }
   ]
