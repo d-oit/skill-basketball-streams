@@ -112,6 +112,9 @@ so a future change cannot demote the product graders on the false belief that
 ### Release flow
 
     feature branch -> PR -> rebase-merge (gh pr merge --rebase --admin)
+                   -> verify by hand, optionally (gh workflow run runtime-daily --ref main;
+                      the dispatch defaults to dry-run, so it proves the merged
+                      pipeline without touching the calendar)
                    -> annotated tag (git tag -a v<X.Y.Z>)
                    -> push tag (git push origin v<X.Y.Z>)
 

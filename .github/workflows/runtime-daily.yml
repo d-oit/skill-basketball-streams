@@ -24,7 +24,11 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Force dry-run (no calendar writes)'
+        # Post-merge verify: dispatch on main with this left true
+        # (`gh workflow run runtime-daily --ref main`) to run the whole
+        # pipeline — probe, skill, plan, apply — without touching the
+        # calendar. ONLY set false when a live write is intended.
+        description: 'Force dry-run (no calendar writes). Post-merge verify runs with this true.'
         type: boolean
         default: true
   repository_dispatch:
