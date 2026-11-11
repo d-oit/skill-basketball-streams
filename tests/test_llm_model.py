@@ -340,6 +340,30 @@ class TestWorkflowWiring:
         assert 'opencode run --model "$FALLBACK_MODEL"' in probe
         assert 'effective-model=' in probe
 
+    def test_cli_probe_is_bounded_so_a_hung_model_cannot_eat_the_job(self):
+        """2026-11-01..09: the probe hung on nine consecutive scheduled runs.
+
+        Each `opencode run` waited forever, the retry loop waited with it, and
+        the 45-minute job timeout cancelled Phase 1/2 before the skill, the
+        plan and the calendar writes ran — a quiet week that read as green.
+        Every attempt is bounded by `timeout`, the step carries its own
+        `timeout-minutes` backstop, and the sleep is skipped after the last
+        attempt of each model."""
+        text = self._without_comments(RUNTIME_DAILY.read_text(encoding="utf-8"))
+        probe_start = text.index("- name: Confirm the opencode CLI can run a model")
+        run_start = text.index("- name: Run the skill")
+        header = text[probe_start:run_start].split("run: |", 1)[0]
+        probe = text[probe_start:run_start].split("run: |", 1)[1]
+        assert "timeout-minutes:" in header
+        lines = probe.splitlines()
+        for model in ('"$LLM_MODEL"', '"$FALLBACK_MODEL"'):
+            call = f"opencode run --model {model}"
+            idx = next(i for i, line in enumerate(lines) if call in line)
+            assert "timeout --signal=TERM --kill-after=" in lines[idx - 1], (
+                f"the {model} attempt must be bounded by `timeout`"
+            )
+        assert '[ "$attempt" = 2 ] || sleep 30' in probe
+
     def test_the_skill_runs_the_probe_winner(self):
         """The skill must run the id that answered PONG, not the first choice."""
         text = RUNTIME_DAILY.read_text(encoding="utf-8")

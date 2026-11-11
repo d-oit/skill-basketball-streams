@@ -589,6 +589,12 @@ jobs:
       # exported as `effective-model` and the skill runs exactly that id.
       - name: Confirm the opencode CLI can run a model
         id: probe
+        # The backstop, not the fix: each `opencode run` below is bounded by
+        # `timeout` as well. An unbounded probe hung on nine consecutive
+        # scheduled runs (2026-11-01..09) and ate the whole 45-minute job
+        # budget each time, so the skill, the plan and the calendar writes
+        # never ran — a quiet week that read as green.
+        timeout-minutes: 15
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
@@ -602,10 +608,18 @@ jobs:
         run: |
           # Primary first (2 attempts for transient flakes), then the fallback
           # free id. Only a model that answers the PONG check serves the skill.
+          #
+          # Every attempt is bounded by `timeout`: a hung model must fail its
+          # attempt, not eat the job. Worst case is 2x180+30 per model, ~13
+          # minutes for both, which leaves the skill and the write path inside
+          # the 45-minute job budget. The sleep is skipped after the last
+          # attempt of each model — waiting after there is nothing left to wait
+          # for only spends budget a hung day does not have.
           set -o pipefail
           EFFECTIVE=""
           for attempt in 1 2; do
-            if opencode run --model "$LLM_MODEL" --format json \
+            if timeout --signal=TERM --kill-after=10s 180 \
+              opencode run --model "$LLM_MODEL" --format json \
               "Reply with exactly: OK" \
               | tee /tmp/opencode-check.json \
               | grep -q '"text":"OK"'; then
@@ -614,11 +628,12 @@ jobs:
               break
             fi
             echo "::warning::opencode probe attempt $attempt failed for $LLM_MODEL"
-            sleep 30
+            [ "$attempt" = 2 ] || sleep 30
           done
           if [ -z "$EFFECTIVE" ] && [ -n "$FALLBACK_MODEL" ]; then
             for attempt in 1 2; do
-              if opencode run --model "$FALLBACK_MODEL" --format json \
+              if timeout --signal=TERM --kill-after=10s 180 \
+                opencode run --model "$FALLBACK_MODEL" --format json \
                 "Reply with exactly: OK" \
                 | tee /tmp/opencode-check.json \
                 | grep -q '"text":"OK"'; then
@@ -627,7 +642,7 @@ jobs:
                 break
               fi
               echo "::warning::opencode fallback probe attempt $attempt failed for $FALLBACK_MODEL"
-              sleep 30
+              [ "$attempt" = 2 ] || sleep 30
             done
           fi
           [ -n "$EFFECTIVE" ] || { echo "::error::the opencode CLI could not serve resolved model $LLM_MODEL nor fallback $FALLBACK_MODEL — see the log above"; exit 1; }
