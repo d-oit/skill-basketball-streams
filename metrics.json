@@ -1,10 +1,10 @@
 {
   "audit": {
     "inconclusive": 17,
-    "judged": 43,
+    "judged": 45,
     "precision": 1.0,
-    "rows": 60,
-    "verified": 43,
+    "rows": 62,
+    "verified": 45,
     "wrong": 0
   },
   "derived": true,
@@ -147,8 +147,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 1043,
-    "missed": 1043,
+    "eligible": 1044,
+    "missed": 1044,
     "missed_keys": [
       "http://live.basketball-bundesliga.de/home",
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
@@ -407,6 +407,7 @@
       "https://sporteurope.tv/en/euroleague",
       "https://sporteurope.tv/en/jbbl",
       "https://sporteurope.tv/en/kickz-ibam-jbbl",
+      "https://sporteurope.tv/en/livestreams",
       "https://sporteurope.tv/en/nbbl",
       "https://sporteurope.tv/en/regionalliga-suedost",
       "https://sporteurope.tv/en/sc-jena",
@@ -1195,9 +1196,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 21608,
-    "unique_games": 1665,
-    "unverifiable": 1043,
+    "rows": 21889,
+    "unique_games": 1668,
+    "unverifiable": 1044,
     "unverifiable_keys": [
       "http://live.basketball-bundesliga.de/home",
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
@@ -1456,6 +1457,7 @@
       "https://sporteurope.tv/en/euroleague",
       "https://sporteurope.tv/en/jbbl",
       "https://sporteurope.tv/en/kickz-ibam-jbbl",
+      "https://sporteurope.tv/en/livestreams",
       "https://sporteurope.tv/en/nbbl",
       "https://sporteurope.tv/en/regionalliga-suedost",
       "https://sporteurope.tv/en/sc-jena",
@@ -2244,47 +2246,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-11-11T09:37Z",
+  "run_id": "2026-11-11T10:09Z",
   "source": {
-    "audit_rows": 60,
-    "candidates_rows": 21608,
+    "audit_rows": 62,
+    "candidates_rows": 21889,
     "fixtures_rows": 129
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 136,
-      "missed": 136,
-      "recall": 0.0,
-      "rows": 275,
-      "run_id": "2026-11-06T16:04Z",
-      "unique_games": 256
-    },
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 2,
-        "precision": 1.0,
-        "rows": 2,
-        "verified": 2,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-11-06T16:52Z",
-      "unique_games": 0
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -2488,7 +2456,41 @@
       "rows": 279,
       "run_id": "2026-11-11T09:35Z",
       "unique_games": 263
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 2,
+        "precision": 1.0,
+        "rows": 2,
+        "verified": 2,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-11-11T09:42Z",
+      "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 128,
+      "missed": 128,
+      "recall": 0.0,
+      "rows": 281,
+      "run_id": "2026-11-11T10:07Z",
+      "unique_games": 267
     }
   ],
-  "ts": "2026-11-11T09:37:14.730358+00:00"
+  "ts": "2026-11-11T10:09:26.506185+00:00"
 }
