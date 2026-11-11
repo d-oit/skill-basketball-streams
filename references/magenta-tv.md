@@ -51,6 +51,14 @@ of `magenta.tv/sport` returned the full programme on 2026-11-11. Treat that
 excerpt as *announcement* evidence (which game is free, when, on which
 channel) — Checks 6/7 for the per-game stream URL still need the ladder.
 
+Phase 0's `render-arena` rung now records the per-game links itself: it
+renders `/sport` and emits one ledger row per `/tv/` program link found in
+the rendered DOM (verified 2026-11-11: `live-deutschland-ungarn`,
+`live-daenemark-deutschland`, `live-portugal-deutschland`, EuroLeague games).
+Text-only clients still cannot validate those URLs — a plain GET returns the
+858-byte shell — so they enter the ledger as `unverifiable` leads, not as
+validation evidence.
+
 **Proven end to end, not just rendered.** Dispatch `36599529155` (2026-09-29)
 planned both games as `VERIFIED` — `Panathinaikos AKTOR Athen vs ASVEL
 Villeurbanne` (30.09. 20:00) and `FC Bayern München vs Partizan Mozzart Bet

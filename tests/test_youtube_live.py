@@ -473,6 +473,42 @@ class TestCli:
         assert not any("prob" in row["query"].lower() for row in searches)
         assert all(f"&sp={LIVE_SEARCH_SP}" in row["url"] for row in searches)
 
+    def test_configured_queries_also_emit_per_channel_discovery_urls(self, tmp_path):
+        """The channels list the agent webfetches when the Live filter is blind.
+
+        The 2026-11-11 live run proved the `results?search_query=` pages return
+        boilerplate to a non-JS client while the channels' own `/streams` tabs
+        and RSS feeds are server-rendered — so the searches file must name both
+        surfaces per approved handle, or the agent has nothing fetchable.
+        """
+        out = tmp_path / "youtube-live-searches.json"
+        result = _run(
+            [
+                "--queries-file",
+                str(REPO_ROOT / "config" / "youtube-live-queries.json"),
+                "--out",
+                str(out),
+            ]
+        )
+        assert result.returncode == 0, result.stderr
+        channels = json.loads(out.read_text(encoding="utf-8"))["channels"]
+        assert {row["handle"] for row in channels} == {
+            "fiba",
+            "basketballbundesliga",
+            "euroleague",
+            "basketballcl",
+            "tampa2films",
+            "enbleague",
+            "legabasket",
+        }
+        for row in channels:
+            assert row["rss_url"].startswith(
+                "https://www.youtube.com/feeds/videos.xml?channel_id=UC"
+            )
+            assert row["streams_url"] == (
+                f"https://www.youtube.com/@{row['handle']}/streams"
+            )
+
     def test_runtime_fetches_the_prebuilt_live_search_urls(self):
         workflow = (REPO_ROOT / ".github" / "workflows" / "runtime-daily.yml").read_text(
             encoding="utf-8"

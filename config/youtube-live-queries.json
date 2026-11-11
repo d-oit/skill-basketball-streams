@@ -12,5 +12,35 @@
     "FIBA Basketball live",
     "EuroLeague Basketball live",
     "Basketball Champions League live"
+  ],
+  "channels": [
+    {
+      "handle": "fiba",
+      "channel_id": "UCtInrnU3QbWqFGsdKT1GZtg"
+    },
+    {
+      "handle": "basketballbundesliga",
+      "channel_id": "UCg4YgrMEO4Y5hg9FJce6Jag"
+    },
+    {
+      "handle": "euroleague",
+      "channel_id": "UCGr3nR_XH9r6E5b09ZJAT9w"
+    },
+    {
+      "handle": "basketballcl",
+      "channel_id": "UCZUkv6tSC5OfX54gLgjV9aw"
+    },
+    {
+      "handle": "tampa2films",
+      "channel_id": "UCDH9pTsSYS2zJDd_Rr9xbWg"
+    },
+    {
+      "handle": "enbleague",
+      "channel_id": "UC4nW9T_6d6e4DKa4A9_3Ouw"
+    },
+    {
+      "handle": "legabasket",
+      "channel_id": "UCKuhExlRMWgfcaD__HtN1yw"
+    }
   ]
 }

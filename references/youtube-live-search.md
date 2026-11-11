@@ -28,6 +28,31 @@ tool. **Never use generic `webSearch` results or the YouTube Data API for stream
 discovery.** A YouTube results URL without the exact Live filter is not an
 acceptable search input.
 
+## When the Live filter is blind: channel-tab discovery
+
+Measured 2026-11-11: all 12 Live-filter `results` pages returned boilerplate
+to a non-JS client while 8 in-window ENBL games were scheduled on
+`@ENBLeague` and none reached the calendar. The channel's own surfaces ARE
+server-rendered — `webfetch` them instead:
+
+1. **RSS feed** — `https://www.youtube.com/feeds/videos.xml?channel_id=<id>`
+   (static XML: videoId + title + published for the 15 newest uploads).
+2. **`/streams` tab** — `https://www.youtube.com/@<handle>/streams` (the HTML
+   carries every listed `"videoId":"..."`; catches older placeholders that
+   fell out of the 15-item RSS window).
+3. **`watch` page per candidate** — `liveBroadcastDetails` carries `isLiveNow`
+   plus an ISO `startTimestamp` for scheduled broadcasts (preferred), else the
+   offline slate's `scheduledStartTime` epoch; the player title names the game
+   and usually embeds its date (`|Nov 11, 2026, 6:30 PM|`).
+
+The workflow's `youtube-live-searches.json` carries both URLs per approved
+handle under `channels` (channel IDs in `config/youtube-live-queries.json`).
+`scripts/youtube_tab.py` is the keyless stdlib implementation of the same
+discovery (tab ∪ RSS, watch-page enrichment), and Phase 0's `youtube-tab`
+rung records those IDs plus RSS titles into the candidate ledger. Titles that
+embed a game date are scheduling evidence; a missing start is still a reject
+— open the `watch` page rather than guessing.
+
 ## Field mapping (raw payload → candidate schema)
 
 | Candidate key | Live-filtered result/page field |

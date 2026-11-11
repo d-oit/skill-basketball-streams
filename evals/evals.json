@@ -688,6 +688,19 @@
         "references/magenta-tv.md",
         "references/validation-workflow.md"
       ]
+    },
+    {
+      "id": 51,
+      "prompt": "A YouTube channel-tab discovery lead passes the live-only/future-only gate. Input: url=https://www.youtube.com/watch?v=4DBGImaLVE0; title=TalTech/ALEXELA v BC Spartak Pleven |Nov 11, 2026, 6:30 PM | ENBLeague 2026/27; live_broadcast_content=upcoming; scheduled_start=2026-11-11T16:30:00+00:00 (liveBroadcastDetails.startTimestamp from the watch page); channel=@ENBLeague (approved Tier 6); now=2026-11-11T14:00:00Z.",
+      "expected_output": "Decision=SCHEDULED; reason=approved channel, upcoming broadcast whose scheduled start 2026-11-11T16:30:00+00:00 is greater than now; checks: liveOnly=PASS, futureDatetime=PASS",
+      "assertions": [
+        "liveOnly expected PASS",
+        "futureDatetime expected PASS"
+      ],
+      "files": [
+        "references/youtube-live-search.md",
+        "scripts/youtube_live.py"
+      ]
     }
   ]
 }

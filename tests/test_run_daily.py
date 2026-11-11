@@ -26,8 +26,10 @@ from scripts.run_daily import (
     LADDER,
     Backend,
     ExaMcpKeylessBackend,
+    YouTubeTabBackend,
     backend_status,
     collect_candidates,
+    extract_arena_links,
     host_of,
     is_plumbing,
     looks_live,
@@ -213,6 +215,7 @@ class TestBackendStatus:
             "exa-mcp": False,
             "exa-mcp-keyless": True,  # the free rung: nothing to configure
             "tinyfish": True,
+            "youtube-tab": True,  # the free rung: nothing to configure
             "render-arena": False,  # no FIRECRAWL_API_KEY in this environment
         }
 
@@ -449,6 +452,124 @@ class TestUniqueQueries:
         assert backend.queries == 1
 
 
+class TestYouTubeTabBackend:
+    """The keyless channel-tab rung: always available, fetch-once per run."""
+
+    def test_always_available_with_no_credential(self, monkeypatch):
+        monkeypatch.delenv("EXA_API_KEY", raising=False)
+        monkeypatch.delenv("TINYFISH_API_KEY", raising=False)
+        backend = YouTubeTabBackend()
+        assert backend.available() is True
+        assert "no key needed" in backend.status_detail(True)
+
+    def test_search_returns_watch_urls_and_fetches_once(self, monkeypatch):
+        import scripts.run_daily as run_daily
+
+        calls: list[str] = []
+
+        def _discover(*, max_watch: int = 0):
+            calls.append(f"max_watch={max_watch}")
+            return [
+                {
+                    "handle": "enbleague",
+                    "channel_id": "UCx",
+                    "videos": [
+                        {"url": "https://www.youtube.com/watch?v=aaa111aaa11", "title": "A v B"},
+                        {"url": "https://www.youtube.com/watch?v=bbb222bbb22", "title": ""},
+                    ],
+                }
+            ]
+
+        monkeypatch.setattr(run_daily, "_discover_youtube_tabs", _discover)
+        backend = YouTubeTabBackend()
+        first = backend.search("q1", 5)
+        second = backend.search("q2", 5)
+        assert [row["url"] for row in first] == [
+            "https://www.youtube.com/watch?v=aaa111aaa11",
+            "https://www.youtube.com/watch?v=bbb222bbb22",
+        ]
+        assert first == second
+        # One query batch, many queries: the tab/RSS fetch ran a single time.
+        assert calls == ["max_watch=0"]
+
+    def test_a_discovery_failure_is_a_named_transport_failure(self, monkeypatch):
+        import scripts.run_daily as run_daily
+
+        def _raising(*, max_watch: int = 0):
+            raise OSError("no route to host")
+
+        monkeypatch.setattr(run_daily, "_discover_youtube_tabs", _raising)
+        backend = YouTubeTabBackend()
+        assert backend.search("q", 5) == []
+        assert "OSError" in backend.last_error
+
+    def test_the_cache_clears_between_runs(self, monkeypatch):
+        import scripts.run_daily as run_daily
+
+        monkeypatch.setattr(
+            run_daily, "_discover_youtube_tabs", lambda *, max_watch=0: []
+        )
+        backend = YouTubeTabBackend()
+        backend._rows_cache = [{"url": "https://www.youtube.com/watch?v=stale"}]
+        backend.reset_stats()
+        assert backend.search("q", 5) == []
+
+
+class TestArenaGameLinks:
+    """Per-game `/tv/` links from a rendered arena page.
+
+    Pinned to the real 2026-11-11 render that proved the arena text names
+    free games (Deutschland–Ungarn tipped that night) while no per-game URL
+    was resolvable without it.
+    """
+
+    @classmethod
+    def _fixture_html(cls) -> str:
+        import gzip
+
+        path = REPO_ROOT / "tests" / "fixtures" / "magenta_arena" / "sport-rendered.html.gz"
+        with gzip.open(path, "rt", encoding="utf-8") as handle:
+            return handle.read()
+
+    def test_the_recorded_render_names_tonights_dbb_game(self):
+        links = {link["url"] for link in extract_arena_links(self._fixture_html())}
+        assert "https://www.magenta.tv/tv/live-deutschland-ungarn/03316f8e" in links
+
+    def test_every_link_is_a_program_link_with_a_title(self):
+        links = extract_arena_links(self._fixture_html())
+        assert len(links) >= 10
+        for link in links:
+            assert link["url"].startswith("https://www.magenta.tv/tv/")
+            assert link["title"].strip()
+        # Navigation is not a game.
+        assert not any(link["url"].rstrip("/").endswith("/sport") for link in links)
+
+    def test_duplicates_keep_the_first_titled_spelling(self):
+        html = (
+            '<a href="/tv/live-a-b/1">Club A - Club B, LIVE</a>'
+            '<a href="/tv/live-a-b/1"></a>'
+            '<a href="/sport">Sport</a>'
+        )
+        assert extract_arena_links(html) == [
+            {
+                "url": "https://www.magenta.tv/tv/live-a-b/1",
+                "title": "Club A - Club B, LIVE",
+            }
+        ]
+
+    def test_the_arena_row_keeps_its_per_game_rows(self, monkeypatch):
+        import scripts.run_daily as run_daily
+
+        html = self._fixture_html()
+        monkeypatch.setattr(
+            run_daily, "_render_page", lambda url: ("KOSTENLOS x11", html, "")
+        )
+        rows = run_daily.RenderArenaBackend().search("q", 5)
+        assert rows[0]["url"] == "https://www.magenta.tv/sport"
+        assert len(rows) >= 11
+        assert any("deutschland-ungarn" in row["url"] for row in rows[1:])
+
+
 class TestRenderArenaErrorIsNamed:
     """A broken renderer must not look like "nothing free today"."""
 
@@ -457,8 +578,8 @@ class TestRenderArenaErrorIsNamed:
 
         monkeypatch.setattr(
             run_daily,
-            "_render_once",
-            lambda url: ("", "Error: browser closed unexpectedly"),
+            "_render_page",
+            lambda url: ("", "", "Error: browser closed unexpectedly"),
         )
         backend = run_daily.RenderArenaBackend()
         assert backend.search("q", 5) == []
@@ -468,7 +589,9 @@ class TestRenderArenaErrorIsNamed:
     def test_a_page_without_the_marker_is_still_a_transport_failure(self, monkeypatch):
         import scripts.run_daily as run_daily
 
-        monkeypatch.setattr(run_daily, "_render_once", lambda url: ("an app shell", ""))
+        monkeypatch.setattr(
+            run_daily, "_render_page", lambda url: ("an app shell", "<html></html>", "")
+        )
         backend = run_daily.RenderArenaBackend()
         assert backend.search("q", 5) == []
         assert "lacks 'KOSTENLOS'" in backend.last_error

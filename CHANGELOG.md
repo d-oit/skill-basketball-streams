@@ -22,6 +22,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   appear under `KOSTENLOS & OHNE LOGIN`; a `webSearch` excerpt of
   `magenta.tv/sport` counts as announcement evidence. New eval case 50 (DBB
   Check 1 without a per-game marker).
+- **YouTube discovery no longer depends on the Live-filter results pages.**
+  All 12 `results?search_query=&sp=EgJAAQ` URLs returned boilerplate to a
+  non-JS client while 8 in-window ENBL games sat scheduled on `@ENBLeague`.
+  New `scripts/youtube_tab.py` (stdlib, keyless) discovers via the
+  server-rendered `/streams` tab, RSS feed and `watch`-page
+  `liveBroadcastDetails`; the Phase 0 ladder gains a `youtube-tab` rung, and
+  `youtube-live-searches.json` now carries per-channel RSS/`/streams` URLs the
+  runtime `webfetch`es directly. The `render-arena` rung additionally emits one
+  ledger row per `/tv/` program link from the rendered arena (e.g.
+  `live-deutschland-ungarn`), so per-game magenta URLs are recorded even when
+  no search backend indexes them. New eval case 51 (channel-tab lead passes
+  the live-only/future-only gate).
 
 ## [1.13.1] - 2026-10-21
 
