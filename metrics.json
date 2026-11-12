@@ -1,10 +1,10 @@
 {
   "audit": {
     "inconclusive": 17,
-    "judged": 63,
+    "judged": 65,
     "precision": 1.0,
-    "rows": 80,
-    "verified": 63,
+    "rows": 82,
+    "verified": 65,
     "wrong": 0
   },
   "derived": true,
@@ -151,8 +151,8 @@
   },
   "recall": {
     "captured": 0,
-    "eligible": 1387,
-    "missed": 1387,
+    "eligible": 1391,
+    "missed": 1391,
     "missed_keys": [
       "http://live.basketball-bundesliga.de/home",
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
@@ -252,6 +252,7 @@
       "https://euroleague.tv/live/309764",
       "https://euroleague.tv/live/309827",
       "https://exa.ai/library/sports/nbl?date=2026-11-11",
+      "https://exa.ai/library/sports/nbl?date=2026-11-12",
       "https://fansided.com/posts/euroleague-live-streams-how-to-watch-the-2023-24-euroleague-season-01ha0tqg9fy0",
       "https://fcbayern.com/basketball/de/news/2023-24/08/basketball-wm-live-deutschland-australien-live-tv-livestream-sehen",
       "https://fcbayern.com/basketball/de/news/2026-27/09/free-tv-bayern-berlin",
@@ -779,6 +780,7 @@
       "https://www.magenta.tv/tv/live-portugal-deutschland/0331db2a",
       "https://www.magenta.tv/tv/live-real-madrid-zalgiris-kaunas/03349c75",
       "https://www.magenta.tv/tv/live-sky-sport-news-der-mittag/03319170",
+      "https://www.magenta.tv/tv/live-sky-sport-news-primetime/0332e2a6",
       "https://www.magenta.tv/tv/live-sky-sport-news-schwarz-rot-klopp-dfb-abschlusstraining/0334dbf3",
       "https://www.magenta.tv/tv/live-telekom-starkick-2026/0333e833",
       "https://www.magenta.tv/tv/live-transfer-update-die-show/0331dd0a",
@@ -1131,6 +1133,7 @@
       "https://www.youtube.com/watch?v=60lce6qpiGg",
       "https://www.youtube.com/watch?v=6JV8jwRSZmg",
       "https://www.youtube.com/watch?v=6PdBBlANCWU",
+      "https://www.youtube.com/watch?v=6SHn-B6cGnY",
       "https://www.youtube.com/watch?v=6fkDlEOcTVk",
       "https://www.youtube.com/watch?v=6x7BQSzGTQg",
       "https://www.youtube.com/watch?v=77niB3AObws",
@@ -1208,6 +1211,7 @@
       "https://www.youtube.com/watch?v=IqXfVM1yHnA",
       "https://www.youtube.com/watch?v=JPavyF_vMXw",
       "https://www.youtube.com/watch?v=JTAU95I_WVs",
+      "https://www.youtube.com/watch?v=J_EK6jtgCac",
       "https://www.youtube.com/watch?v=JsomM8ifry0",
       "https://www.youtube.com/watch?v=JxtS48WRMKY",
       "https://www.youtube.com/watch?v=K5zuonU-hHo",
@@ -1543,9 +1547,9 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.0,
-    "rows": 24139,
-    "unique_games": 2026,
-    "unverifiable": 1387,
+    "rows": 24741,
+    "unique_games": 2031,
+    "unverifiable": 1391,
     "unverifiable_keys": [
       "http://live.basketball-bundesliga.de/home",
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
@@ -1645,6 +1649,7 @@
       "https://euroleague.tv/live/309764",
       "https://euroleague.tv/live/309827",
       "https://exa.ai/library/sports/nbl?date=2026-11-11",
+      "https://exa.ai/library/sports/nbl?date=2026-11-12",
       "https://fansided.com/posts/euroleague-live-streams-how-to-watch-the-2023-24-euroleague-season-01ha0tqg9fy0",
       "https://fcbayern.com/basketball/de/news/2023-24/08/basketball-wm-live-deutschland-australien-live-tv-livestream-sehen",
       "https://fcbayern.com/basketball/de/news/2026-27/09/free-tv-bayern-berlin",
@@ -2172,6 +2177,7 @@
       "https://www.magenta.tv/tv/live-portugal-deutschland/0331db2a",
       "https://www.magenta.tv/tv/live-real-madrid-zalgiris-kaunas/03349c75",
       "https://www.magenta.tv/tv/live-sky-sport-news-der-mittag/03319170",
+      "https://www.magenta.tv/tv/live-sky-sport-news-primetime/0332e2a6",
       "https://www.magenta.tv/tv/live-sky-sport-news-schwarz-rot-klopp-dfb-abschlusstraining/0334dbf3",
       "https://www.magenta.tv/tv/live-telekom-starkick-2026/0333e833",
       "https://www.magenta.tv/tv/live-transfer-update-die-show/0331dd0a",
@@ -2524,6 +2530,7 @@
       "https://www.youtube.com/watch?v=60lce6qpiGg",
       "https://www.youtube.com/watch?v=6JV8jwRSZmg",
       "https://www.youtube.com/watch?v=6PdBBlANCWU",
+      "https://www.youtube.com/watch?v=6SHn-B6cGnY",
       "https://www.youtube.com/watch?v=6fkDlEOcTVk",
       "https://www.youtube.com/watch?v=6x7BQSzGTQg",
       "https://www.youtube.com/watch?v=77niB3AObws",
@@ -2601,6 +2608,7 @@
       "https://www.youtube.com/watch?v=IqXfVM1yHnA",
       "https://www.youtube.com/watch?v=JPavyF_vMXw",
       "https://www.youtube.com/watch?v=JTAU95I_WVs",
+      "https://www.youtube.com/watch?v=J_EK6jtgCac",
       "https://www.youtube.com/watch?v=JsomM8ifry0",
       "https://www.youtube.com/watch?v=JxtS48WRMKY",
       "https://www.youtube.com/watch?v=K5zuonU-hHo",
@@ -2936,47 +2944,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-11-12T08:31Z",
+  "run_id": "2026-11-12T09:00Z",
   "source": {
-    "audit_rows": 80,
-    "candidates_rows": 24139,
+    "audit_rows": 82,
+    "candidates_rows": 24741,
     "fixtures_rows": 133
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 2,
-        "precision": 1.0,
-        "rows": 2,
-        "verified": 2,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-11-11T10:30Z",
-      "unique_games": 0
-    },
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 136,
-      "missed": 136,
-      "recall": 0.0,
-      "rows": 287,
-      "run_id": "2026-11-11T10:45Z",
-      "unique_games": 271
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -3180,7 +3154,41 @@
       "rows": 603,
       "run_id": "2026-11-12T08:29Z",
       "unique_games": 586
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 2,
+        "precision": 1.0,
+        "rows": 2,
+        "verified": 2,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-11-12T08:43Z",
+      "unique_games": 0
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 456,
+      "missed": 456,
+      "recall": 0.0,
+      "rows": 602,
+      "run_id": "2026-11-12T08:59Z",
+      "unique_games": 589
     }
   ],
-  "ts": "2026-11-12T08:31:33.191113+00:00"
+  "ts": "2026-11-12T09:00:42.774994+00:00"
 }
