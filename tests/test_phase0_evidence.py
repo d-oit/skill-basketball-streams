@@ -223,6 +223,15 @@ class TestPhase0EvidenceWiring:
             "fallback must guarantee the path exists"
         )
 
+    def test_the_agent_gets_the_current_time_for_its_timestamps(self):
+        workflow = self._workflow()
+        assert 'NOW_UTC="$(date -u +%Y-%m-%dT%H:%M:%SZ)"' in workflow
+        assert "NOW_UTC=$NOW_UTC" in workflow
+        assert "Use NOW_UTC verbatim as validationTimestamp" in workflow, (
+            "the agent has no clock and rounds up; the planner skips "
+            "future-stamped candidates, so the exact time must be handed over"
+        )
+
     def test_help_names_the_evidence_mode(self):
         import subprocess
         import sys
