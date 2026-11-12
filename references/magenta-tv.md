@@ -55,9 +55,19 @@ Phase 0's `render-arena` rung now records the per-game links itself: it
 renders `/sport` and emits one ledger row per `/tv/` program link found in
 the rendered DOM (verified 2026-11-11: `live-deutschland-ungarn`,
 `live-daenemark-deutschland`, `live-portugal-deutschland`, EuroLeague games).
-Text-only clients still cannot validate those URLs — a plain GET returns the
-858-byte shell — so they enter the ledger as `unverifiable` leads, not as
-validation evidence.
+Ledger rows are `unverifiable` by construction — they feed recall, not the
+agent, which never sees them. What the agent DOES see is the evidence
+pre-read: the workflow runs `run_daily.py --evidence-out` in the agent job
+and attaches `.tmp/phase0-evidence.json` to its prompt, carrying the same-run
+arena render (free-block markers, full text, every per-game `/tv/` link with
+title). The agent validates Checks 1–5 itself and cites that file verbatim
+as its Check 6/7 proof for exactly the URLs named there — measured
+2026-11-12, its own `webfetch` of `/sport` returned the 858-byte shell, so
+re-fetching an evidence URL only re-proves the block, never a failed check.
+Eval vocabulary for this handoff: `freeAccess` still comes from the readable
+announcement side, `recordedEvidence` is the same-run file side of Checks 6/7,
+and `noRefetchPenalty` records that a `webfetch` shell on an evidence-listed
+URL is the known block, never a failed check.
 
 **Proven end to end, not just rendered.** Dispatch `36599529155` (2026-09-29)
 planned both games as `VERIFIED` — `Panathinaikos AKTOR Athen vs ASVEL

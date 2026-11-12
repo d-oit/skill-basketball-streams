@@ -53,6 +53,22 @@ rung records those IDs plus RSS titles into the candidate ledger. Titles that
 embed a game date are scheduling evidence; a missing start is still a reject
 — open the `watch` page rather than guessing.
 
+## The agent cannot read YouTube: the evidence pre-read
+
+Measured 2026-11-12: the daily agent runtime (restricted to `webfetch` +
+`websearch`) got boilerplate from every Live-filter page and every `/streams`
+tab, and a 404 from all 7 channel RSS feeds — while the runner read the same
+surfaces with stdlib `urllib` seconds earlier. So the workflow pre-reads them
+on the runner (`run_daily.py --evidence-out .tmp/phase0-evidence.json`: newest
+videos per handle, newest-first, with up to 6 watch-page enrichments each)
+and attaches the file to the agent prompt. The agent starts from that file:
+Checks 1–5 against readable sources as usual, and the file's verbatim
+recorded evidence (URL, title, `scheduled_start`/`is_live_now`, `recorded_at`)
+is its Check 6/7 proof for exactly the URLs named there. A video whose
+`scheduled_start` is null has no recorded start — still a reject, never a
+guess. Re-fetching an evidence URL with `webfetch` only re-proves the block;
+it is not a failed Check 6.
+
 ## Field mapping (raw payload → candidate schema)
 
 | Candidate key | Live-filtered result/page field |
