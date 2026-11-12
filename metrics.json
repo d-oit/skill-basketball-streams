@@ -1,9 +1,9 @@
 {
   "audit": {
-    "inconclusive": 17,
+    "inconclusive": 19,
     "judged": 69,
     "precision": 1.0,
-    "rows": 86,
+    "rows": 88,
     "verified": 69,
     "wrong": 0
   },
@@ -150,10 +150,12 @@
     ]
   },
   "recall": {
-    "captured": 0,
+    "captured": 2,
     "eligible": 1429,
-    "missed": 1429,
+    "missed": 1427,
     "missed_keys": [
+      "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
+      "EuroLeague|Olympiakos Piräus|Real Madrid|2026-11-20T19:15Z",
       "http://live.basketball-bundesliga.de/home",
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -773,9 +775,7 @@
       "https://www.magenta.tv/tv/live-asian-tour-philippine-open-1-tag-in-carmona-philippinen/0331e3a9",
       "https://www.magenta.tv/tv/live-atp-250-bnp-paribas-nordic-open-in-stockholm-swe-5-tag/0331e3a0",
       "https://www.magenta.tv/tv/live-austin-championship-tag-1-teil-1/0334b71d",
-      "https://www.magenta.tv/tv/live-besiktas-istanbul-real-madrid/0331db2b",
       "https://www.magenta.tv/tv/live-brynaes-if-skelleftea-aik/03343377",
-      "https://www.magenta.tv/tv/live-daenemark-deutschland/03316f8f",
       "https://www.magenta.tv/tv/live-deutschland-finnland-iihf-eishockey-wm-der-frauen-2026/03361430",
       "https://www.magenta.tv/tv/live-deutschland-schweden/03359e4a",
       "https://www.magenta.tv/tv/live-deutschland-schweden/03359e72",
@@ -783,8 +783,6 @@
       "https://www.magenta.tv/tv/live-finale-iihf-eishockey-wm-der-frauen-2026/03316f90",
       "https://www.magenta.tv/tv/live-iserlohn-roosters-adler-mannheim/0330431c",
       "https://www.magenta.tv/tv/live-nhl-carolina-hurricanes-seattle-kraken-nhl-global-games-in-helsinki-fin/0331e42b",
-      "https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c",
-      "https://www.magenta.tv/tv/live-portugal-deutschland/0331db2a",
       "https://www.magenta.tv/tv/live-real-madrid-zalgiris-kaunas/03349c75",
       "https://www.magenta.tv/tv/live-sky-sport-news-der-mittag/03319170",
       "https://www.magenta.tv/tv/live-sky-sport-news-der-nachmittag/0332e2a4",
@@ -1584,11 +1582,13 @@
       "https://www.youtube.com/watch?v=zuP5yPWEc4A",
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
-    "recall": 0.0,
-    "rows": 25948,
+    "recall": 0.001,
+    "rows": 25952,
     "unique_games": 2070,
-    "unverifiable": 1429,
+    "unverifiable": 1427,
     "unverifiable_keys": [
+      "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
+      "EuroLeague|Olympiakos Piräus|Real Madrid|2026-11-20T19:15Z",
       "http://live.basketball-bundesliga.de/home",
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -2208,9 +2208,7 @@
       "https://www.magenta.tv/tv/live-asian-tour-philippine-open-1-tag-in-carmona-philippinen/0331e3a9",
       "https://www.magenta.tv/tv/live-atp-250-bnp-paribas-nordic-open-in-stockholm-swe-5-tag/0331e3a0",
       "https://www.magenta.tv/tv/live-austin-championship-tag-1-teil-1/0334b71d",
-      "https://www.magenta.tv/tv/live-besiktas-istanbul-real-madrid/0331db2b",
       "https://www.magenta.tv/tv/live-brynaes-if-skelleftea-aik/03343377",
-      "https://www.magenta.tv/tv/live-daenemark-deutschland/03316f8f",
       "https://www.magenta.tv/tv/live-deutschland-finnland-iihf-eishockey-wm-der-frauen-2026/03361430",
       "https://www.magenta.tv/tv/live-deutschland-schweden/03359e4a",
       "https://www.magenta.tv/tv/live-deutschland-schweden/03359e72",
@@ -2218,8 +2216,6 @@
       "https://www.magenta.tv/tv/live-finale-iihf-eishockey-wm-der-frauen-2026/03316f90",
       "https://www.magenta.tv/tv/live-iserlohn-roosters-adler-mannheim/0330431c",
       "https://www.magenta.tv/tv/live-nhl-carolina-hurricanes-seattle-kraken-nhl-global-games-in-helsinki-fin/0331e42b",
-      "https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c",
-      "https://www.magenta.tv/tv/live-portugal-deutschland/0331db2a",
       "https://www.magenta.tv/tv/live-real-madrid-zalgiris-kaunas/03349c75",
       "https://www.magenta.tv/tv/live-sky-sport-news-der-mittag/03319170",
       "https://www.magenta.tv/tv/live-sky-sport-news-der-nachmittag/0332e2a4",
@@ -3020,47 +3016,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-11-12T16:58Z",
+  "run_id": "",
   "source": {
-    "audit_rows": 86,
-    "candidates_rows": 25948,
+    "audit_rows": 88,
+    "candidates_rows": 25952,
     "fixtures_rows": 133
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 2,
-      "run_id": "2026-11-11T12:45Z",
-      "unique_games": 2
-    },
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 2,
-        "precision": 1.0,
-        "rows": 2,
-        "verified": 2,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-11-11T12:46Z",
-      "unique_games": 0
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -3264,7 +3226,41 @@
       "rows": 605,
       "run_id": "2026-11-12T16:56Z",
       "unique_games": 592
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 4,
+      "run_id": "2026-11-12T17:03Z",
+      "unique_games": 4
+    },
+    {
+      "audit": {
+        "inconclusive": 2,
+        "judged": 0,
+        "precision": null,
+        "rows": 2,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-11-12T17:04Z",
+      "unique_games": 0
     }
   ],
-  "ts": "2026-11-12T16:58:44.497332+00:00"
+  "ts": "2026-11-12T17:04:17.901966+00:00"
 }

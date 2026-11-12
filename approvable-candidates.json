@@ -1,16 +1,16 @@
 {
   "candidates": [
     {
-      "league": "FIBA Europe Cup",
+      "league": "FIBA Women's EuroBasket 2027 Qualifiers",
       "teams": [
-        "BC Batumi",
-        "Gladiators Trier"
+        "D\u00e4nemark",
+        "Deutschland"
       ],
-      "start": "2026-11-11T17:00:00+01:00",
+      "start": "2026-11-14T15:00:00+01:00",
       "state": "VERIFIED",
-      "summary": "FIBA Europe Cup: BC Batumi vs Gladiators Trier",
-      "game_key": "FIBA Europe Cup|BC Batumi|Gladiators Trier|2026-11-11T16:00Z",
-      "url": "https://www.sportschau.de/basketball/eurocup/bc-batumi-gegen-gladiators-trier,livestream-basketball-europecup-trier-108.html",
+      "summary": "FIBA Women's EuroBasket 2027 Qualifiers: D\u00e4nemark vs Deutschland",
+      "game_key": "FIBA Women's EuroBasket 2027 Qualifiers|Deutschland|D\u00e4nemark|2026-11-14T14:00Z",
+      "url": "https://www.magenta.tv/tv/live-daenemark-deutschland/03316f8f",
       "backend": "",
       "evidence": {
         "live_confirmed": true,
@@ -19,25 +19,25 @@
       "direct_links": [
         {
           "source": "",
-          "url": "https://www.sportschau.de/basketball/eurocup/bc-batumi-gegen-gladiators-trier,livestream-basketball-europecup-trier-108.html"
+          "url": "https://www.magenta.tv/tv/live-daenemark-deutschland/03316f8f"
         }
       ],
-      "source_reference": "https://www.sportschau.de/streams",
+      "source_reference": "https://www.basketball-bund.de/damen-bundestrainer-olaf-lange-nominiert-kader-fuer-start-der-em-qualifikation/",
       "access": "Free",
-      "validated_at": "2026-11-11T00:00:00Z",
-      "validation_notes": "Sportschau/ARD livestream page for the FIBA Europe Cup game; page states the match is in the SWR livestream (commentator David Luding) and lists 'Sportschau, Das Erste, 11.11.2026 16:55 Uhr'. Tip-off 17:00 CET confirmed by SWR/Gladiators schedule reporting. Free public broadcaster, live only."
+      "validated_at": "2026-11-12T17:00:25Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-12T17:00:28.224636+00:00): rendered magenta.tv/sport lists the game under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT' (markers KOSTENLOS x11, OHNE LOGIN x10) with per-game link https://www.magenta.tv/tv/live-daenemark-deutschland/03316f8f, title 'Sport 18 - myTeamTV, FIBA Basketball Frauen EM-Qualifikation 2027 - LIVE: D\u00e4nemark - Deutschland, Sa. 14.11.: 13:50 - 17:00'. DBB/FIBA schedule confirms the DBB women's national-team game on 14.11.2026 (tip-off 15:00 CET); DBB games are free on MagentaSport/MagentaTV under the Telekom-DBB deal. Check 6/7 evidence is the same-run arena render cited verbatim (webfetch only returns the SPA shell)."
     },
     {
-      "league": "FIBA Europe Cup",
+      "league": "FIBA Women's EuroBasket 2027 Qualifiers",
       "teams": [
-        "Gladiators Trier",
-        "Promitheas Patras"
+        "Portugal",
+        "Deutschland"
       ],
-      "start": "2026-11-18T20:00:00+01:00",
+      "start": "2026-11-17T20:00:00+01:00",
       "state": "VERIFIED",
-      "summary": "FIBA Europe Cup: Gladiators Trier vs Promitheas Patras",
-      "game_key": "FIBA Europe Cup|Gladiators Trier|Promitheas Patras|2026-11-18T19:00Z",
-      "url": "https://www.sportschau.de/basketball/eurocup/gladiators-trier-gegen-promitheas-patras,livestream-basketball-europecup-trier-110.html",
+      "summary": "FIBA Women's EuroBasket 2027 Qualifiers: Portugal vs Deutschland",
+      "game_key": "FIBA Women's EuroBasket 2027 Qualifiers|Deutschland|Portugal|2026-11-17T19:00Z",
+      "url": "https://www.magenta.tv/tv/live-portugal-deutschland/0331db2a",
       "backend": "",
       "evidence": {
         "live_confirmed": true,
@@ -46,13 +46,67 @@
       "direct_links": [
         {
           "source": "",
-          "url": "https://www.sportschau.de/basketball/eurocup/gladiators-trier-gegen-promitheas-patras,livestream-basketball-europecup-trier-110.html"
+          "url": "https://www.magenta.tv/tv/live-portugal-deutschland/0331db2a"
         }
       ],
-      "source_reference": "https://www.sportschau.de/streams",
+      "source_reference": "https://www.basketball-bund.de/damen-bundestrainer-olaf-lange-nominiert-kader-fuer-start-der-em-qualifikation/",
       "access": "Free",
-      "validated_at": "2026-11-11T00:00:00Z",
-      "validation_notes": "Sportschau/ARD livestream page for the FIBA Europe Cup game; page states the match is in the SWR livestream (commentator David Luding) and lists 'Sportschau, Das Erste, 18.11.2026 19:55 Uhr'. Tip-off 20:00 CET confirmed by SWR/Gladiators schedule reporting. Free public broadcaster, live only."
+      "validated_at": "2026-11-12T17:00:25Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-12T17:00:28.224636+00:00): rendered magenta.tv/sport lists the game under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT' (markers KOSTENLOS x11, OHNE LOGIN x10) with per-game link https://www.magenta.tv/tv/live-portugal-deutschland/0331db2a, title 'Sport 18 - myTeamTV, FIBA Basketball Frauen EM-Qualifikation 2027 - LIVE: Portugal - Deutschland, Di. 17.11.: 18:50 - 22:00'. DBB/FIBA schedule confirms the DBB women's away game on 17.11.2026 (tip-off 20:00 CET); DBB games are free on MagentaSport/MagentaTV under the Telekom-DBB deal. Check 6/7 evidence is the same-run arena render cited verbatim."
+    },
+    {
+      "league": "EuroLeague",
+      "teams": [
+        "Besiktas Istanbul",
+        "Real Madrid"
+      ],
+      "start": "2026-11-18T18:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "EuroLeague: Besiktas Istanbul vs Real Madrid",
+      "game_key": "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
+      "url": "https://www.magenta.tv/tv/live-besiktas-istanbul-real-madrid/0331db2b",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.magenta.tv/tv/live-besiktas-istanbul-real-madrid/0331db2b"
+        }
+      ],
+      "source_reference": "https://www.euroleaguebasketball.net/euroleague/game-center/",
+      "access": "Free",
+      "validated_at": "2026-11-12T17:00:25Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-12T17:00:28.224636+00:00): rendered magenta.tv/sport lists the game under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT' (markers KOSTENLOS x11, OHNE LOGIN x10) with per-game link https://www.magenta.tv/tv/live-besiktas-istanbul-real-madrid/0331db2b, title 'Sport 18 - myTeamTV, Euroleague - LIVE: Besiktas Istanbul - Real Madrid, Mi. 18.11.: 16:45 - 20:00'. EuroLeague Round 12 schedule confirms Besiktas vs Real Madrid on 18.11.2026 (20:00 local Istanbul = 18:00 CET). Check 6/7 evidence is the same-run arena render cited verbatim."
+    },
+    {
+      "league": "EuroLeague",
+      "teams": [
+        "Olympiakos Pir\u00e4us",
+        "Real Madrid"
+      ],
+      "start": "2026-11-20T20:15:00+01:00",
+      "state": "VERIFIED",
+      "summary": "EuroLeague: Olympiakos Pir\u00e4us vs Real Madrid",
+      "game_key": "EuroLeague|Olympiakos Pir\u00e4us|Real Madrid|2026-11-20T19:15Z",
+      "url": "https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c"
+        }
+      ],
+      "source_reference": "https://www.euroleaguebasketball.net/euroleague/game-center/",
+      "access": "Free",
+      "validated_at": "2026-11-12T17:00:25Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-12T17:00:28.224636+00:00): rendered magenta.tv/sport lists the game under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT' (markers KOSTENLOS x11, OHNE LOGIN x10) with per-game link https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c, title 'Sport 18 - myTeamTV, Euroleague - LIVE: Olympiakos Pir\u00e4us - Real Madrid, Fr. 20.11.: 19:00 - 21:40'. EuroLeague Round 13 schedule confirms Olympiakos vs Real Madrid on 20.11.2026 (21:15 local Greece = 20:15 CET). Check 6/7 evidence is the same-run arena render cited verbatim."
     }
   ]
 }
