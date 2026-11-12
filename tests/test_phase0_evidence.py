@@ -232,6 +232,11 @@ class TestPhase0EvidenceWiring:
             "future-stamped candidates, so the exact time must be handed over"
         )
 
+    def test_the_prompt_names_the_gitignore_trap(self):
+        workflow = self._workflow()
+        assert "is gitignored, so `glob` will never list this file" in workflow
+        assert "treat a completed `read` as proof of presence" in workflow
+
     def test_help_names_the_evidence_mode(self):
         import subprocess
         import sys
