@@ -1,10 +1,10 @@
 {
   "leads": [
     {
-      "url": "https://www.magenta.tv/tv/live-daenemark-deutschland"
-    },
-    {
-      "url": "https://www.magenta.tv/tv/live-portugal-deutschland"
+      "url": "https://www.swr.de/sport/mehr-sport/basketball-live-gladiators-trier-gegen-promitheas-patras-100.html",
+      "name": "SWR Sport",
+      "league": "Europe Cup",
+      "reason": "Official ARD regional broadcaster page for the same 18.11 game; not in config/sources.json, so quarantined as a lead (approved sportschau.de livestream used as directLink)."
     }
   ]
 }
