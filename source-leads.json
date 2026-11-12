@@ -1,3 +1,10 @@
 {
-  "leads": []
+  "leads": [
+    {
+      "url": "https://www.magenta.tv/tv/live-daenemark-deutschland"
+    },
+    {
+      "url": "https://www.magenta.tv/tv/live-portugal-deutschland"
+    }
+  ]
 }
