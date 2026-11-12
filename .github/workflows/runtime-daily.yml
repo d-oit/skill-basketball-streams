@@ -212,7 +212,10 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m pip install --quiet --disable-pip-version-check patchright
-          python3 -m patchright install --with-deps chromium
+          python3 -m patchright install --with-deps chromium || {
+            echo "::warning::patchright --with-deps failed (Azure apt DNS flakes); falling back to chromium-only install"
+            python3 -m patchright install chromium
+          }
           python3 -c "from patchright.sync_api import sync_playwright; print('render rung: patchright ready')"
 
       # Phase 0 is the ONLY producer of the recall denominator. With no search
@@ -697,7 +700,10 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m pip install --quiet --disable-pip-version-check patchright
-          python3 -m patchright install --with-deps chromium
+          python3 -m patchright install --with-deps chromium || {
+            echo "::warning::patchright --with-deps failed (Azure apt DNS flakes); falling back to chromium-only install"
+            python3 -m patchright install chromium
+          }
           python3 -c "from patchright.sync_api import sync_playwright; print('render rung: patchright ready')"
 
       # Evidence, not a gate: probe the newest verified stream through a Tor
