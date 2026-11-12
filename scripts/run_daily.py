@@ -569,6 +569,108 @@ def _render_once(url: str, wait_ms: int = 6000) -> tuple[str, str]:
     return text, error
 
 
+EVIDENCE_WATCH_PER_HANDLE = 6
+ARENA_TEXT_CAP = 20000
+
+
+def build_phase0_evidence(
+    *,
+    watch_per_handle: int = EVIDENCE_WATCH_PER_HANDLE,
+    fetch=None,
+    render=None,
+    now: datetime | None = None,
+) -> dict:
+    """Bot-blocked-surface evidence for the planner agent, recorded on the runner.
+
+    The daily agent is restricted to `webfetch` + `websearch`, and both surfaces
+    below are unreadable to it: YouTube serves boilerplate to a non-JS client
+    (Live-filter pages, `/streams` tabs, and even RSS return nothing usable
+    through its fetcher — measured 2026-11-12, all 7 channel RSS feeds 404'd
+    and every tab came back boilerplate), while `magenta.tv/sport` is a
+    client-rendered SPA shell. The runner CAN read both (`urllib` for YouTube's
+    server-rendered tab/RSS/watch pages, `patchright` for the arena), so this
+    records them minutes before the agent runs and the workflow attaches the
+    file to its prompt. The agent still validates Checks 1-5 itself against
+    readable sources; this file's verbatim, same-run evidence is its Check 6/7
+    proof for exactly the URLs named here — the render its runtime cannot do.
+    A URL absent from this file has no such proof and is validated as before.
+
+    `fetch`/`render` are seams for offline tests. `render` replaces the
+    `patchright` page render and receives the arena URL.
+    """
+    moment = now or datetime.now(timezone.utc)
+    recorded_at = moment.isoformat()
+    evidence: dict = {
+        "recorded_at": recorded_at,
+        "youtube": {"channels": []},
+        "magenta_arena": {
+            "url": RenderArenaBackend.arena,
+            "rendered_at": None,
+            "markers": {},
+            "text": "",
+            "games": [],
+        },
+    }
+    try:
+        channels = _discover_youtube_tabs(
+            max_watch=max(0, watch_per_handle), fetch=fetch
+        )
+    except Exception as exc:  # noqa: BLE001 - degraded, never fatal
+        evidence["youtube"] = {
+            "channels": [],
+            "error": f"{type(exc).__name__}: {exc}",
+        }
+    else:
+        for channel in channels:
+            evidence["youtube"]["channels"].append(
+                {
+                    "handle": channel.get("handle", ""),
+                    "channel_id": channel.get("channel_id", ""),
+                    "videos": [
+                        {
+                            "url": video.get("url", ""),
+                            "video_id": video.get("video_id", ""),
+                            "title": video.get("title", ""),
+                            "published": video.get("published", ""),
+                            "scheduled_start": video.get("scheduled_start"),
+                            "is_live_now": bool(video.get("is_live_now", False)),
+                        }
+                        for video in channel.get("videos", [])
+                    ],
+                }
+            )
+    try:
+        if render is None:
+            text, html, error = (
+                _render_page(RenderArenaBackend.arena)
+                if _patchright_importable()
+                else ("", "", "patchright unavailable: no local renderer")
+            )
+        else:
+            text, html, error = render(RenderArenaBackend.arena)
+    except Exception as exc:  # noqa: BLE001 - degraded, never fatal
+        text, html, error = "", "", f"{type(exc).__name__}: {exc}"
+    arena = evidence["magenta_arena"]
+    if error:
+        arena["error"] = error
+    elif RenderArenaBackend.marker not in text:
+        arena["error"] = (
+            f"rendered page lacks {RenderArenaBackend.marker!r} ({len(text)} chars)"
+        )
+    else:
+        arena["rendered_at"] = recorded_at
+        arena["markers"] = {
+            "KOSTENLOS": text.count("KOSTENLOS"),
+            "OHNE LOGIN": text.count("OHNE LOGIN"),
+        }
+        arena["text"] = text[:ARENA_TEXT_CAP]
+        arena["games"] = [
+            {"url": link["url"], "title": link["title"]}
+            for link in extract_arena_links(html)
+        ]
+    return evidence
+
+
 class YouTubeTabBackend(Backend):
     """The approved channels' own surfaces: `/streams` tabs plus RSS.
 
@@ -761,6 +863,12 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true", help="do not write")
     parser.add_argument("--json", action="store_true")
     parser.add_argument(
+        "--evidence-out",
+        help="write bot-blocked-surface evidence for the planner agent to PATH "
+             "(YouTube channel videos with watch-page starts + rendered magenta "
+             "arena) instead of running the search ladder",
+    )
+    parser.add_argument(
         "--check-backends",
         action="store_true",
         help="fail when NO search backend is configured; offline and "
@@ -775,6 +883,43 @@ def main() -> None:
     # It matters here because Phase 0's whole purpose is to populate the recall
     # denominator — a green run that recorded nothing silently shrinks the only
     # evidence a later change can be judged against.
+    if args.evidence_out:
+        evidence = build_phase0_evidence()
+        out = Path(args.evidence_out)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        sections = [
+            bool(evidence["youtube"].get("channels")),
+            bool(evidence["magenta_arena"].get("games")),
+        ]
+        if not any(sections):
+            causes = [
+                evidence["youtube"].get("error", "no channel videos"),
+                evidence["magenta_arena"].get("error", "no arena games"),
+            ]
+            print(
+                f"FAIL: run_daily: evidence empty (youtube: {causes[0]}; "
+                f"arena: {causes[1]})",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        payload = json.dumps(evidence, ensure_ascii=False, indent=1) + "\n"
+        if args.dry_run:
+            print(payload, end="")
+        else:
+            out.write_text(payload, encoding="utf-8")
+        n_videos = sum(
+            len(channel["videos"])
+            for channel in evidence["youtube"].get("channels", [])
+        )
+        n_games = len(evidence["magenta_arena"].get("games", []))
+        print(
+            f"OK: run_daily: evidence {n_videos} videos + {n_games} arena games "
+            f"-> {out}",
+            file=sys.stderr,
+        )
+        if args.json and not args.dry_run:
+            print(payload, end="")
+        return
     if args.check_backends:
         unknown = [name for name in args.backend if name not in ALL_BACKENDS]
         if unknown:

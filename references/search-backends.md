@@ -31,7 +31,11 @@ The implemented search ladder is `run_daily.py`'s `LADDER`, and it is the truth:
     ("exa-mcp", "exa-mcp-keyless", "tinyfish", "youtube-tab", "render-arena")
 
 i.e. paid Exa → keyless Exa → TinyFish → keyless YouTube channel tabs+RSS →
-headless render. The table above lists
+headless render. The two bot-blocked rungs are additionally pre-read for the
+agent: `run_daily.py --evidence-out` records the YouTube videos (with
+watch-page starts) and the rendered arena into `.tmp/phase0-evidence.json`,
+attached to the agent prompt, because the agent runtime (webfetch only) reads
+neither surface. The table above lists
 the backends an *agent runtime* may also call, which is a different list: it
 includes Composio (not a search rung) and Firecrawl,
 which `run_daily.py` has no backend for — `render_ladder.py` uses Firecrawl as a

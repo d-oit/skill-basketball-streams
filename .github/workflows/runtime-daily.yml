@@ -757,6 +757,24 @@ jobs:
             echo "::notice::No telemetry branch yet; the agent gets no source hints this run."
           fi
           python3 scripts/source_hints.py --dest .tmp/hints --out .tmp/source-hints.json
+          # Bot-blocked surfaces, pre-read for the agent: the agent runtime is
+          # restricted to webfetch + websearch, and YouTube serves it boilerplate
+          # while magenta.tv serves its SPA shell (measured 2026-11-12: all 7
+          # channel RSS feeds 404'd and every tab came back boilerplate). The
+          # runner CAN read both (urllib for YouTube's server-rendered
+          # tab/RSS/watch pages, patchright for the arena), so record them here,
+          # minutes before the agent runs, and attach the file to its prompt.
+          # Tolerated, not required: without the file the agent falls back to
+          # webfetch-only discovery exactly as before.
+          python3 scripts/run_daily.py --evidence-out .tmp/phase0-evidence.json \
+            || echo "::warning::phase-0 evidence unavailable (see the FAIL lines above) — the agent falls back to webfetch-only discovery"
+          # `--file` below names this path unconditionally, and a missing file
+          # makes the CLI exit `File not found` instead of running. An empty
+          # evidence object keeps the contract (same schema, no entries) so a
+          # failed pre-read degrades to webfetch-only discovery, not a red run.
+          if [ ! -f .tmp/phase0-evidence.json ]; then
+            python3 -c "import json,datetime,pathlib;pathlib.Path('.tmp/phase0-evidence.json').write_text(json.dumps({'recorded_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'youtube': {'channels': [], 'error': 'pre-read failed this run'}, 'magenta_arena': {'url': 'https://www.magenta.tv/sport', 'rendered_at': None, 'markers': {}, 'text': '', 'games': [], 'error': 'pre-read failed this run'}}) + chr(10), encoding='utf-8')"
+          fi
           # The prompt comes **before** the `--file` flags, and that is not
           # style. In opencode 1.18.33 `--file` is declared as an *array*, so it
           # swallows every following token: with the prompt last, the CLI read
@@ -793,7 +811,9 @@ jobs:
 
             Do NOT call bash or any shell command. It is denied, and a denied call ends the run with no answer. Research only with webfetch and websearch; the calendar is written by the workflow, not by you. Get today's date from the Europe/Berlin timezone in the prompt context, not from a shell.
 
-            YouTube discovery must use webfetch on every URL in the attached youtube-live-searches.json. Each URL already has YouTube's Live filter (sp=EgJAAQ%3D%3D). The file also lists per-channel discovery URLs under `channels` (one RSS feed URL plus one `/streams` tab URL per approved handle): webfetch those too, RSS first, because the Live-filter results pages return boilerplate to a non-JS client while the channel tabs and RSS feeds are server-rendered. Validate any upcoming game by webfetching its `watch` page, whose `liveBroadcastDetails` carries the scheduled start. Never use generic websearch results to discover YouTube streams, and never fetch a YouTube results URL without that exact Live filter. New YouTube handles and other unapproved source URLs are quarantined source leads unless already approved. The attached source-hints.json lists preferred_hosts (hosts that already streamed a VERIFIED calendar game: search them first) and deprioritized_hosts (hosts skipped as not free: do not spend budget there). Hints only change search order; every validation rule below still applies in full. Do not omit source_leads from the final JSON: add it beside candidates and use [] when no new sources were found.
+            YouTube discovery must use webfetch on every URL in the attached youtube-live-searches.json. Each URL already has YouTube's Live filter (sp=EgJAAQ%3D%3D). The file also lists per-channel discovery URLs under `channels` (one RSS feed URL plus one `/streams` tab URL per approved handle): webfetch those too, RSS first, because the Live-filter results pages return boilerplate to a non-JS client while the channel tabs and RSS feeds are server-rendered. Validate any upcoming game by webfetching its `watch` page, whose `liveBroadcastDetails` carries the scheduled start. Never use generic websearch results to discover YouTube streams, and never fetch a YouTube results URL without that exact Live filter. New YouTube handles and other unapproved source URLs are quarantined source leads unless already approved.            The attached source-hints.json lists preferred_hosts (hosts that already streamed a VERIFIED calendar game: search them first) and deprioritized_hosts (hosts skipped as not free: do not spend budget there). Hints only change search order; every validation rule below still applies in full. Do not omit source_leads from the final JSON: add it beside candidates and use [] when no new sources were found.
+
+            Bot-blocked surfaces were pre-read for you: the attached phase0-evidence.json was recorded on the runner minutes before this run (see its recorded_at). Under youtube.channels are the newest videos per approved handle with watch-page scheduled_start/is_live_now proof; under magenta_arena is the patchright-rendered magenta.tv/sport page (free-block markers plus every per-game /tv/ link). webfetch cannot read either surface from your runtime, so START from this file instead of re-fetching it: validate each entry through Checks 1-5 yourself against readable sources (league schedule pages, club and federation announcements), and cite the file's recorded evidence verbatim — URL, title, scheduled start or arena markers plus its recorded_at — in validationNotes as your Check 6/7 proof for exactly those URLs. Do not re-fetch these URLs with webfetch (it returns boilerplate or the SPA shell for them) and do not treat that as a failed Check 6. A URL absent from that file has no recorded proof: validate it the normal way, and never invent stream evidence. If the file is absent, fall back to webfetch-only discovery exactly as before.
 
             You are also the ONLY channel the planner has. The runtime agent is denied 'edit' and 'bash', so it cannot write a file, and scripts/extract_candidates.py reads the final answer out of your transcript. It accepts a fenced \`\`\`json block and NOTHING else - a markdown table, prose, or a tool result are all invisible to it.
 
@@ -807,6 +827,7 @@ jobs:
             --file SKILL.md \
             --file .tmp/youtube-live-searches.json \
             --file .tmp/source-hints.json \
+            --file .tmp/phase0-evidence.json \
             --file references/validation-workflow.md \
             --file references/youtube-live-search.md \
             --file references/magenta-tv.md \

@@ -77,14 +77,14 @@ For every result, call `validateStreamUrl(url)` (TypeScript in `references/imple
 
 A YouTube hit is promotable only when it is a **real live broadcast** AND its start datetime is **greater than now** (or it is live at this moment with no end timestamp). Full contract: `references/youtube-live-search.md`. Gate every candidate with `scripts/youtube_live.py`.
 
-1. **Search YouTube only with its Live filter** (`sp=EgJAAQ%3D%3D`): the daily runtime fetches every URL in `.tmp/youtube-live-searches.json` with `webfetch`; interactive runs use `youtubeLiveSearch`. The same file lists per-channel RSS and `/streams` tab URLs under `channels` — fetch those too (RSS first), because the Live-filter pages return boilerplate to a non-JS client while the channel surfaces are server-rendered. Never use generic `webSearch` results or the Data API for YouTube stream discovery.
+1. **Search YouTube only with its Live filter** (`sp=EgJAAQ%3D%3D`): the daily runtime fetches every URL in `.tmp/youtube-live-searches.json` with `webfetch`; interactive runs use `youtubeLiveSearch`. The same file lists per-channel RSS and `/streams` tab URLs under `channels` — fetch those too (RSS first), because the Live-filter pages return boilerplate to a non-JS client while the channel surfaces are server-rendered. In the daily runtime, the attached `phase0-evidence.json` already carries the same-run watch-page proof (`scheduled_start`/`is_live_now` per newest video): start from it and cite it verbatim in `validationNotes` as Check 6/7 proof for exactly those URLs — do not re-fetch them (the runtime fetcher gets boilerplate) and do not treat that as a failed Check 6. Never use generic `webSearch` results or the Data API for YouTube stream discovery.
 2. **Normalize** each Live-filter hit into the candidate schema (field mapping in the reference).
 3. **Gate** with `classify_stream`: direct `/@handle/live`, `/live/<id>` or `/watch?v=<id>` URLs only; reject `liveBroadcastContent == none`, a set `actualEndTime` (ended broadcast → archived VOD), a fixed `duration_seconds` while not live now, and any `scheduled_start` that is not strictly greater than now.
 4. Only `LIVE` and `SCHEDULED` decisions continue to Step 3. Never invent or reuse a `/live` URL from a finished broadcast; unapproved handles are quarantine leads only.
 
 ### Step 2.8 — Fetch Ladder for Dynamic / Bot-Blocked Pages
 
-`magenta.tv` is a JavaScript-rendered SPA that blocks plain HTTP clients: a 200 returns an app shell with **no readable text**. A bare 200 on the shell does **not** satisfy Checks 6 or 7. Climb the fetch ladder until the page yields stream evidence, and log which rung was used: Firecrawl scrape → TinyFish Fetch → Exa `search_and_contents` → Tavily `extract` → headless browser. Acceptance markers, URL shapes and worked logs: `references/magenta-tv.md`. Backend keys and MCP wiring: `references/search-backends.md`. If every rung fails → UNVERIFIED → no event. Never treat `401/403/429/451` as "broken": those mean *blocked*, so climb the ladder rather than rejecting the game.
+`magenta.tv` is a JavaScript-rendered SPA that blocks plain HTTP clients: a 200 returns an app shell with **no readable text**. A bare 200 on the shell does **not** satisfy Checks 6 or 7. Climb the fetch ladder until the page yields stream evidence, and log which rung was used: Firecrawl scrape → TinyFish Fetch → Exa `search_and_contents` → Tavily `extract` → headless browser. In the daily runtime, the attached `phase0-evidence.json` already carries the same-run arena render (free-block markers plus every per-game `/tv/` link with titles): those URLs arrive with Check 6/7 proof recorded — validate Checks 1–5 yourself against readable sources and cite the file verbatim. Acceptance markers, URL shapes and worked logs: `references/magenta-tv.md`. Backend keys and MCP wiring: `references/search-backends.md`. If every rung fails → UNVERIFIED → no event. Never treat `401/403/429/451` as "broken": those mean *blocked*, so climb the ladder rather than rejecting the game.
 
 ### Step 2.9 — Revalidate Links, Log the Run, Discover New Sources
 
@@ -162,7 +162,7 @@ Refused rather than repaired, so get them right: exactly two teams; a `start` th
 3. **No paid content** — Sky / general Prime → REJECT, even if domain is on the allow-list. DAZN is an approved source only per game: a DAZN game its page does not state is free to watch, or that needs a paid subscription, → REJECT.
 4. **No unofficial streams** — no pirate sites, third-party aggregators, fan-run YouTube.
 5. **Date accuracy** — every event must start strictly after now and no later than now + 10 days; the final planner enforces this window.
-6. **Link testing** — every direct link tested with `openUrl` and confirmed working.
+6. **Link testing** — every direct link tested with `openUrl` and confirmed working, or recorded in that run's `phase0-evidence.json` (whose runner-side render/fetch IS the test, cited verbatim with its `recorded_at`).
 7. **Live verification** — read page content to confirm an active live stream exists.
 8. **YouTube URL rules** — only `@handle`, `@handle/live`, and `/user/TheDBBTV` are accepted.
 9. **Include references** — every event description must contain `sourceReference` and validation timestamp.
@@ -255,4 +255,4 @@ All scripts are stdlib-only on Python 3.8+ and share the same exit codes: `0` PA
 - `docs/runtime.md` — daily runtime operations: cadence, secrets, telemetry schema, rung health, recovery runbook, AGPL notice
 - `references/lessons-learned.md` — incident post-mortem (broken `/user/FIBA` events), root causes, prevention checklist, validation log template and worked examples
 - `config/sources.json` — machine-readable approved-source registry + excluded sources
-- `evals/evals.json` — 47 eval cases (driving the `skill-evaluator` rubric; see `README.md` → Self-Validation)
+- `evals/evals.json` — 52 eval cases (driving the `skill-evaluator` rubric; see `README.md` → Self-Validation)

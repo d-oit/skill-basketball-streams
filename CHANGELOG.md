@@ -34,6 +34,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `live-deutschland-ungarn`), so per-game magenta URLs are recorded even when
   no search backend indexes them. New eval case 51 (channel-tab lead passes
   the live-only/future-only gate).
+- **The agent is handed the bot-blocked surfaces pre-read, not just their URLs.**
+  Measured 2026-11-12: the agent runtime (`webfetch` + `websearch` only) got
+  boilerplate from every YouTube tab and 404s from all 7 channel RSS feeds,
+  and the 858-byte shell from `magenta.tv/sport` — while the runner read both
+  surfaces seconds earlier (207 YouTube videos, 24 arena links incl.
+  `live-daenemark-deutschland` and `live-portugal-deutschland`).
+  `run_daily.py --evidence-out` records the newest channel videos with
+  watch-page starts plus the rendered arena (markers, text, per-game links)
+  into `.tmp/phase0-evidence.json`, attached to the agent prompt; the file's
+  verbatim same-run evidence is the agent's Check 6/7 proof for exactly the
+  URLs named there, cited with its `recorded_at`. Eval case 52.
 
 ## [1.13.1] - 2026-10-21
 

@@ -701,6 +701,20 @@
         "references/youtube-live-search.md",
         "scripts/youtube_live.py"
       ]
-    }
+    },
+{
+      "id": 52,
+      "prompt": "Phase-0 evidence pre-read lead (same run, recorded_at=2026-11-12T07:47:00+00:00). phase0-evidence.json names url=https://www.magenta.tv/tv/live-daenemark-deutschland/03316f8f with title Danmark - Basketball Frauen EM-Qualifikation; magenta_arena.markers KOSTENLOS=11. Readable sources confirm the game: Dänemark - Deutschland, 2026-11-14T15:00:00+01:00, basketball-bund.de: Alle Spiele live und kostenlos bei MagentaSport und MagentaTV. The agent's own webfetch of the URL returns the 858-byte SPA shell.",
+      "expected_output": "Decision=VERIFIED; reason=Checks 1-5 PASS on readable sources (free via basketball-bund.de announcement under the Telekom-DBB deal; game in window 2026-11-14T15:00:00+01:00); Checks 6/7 PASS on the same-run recorded evidence cited verbatim (URL plus KOSTENLOS markers plus recorded_at) in validationNotes; the webfetch shell is the known block, not a failed check; checks: freeAccess=PASS, recordedEvidence=PASS, noRefetchPenalty=PASS",
+      "assertions": [
+            "freeAccess expected PASS",
+            "recordedEvidence expected PASS",
+            "noRefetchPenalty expected PASS"
+      ],
+      "files": [
+            "references/magenta-tv.md",
+            "scripts/run_daily.py"
+      ]
+}
   ]
 }
