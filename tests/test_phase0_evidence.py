@@ -104,13 +104,18 @@ class TestBuildPhase0Evidence:
 
         orig_discover = run_daily._discover_youtube_tabs
         orig_render = run_daily._render_page
+        orig_gate = run_daily._patchright_importable
         run_daily._discover_youtube_tabs = lambda *, max_watch=0, fetch=None: []
         run_daily._render_page = _render_ok
+        # The builder gates the render on an importable renderer (CI runners
+        # have no browser); the seam under test is what happens after the gate.
+        run_daily._patchright_importable = lambda: True
         try:
             evidence = build_phase0_evidence(now=NOW)
         finally:
             run_daily._discover_youtube_tabs = orig_discover
             run_daily._render_page = orig_render
+            run_daily._patchright_importable = orig_gate
         arena = evidence["magenta_arena"]
         assert arena["url"] == "https://www.magenta.tv/sport"
         assert arena["rendered_at"] == "2026-11-12T07:45:00+00:00"
@@ -128,17 +133,39 @@ class TestBuildPhase0Evidence:
 
         orig_discover = run_daily._discover_youtube_tabs
         orig_render = run_daily._render_page
+        orig_gate = run_daily._patchright_importable
         run_daily._discover_youtube_tabs = lambda *, max_watch=0, fetch=None: []
         run_daily._render_page = lambda url: ("", "", "Error: browser closed")
+        run_daily._patchright_importable = lambda: True
         try:
             evidence = build_phase0_evidence(now=NOW)
         finally:
             run_daily._discover_youtube_tabs = orig_discover
             run_daily._render_page = orig_render
+            run_daily._patchright_importable = orig_gate
         arena = evidence["magenta_arena"]
         assert arena["games"] == []
         assert "Error: browser closed" in arena["error"]
         assert arena["rendered_at"] is None
+
+    def test_no_renderer_means_no_render_attempt(self):
+        import scripts.run_daily as run_daily
+
+        calls: list[str] = []
+        orig_discover = run_daily._discover_youtube_tabs
+        orig_render = run_daily._render_page
+        orig_gate = run_daily._patchright_importable
+        run_daily._discover_youtube_tabs = lambda *, max_watch=0, fetch=None: []
+        run_daily._render_page = lambda url: calls.append(url) or ("", "", "")
+        run_daily._patchright_importable = lambda: False
+        try:
+            evidence = build_phase0_evidence(now=NOW)
+        finally:
+            run_daily._discover_youtube_tabs = orig_discover
+            run_daily._render_page = orig_render
+            run_daily._patchright_importable = orig_gate
+        assert calls == [], "without a renderer there is nothing to call"
+        assert "patchright unavailable" in evidence["magenta_arena"]["error"]
 
     def test_total_youtube_failure_degrades_to_empty_channels(self):
         import scripts.run_daily as run_daily
