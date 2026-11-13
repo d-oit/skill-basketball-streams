@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Added the official PGE Basket Liga YouTube source (`@basketliga`).**
+  The 2026/27 league guide says usually four games per round are free on
+  YouTube, and its fixture schedule marks the selected games; the remaining
+  games are carried on Polsat. Added the channel ID
+  `UCT3PGkIHb_jd6Nr8dmQGUMQ`, its RSS/`/streams` pre-read, and Polish/English
+  Live-filter queries. The source is `selected`, not globally free: each
+  fixture still needs its official YouTube marker and a real live/upcoming
+  broadcast. Evidence: official league guide (2026-09-30) and schedule,
+  verified 2026-11-13. Added eval cases 56–57.
+
 - **League labels match on tokens, not word order.** The 2026-11-13 dry run
   stored "FIBA Women's EuroBasket 2027 Qualifiers" while the agent re-read
   "FIBA Women's EuroBasket Qualifiers 2027" — same tokens, different order —
