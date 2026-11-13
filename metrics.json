@@ -1,9 +1,9 @@
 {
   "audit": {
-    "inconclusive": 19,
+    "inconclusive": 21,
     "judged": 69,
     "precision": 1.0,
-    "rows": 88,
+    "rows": 90,
     "verified": 69,
     "wrong": 0
   },
@@ -155,7 +155,7 @@
     "missed": 1451,
     "missed_keys": [
       "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
-      "EuroLeague|Olympiakos Piräus|Real Madrid|2026-11-20T19:15Z",
+      "easyCredit BBL|Rostock Seawolves|Science City Jena|2026-11-21T15:00Z",
       "http://live.basketball-bundesliga.de/home",
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -799,6 +799,7 @@
       "https://www.magenta.tv/tv/live-hamburger-sv-1-fsv-mainz-05/03304334",
       "https://www.magenta.tv/tv/live-iserlohn-roosters-adler-mannheim/0330431c",
       "https://www.magenta.tv/tv/live-nhl-carolina-hurricanes-seattle-kraken-nhl-global-games-in-helsinki-fin/0331e42b",
+      "https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c",
       "https://www.magenta.tv/tv/live-penny-del-konferenz/03316f66",
       "https://www.magenta.tv/tv/live-real-madrid-zalgiris-kaunas/03349c75",
       "https://www.magenta.tv/tv/live-sky-sport-news-der-mittag/03319170",
@@ -961,7 +962,6 @@
       "https://www.sportpresseportal.de/news/tLdSMU/basketball-em-komplett-live-bei-magentasport-und-magentatv-deutscher-auftakt-am-mittwoch-vs-montenegro-kostenlos",
       "https://www.sportpresseportal.de/news/vW28B1/basketball-live-bei-magentasport-deutschland-gegen-israel-am-28-november-live-kostenlos",
       "https://www.sportschau.de/basketball/bbl-pokal/bbl-fc-bayern-muenchen-gegen-alba-berlin,livestream-bbl-fcb-alba-100.html",
-      "https://www.sportschau.de/basketball/bbl-science-city-jena-gegen-rostock-seawolves,livestream-bbl-jena-rostock-100.html",
       "https://www.sportschau.de/basketball/bundesliga/fc-bayern-muenchen-gegen-alba-berlin-im-re-live,basketball-bayern-muenchen-alba-berlin-re-live-100.html",
       "https://www.sportschau.de/live-und-ergebnisse/basketball/deutschland-bbl/konferenz/dn2026-10-10",
       "https://www.sportschau.de/live-und-ergebnisse/basketball/deutschland-bbl/ma12415669/ratiopharm-ulm_mhp-riesen-ludwigsburg/liveticker",
@@ -1607,12 +1607,12 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.001,
-    "rows": 26469,
-    "unique_games": 2108,
+    "rows": 26476,
+    "unique_games": 2111,
     "unverifiable": 1451,
     "unverifiable_keys": [
       "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
-      "EuroLeague|Olympiakos Piräus|Real Madrid|2026-11-20T19:15Z",
+      "easyCredit BBL|Rostock Seawolves|Science City Jena|2026-11-21T15:00Z",
       "http://live.basketball-bundesliga.de/home",
       "https://1xbet.com/en/live/basketball/2414866-belarus-nbbl",
       "https://24live.com/page/sport/event/basketball-5/101",
@@ -2256,6 +2256,7 @@
       "https://www.magenta.tv/tv/live-hamburger-sv-1-fsv-mainz-05/03304334",
       "https://www.magenta.tv/tv/live-iserlohn-roosters-adler-mannheim/0330431c",
       "https://www.magenta.tv/tv/live-nhl-carolina-hurricanes-seattle-kraken-nhl-global-games-in-helsinki-fin/0331e42b",
+      "https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c",
       "https://www.magenta.tv/tv/live-penny-del-konferenz/03316f66",
       "https://www.magenta.tv/tv/live-real-madrid-zalgiris-kaunas/03349c75",
       "https://www.magenta.tv/tv/live-sky-sport-news-der-mittag/03319170",
@@ -2418,7 +2419,6 @@
       "https://www.sportpresseportal.de/news/tLdSMU/basketball-em-komplett-live-bei-magentasport-und-magentatv-deutscher-auftakt-am-mittwoch-vs-montenegro-kostenlos",
       "https://www.sportpresseportal.de/news/vW28B1/basketball-live-bei-magentasport-deutschland-gegen-israel-am-28-november-live-kostenlos",
       "https://www.sportschau.de/basketball/bbl-pokal/bbl-fc-bayern-muenchen-gegen-alba-berlin,livestream-bbl-fcb-alba-100.html",
-      "https://www.sportschau.de/basketball/bbl-science-city-jena-gegen-rostock-seawolves,livestream-bbl-jena-rostock-100.html",
       "https://www.sportschau.de/basketball/bundesliga/fc-bayern-muenchen-gegen-alba-berlin-im-re-live,basketball-bayern-muenchen-alba-berlin-re-live-100.html",
       "https://www.sportschau.de/live-und-ergebnisse/basketball/deutschland-bbl/konferenz/dn2026-10-10",
       "https://www.sportschau.de/live-und-ergebnisse/basketball/deutschland-bbl/ma12415669/ratiopharm-ulm_mhp-riesen-ludwigsburg/liveticker",
@@ -3064,30 +3064,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-11-13T06:52Z",
+  "run_id": "",
   "source": {
-    "audit_rows": 88,
-    "candidates_rows": 26469,
+    "audit_rows": 90,
+    "candidates_rows": 26476,
     "fixtures_rows": 133
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 2,
-        "precision": 1.0,
-        "rows": 2,
-        "verified": 2,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-11-11T15:00Z",
-      "unique_games": 0
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -3308,7 +3291,24 @@
       "rows": 517,
       "run_id": "2026-11-13T06:50Z",
       "unique_games": 498
+    },
+    {
+      "audit": {
+        "inconclusive": 2,
+        "judged": 0,
+        "precision": null,
+        "rows": 2,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 7,
+      "run_id": "2026-11-13T07:05Z",
+      "unique_games": 7
     }
   ],
-  "ts": "2026-11-13T06:52:36.917842+00:00"
+  "ts": "2026-11-13T07:05:45.762667+00:00"
 }

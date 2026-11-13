@@ -22,10 +22,37 @@
           "url": "https://www.magenta.tv/tv/live-daenemark-deutschland/03316f8f"
         }
       ],
-      "source_reference": "https://www.basketball-bund.de/damen-bundestrainer-olaf-lange-nominiert-kader-fuer-start-der-em-qualifikation/",
+      "source_reference": "https://www.basketball-bund.de/em-quali-startschuss-fuer-die-dbb-damen",
       "access": "Free",
-      "validated_at": "2026-11-12T17:00:25Z",
-      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-12T17:00:28.224636+00:00): rendered magenta.tv/sport lists the game under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT' (markers KOSTENLOS x11, OHNE LOGIN x10) with per-game link https://www.magenta.tv/tv/live-daenemark-deutschland/03316f8f, title 'Sport 18 - myTeamTV, FIBA Basketball Frauen EM-Qualifikation 2027 - LIVE: D\u00e4nemark - Deutschland, Sa. 14.11.: 13:50 - 17:00'. DBB/FIBA schedule confirms the DBB women's national-team game on 14.11.2026 (tip-off 15:00 CET); DBB games are free on MagentaSport/MagentaTV under the Telekom-DBB deal. Check 6/7 evidence is the same-run arena render cited verbatim (webfetch only returns the SPA shell)."
+      "validated_at": "2026-11-13T06:53:43Z",
+      "validation_notes": "DBB announcement lists Sa., 14.11.2026, 15.00 Uhr D\u00e4nemark \u2013 Deutschland and states all games are live and free on MagentaSport and MagentaTV; phase0 magenta arena render (recorded_at 2026-11-13T06:53:46.141825+00:00) lists https://www.magenta.tv/tv/live-daenemark-deutschland/03316f8f as KID00765-TelekomBasketball4, FIBA Basketball Frauen EM-Qualifikation 2027 - LIVE: D\u00e4nemark - Deutschland, Morgen: 13:50 - 17:00."
+    },
+    {
+      "league": "easyCredit BBL",
+      "teams": [
+        "NINERS Chemnitz",
+        "Basketball L\u00f6wen Braunschweig"
+      ],
+      "start": "2026-11-15T18:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "easyCredit BBL: NINERS Chemnitz vs Basketball L\u00f6wen Braunschweig",
+      "game_key": "easyCredit BBL|Basketball L\u00f6wen Braunschweig|NINERS Chemnitz|2026-11-15T17:00Z",
+      "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4"
+        }
+      ],
+      "source_reference": "https://www.dyn.sport/deinsender/dyn-sport-mix",
+      "access": "Free",
+      "validated_at": "2026-11-13T06:53:43Z",
+      "validation_notes": "Dyn Sport Mix official Basketball Free Spiele list states So. 15.11.2026, 18:00 Uhr, easyCredit BBL, NINERS Chemnitz \u2013 Basketball L\u00f6wen Braunschweig, live on Dyn and all Dyn Sport Mix partners; direct link is the Dyn Sport Mix channel on Pluto TV, whose channel API confirms 6866525c8a412a0e95c438b4 = Dyn Sport Mix (slug dyn-sport-mix-de)."
     },
     {
       "league": "FIBA Women's EuroBasket 2027 Qualifiers",
@@ -49,10 +76,10 @@
           "url": "https://www.magenta.tv/tv/live-portugal-deutschland/0331db2a"
         }
       ],
-      "source_reference": "https://www.basketball-bund.de/damen-bundestrainer-olaf-lange-nominiert-kader-fuer-start-der-em-qualifikation/",
+      "source_reference": "https://www.basketball-bund.de/em-quali-startschuss-fuer-die-dbb-damen",
       "access": "Free",
-      "validated_at": "2026-11-12T17:00:25Z",
-      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-12T17:00:28.224636+00:00): rendered magenta.tv/sport lists the game under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT' (markers KOSTENLOS x11, OHNE LOGIN x10) with per-game link https://www.magenta.tv/tv/live-portugal-deutschland/0331db2a, title 'Sport 18 - myTeamTV, FIBA Basketball Frauen EM-Qualifikation 2027 - LIVE: Portugal - Deutschland, Di. 17.11.: 18:50 - 22:00'. DBB/FIBA schedule confirms the DBB women's away game on 17.11.2026 (tip-off 20:00 CET); DBB games are free on MagentaSport/MagentaTV under the Telekom-DBB deal. Check 6/7 evidence is the same-run arena render cited verbatim."
+      "validated_at": "2026-11-13T06:53:43Z",
+      "validation_notes": "DBB announcement lists Di. 17.11.2026, 20.00 Uhr Portugal \u2013 Deutschland and states all games are live and free on MagentaSport and MagentaTV; phase0 magenta arena render (recorded_at 2026-11-13T06:53:46.141825+00:00) lists https://www.magenta.tv/tv/live-portugal-deutschland/0331db2a as KID00765-TelekomBasketball4, FIBA Basketball Frauen EM-Qualifikation 2027 - LIVE: Portugal - Deutschland, Di. 17.11.: 18:50 - 22:00."
     },
     {
       "league": "EuroLeague",
@@ -76,21 +103,21 @@
           "url": "https://www.magenta.tv/tv/live-besiktas-istanbul-real-madrid/0331db2b"
         }
       ],
-      "source_reference": "https://www.euroleaguebasketball.net/euroleague/game-center/",
+      "source_reference": "https://www.euroleaguebasketball.net/euroleague/game-center/2026-27/besiktas-istanbul-real-madrid/E2026/120",
       "access": "Free",
-      "validated_at": "2026-11-12T17:00:25Z",
-      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-12T17:00:28.224636+00:00): rendered magenta.tv/sport lists the game under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT' (markers KOSTENLOS x11, OHNE LOGIN x10) with per-game link https://www.magenta.tv/tv/live-besiktas-istanbul-real-madrid/0331db2b, title 'Sport 18 - myTeamTV, Euroleague - LIVE: Besiktas Istanbul - Real Madrid, Mi. 18.11.: 16:45 - 20:00'. EuroLeague Round 12 schedule confirms Besiktas vs Real Madrid on 18.11.2026 (20:00 local Istanbul = 18:00 CET). Check 6/7 evidence is the same-run arena render cited verbatim."
+      "validated_at": "2026-11-13T06:53:43Z",
+      "validation_notes": "EuroLeague official game center lists Besiktas Istanbul vs Real Madrid 2026-11-18 17:00 GMT (18:00 CET), and Real Madrid's official schedule gives 18 Nov 6:00 pm; phase0 magenta arena render (recorded_at 2026-11-13T06:53:46.141825+00:00) lists https://www.magenta.tv/tv/live-besiktas-istanbul-real-madrid/0331db2b in the KID00765-TelekomBasketball4 free block as Euroleague - LIVE: Besiktas Istanbul - Real Madrid, Mi. 18.11.: 16:45 - 20:00."
     },
     {
       "league": "EuroLeague",
       "teams": [
-        "Olympiakos Pir\u00e4us",
+        "Olympiacos Piraeus",
         "Real Madrid"
       ],
       "start": "2026-11-20T20:15:00+01:00",
       "state": "VERIFIED",
-      "summary": "EuroLeague: Olympiakos Pir\u00e4us vs Real Madrid",
-      "game_key": "EuroLeague|Olympiakos Pir\u00e4us|Real Madrid|2026-11-20T19:15Z",
+      "summary": "EuroLeague: Olympiacos Piraeus vs Real Madrid",
+      "game_key": "EuroLeague|Olympiacos Piraeus|Real Madrid|2026-11-20T19:15Z",
       "url": "https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c",
       "backend": "",
       "evidence": {
@@ -103,10 +130,64 @@
           "url": "https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c"
         }
       ],
-      "source_reference": "https://www.euroleaguebasketball.net/euroleague/game-center/",
+      "source_reference": "https://www.euroleaguebasketball.net/en/euroleague/game-center/2026-27/olympiacos-piraeus-real-madrid/E2026/130/",
       "access": "Free",
-      "validated_at": "2026-11-12T17:00:25Z",
-      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-12T17:00:28.224636+00:00): rendered magenta.tv/sport lists the game under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT' (markers KOSTENLOS x11, OHNE LOGIN x10) with per-game link https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c, title 'Sport 18 - myTeamTV, Euroleague - LIVE: Olympiakos Pir\u00e4us - Real Madrid, Fr. 20.11.: 19:00 - 21:40'. EuroLeague Round 13 schedule confirms Olympiakos vs Real Madrid on 20.11.2026 (21:15 local Greece = 20:15 CET). Check 6/7 evidence is the same-run arena render cited verbatim."
+      "validated_at": "2026-11-13T06:53:43Z",
+      "validation_notes": "EuroLeague official game center lists Olympiacos Piraeus vs Real Madrid 2026-11-20 19:15 GMT (20:15 CET), and Real Madrid's official schedule gives 20 Nov 8:15 pm; phase0 magenta arena render (recorded_at 2026-11-13T06:53:46.141825+00:00) lists https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c in the KID00765-TelekomBasketball4 free block as Euroleague - LIVE: Olympiakos Pir\u00e4us - Real Madrid, Fr. 20.11.: 19:00 - 21:40."
+    },
+    {
+      "league": "easyCredit BBL",
+      "teams": [
+        "Science City Jena",
+        "Rostock Seawolves"
+      ],
+      "start": "2026-11-21T16:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "easyCredit BBL: Science City Jena vs Rostock Seawolves",
+      "game_key": "easyCredit BBL|Rostock Seawolves|Science City Jena|2026-11-21T15:00Z",
+      "url": "https://www.sportschau.de/basketball/bbl-science-city-jena-gegen-rostock-seawolves,livestream-bbl-jena-rostock-100.html",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.sportschau.de/basketball/bbl-science-city-jena-gegen-rostock-seawolves,livestream-bbl-jena-rostock-100.html"
+        }
+      ],
+      "source_reference": "https://www.sportschau.de/basketball/bbl-science-city-jena-gegen-rostock-seawolves,livestream-bbl-jena-rostock-100.html",
+      "access": "Free",
+      "validated_at": "2026-11-13T06:53:43Z",
+      "validation_notes": "Sportschau livestream page title is 'Livestream - BBL - Science City Jena gegen Rostock Seawolves' and the page states 'Sportschau, Das Erste, 21.11.2026 \u2022 16:00 Uhr' and 'Am 10. Spieltag der BBL empf\u00e4ngt Jena die G\u00e4ste aus Rostock. Das Spiel im Livestream des MDR.'"
+    },
+    {
+      "league": "easyCredit BBL",
+      "teams": [
+        "ALBA Berlin",
+        "FC Bayern M\u00fcnchen"
+      ],
+      "start": "2026-11-22T16:30:00+01:00",
+      "state": "VERIFIED",
+      "summary": "easyCredit BBL: ALBA Berlin vs FC Bayern M\u00fcnchen",
+      "game_key": "easyCredit BBL|ALBA Berlin|FC Bayern M\u00fcnchen|2026-11-22T15:30Z",
+      "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4"
+        }
+      ],
+      "source_reference": "https://www.dyn.sport/deinsender/dyn-sport-mix",
+      "access": "Free",
+      "validated_at": "2026-11-13T06:53:43Z",
+      "validation_notes": "Dyn Sport Mix official Basketball Free Spiele list states So. 22.11.2026, 16:30 Uhr, easyCredit BBL, ALBA BERLIN \u2013 FC Bayern M\u00fcnchen Basketball, live on Dyn and all Dyn Sport Mix partners; direct link is the Dyn Sport Mix channel on Pluto TV, whose channel API confirms 6866525c8a412a0e95c438b4 = Dyn Sport Mix (slug dyn-sport-mix-de)."
     }
   ]
 }
