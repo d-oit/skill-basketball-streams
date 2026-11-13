@@ -978,6 +978,28 @@ jobs:
             echo "::notice::No audit ledger on the telemetry branch yet, so no event is held by a WRONG verdict this run."
           fi
 
+      # ── The fixture feed, read back so tip times can be pinned to it. ─────
+      # The agent reads tip times off announcement pages and drifts (2026-11-13:
+      # 13:50 against a 15:00 game); the league feed is authoritative for *when*
+      # a game is. Same read-only `git show` as the verdicts step above; an
+      # absent feed is not a fault — the planner then plans on the agent's
+      # readings, guarded by the same-day rule instead.
+      - name: Read the league fixture feed
+        id: fixtures
+        if: vars.ENABLE_CALENDAR_WRITES == 'true'
+        run: |
+          mkdir -p .tmp
+          if git fetch --depth=1 origin telemetry 2>/dev/null; then
+            git show origin/telemetry:fixtures.jsonl > .tmp/fixtures.jsonl 2>/dev/null || true
+          fi
+          if [ -s .tmp/fixtures.jsonl ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "Fixture rows on the telemetry branch: $(wc -l < .tmp/fixtures.jsonl)"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No fixture feed on the telemetry branch yet, so tip times are the agent's own readings this run."
+          fi
+
       - name: Plan the calendar writes (no API calls)
         id: plan
         if: >-
@@ -987,6 +1009,7 @@ jobs:
           # Via `env`, not interpolated into the shell — GitHub's script-injection
           # guidance, and what keeps this step replayable.
           VERDICTS_READY: ${{ steps.verdicts.outputs.ready }}
+          FIXTURES_READY: ${{ steps.fixtures.outputs.ready }}
         run: |
           # Resolve the clock once and pass the same value through the planner
           # and summary. The planner refuses starts at/before this instant and
@@ -1000,6 +1023,9 @@ jobs:
                  --now "$RUN_NOW" --window-days 10 --json
           if [ "$VERDICTS_READY" = "true" ]; then
             set -- "$@" --verdicts .tmp/audit.jsonl
+          fi
+          if [ "$FIXTURES_READY" = "true" ]; then
+            set -- "$@" --fixtures .tmp/fixtures.jsonl
           fi
           python3 scripts/upsert_events.py "$@" > .tmp/plan.json
           python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"

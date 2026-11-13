@@ -289,3 +289,22 @@ Dyn splits the same way Magenta does, and — like the BCL — the free decision
 If a stream is found from multiple sources (e.g., both Sportschau and MagentaSport cover the same game):
 - Create ONE calendar event with BOTH stream links in the description
 - Check for calendar duplicates before creating
+
+**Tip times are pinned to the fixture feed, not the agent's reading.** The
+agent reads tip times off announcement pages and drifts (2026-11-13: 13:50
+against a 15:00 game, 70 minutes past the match window), so a candidate that
+unambiguously names a fixture's game — same pairing, compatible league, same
+UTC date, exactly one fixture — takes the fixture's start before planning,
+matching and event creation. The plan row says so (`tip anchored to fixture …`),
+which is what the `fixtureAnchored` check grades: an unambiguous candidate that
+keeps the agent's drifted time, or a snap that still duplicates, is a FAIL.
+Ambiguity pins nothing: zero fixtures (DBB games have no feed source) or two
+leaves the agent's own time standing.
+
+**Same-day backstop for settled games.** Past the 30-minute window but same
+pairing, same competition, same date against a `VERIFIED` (or `WRONG`) event is
+a drifted re-reading, not a second game — basketball has no same-day
+double-headers — so the planner skips and names the collision instead of
+creating a visible duplicate. `UNVERIFIED` entries are exempt: blocking their
+promotion path would trade a possible duplicate for a certain dropped
+confirmation.

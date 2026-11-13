@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Tip times are pinned to the fixture feed, with a same-day backstop.**
+  The 2026-11-13 dry run caught the agent reading 13:50 for a 15:00 game —
+  70 minutes past the match window — and planning a duplicate next to the
+  VERIFIED event. `plan_upsert --fixtures` now snaps an unambiguous candidate
+  (same pairing, compatible league, same UTC date, exactly one fixture) to
+  the feed's start before eligibility, matching and event creation, and says so
+  in the plan row; a same-pair same-league same-date collision against a
+  settled event skips instead of creating (covers feed-less DBB games, exempts
+  `UNVERIFIED` promotions). New eval case 54 (`fixtureAnchored`).
+
 - **Search asks for games that exist, and learns the ones it missed.**
   `scripts/queries.py` merges per-fixture queries (`ALBA Berlin Bayern live
   kostenlos`) into the Phase 0 run (`run_daily.py --fixtures`, capped so a
