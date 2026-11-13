@@ -11,7 +11,10 @@
     "Serie A basket live stream",
     "FIBA Basketball live",
     "EuroLeague Basketball live",
-    "Basketball Champions League live"
+    "Basketball Champions League live",
+    "PGE Basket Liga live",
+    "ORLEN Basket Liga live",
+    "Polska Liga Koszykówki transmisja na żywo"
   ],
   "channels": [
     {
@@ -41,6 +44,10 @@
     {
       "handle": "legabasket",
       "channel_id": "UCKuhExlRMWgfcaD__HtN1yw"
+    },
+    {
+      "handle": "basketliga",
+      "channel_id": "UCT3PGkIHb_jd6Nr8dmQGUMQ"
     }
   ]
 }
