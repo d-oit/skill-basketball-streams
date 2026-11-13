@@ -30,12 +30,15 @@ from scripts.upsert_events import (
     ACTION_UPDATE,
     MATCH_WINDOW,
     STATE_WRONG,
+    _load_fixtures,
     _team_matches,
+    anchor_to_fixtures,
     events_match,
     game_key,
     load_verdicts,
     parse_dt,
     plan_upsert,
+    same_day_collision,
     summarise,
     verdict_wrong,
 )
@@ -882,6 +885,171 @@ class TestCli:
         assert "--now" in result.stderr
 
 
+class TestFixtureAnchor:
+    """Tip times are pinned to the fixture feed before planning.
+
+    The 2026-11-13 dry run: the agent read 13:50 off an announcement page for
+    a 15:00 game — 70 minutes past the match window — so dedupe missed the
+    VERIFIED event already holding it and planned a duplicate create.
+    """
+
+    def _fixture(self, **overrides) -> dict:
+        row = {
+            "league": "BBL",
+            "teams": ["ALBA Berlin", "FC Bayern Muenchen"],
+            "start": "2026-09-16T19:00:00+02:00",
+            "game_key": "BBL|ALBA Berlin|FC Bayern Muenchen|2026-09-16T17:00Z",
+            "source": "bbl",
+        }
+        row.update(overrides)
+        return row
+
+    def test_a_drifted_reading_meets_the_event_it_names(self):
+        stored = _existing(state="VERIFIED")
+        drifted = _candidate(start="2026-09-16T17:50:00+02:00")
+        # Without the feed the backstop still holds: a same-day skip, not a
+        # duplicate — but it cannot name the authoritative tip.
+        bare = plan_upsert([stored], [drifted])
+        assert bare[0]["action"] == ACTION_SKIP
+        assert "same-day pairing already on the calendar" in bare[0]["reason"]
+        plan = plan_upsert([stored], [drifted], fixtures=[self._fixture()])
+        assert plan[0]["action"] == ACTION_SKIP
+        assert "verified event exists" in plan[0]["reason"]
+        assert "anchored to fixture" in plan[0]["reason"]
+
+    def test_an_anchored_create_carries_the_fixture_time(self):
+        drifted = _candidate(start="2026-09-16T17:50:00+02:00")
+        plan = plan_upsert([], [drifted], fixtures=[self._fixture()])
+        assert plan[0]["action"] == ACTION_CREATE
+        assert plan[0]["game_key"].endswith("2026-09-16T17:00Z")
+        assert plan[0]["start"] == "2026-09-16T19:00:00+02:00"
+
+    def test_the_anchor_is_unambiguous_only(self):
+        # Two fixtures name the same pairing on the same day: a double-header
+        # the planner must not guess between, so the agent's reading stands.
+        drifted = _candidate(start="2026-09-16T17:50:00+02:00")
+        pair = [
+            self._fixture(start="2026-09-16T19:00:00+02:00"),
+            self._fixture(start="2026-09-16T21:00:00+02:00"),
+        ]
+        anchored, notes = anchor_to_fixtures([drifted], pair)
+        assert anchored[0]["start"] == "2026-09-16T17:50:00+02:00"
+        assert notes == {}
+
+    def test_no_fixture_coverage_keeps_the_agents_reading(self):
+        drifted = _candidate(start="2026-09-16T17:50:00+02:00")
+        other = self._fixture(teams=["Bonn", "Ulm"])
+        anchored, notes = anchor_to_fixtures([drifted], [other])
+        assert anchored[0]["start"] == "2026-09-16T17:50:00+02:00"
+        assert notes == {}
+
+    def test_a_supplied_end_shifts_by_the_same_delta(self):
+        drifted = _candidate(
+            start="2026-09-16T17:50:00+02:00", end="2026-09-16T19:50:00+02:00"
+        )
+        anchored, _ = anchor_to_fixtures([drifted], [self._fixture()])
+        assert anchored[0]["end"] == "2026-09-16T21:00:00+02:00"
+
+    def test_the_anchor_never_mutates_the_callers_list(self):
+        drifted = _candidate(start="2026-09-16T17:50:00+02:00")
+        anchor_to_fixtures([drifted], [self._fixture()])
+        assert drifted["start"] == "2026-09-16T17:50:00+02:00"
+
+    def test_fixture_loader_reads_jsonl_arrays_and_wrappers(self, tmp_path):
+        rows = [self._fixture(), self._fixture(league="EuroLeague")]
+        as_jsonl = tmp_path / "a.jsonl"
+        as_jsonl.write_text("\n".join(json.dumps(row) for row in rows) + "\n")
+        assert _load_fixtures(as_jsonl) == rows
+        as_array = tmp_path / "b.json"
+        as_array.write_text(json.dumps(rows))
+        assert _load_fixtures(as_array) == rows
+        as_wrapped = tmp_path / "c.json"
+        as_wrapped.write_text(json.dumps({"fixtures": rows}))
+        assert _load_fixtures(as_wrapped) == rows
+
+    def test_fixture_loader_refuses_garbage(self, tmp_path, capsys):
+        bad = tmp_path / "bad.jsonl"
+        bad.write_text('{"league": "BBL"\nnot json\n')
+        with pytest.raises(SystemExit) as exc:
+            _load_fixtures(bad)
+        assert exc.value.code == 2
+
+
+class TestSameDayGuard:
+    """The backstop for games the fixture feed does not cover.
+
+    DBB national-team games have no feed source, so the anchor cannot fire for
+    them. The 2026-11-13 shape: stored VERIFIED at 14:00Z, candidate at 12:50Z
+    — same pairing, compatible league, same date, 70 minutes apart.
+    """
+
+    def _dbb_stored(self, **overrides) -> dict:
+        row = {
+            "event_id": "evt-dbb",
+            "league": "FIBA Women's EuroBasket 2027 Qualifiers",
+            "teams": ["Deutschland", "Dänemark"],
+            "start": "2026-11-14T14:00:00Z",
+            "state": "VERIFIED",
+            "summary": "FIBA Women's EuroBasket 2027 Qualifiers: Dänemark vs Deutschland",
+        }
+        row.update(overrides)
+        return row
+
+    def _dbb_candidate(self, **overrides) -> dict:
+        row = _candidate(
+            league="FIBA",
+            teams=["Dänemark", "Deutschland"],
+            start="2026-11-14T12:50:00Z",
+            state="VERIFIED",
+            summary="FIBA: Dänemark vs Deutschland",
+        )
+        row.update(overrides)
+        return row
+
+    def test_a_drifted_rereading_does_not_duplicate_a_verified_game(self):
+        plan = plan_upsert([self._dbb_stored()], [self._dbb_candidate()])
+        assert plan[0]["action"] == ACTION_SKIP
+        assert "same-day pairing already on the calendar" in plan[0]["reason"]
+        assert same_day_collision([self._dbb_stored()], self._dbb_candidate())
+
+    def test_a_genuinely_different_game_still_creates(self):
+        other = self._dbb_candidate(teams=["Portugal", "Deutschland"])
+        plan = plan_upsert([self._dbb_stored()], [other])
+        assert plan[0]["action"] == ACTION_CREATE
+
+    def test_a_single_shared_club_is_not_a_pairing(self):
+        # Same-day double-headers share one club; both clubs must match.
+        other = self._dbb_candidate(teams=["Dänemark", "Portugal"])
+        plan = plan_upsert([self._dbb_stored()], [other])
+        assert plan[0]["action"] == ACTION_CREATE
+
+    def test_an_unverified_entry_keeps_its_promotion_path(self):
+        # Blocking UNVERIFIED collisions would trade a possible duplicate for
+        # a certain dropped confirmation, so the guard leaves them alone.
+        plan = plan_upsert(
+            [self._dbb_stored(state="UNVERIFIED")], [self._dbb_candidate()]
+        )
+        assert plan[0]["action"] == ACTION_CREATE
+
+    def test_a_teamless_stored_entry_must_name_the_clubs(self):
+        naming = _teams_less(
+            start="2026-09-16T19:00:00+02:00",
+            summary="ALBA BERLIN vs. NINERS Chemnitz",
+        )
+        same_day = _candidate(
+            start="2026-09-16T17:50:00+02:00",
+            teams=["ALBA Berlin", "NINERS Chemnitz"],
+            summary="BBL: ALBA Berlin vs NINERS Chemnitz",
+        )
+        assert same_day_collision([naming], same_day)
+        stranger = _candidate(
+            start="2026-09-16T17:50:00+02:00",
+            teams=["Bonn", "Ulm"],
+            summary="Bonn vs Ulm",
+        )
+        assert same_day_collision([naming], stranger) is None
+
+
 def test_runtime_workflow_passes_its_resolved_clock_to_the_calendar_gate():
     workflow = (REPO_ROOT / ".github" / "workflows" / "runtime-daily.yml").read_text(
         encoding="utf-8"
@@ -890,3 +1058,14 @@ def test_runtime_workflow_passes_its_resolved_clock_to_the_calendar_gate():
     plan_step = plan_step.split("- name: Apply the plan", 1)[0]
     assert 'RUN_NOW="$(date -u +' in plan_step
     assert '--now "$RUN_NOW" --window-days 10' in plan_step
+
+
+def test_runtime_workflow_pins_tip_times_to_the_fixture_feed():
+    workflow = (REPO_ROOT / ".github" / "workflows" / "runtime-daily.yml").read_text(
+        encoding="utf-8"
+    )
+    assert "- name: Read the league fixture feed" in workflow
+    plan_step = workflow.split("- name: Plan the calendar writes (no API calls)", 1)[1]
+    plan_step = plan_step.split("- name: Apply the plan", 1)[0]
+    assert '"$FIXTURES_READY" = "true"' in plan_step
+    assert '"$@" --fixtures .tmp/fixtures.jsonl' in plan_step

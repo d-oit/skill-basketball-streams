@@ -245,35 +245,197 @@ def events_match(existing: dict, candidate: dict) -> bool:
 
     existing_teams = _teams_of(existing)
     candidate_teams = _teams_of(candidate)
-    if existing_teams and candidate_teams:
-        # *Both* teams must match: two different games can share one team name on
-        # a double-header day, so a single overlap is not enough.
-        if not all(
-            any(_team_matches(team, other) for other in candidate_teams)
-            for team in existing_teams
-        ):
-            return False
-        if not all(
-            any(_team_matches(other, team) for other in existing_teams)
-            for team in candidate_teams
-        ):
-            return False
-    elif candidate_teams:
-        # The stored entry records no teams of its own. Do not treat that as
-        # "matches anything": require it to name the candidate's clubs. A
-        # candidate with no teams is left alone here — it has nothing to be
-        # checked against, and `extract_candidates.py` refuses such a candidate
-        # before it can reach the planner.
-        if not text_names_all(_event_text(existing), candidate_teams):
-            return False
-
-    league = str(candidate.get("league") or "").lower()
-    existing_league = str(existing.get("league") or "").lower()
-    if league and existing_league and league not in existing_league and (
-        existing_league not in league
+    # The pairing rule lives in `_pairing_matches` (shared with the fixture
+    # anchor and the same-day guard below): one implementation, or the three
+    # disagree about which clubs name the same game. A candidate with no teams
+    # is left alone here — it has nothing to be checked against, and
+    # `extract_candidates.py` refuses such a candidate before it can reach
+    # the planner.
+    if candidate_teams and not _pairing_matches(
+        existing_teams, candidate_teams, _event_text(existing)
     ):
         return False
+
+    if not _leagues_compatible(candidate.get("league"), existing.get("league")):
+        return False
     return True
+
+
+def _leagues_compatible(candidate_league: object, other_league: object) -> bool:
+    """Can two league labels name the same competition?
+
+    The substring rule `events_match` has always enforced, factored out so the
+    fixture anchor and the same-day guard below agree with the matcher: "FIBA"
+    and "FIBA Women's EuroBasket 2027 Qualifiers" are the same competition
+    spelled at different lengths, while "BBL" and "EuroLeague" never are. An
+    empty label on either side constrains nothing.
+    """
+    league = str(candidate_league or "").lower()
+    other = str(other_league or "").lower()
+    if league and other and league not in other and other not in league:
+        return False
+    return True
+
+
+def _pairing_matches(
+    existing_teams: list[str], candidate_teams: list[str], existing_text: str = ""
+) -> bool:
+    """Do both sides name the same pairing — the teams half of `events_match`.
+
+    *Both* teams must match: two different games can share one team name on a
+    double-header day, so a single overlap is not enough. When the stored side
+    records no teams of its own, that is not "matches anything": it must name
+    the candidate's clubs in its own text.
+    """
+    if existing_teams and candidate_teams:
+        return all(
+            any(_team_matches(team, other) for other in candidate_teams)
+            for team in existing_teams
+        ) and all(
+            any(_team_matches(mate, team) for team in existing_teams)
+            for mate in candidate_teams
+        )
+    if candidate_teams:
+        return text_names_all(existing_text, candidate_teams)
+    return False
+
+
+def _fixture_for(candidate: dict, fixtures: list[dict]) -> dict | None:
+    """The single fixture naming this candidate's game, or None.
+
+    Unambiguous-only: zero matches means no fixture coverage (DBB national-team
+    games, for example — the feed carries BBL, EuroLeague and BCL), and two or
+    more means a same-day double-header the planner must not guess between.
+    Either way the candidate keeps the agent's own reading.
+    """
+    candidate_teams = _teams_of(candidate)
+    right = parse_dt(candidate.get("start") or candidate.get("startTime"))
+    if not candidate_teams or right is None:
+        return None
+    day = right.astimezone(timezone.utc).date()
+    hits = []
+    for fixture in fixtures:
+        if not isinstance(fixture, dict):
+            continue
+        fixture_teams = fixture.get("teams")
+        if isinstance(fixture_teams, str):
+            fixture_teams = [
+                part.strip()
+                for part in fixture_teams.split(" vs ")
+                if part.strip()
+            ]
+        fixture_teams = [
+            str(team).strip() for team in (fixture_teams or []) if str(team).strip()
+        ]
+        if not _pairing_matches(fixture_teams, candidate_teams):
+            continue
+        if not _leagues_compatible(candidate.get("league"), fixture.get("league")):
+            continue
+        start = parse_dt(fixture.get("start") or fixture.get("startTime"))
+        if start is None:
+            continue
+        if start.astimezone(timezone.utc).date() != day:
+            continue
+        hits.append(fixture)
+    if len(hits) != 1:
+        return None
+    return hits[0]
+
+
+def anchor_to_fixtures(
+    candidates: list[dict], fixtures: list[dict]
+) -> tuple[list[dict], dict[int, str]]:
+    """Pin candidate tip times to the fixture feed before planning.
+
+    The agent reads tip times off announcement pages and drifts — 2026-11-13:
+    13:50 against a 15:00 game, 70 minutes past the match window, so dedupe
+    missed the VERIFIED event already holding it and planned a duplicate. The
+    league feed (ICS/schedule) is authoritative for *when* a game is, so a
+    candidate that unambiguously names a fixture's game takes the fixture's
+    start; the snap covers planning, matching and the created event together,
+    because every reader (`eligibility_reason`, `game_key`, `_event_fields`)
+    takes `start` from the candidate.
+
+    Returns the anchored candidates plus notes keyed by `id()` of each snapped
+    copy, so the planner can say *why* a time differs from the agent's reading.
+    Copies, never mutates: the caller's list still holds the agent's own
+    readings. A candidate end the agent supplied shifts by the same delta, so a
+    two-hour broadcast stays two hours; a missing end stays missing.
+    """
+    anchored: list[dict] = []
+    notes: dict[int, str] = {}
+    if not fixtures:
+        return list(candidates), notes
+    for candidate in candidates:
+        if not isinstance(candidate, dict):
+            anchored.append(candidate)
+            continue
+        fixture = _fixture_for(candidate, fixtures)
+        agent_start = parse_dt(candidate.get("start") or candidate.get("startTime"))
+        fixture_start = (
+            parse_dt(fixture.get("start") or fixture.get("startTime"))
+            if fixture is not None
+            else None
+        )
+        if fixture is None or agent_start is None or fixture_start is None:
+            anchored.append(candidate)
+            continue
+        if agent_start == fixture_start:
+            anchored.append(candidate)
+            continue
+        snapped = dict(candidate)
+        fixture_text = str(fixture.get("start") or fixture.get("startTime") or "")
+        snapped["start"] = fixture_text
+        agent_end = parse_dt(candidate.get("end") or candidate.get("endTime"))
+        if agent_end is not None and ("end" in snapped or "endTime" in snapped):
+            key = "end" if snapped.get("end") else "endTime"
+            snapped[key] = (agent_end + (fixture_start - agent_start)).isoformat()
+        anchored.append(snapped)
+        notes[id(snapped)] = (
+            f"tip anchored to fixture {fixture_text} "
+            f"(agent read {candidate.get('start') or candidate.get('startTime')})"
+        )
+    return anchored, notes
+
+
+def same_day_collision(existing_events: list[dict], candidate: dict) -> dict | None:
+    """A settled event for the same pairing, league and date outside the window.
+
+    The backstop for games the fixture feed does not cover: without a fixture
+    row the anchor cannot fire, and the old path planned a `create` next to the
+    VERIFIED event already holding the game — a visible duplicate on a public
+    calendar. A same-pair, same-competition, same-date event is the same game
+    all but certainly (basketball has no same-day double-headers), so the
+    planner skips and names the collision instead of creating.
+
+    Only VERIFIED and WRONG entries guard, checked by the caller: an
+    UNVERIFIED entry is still being worked and a later run may promote it, so
+    blocking that path would trade a possible duplicate for a certain dropped
+    confirmation.
+    """
+    candidate_teams = _teams_of(candidate)
+    right = parse_dt(candidate.get("start") or candidate.get("startTime"))
+    if not candidate_teams or right is None:
+        return None
+    day = right.astimezone(timezone.utc).date()
+    for event in existing_events:
+        if not isinstance(event, dict):
+            continue
+        if events_match(event, candidate):
+            continue
+        left = parse_dt(event.get("start") or event.get("startTime"))
+        if left is None:
+            continue
+        if left.astimezone(timezone.utc).date() != day:
+            continue
+        if not _leagues_compatible(candidate.get("league"), event.get("league")):
+            continue
+        if not _pairing_matches(
+            _teams_of(event), candidate_teams, _event_text(event)
+        ):
+            continue
+        return event
+    return None
 
 
 def load_verdicts(path: Path) -> dict[str, dict]:
@@ -423,6 +585,7 @@ def plan_upsert(
     *,
     now: datetime | None = None,
     window_days: int = 10,
+    fixtures: list[dict] | None = None,
 ) -> list[dict]:
     """Reconcile candidates against existing events. Returns one plan row each.
 
@@ -432,6 +595,14 @@ def plan_upsert(
     computes but nothing applies.
     """
     verdicts = verdicts or {}
+    # The fixture feed is authoritative for tip times: snap the agent's
+    # readings to it before eligibility, matching and event creation, so a
+    # drifted re-reading meets the event it names instead of duplicating it.
+    candidates, anchor_notes = anchor_to_fixtures(candidates, fixtures or [])
+
+    def _anchored_note(row_candidate: dict) -> str:
+        note = anchor_notes.get(id(row_candidate), "")
+        return f" ({note})" if note else ""
     plan: list[dict] = []
     for candidate in candidates:
         if not isinstance(candidate, dict):
@@ -475,10 +646,33 @@ def plan_upsert(
                 break
 
         if match is None:
+            collision = same_day_collision(existing_events, candidate)
+            if collision is not None and normalise_state(
+                collision.get("state"), default=STATE_UNVERIFIED
+            ) in (STATE_VERIFIED, STATE_WRONG):
+                plan.append(
+                    {
+                        "action": ACTION_SKIP,
+                        "reason": (
+                            "same-day pairing already on the calendar "
+                            f"({collision.get('start') or collision.get('startTime') or '?'}, "
+                            f"{collision.get('event_id') or collision.get('id') or 'no id'}) "
+                            "— a drifted re-reading, not a second game"
+                            + _anchored_note(candidate)
+                        ),
+                        "game_key": key,
+                        "event_id": "",
+                        "state": new_state,
+                        "title": "",
+                        "color_id": "",
+                    }
+                )
+                continue
             plan.append(
                 {
                     "action": ACTION_CREATE,
-                    "reason": "no existing event for this slot",
+                    "reason": "no existing event for this slot"
+                    + _anchored_note(candidate),
                     "game_key": key,
                     "event_id": "",
                     "state": new_state,
@@ -527,7 +721,8 @@ def plan_upsert(
             plan.append(
                 {
                     "action": ACTION_SKIP,
-                    "reason": "verified event exists — never modified",
+                    "reason": "verified event exists — never modified"
+                    + _anchored_note(candidate),
                     "game_key": key,
                     "event_id": event_id,
                     "state": existing_state,
@@ -641,6 +836,51 @@ def _event_fields(candidate: dict, league: str) -> dict:
     return fields
 
 
+def _load_fixtures(path: Path) -> list:
+    """Read the league fixture feed: a JSON array, a `{"fixtures": [...]}`
+    document, or JSONL with one fixture object per line (what `fixtures.py`
+    writes). A malformed file is a caller bug and fails loudly — silently
+    planning without the anchor would re-introduce the drifted duplicates.
+    """
+    try:
+        text = path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        print(f"FAIL: upsert_events: {path}: file not found", file=sys.stderr)
+        sys.exit(2)
+    except OSError as exc:
+        print(f"FAIL: upsert_events: {path}: unreadable ({exc})", file=sys.stderr)
+        sys.exit(2)
+    rows: list = []
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError:
+        payload = None
+    if isinstance(payload, list):
+        rows = payload
+    elif isinstance(payload, dict) and isinstance(payload.get("fixtures"), list):
+        rows = payload["fixtures"]
+    elif payload is None:
+        for number, line in enumerate(text.splitlines(), start=1):
+            if not line.strip():
+                continue
+            try:
+                rows.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                print(
+                    f"FAIL: upsert_events: {path}:{number}: invalid JSON ({exc})",
+                    file=sys.stderr,
+                )
+                sys.exit(2)
+    else:
+        print(
+            f"FAIL: upsert_events: {path}: expected a list, a "
+            f'{{"fixtures": [...]}} document, or JSONL',
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    return rows
+
+
 def summarise(plan: list[dict]) -> dict:
     # All four actions are seeded at zero, so a reader can always tell "no
     # unchanged events this run" from "this plan does not speak about unchanged
@@ -707,6 +947,14 @@ def main() -> None:
         help="required current ISO-8601 datetime used to enforce the upcoming-game window",
     )
     parser.add_argument(
+        "--fixtures",
+        help=(
+            "league fixture feed JSONL (scripts/fixtures.py output): candidate "
+            "tip times are pinned to it before planning, so a drifted "
+            "re-reading meets the event it names instead of duplicating it"
+        ),
+    )
+    parser.add_argument(
         "--window-days",
         type=int,
         default=get_window_days(),
@@ -723,6 +971,7 @@ def main() -> None:
 
     existing = _load(Path(args.existing), "events")
     candidates = _load(Path(args.candidates), "candidates")
+    fixtures = _load_fixtures(Path(args.fixtures)) if args.fixtures else []
     # Only when asked for: an absent ledger is not an error, it is a repository
     # whose audit has not run yet, and defaulting to "no verdicts" would be a
     # silent way to lose the one input that enforces the hard requirement.
@@ -733,6 +982,7 @@ def main() -> None:
         verdicts,
         now=now,
         window_days=args.window_days,
+        fixtures=fixtures,
     )
     counts = summarise(plan)
 

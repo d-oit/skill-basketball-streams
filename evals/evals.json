@@ -727,6 +727,18 @@
         "references/self-learning.md",
         "scripts/queries.py"
       ]
+    },
+    {
+      "id": 54,
+      "prompt": "A VERIFIED event holds Daenemark - Deutschland, 2026-11-14T15:00:00+01:00 (FIBA Women's EuroBasket 2027 Qualifiers). The agent re-reads the game at 13:50 from an announcement page and proposes league FIBA, start 2026-11-14T13:50:00+01:00. The BBL/EuroLeague/BCL fixture feed has no DBB row. What does the planner do?",
+      "expected_output": "Decision=SKIP; reason=same pairing, compatible league and same UTC date 70 minutes past the match window against a VERIFIED event is a drifted re-reading, not a second game, so no duplicate is created; checks: fixtureAnchored=PASS",
+      "assertions": [
+        "fixtureAnchored expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "scripts/upsert_events.py"
+      ]
     }
   ]
 }
