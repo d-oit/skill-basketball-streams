@@ -30,6 +30,7 @@ from scripts.upsert_events import (
     ACTION_UPDATE,
     MATCH_WINDOW,
     STATE_WRONG,
+    _leagues_compatible,
     _load_fixtures,
     _team_matches,
     anchor_to_fixtures,
@@ -223,6 +224,69 @@ class TestEventsMatch:
             _existing(game_key="a"),
             _candidate(game_key="b", teams=["ALBA Berlin", "Bonn"]),
         )
+
+
+class TestLeagueWordOrder:
+    """The 2026-11-13 dry-run defect: the same competition in a different word
+    order ("Qualifiers 2027" vs "2027 Qualifiers") read as two competitions,
+    so neither the matcher nor the same-day guard fired and the planner
+    planned a duplicate. League comparison is token-subset, not substring.
+    """
+
+    @pytest.mark.parametrize(
+        ("stored", "read"),
+        [
+            (
+                "FIBA Women's EuroBasket 2027 Qualifiers",
+                "FIBA Women's EuroBasket Qualifiers 2027",
+            ),
+            ("BBL", "BBL Pokal"),
+            ("FIBA", "FIBA Women's EuroBasket 2027 Qualifiers"),
+        ],
+    )
+    def test_reordered_or_shortened_labels_still_name_the_same_competition(
+        self, stored, read
+    ):
+        assert _leagues_compatible(read, stored)
+        assert _leagues_compatible(stored, read)
+
+    def test_disjoint_labels_never_match(self):
+        assert not _leagues_compatible("BBL", "EuroLeague")
+        assert not _leagues_compatible("EuroLeague", "EuroCup")
+
+    def test_an_empty_label_constrains_nothing(self):
+        assert _leagues_compatible("", "BBL")
+        assert _leagues_compatible("BBL", "")
+
+    def test_the_drifted_re_reading_matches_the_stored_event(self):
+        """The exact 2026-11-13 shape: same pairing, same tip, league words
+        reordered — the matcher must see one game, not two."""
+        stored = _existing(
+            league="FIBA Women's EuroBasket 2027 Qualifiers",
+            teams=["Deutschland", "Dänemark"],
+            start="2026-11-14T15:00:00+01:00",
+        )
+        reread = _candidate(
+            league="FIBA Women's EuroBasket Qualifiers 2027",
+            teams=["Deutschland", "Dänemark"],
+            start="2026-11-14T15:00:00+01:00",
+        )
+        assert events_match(stored, reread)
+
+    def test_the_same_day_guard_fires_across_word_order(self):
+        """The guard shares `_leagues_compatible`, so the drifted re-reading
+        at a drifted time is a skip, not a create."""
+        stored = _existing(
+            league="FIBA Women's EuroBasket 2027 Qualifiers",
+            teams=["Deutschland", "Dänemark"],
+            start="2026-11-14T15:00:00+01:00",
+        )
+        drifted = _candidate(
+            league="FIBA Women's EuroBasket Qualifiers 2027",
+            teams=["Deutschland", "Dänemark"],
+            start="2026-11-14T13:50:00+01:00",
+        )
+        assert same_day_collision([stored], drifted) is stored
 
 
 class TestATeamslessEventIsNotAWildcard:

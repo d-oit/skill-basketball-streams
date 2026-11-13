@@ -1144,6 +1144,61 @@ def fetch(url: str) -> FetchResult:
         )
 
 
+# A fixture fetch is a **retryable GET**: a 5xx, a transport fault, or a 429
+# that is a throttle proves the request was not served, so repeating it cannot
+# invent a fixture. A 429 carrying a bot-challenge marker (`x-vercel-mitigated`
+# / `cf-mitigated` — the EuroLeague case, measured 2026-09-30 and again
+# 2026-11-13) is a refusal a retry will not beat, and neither are 401/403/451
+# or a 404/410: retrying those only spends the run's time on the same refusal.
+# Mirrors `run_daily._open_with_retry` (honour `Retry-After`, bounded attempts).
+MAX_FETCH_RETRIES = 2
+FETCH_RETRY_BASE_SECONDS = 0.5
+
+
+def _fetch_retryable(result: FetchResult) -> bool:
+    """Is another attempt worth it, or is this a refusal to respect?"""
+    if result.status in ("server_error", "unreachable"):
+        return True
+    if result.status == "blocked" and result.code == 429:
+        challenge = result.headers.get("x-vercel-mitigated") or result.headers.get(
+            "cf-mitigated"
+        )
+        return not challenge
+    return False
+
+
+def _retry_delay(result: FetchResult, attempt: int) -> float:
+    """The server's `Retry-After` hint when it is a number, else backoff."""
+    try:
+        value = str(result.headers.get("retry-after") or "").strip()
+        if value:
+            return max(0.0, float(value))
+    except (TypeError, ValueError):
+        pass
+    return FETCH_RETRY_BASE_SECONDS * (2**attempt)
+
+
+def fetch_with_retry(url: str) -> tuple[FetchResult, list[FetchResult]]:
+    """`fetch` with bounded retries for transient failures.
+
+    Returns the final result plus every attempt, oldest first, so the caller
+    can ledger each attempt: a retried fetch that still fails must leave the
+    same evidence a single attempt would, not a silence. A plain `str` from a
+    monkeypatched `fetch` reads as a success, exactly as in `main`.
+    """
+    attempts: list[FetchResult] = []
+    for attempt in range(MAX_FETCH_RETRIES + 1):
+        result = fetch(url)
+        if not isinstance(result, FetchResult):
+            result = FetchResult(str(result), "ok")
+        attempts.append(result)
+        if result.status == "ok" or not _fetch_retryable(result):
+            break
+        if attempt < MAX_FETCH_RETRIES:
+            time.sleep(_retry_delay(result, attempt))
+    return attempts[-1], attempts
+
+
 def in_window(fixture: dict, *, now: datetime, days: int) -> bool:
     start = parse_dt(fixture.get("start"))
     if start is None:
@@ -1329,15 +1384,17 @@ def main() -> None:
             )
         for name in sources:
             config = DEFAULT_SOURCES[name]
-            result = fetch(config["url"])
+            result, attempts = fetch_with_retry(config["url"])
             if ledger_path is not None:
-                append_fetch_row(
-                    ledger_path,
-                    source=name,
-                    url=config["url"],
-                    result=result,
-                    run_id=default_run_id(),
-                )
+                run_id = default_run_id()
+                for attempt_result in attempts:
+                    append_fetch_row(
+                        ledger_path,
+                        source=name,
+                        url=config["url"],
+                        result=attempt_result,
+                        run_id=run_id,
+                    )
             if not isinstance(result, FetchResult):
                 result = FetchResult(str(result), "ok")
             pages.append((name, result, config["url"],

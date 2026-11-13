@@ -261,18 +261,27 @@ def events_match(existing: dict, candidate: dict) -> bool:
     return True
 
 
+def _league_tokens(label: object) -> frozenset:
+    """The alphanumeric tokens of a league label, lowercased."""
+    return frozenset(re.findall(r"[a-z0-9]+", str(label or "").lower()))
+
+
 def _leagues_compatible(candidate_league: object, other_league: object) -> bool:
     """Can two league labels name the same competition?
 
-    The substring rule `events_match` has always enforced, factored out so the
-    fixture anchor and the same-day guard below agree with the matcher: "FIBA"
-    and "FIBA Women's EuroBasket 2027 Qualifiers" are the same competition
-    spelled at different lengths, while "BBL" and "EuroLeague" never are. An
-    empty label on either side constrains nothing.
+    Token-subset, not substring: the 2026-11-13 dry run stored "FIBA Women's
+    EuroBasket 2027 Qualifiers" while the agent re-read "FIBA Women's
+    EuroBasket Qualifiers 2027" — same tokens in a different order, which the
+    old substring rule read as two competitions and let a duplicate through.
+    A shorter label naming a longer one ("FIBA" vs the full qualifier name,
+    "BBL" vs "BBL Pokal") still matches, while disjoint labels ("BBL" vs
+    "EuroLeague") never do. An empty label on either side constrains
+    nothing. Shared with the fixture anchor and the same-day guard below, so
+    the three agree about which labels name the same competition.
     """
-    league = str(candidate_league or "").lower()
-    other = str(other_league or "").lower()
-    if league and other and league not in other and other not in league:
+    league = _league_tokens(candidate_league)
+    other = _league_tokens(other_league)
+    if league and other and not (league <= other or other <= league):
         return False
     return True
 
