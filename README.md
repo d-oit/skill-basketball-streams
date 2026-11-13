@@ -215,10 +215,11 @@ references/
 - Dyn Sport Mix (Joyn, Pluto TV, Zattoo free tier only)
 - MagentaSport / MagentaTV (one free EuroLeague game per matchday; `magenta.tv` needs a browser-rendering backend)
 - **Basketball Champions League** — `championsleague.basketball`, **selected games only**, validated per game with `@BasketballCL` and the BCL Facebook page
+- **PGE Basket Liga (Poland)** — official `@basketliga` YouTube channel; usually four games per round are free, with exact fixtures selected by the league
 - Sportschau / ARD, ZDF
 - Regional: MDR, BR24, RBB24
 - Official BBL club websites (ALBA Berlin, FC Bayern München, ratiopharm ulm, …)
-- Official YouTube channels (`@fiba`, `@EuroLeague`, `@basketballbundesliga`, `@BasketballCL`, `user/TheDBBTV` accepted; `@FIBAWorld`, generic `/channel/UC…`, and most `/user/…` URLs rejected)
+- Official YouTube channels (`@fiba`, `@EuroLeague`, `@basketballbundesliga`, `@BasketballCL`, `@ENBLeague`, `@legabasket`, `@basketliga`, `user/TheDBBTV` accepted; `@FIBAWorld`, generic `/channel/UC…`, and most `/user/…` URLs rejected). PGE Basket Liga (`@basketliga`) is selected-games only: usually four games per round are free on YouTube; verify each fixture.
 
 Social accounts (`@BasketballCL`, `@MagentaSport`, `@EuroLeague`, `@easyCreditBBL`) are **validation evidence for free access only** — never a stored stream link.
 
