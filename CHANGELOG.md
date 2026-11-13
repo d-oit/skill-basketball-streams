@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **League labels match on tokens, not word order.** The 2026-11-13 dry run
+  stored "FIBA Women's EuroBasket 2027 Qualifiers" while the agent re-read
+  "FIBA Women's EuroBasket Qualifiers 2027" — same tokens, different order —
+  and the old substring rule read two competitions, so neither the matcher
+  nor the same-day guard fired. `_leagues_compatible` is now a token-subset
+  check (empty label still constrains nothing; disjoint labels still never
+  match). New eval case 55 (`leagueWordOrder`).
+- **Fixture fetches retry transient failures.** The same 2026-11-13 run
+  fetched zero fixtures (EuroLeague 429) and one attempt per source meant a
+  single throttle killed the tip anchor and the fixture-driven second search
+  pass for the whole run. `fetch_with_retry` retries 5xx, transport faults
+  and throttle-429s (honouring `Retry-After`, exponential backoff, 2 retries),
+  fails fast on bot-challenge 429s / 401 / 403 / 451 / 404 / 410, and ledgers
+  every attempt.
+
 - **Tip times are pinned to the fixture feed, with a same-day backstop.**
   The 2026-11-13 dry run caught the agent reading 13:50 for a 15:00 game —
   70 minutes past the match window — and planning a duplicate next to the

@@ -739,6 +739,18 @@
         "references/validation-workflow.md",
         "scripts/upsert_events.py"
       ]
+    },
+    {
+      "id": 55,
+      "prompt": "A VERIFIED event holds Deutschland - Dänemark, 2026-11-14T15:00:00+01:00 (FIBA Women's EuroBasket 2027 Qualifiers). The agent re-reads the same game from an announcement page that spells the competition \"FIBA Women's EuroBasket Qualifiers 2027\" at the same 15:00 tip. What does the planner do?",
+      "expected_output": "Decision=SKIP; reason=same pairing, same tip and a league label with the same tokens in a different order against a VERIFIED event is the same game re-read, not a second game, so no duplicate is created; checks: leagueWordOrder=PASS",
+      "assertions": [
+        "leagueWordOrder expected PASS"
+      ],
+      "files": [
+        "references/validation-workflow.md",
+        "scripts/upsert_events.py"
+      ]
     }
   ]
 }

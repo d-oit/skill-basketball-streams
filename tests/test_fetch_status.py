@@ -33,6 +33,7 @@ from scripts.fixtures import (
     _empty_cause,
     _overall_advice,
     fetch,
+    fetch_with_retry,
 )
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -391,3 +392,131 @@ class TestFetchLedger:
     def test_a_missing_ledger_is_not_a_failure(self, capsys, tmp_path):
         assert mod.report_fetch_log(tmp_path / "nope.jsonl") == 0
         assert "no fetch attempts recorded" in capsys.readouterr().out
+
+
+class TestFetchRetry:
+    """Bounded retries for transient fetch failures, via `fetch_with_retry`.
+
+    The 2026-11-13 run fetched zero fixtures — euroleague answered 429 — and
+    one attempt per source meant a transient throttle killed the anchor and
+    the fixture-driven second search pass for the whole run. A 5xx, a
+    transport fault, or a throttle-429 is now retried; a bot-challenge 429, a
+    401/403/451, or a 404/410 fails fast, because repeating those only spends
+    the run's time on the same refusal.
+    """
+
+    def _script(self, results, sleeps):
+        calls = []
+
+        def fake_fetch(url):
+            calls.append(url)
+            return results[min(len(calls) - 1, len(results) - 1)]
+
+        return fake_fetch, calls, sleeps.append
+
+    def test_a_transient_500_is_retried_then_wins(self, monkeypatch):
+        sleeps: list = []
+        fake, calls, _ = self._script(
+            [
+                FetchResult("", "server_error", 500),
+                FetchResult("", "server_error", 500),
+                FetchResult("<html>ok</html>", "ok"),
+            ],
+            sleeps,
+        )
+        monkeypatch.setattr(mod, "fetch", fake)
+        monkeypatch.setattr(mod.time, "sleep", sleeps.append)
+        final, attempts = fetch_with_retry("https://example.invalid/")
+        assert final.status == "ok"
+        assert [a.status for a in attempts] == ["server_error", "server_error", "ok"]
+        assert len(calls) == 3
+
+    def test_a_persistent_500_fails_after_bounded_attempts(self, monkeypatch):
+        sleeps: list = []
+        fake, calls, _ = self._script([FetchResult("", "server_error", 500)], sleeps)
+        monkeypatch.setattr(mod, "fetch", fake)
+        monkeypatch.setattr(mod.time, "sleep", sleeps.append)
+        final, attempts = fetch_with_retry("https://example.invalid/")
+        assert final.status == "server_error"
+        assert len(attempts) == 3
+        assert len(calls) == 3
+        # Exponential backoff between the three attempts.
+        assert sleeps == [0.5, 1.0]
+
+    def test_a_bot_challenge_429_is_never_retried(self, monkeypatch):
+        calls = []
+
+        def fake_fetch(url):
+            calls.append(url)
+            return FetchResult(
+                "", "blocked", 429,
+                {"server": "Vercel", "x-vercel-mitigated": "challenge"},
+            )
+
+        monkeypatch.setattr(mod, "fetch", fake_fetch)
+        final, attempts = fetch_with_retry("https://example.invalid/")
+        assert final.status == "blocked"
+        assert len(attempts) == 1
+        assert len(calls) == 1
+
+    def test_a_throttle_429_is_retried(self, monkeypatch):
+        fake, calls, _ = self._script(
+            [
+                FetchResult("", "blocked", 429),
+                FetchResult("<html>ok</html>", "ok"),
+            ],
+            [],
+        )
+        monkeypatch.setattr(mod, "fetch", fake)
+        monkeypatch.setattr(mod.time, "sleep", lambda seconds: None)
+        final, attempts = fetch_with_retry("https://example.invalid/")
+        assert final.status == "ok"
+        assert len(calls) == 2
+
+    def test_a_404_is_not_retried(self, monkeypatch):
+        calls = []
+        monkeypatch.setattr(
+            mod, "fetch", lambda url: (calls.append(url), FetchResult("", "not_found", 404))[1]
+        )
+        final, attempts = fetch_with_retry("https://example.invalid/")
+        assert final.status == "not_found"
+        assert len(attempts) == 1
+        assert len(calls) == 1
+
+    def test_retry_after_is_honoured_over_backoff(self, monkeypatch):
+        sleeps: list = []
+        fake, _, _ = self._script(
+            [
+                FetchResult("", "blocked", 429, {"retry-after": "5"}),
+                FetchResult("<html>ok</html>", "ok"),
+            ],
+            sleeps,
+        )
+        monkeypatch.setattr(mod, "fetch", fake)
+        monkeypatch.setattr(mod.time, "sleep", sleeps.append)
+        final, _ = fetch_with_retry("https://example.invalid/")
+        assert final.status == "ok"
+        assert sleeps == [5.0]
+
+    def test_main_ledgers_every_attempt(self, monkeypatch, tmp_path):
+        """Each attempt is evidence: a retried fetch that still fails must
+        leave the same rows a single attempt would, not a silence."""
+        ledger = tmp_path / "fetch.jsonl"
+        monkeypatch.setattr(
+            mod, "fetch", lambda url: FetchResult("", "server_error", 500)
+        )
+        monkeypatch.setattr(mod.time, "sleep", lambda seconds: None)
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            ["fixtures.py", "--source", "bbl", "--fetch-ledger", str(ledger),
+             "--now", "2026-10-06T08:30:00Z"],
+        )
+        with pytest.raises(SystemExit) as exc:
+            mod.main()
+        assert exc.value.code == 1
+        rows = mod.read_fetch_ledger(ledger)
+        assert len(rows) == 3
+        assert {row["source"] for row in rows} == {"bbl"}
+        assert {row["status"] for row in rows} == {"server_error"}
+        assert len({row["run_id"] for row in rows}) == 1

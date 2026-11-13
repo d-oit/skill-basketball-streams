@@ -308,3 +308,14 @@ double-headers — so the planner skips and names the collision instead of
 creating a visible duplicate. `UNVERIFIED` entries are exempt: blocking their
 promotion path would trade a possible duplicate for a certain dropped
 confirmation.
+
+**League labels match on tokens, not word order.** Two sources spell the same
+competition differently ("FIBA Women's EuroBasket 2027 Qualifiers" vs
+"FIBA Women's EuroBasket Qualifiers 2027"), so the league comparison is a
+token-subset check: same tokens in any order, or a shorter label naming a
+longer one ("FIBA", "BBL" vs "BBL Pokal"), is the same competition, while
+disjoint labels ("BBL" vs "EuroLeague") never are. An empty label constrains
+nothing. This is what the `leagueWordOrder` check grades: a re-reading that
+matches on pairing and tip but is treated as a different competition — and
+therefore duplicated — because the words arrived in a different order is a
+FAIL.
