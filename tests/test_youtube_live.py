@@ -286,6 +286,20 @@ class TestIsYoutubeLiveUrl:
 
 
 class TestClassifyStream:
+    def test_pge_basket_liga_channel_future_broadcast_is_scheduled(self):
+        decision, reason = classify_stream(
+            {
+                "url": "https://www.youtube.com/@basketliga/live",
+                "channel": "@basketliga",
+                "title": "PGE Basket Liga LIVE: Toruń vs Trefl Sopot",
+                "live_broadcast_content": "upcoming",
+                "scheduled_start": "2026-09-15T18:00:00+02:00",
+            },
+            now=NOW,
+        )
+        assert decision == DECISION_SCHEDULED
+        assert "greater than now" in reason
+
     def test_upcoming_with_future_start_is_scheduled(self):
         decision, reason = classify_stream(
             {
@@ -500,7 +514,9 @@ class TestCli:
             "tampa2films",
             "enbleague",
             "legabasket",
+            "basketliga",
         }
+        assert next(row for row in channels if row["handle"] == "basketliga")["channel_id"] == "UCT3PGkIHb_jd6Nr8dmQGUMQ"
         for row in channels:
             assert row["rss_url"].startswith(
                 "https://www.youtube.com/feeds/videos.xml?channel_id=UC"
