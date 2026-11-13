@@ -1,9 +1,9 @@
 {
   "audit": {
-    "inconclusive": 25,
+    "inconclusive": 27,
     "judged": 69,
     "precision": 1.0,
-    "rows": 94,
+    "rows": 96,
     "verified": 69,
     "wrong": 0
   },
@@ -2017,7 +2017,7 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ],
     "recall": 0.001,
-    "rows": 28981,
+    "rows": 28985,
     "unique_games": 2719,
     "unverifiable": 1861,
     "unverifiable_keys": [
@@ -3884,47 +3884,13 @@
       "https://www.youtv.de/tv-sendungen/8334080-basketball-bundesliga-live-wuerzburg-baskets-vs-mhp-riesen-ludwigsburg"
     ]
   },
-  "run_id": "2026-11-13T16:42Z",
+  "run_id": "",
   "source": {
-    "audit_rows": 94,
-    "candidates_rows": 28981,
+    "audit_rows": 96,
+    "candidates_rows": 28985,
     "fixtures_rows": 133
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 2,
-        "precision": 1.0,
-        "rows": 2,
-        "verified": 2,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-11-12T09:47Z",
-      "unique_games": 0
-    },
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 462,
-      "missed": 462,
-      "recall": 0.0,
-      "rows": 605,
-      "run_id": "2026-11-12T16:56Z",
-      "unique_games": 592
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -4128,7 +4094,41 @@
       "rows": 21,
       "run_id": "2026-11-13T16:41Z",
       "unique_games": 21
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 4,
+      "run_id": "2026-11-13T16:50Z",
+      "unique_games": 4
+    },
+    {
+      "audit": {
+        "inconclusive": 2,
+        "judged": 0,
+        "precision": null,
+        "rows": 2,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-11-13T16:51Z",
+      "unique_games": 0
     }
   ],
-  "ts": "2026-11-13T16:42:47.345016+00:00"
+  "ts": "2026-11-13T16:51:17.058793+00:00"
 }
