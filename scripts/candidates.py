@@ -97,6 +97,7 @@ def normalise_row(raw: dict, *, ts: str | None = None, run_id: str = "") -> dict
         "candidate_id": str(raw.get("candidate_id") or ""),
         "url": url,
         "backend": str(raw.get("backend") or ""),
+        "query": str(raw.get("query") or ""),
         "game_key": game_key,
         "live_signal": bool(raw.get("live_signal", False)),
         "disposition": disposition,

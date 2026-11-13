@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Search asks for games that exist, and learns the ones it missed.**
+  `scripts/queries.py` merges per-fixture queries (`ALBA Berlin Bayern live
+  kostenlos`) into the Phase 0 run (`run_daily.py --fixtures`, capped so a
+  60-game window cannot burn a free tier), and the telemetry job runs a second
+  ladder pass with them after the fixture fetch — same ledger, appended, with
+  cross-pass duplicates dropped. A keyless `direct-list` rung fetches the free
+  listing pages in `config/direct-lists.json` (MDR livestreams, sportschau
+  basketball); a `youtube-expand` post-pass resolves `@handle`/`/channel/` URLs
+  the search hits merely mentioned into full tab+RSS leads (bounded, quarantined
+  until Check 3 / `approve_source.py`). Every ledger row carries its `query`, so
+  per-query hit rates are evidence; `queries.py --suggest` inverts the join for
+  self-improvement (fixtures no row covers become tomorrow's advisory-only
+  search list). New eval case 53 (`fixtureQuery`).
+
 - **Approved the ENBLeague and LBA Serie A YouTube channels (Tier 6).**
   `youtube.com/@ENBLeague` streams every league game live free (schedule at
   `enbleague.eu/schedule`); `youtube.com/@legabasket` streams full Serie A

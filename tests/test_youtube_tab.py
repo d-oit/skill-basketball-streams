@@ -273,3 +273,109 @@ class TestCli:
         with pytest.raises(SystemExit) as excinfo:
             youtube_tab.main()
         assert excinfo.value.code == 2
+
+
+class TestHandlesFromUrls:
+    def test_handle_urls_are_extracted_lowercased(self):
+        from scripts.youtube_tab import handles_from_urls
+
+        assert handles_from_urls(
+            ["https://www.youtube.com/@New-Club/live", "https://example.com/x"]
+        ) == [{"handle": "new-club"}]
+
+    def test_channel_urls_yield_ids(self):
+        from scripts.youtube_tab import handles_from_urls
+
+        assert handles_from_urls(
+            ["https://www.youtube.com/channel/UC4nW9T_6d6e4DKa4A9_3Ouw/videos"]
+        ) == [{"channel_id": "UC4nW9T_6d6e4DKa4A9_3Ouw"}]
+
+    def test_bare_watch_urls_yield_nothing(self):
+        from scripts.youtube_tab import handles_from_urls
+
+        assert (
+            handles_from_urls(["https://www.youtube.com/watch?v=abcdefghijk"])
+            == []
+        )
+
+
+class TestDiscoverHandlesFromUrls:
+    def test_approved_handles_are_skipped(self):
+        from scripts.youtube_tab import discover_handles_from_urls
+
+        def _boom(url: str) -> str:
+            raise AssertionError(f"must not fetch: {url}")
+
+        out = discover_handles_from_urls(
+            ["https://www.youtube.com/@FIBA/live"],
+            known_handles=["fiba"],
+            fetch=_boom,
+        )
+        assert out == []
+
+    def test_new_handle_is_discovered_with_max_watch_zero(self):
+        from scripts.youtube_tab import discover_handles_from_urls
+
+        rss = (
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<feed xmlns:atom="http://www.w3.org/2005/Atom"'
+            ' xmlns:yt="http://www.youtube.com/xml/schemas/2015">'
+            "<atom:entry><yt:videoId>abcdefghijk</yt:videoId>"
+            "<atom:title>Club A vs Club B LIVESTREAM</atom:title>"
+            "<atom:published>2026-11-13T10:00:00+00:00</atom:published>"
+            "</atom:entry></feed>"
+        )
+
+        def _fetch(url: str) -> str:
+            if "channel_id" in url or "videos.xml" in url:
+                return rss
+            if url.startswith("https://www.youtube.com/@"):
+                return (
+                    "<html><head><title>x</title></head><body>"
+                    '"browseId":"UCAAAAAAAAAAAAAAAAAAAAAA"</body></html>'
+                )
+            raise AssertionError(f"unexpected fetch: {url}")
+
+        out = discover_handles_from_urls(
+            ["https://www.youtube.com/@new-club/live"],
+            known_handles=["fiba"],
+            fetch=_fetch,
+        )
+        assert len(out) == 1
+        assert out[0]["videos"][0]["video_id"] == "abcdefghijk"
+
+    def test_channel_id_url_uses_rss_not_tab(self):
+        from scripts.youtube_tab import discover_by_id
+
+        seen: list[str] = []
+
+        def _fetch(url: str) -> str:
+            seen.append(url)
+            return "<feed/>"
+
+        out = discover_by_id("UC4nW9T_6d6e4DKa4A9_3Ouw", fetch=_fetch)
+        assert out["channel_id"] == "UC4nW9T_6d6e4DKa4A9_3Ouw"
+        assert out["videos"] == []
+        assert seen == [
+            "https://www.youtube.com/feeds/videos.xml?channel_id=UC4nW9T_6d6e4DKa4A9_3Ouw"
+        ]
+
+    def test_max_new_bounds_the_discovery(self):
+        from scripts.youtube_tab import discover_handles_from_urls
+
+        calls: list[str] = []
+
+        def _fetch(url: str) -> str:
+            calls.append(url)
+            return "<html>no ids here</html>"
+
+        out = discover_handles_from_urls(
+            [
+                "https://www.youtube.com/@club-one/live",
+                "https://www.youtube.com/@club-two/live",
+            ],
+            fetch=_fetch,
+            max_new=1,
+        )
+        assert out == []
+        assert sum(1 for u in calls if "/@club-two/" in u) == 0

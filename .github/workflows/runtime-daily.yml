@@ -292,6 +292,39 @@ jobs:
             --fetch-ledger .tmp/telemetry/fetch-attempts.jsonl \
             || echo "::warning::at least one league fixture source produced nothing (see the FAIL lines above) — fixture_recall is partial or n/a this run"
 
+      # Second pass: ask for games that exist. The base pass queries generic
+      # terms; this one merges per-fixture queries ("ALBA Berlin Bayern live
+      # kostenlos") so the index is asked about actual pairings — the route
+      # by which broadcaster listing pages are found rather than hoped for.
+      # Same ledger, appended: the recall denominator only grows. Tolerated
+      # like the first pass, for the same reason (a 429 is not a red run).
+      # The tab/arena rungs already ran above, so this pass is the search
+      # rungs plus the keyless direct-list fetch; the youtube-expand post-pass
+      # runs in both passes unconditionally.
+      - name: Fixture-driven second search pass
+        env:
+          EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+          TINYFISH_API_KEY: ${{ secrets.TINYFISH_API_KEY }}
+          # Present for credential parity (any run_daily.py step must carry
+          # the render-arena credential), though this pass names only search
+          # backends: the query-independent rungs (direct-list, youtube-tab,
+          # render-arena) already ran in the base pass, and re-running them
+          # here would append the same rows a second time.
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+        run: |
+          if [ -f .tmp/telemetry/fixtures.jsonl ]; then
+            python3 scripts/run_daily.py \
+              --dest .tmp/telemetry \
+              --run-id "$(date -u +%Y-%m-%dT%H:%MZ)" \
+              --fixtures .tmp/telemetry/fixtures.jsonl \
+              --backend exa-mcp --backend exa-mcp-keyless \
+              --backend tinyfish \
+              --json \
+              || echo "::warning::fixture-driven pass surfaced nothing new (reachable backends, empty answers) — the base pass stands"
+          else
+            echo "::notice::no fixtures this run, so no fixture-driven second pass"
+          fi
+
       # A FAIL line naming a status code is a claim; this is the evidence. A
       # blocked source is otherwise only ever one line in one morning's log,
       # which is the failure `scripts/rung_health.py` exists to end. The ledger

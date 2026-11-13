@@ -116,6 +116,29 @@ jobs:
             echo "::notice::No actionable misjudgements in this ledger."
           fi
 
+      # Query learning: fixtures name games that existed, the ledger names
+      # games a backend saw. A fixture no row covers is the recall failure
+      # search-derived candidates structurally cannot see — so propose the
+      # queries that would have asked for it. Advisory only (a notice, never
+      # a red step): the synthesised eval case above is the durable artefact,
+      # this is tomorrow's search list.
+      - name: Suggest queries for fixtures the ledger missed
+        id: queries
+        if: always()
+        run: |
+          if git show origin/telemetry:fixtures.jsonl > .tmp/fixtures.jsonl 2>/dev/null && [ -s .tmp/fixtures.jsonl ] && [ -f .tmp/candidates.jsonl ]; then
+            if python3 scripts/queries.py --suggest --fixtures .tmp/fixtures.jsonl --ledger .tmp/candidates.jsonl --json > .tmp/query-suggestions.json; then
+              echo "suggested=true" >> "$GITHUB_OUTPUT"
+              python3 -c "import json;d=json.load(open('.tmp/query-suggestions.json'));print('Query suggestions:',len(d['suggestions']))"
+            else
+              echo "suggested=false" >> "$GITHUB_OUTPUT"
+              echo "::notice::every fixture is already covered by the ledger — no query suggestions this run"
+            fi
+          else
+            echo "suggested=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::no fixtures or ledger to learn queries from this run"
+          fi
+
       # The branch is created and pushed BEFORE the gate runs. A red result is
       # therefore preserved as evidence on the branch rather than thrown away.
       - name: Create the self-improvement branch

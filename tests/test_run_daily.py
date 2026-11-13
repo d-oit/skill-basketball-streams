@@ -216,6 +216,7 @@ class TestBackendStatus:
             "exa-mcp": False,
             "exa-mcp-keyless": True,  # the free rung: nothing to configure
             "tinyfish": True,
+            "direct-list": True,  # the free rung: nothing to configure
             "youtube-tab": True,  # the free rung: nothing to configure
             "render-arena": False,  # no FIRECRAWL_API_KEY in this environment
         }
@@ -1147,3 +1148,148 @@ class TestExaMcpKeylessBackend:
         self._backend_with(monkeypatch, responses)
         assert backend.search("q", 5) == []
         assert "no result content" in backend.last_error
+
+
+class TestQueryAttribution:
+    def test_rows_carry_the_query_that_surfaced_them(self):
+        backend = FakeBackend("fake", [{"url": "https://sport1.de/live", "title": "live"}])
+        rows, _, _ = collect_candidates(
+            ["ALBA Berlin live kostenlos"],
+            backends=[backend],
+            limit=5,
+            run_id=RUN_ID,
+            ts=TS,
+        )
+        assert rows[0]["query"] == "ALBA Berlin live kostenlos"
+
+
+class TestExtractListLinks:
+    def test_only_stream_leaning_links_become_candidates(self):
+        from scripts.run_daily import extract_list_links
+
+        html = (
+            '<a href="/video/livestreams/sport-event-mediathek-174.html">'
+            "Basketball LIVESTREAM: Chemnitz vs Bonn</a>"
+            '<a href="/basketball/bundesliga/klare-sache-in-wuerzburg,xx-100.html">'
+            "Klare Sache in Würzburg</a>"
+            '<a href="#top">Anker</a>'
+        )
+        links = extract_list_links(html, "https://www.mdr.de")
+        assert [link["url"] for link in links] == [
+            "https://www.mdr.de/video/livestreams/sport-event-mediathek-174.html"
+        ]
+
+    def test_relative_links_resolve_against_the_page(self):
+        from scripts.run_daily import extract_list_links
+
+        links = extract_list_links(
+            '<a href="/sport/live/heute">Live: Basketball heute live</a>',
+            "https://www.mdr.de/sport/livestreams",
+        )
+        assert links[0]["url"] == "https://www.mdr.de/sport/live/heute"
+
+
+class TestDirectListBackend:
+    def test_lists_come_from_config_not_code(self, tmp_path, monkeypatch):
+        import scripts.run_daily as run_daily
+
+        config = tmp_path / "direct-lists.json"
+        config.write_text(
+            json.dumps({"lists": [{"name": "demo", "url": "https://lists.test/all"}]}),
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(run_daily, "DIRECT_LISTS_CONFIG", config)
+        assert [entry["url"] for entry in run_daily.load_direct_lists()] == [
+            "https://lists.test/all"
+        ]
+
+    def test_missing_config_means_no_lists_not_a_fallback(self, tmp_path, monkeypatch):
+        import scripts.run_daily as run_daily
+
+        monkeypatch.setattr(
+            run_daily, "DIRECT_LISTS_CONFIG", tmp_path / "absent.json"
+        )
+        assert run_daily.load_direct_lists() == []
+
+    def test_backend_is_keyless_and_in_the_ladder(self):
+        assert ALL_BACKENDS["direct-list"].available() is True
+        assert "direct-list" in LADDER
+
+
+class TestExpandYoutubeLeads:
+    RSS = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<feed xmlns:atom="http://www.w3.org/2005/Atom"'
+        ' xmlns:yt="http://www.youtube.com/xml/schemas/2015">'
+        "<atom:entry><yt:videoId>abcdefghijk</yt:videoId>"
+        "<atom:title>Club A vs Club B LIVESTREAM</atom:title>"
+        "<atom:published>2026-11-13T10:00:00+00:00</atom:published>"
+        "</atom:entry></feed>"
+    )
+
+    @staticmethod
+    def _fetch(url: str) -> str:
+        if "videos.xml" in url:
+            return TestExpandYoutubeLeads.RSS
+        return (
+            "<html><body>"
+            '"browseId":"UCAAAAAAAAAAAAAAAAAAAAAA"</body></html>'
+        )
+
+    def test_new_channels_from_search_hits_become_rows(self):
+        import scripts.run_daily as run_daily
+
+        rows = run_daily.expand_youtube_leads(
+            [{"url": "https://www.youtube.com/@new-club/live"}],
+            run_id=RUN_ID,
+            ts=TS,
+            fetch=self._fetch,
+        )
+        assert len(rows) == 1
+        assert rows[0]["backend"] == "youtube-expand"
+        assert rows[0]["url"] == "https://www.youtube.com/watch?v=abcdefghijk"
+
+    def test_a_failed_discovery_is_no_rows_not_a_red_run(self):
+        import scripts.run_daily as run_daily
+
+        def _failing(url: str) -> str:
+            raise OSError("no route to host")
+
+        assert (
+            run_daily.expand_youtube_leads(
+                [{"url": "https://www.youtube.com/@new-club/live"}],
+                run_id=RUN_ID,
+                ts=TS,
+                fetch=_failing,
+            )
+            == []
+        )
+
+
+class TestFixtureFlags:
+    def test_fixtures_expand_the_query_list(self, tmp_path):
+        fixtures = tmp_path / "fixtures.jsonl"
+        fixtures.write_text(
+            json.dumps(
+                {
+                    "league": "BBL",
+                    "teams": ["ALBA Berlin", "Bayern"],
+                    "game_key": "BBL|A|B|t",
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        result = _run(
+            [
+                "--fixtures",
+                str(fixtures),
+                "--backend",
+                "direct-list",
+                "--dry-run",
+                "--run-id",
+                RUN_ID,
+            ]
+        )
+        assert result.returncode in (0, 1), result.stderr
+        assert "fixture-derived" in result.stderr

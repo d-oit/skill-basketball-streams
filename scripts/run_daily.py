@@ -49,7 +49,13 @@ try:  # direct CLI execution: `python3 scripts/run_daily.py`
         recall_metrics,
         read_ledger,
     )
-    from youtube_tab import discover_handles as _discover_youtube_tabs  # noqa: E402
+    from youtube_tab import (  # noqa: E402
+        discover_handles as _discover_youtube_tabs,
+    )
+    from youtube_tab import (  # noqa: E402
+        discover_handles_from_urls as _discover_youtube_expanded,
+    )
+    from queries import expand_queries as _expand_queries  # noqa: E402
 except ImportError:  # imported as a package module, e.g. scripts.run_daily
     from scripts.candidates import (  # type: ignore[no-redef]
         DEFAULT_LEDGER,
@@ -60,6 +66,12 @@ except ImportError:  # imported as a package module, e.g. scripts.run_daily
     )
     from scripts.youtube_tab import (  # type: ignore[no-redef]
         discover_handles as _discover_youtube_tabs,
+    )
+    from scripts.youtube_tab import (  # type: ignore[no-redef]
+        discover_handles_from_urls as _discover_youtube_expanded,
+    )
+    from scripts.queries import (  # type: ignore[no-redef]
+        expand_queries as _expand_queries,
     )
 
 DEFAULT_QUERIES = (
@@ -421,6 +433,120 @@ class TinyFishSearchBackend(Backend):
         )
 
 
+DIRECT_LISTS_CONFIG = Path(__file__).resolve().parent.parent / "config" / "direct-lists.json"
+
+
+def load_direct_lists(root: Path | str | None = None) -> list[dict]:
+    """Free listing pages from `config/direct-lists.json`.
+
+    Same authority rule as the YouTube allow-list: a config that names lists
+    is authoritative, and a missing/unreadable config means no lists rather
+    than a hard-coded fallback — a fallback would make a removed page
+    impossible to revoke.
+    """
+    # A caller that names a root gets that root's config; otherwise the module
+    # constant decides — which is what makes the config replaceable in tests
+    # and the absence of one a clean empty rather than a hard-coded fallback.
+    config = (
+        DIRECT_LISTS_CONFIG
+        if root is None
+        else Path(root) / "config" / "direct-lists.json"
+    )
+    try:
+        payload = json.loads(config.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    lists = payload.get("lists")
+    if not isinstance(lists, list):
+        return []
+    return [
+        {"name": str(item.get("name") or ""), "url": str(item.get("url") or "")}
+        for item in lists
+        if isinstance(item, dict) and str(item.get("url") or "").strip()
+    ]
+
+
+LIST_LINK_RE = re.compile(
+    r'<a\b[^>]*\bhref="([^"]+)"[^>]*>(.*?)</a>',
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def extract_list_links(html: str, base: str) -> list[dict]:
+    """Stream-leaning links from a free listing page.
+
+    A listing page (MDR livestreams, sportschau basketball) links hundreds of
+    pages, nearly all articles. Only links with a live/basketball signal in
+    the URL or the anchor text become candidates — the same cheap signal Phase
+    0 uses everywhere else, so an article about last night's game stays a
+    non-row the same way it does from a search backend.
+    """
+    import html as _html
+
+    links: list[dict] = []
+    seen: set[str] = set()
+    for match in LIST_LINK_RE.finditer(html or ""):
+        href = match.group(1).strip()
+        if not href or href.startswith(("#", "javascript:", "mailto:")):
+            continue
+        url = urllib.parse.urljoin(base, href)
+        if not url.startswith("http") or url in seen:
+            continue
+        text = " ".join(_html.unescape(_TAG_RE.sub(" ", match.group(2))).split())
+        if not looks_live(url, text):
+            continue
+        seen.add(url)
+        links.append({"url": url, "title": text or url})
+    return links
+
+
+class DirectListBackend(Backend):
+    """Keyless fetch of known free listing pages — no index between us.
+
+    Search backends ask an index what it remembers; these pages (MDR
+    livestreams, sportschau basketball) ARE the broadcaster's own listing, and
+    their markup is server-rendered (verified 2026-11-13 via plain GET).
+    One fetch per configured page per run, cached like the YouTube tab rung,
+    stdlib only, always available. A page that fails to fetch degrades to no
+    rows — the search rungs still cover the run.
+    """
+
+    name = "direct-list"
+    env_var = ""  # free: nothing to configure
+
+    def available(self) -> bool:
+        return True
+
+    def status_detail(self, configured: bool) -> str:
+        return "keyless fetch of config/direct-lists.json free listing pages"
+
+    def reset_stats(self) -> None:
+        super().reset_stats()
+        self._rows_cache: list[dict] | None = None
+
+    def search(self, query: str, limit: int) -> list[dict]:
+        cached = getattr(self, "_rows_cache", None)
+        if cached is None:
+            cached = []
+            for entry in load_direct_lists():
+                url = entry["url"]
+                try:
+                    request = urllib.request.Request(
+                        url, headers={"User-Agent": USER_AGENT}
+                    )
+                    with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as resp:
+                        html = resp.read().decode("utf-8", "replace")
+                except (urllib.error.URLError, OSError, ValueError) as exc:
+                    self._fail(f"{entry.get('name', url)}: {type(exc).__name__}")
+                    continue
+                for link in extract_list_links(html, url):
+                    cached.append(link)
+                    if len(cached) >= max(1, limit):
+                        break
+            self._rows_cache = cached
+        return cached
+
+
 ARENA_GAME_LINK_RE = re.compile(
     r'<a\b[^>]*\bhref="(/tv/[^"]+)"[^>]*>(.*?)</a>',
     re.IGNORECASE | re.DOTALL,
@@ -724,11 +850,82 @@ ALL_BACKENDS: dict[str, Backend] = {
         ExaBackend(),
         ExaMcpKeylessBackend(),
         TinyFishSearchBackend(),
+        DirectListBackend(),
         YouTubeTabBackend(),
         RenderArenaBackend(),
     )
 }
-LADDER = ("exa-mcp", "exa-mcp-keyless", "tinyfish", "youtube-tab", "render-arena")
+LADDER = (
+    "exa-mcp",
+    "exa-mcp-keyless",
+    "tinyfish",
+    "direct-list",
+    "youtube-tab",
+    "render-arena",
+)
+
+
+def expand_youtube_leads(
+    rows: list[dict],
+    *,
+    run_id: str,
+    ts: str,
+    max_new: int = 8,
+    fetch=None,
+) -> list[dict]:
+    """Tab+RSS discovery for YouTube channels the ladder merely mentioned.
+
+    Search hits like `youtube.com/@new-club/live` name a channel the
+    approved-handle rung never fetches. This resolves up to `max_new` such
+    channels (keyless, IDs + RSS titles only) and appends the videos as
+    `youtube-expand` rows — still `unverifiable` Phase 0 leads, still
+    quarantined for calendar use until Check 3 / `approve_source.py` says
+    otherwise. Degraded, never fatal: discovery must not red a run that
+    already has rows.
+    """
+    try:
+        from youtube_tab import load_allowed_handles  # noqa: E402
+    except ImportError:
+        from scripts.youtube_tab import load_allowed_handles  # type: ignore[no-redef]
+    try:
+        known = list(load_allowed_handles() or ())
+    except Exception:  # noqa: BLE001 - degraded, never fatal
+        known = []
+    try:
+        channels = _discover_youtube_expanded(
+            [str(row.get("url") or "") for row in rows],
+            known_handles=known,
+            fetch=fetch,
+            max_watch=0,
+            max_new=max_new,
+        )
+    except Exception:  # noqa: BLE001 - degraded, never fatal
+        return []
+    extra: list[dict] = []
+    seen = {str(row.get("url") or "") for row in rows}
+    for channel in channels:
+        for video in channel.get("videos", []):
+            url = str(video.get("url") or "").strip()
+            if not url or url in seen:
+                continue
+            seen.add(url)
+            extra.append(
+                normalise_row(
+                    {
+                        "run_id": run_id,
+                        "url": url,
+                        "backend": "youtube-expand",
+                        "query": "",
+                        "live_signal": looks_live(url, video.get("title", "")),
+                        "disposition": "unverifiable",
+                        "first_seen_run": run_id,
+                        "ts": ts,
+                    },
+                    ts=ts,
+                    run_id=run_id,
+                )
+            )
+    return extra
 
 # Hosts that must never be recorded as candidate stream sources.
 NEVER_SOURCE_HOSTS = (
@@ -833,6 +1030,7 @@ def collect_candidates(
                             "run_id": run_id,
                             "url": url,
                             "backend": backend.name,
+                            "query": query,
                             "live_signal": looks_live(url, item.get("title", "")),
                             # Phase 0 validates nothing: everything is unverifiable.
                             "disposition": "unverifiable",
@@ -855,6 +1053,15 @@ def main() -> None:
     parser.add_argument("--dest", help="telemetry directory (ledger lives here)")
     parser.add_argument("--ledger", help="explicit ledger path (overrides --dest)")
     parser.add_argument("--queries", help="file with one query per line")
+    parser.add_argument(
+        "--fixtures",
+        help="fixture JSONL (scripts/fixtures.py output): per-game queries "
+             "are merged into the run so the ladder asks for games that exist",
+    )
+    parser.add_argument(
+        "--fixture-cap", type=int, default=12,
+        help="max fixture-derived queries merged into the run (default: 12)",
+    )
     parser.add_argument("--backend", action="append", default=[],
                         help="restrict to a backend (repeatable)")
     parser.add_argument("--limit", type=int, default=20)
@@ -972,6 +1179,35 @@ def main() -> None:
     if not queries:
         print("FAIL: run_daily: no queries to run", file=sys.stderr)
         sys.exit(2)
+    if args.fixtures:
+        try:
+            fixture_rows: list[dict] = []
+            for line in Path(args.fixtures).read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    payload = json.loads(line)
+                except ValueError:
+                    continue
+                if isinstance(payload, dict) and isinstance(payload.get("fixtures"), list):
+                    fixture_rows.extend(
+                        item for item in payload["fixtures"] if isinstance(item, dict)
+                    )
+                elif isinstance(payload, dict):
+                    fixture_rows.append(payload)
+        except OSError as exc:
+            print(f"FAIL: run_daily: {args.fixtures}: {exc}", file=sys.stderr)
+            sys.exit(2)
+        before = len(queries)
+        queries = _expand_queries(
+            queries, fixture_rows, cap=max(0, args.fixture_cap)
+        )
+        print(
+            f"OK: run_daily: merged {len(queries) - before} fixture-derived "
+            f"queries from {len(fixture_rows)} fixture(s)",
+            file=sys.stderr,
+        )
     unique = unique_queries(queries)
     if len(unique) != len(queries):
         print(
@@ -1001,6 +1237,16 @@ def main() -> None:
     rows, contributed, attempted = collect_candidates(
         queries, backends=backends, limit=args.limit, run_id=run_id, ts=ts
     )
+    expanded = expand_youtube_leads(rows, run_id=run_id, ts=ts, fetch=None)
+    if expanded:
+        rows.extend(expanded)
+        if "youtube-expand" not in contributed:
+            contributed.append("youtube-expand")
+        print(
+            f"OK: run_daily: youtube-expand: {len(expanded)} video(s) from "
+            f"channels the ladder merely mentioned",
+            file=sys.stderr,
+        )
 
     # One line per rung, including the ones that answered nothing: the aggregate
     # "surfaced no candidates" cannot say which backend was rate-limited, how
@@ -1022,6 +1268,39 @@ def main() -> None:
     ledger = Path(args.ledger) if args.ledger else (
         Path(args.dest) / "candidates.jsonl" if args.dest else Path(DEFAULT_LEDGER)
     )
+
+    if args.fixtures and ledger.is_file() and rows:
+        # The fixture pass appends to a ledger the base pass already wrote.
+        # Query-independent rungs are excluded from it by the caller, but a
+        # search backend can still return a URL it already surfaced for a
+        # generic query — a blind append would record that game twice and the
+        # denominator would grow without covering anything new.
+        seen_pairs: set[tuple[str, str]] = set()
+        for line in ledger.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                stored = json.loads(line)
+            except ValueError:
+                continue
+            if isinstance(stored, dict):
+                seen_pairs.add(
+                    (str(stored.get("backend") or ""), str(stored.get("url") or ""))
+                )
+        before_dedupe = len(rows)
+        rows = [
+            row
+            for row in rows
+            if (str(row.get("backend") or ""), str(row.get("url") or ""))
+            not in seen_pairs
+        ]
+        if len(rows) != before_dedupe:
+            print(
+                f"OK: run_daily: dropped {before_dedupe - len(rows)} row(s) "
+                f"already in {ledger}",
+                file=sys.stderr,
+            )
 
     if not rows:
         # Name the cause where there is one: a rejected key is actionable, an
