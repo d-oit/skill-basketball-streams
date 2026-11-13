@@ -765,7 +765,8 @@
       "files": [
         "config/sources.json",
         "references/approved-sources.md",
-        "references/youtube-live-search.md"
+        "references/youtube-live-search.md",
+        "references/validation-workflow.md"
       ]
     },
     {
