@@ -8,6 +8,13 @@ Commit prefix follows [Conventional Commits](https://www.conventionalcommits.org
 `feat:` / `fix:` / `chore:` / `docs:` / `test:` / `refactor:` / `perf:` /
 `build:` / `ci:` / `style:` / `revert:`.
 
+An optional single scope is lowercase alphanumerics plus `.`, `_`, `-` only
+(`fix(planner): …` — no commas, no double scopes, so `fix(a,b): …` is
+rejected), and the whole subject line stays within 72 characters. Enforced by
+the `commit-msg` hook (`scripts/check-commitlint.sh`) and pinned in
+`tests/test_harness_boundary.py`; a scope that wants a comma is a sign to pick
+the narrower scope or drop it.
+
 ## Quick start
 
 1. Fork & clone.
