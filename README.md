@@ -99,7 +99,7 @@ live-stream-runtime-spec.md           Spec: daily runtime, evals, self-improveme
   ├── corpus-refresh.yml              Weekly: re-record the evidence corpus; ONE issue per verdict flip, never per byte change
   └── codeql.yml                      CodeQL analysis
 evals/
-  └── evals.json                      47 standard-schema eval cases (driving the rubric)
+  └── evals.json                      57 standard-schema eval cases (driving the rubric)
 scripts/
   ├── validate.py                     Self-contained validator (stdlib only): four checks plus smoke-test regression guard.
   ├── runtime_eval.py                 Runtime skill-evaluator: structural + canned-stub passes, plus --transcripts for real captured runs.
@@ -208,17 +208,18 @@ references/
 - Mandatory source reference URL and ISO validation timestamp on every event.
 - Duplicate detection via `GOOGLECALENDAR_EVENTS_LIST` over the whole window (±30 min, team pair, compatible league), then a payload comparison: an event that already holds exactly what the run would send is `unchanged` and no request is sent at all.
 - Mandatory `## Rationalizations` / `## Red Flags` sections to defend against agent drift.
-- Schema-conformant `evals/evals.json` (47 standard-shape cases passable by any external evaluator).
+- Schema-conformant `evals/evals.json` (57 standard-shape cases passable by any external evaluator).
 
 ## Approved Sources (top-level categories)
 
 - Dyn Sport Mix (Joyn, Pluto TV, Zattoo free tier only)
 - MagentaSport / MagentaTV (one free EuroLeague game per matchday; `magenta.tv` needs a browser-rendering backend)
 - **Basketball Champions League** — `championsleague.basketball`, **selected games only**, validated per game with `@BasketballCL` and the BCL Facebook page
+- **PGE Basket Liga (Poland)** — official `@basketliga` YouTube channel; usually four games per round are free, with exact fixtures selected by the league
 - Sportschau / ARD, ZDF
 - Regional: MDR, BR24, RBB24
 - Official BBL club websites (ALBA Berlin, FC Bayern München, ratiopharm ulm, …)
-- Official YouTube channels (`@fiba`, `@EuroLeague`, `@basketballbundesliga`, `@BasketballCL`, `user/TheDBBTV` accepted; `@FIBAWorld`, generic `/channel/UC…`, and most `/user/…` URLs rejected)
+- Official YouTube channels (`@fiba`, `@EuroLeague`, `@basketballbundesliga`, `@BasketballCL`, `@ENBLeague`, `@legabasket`, `@basketliga`, `user/TheDBBTV` accepted; `@FIBAWorld`, generic `/channel/UC…`, and most `/user/…` URLs rejected). PGE Basket Liga (`@basketliga`) is selected-games only: usually four games per round are free on YouTube; verify each fixture.
 
 Social accounts (`@BasketballCL`, `@MagentaSport`, `@EuroLeague`, `@easyCreditBBL`) are **validation evidence for free access only** — never a stored stream link.
 
@@ -269,7 +270,7 @@ Run before each release; every item is checkable without external tooling.
 - [ ] Frontmatter contains `name`, `description`, `category`, and `version`
 - [ ] `description` line is ≤ 1024 chars
 - [ ] Includes `## Rationalizations` and `## Red Flags` sections
-- [ ] Contains at least 3 realistic eval cases in `evals/evals.json` (currently 47)
+- [ ] Contains at least 3 realistic eval cases in `evals/evals.json` (currently 57)
 - [ ] JSON-shape validation passes (`id:int`, `prompt`, `expected_output`, `assertions[]`)
 - [ ] Every assertion needle `"<name>=PASS|FAIL"` appears in its case's `expected_output`
 - [ ] All backtick-wrapped `.md` paths in `SKILL.md` and `README.md` resolve to real files

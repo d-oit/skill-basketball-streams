@@ -29,6 +29,20 @@ the same checks.
 - Contains pricing information
 - Sporteurope.TV ProA 2026/27 is paid; ProB is excluded from this calendar as not free of charge
 
+### PGE Basket Liga (Poland) — selected YouTube games only
+
+For the 2026/27 season, the league states that usually four games per round are
+broadcast free on its official YouTube channel; the remaining games are carried
+on Polsat. **Do not treat the channel allow-list as proof that a fixture is free.**
+
+Check the official fixture on `https://plk.pl/terminarz` and confirm the exact
+game's TV/broadcast field is `YouTube` (not Polsat). Then tie that selection to
+the league's published free-YouTube policy at
+`https://plk.pl/aktualnosci/27451/co-musisz-wiedziec-o-nowym-sezonie-pge-basket-ligi`.
+Only this combination establishes Check 1 for a PGE Basket Liga game; an absent,
+ambiguous or Polsat listing fails Check 1. Still verify a real live/upcoming
+broadcast on `@basketliga` separately under Checks 2, 3, 6 and 7.
+
 ## Check 2: Live Content (check id: `liveContent`)
 
 **Purpose**: Ensure it is a live stream, not a replay or highlight reel.

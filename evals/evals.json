@@ -751,6 +751,35 @@
         "references/validation-workflow.md",
         "scripts/upsert_events.py"
       ]
+    },
+    {
+      "id": 56,
+      "prompt": "A future PGE Basket Liga game is explicitly listed as YouTube on the official 2026/27 league schedule, and the live broadcast is upcoming on the approved @basketliga channel. The league guide says usually four games per round are free on YouTube; this exact fixture is one of them. Input: url=https://www.youtube.com/@basketliga/live; title=PGE Basket Liga LIVE: Arriva Lotto Twarde Pierniki Toruń vs Energa Trefl Sopot; league=PGE Basket Liga; teams=Arriva Lotto Twarde Pierniki Toruń vs Energa Trefl Sopot; live_broadcast_content=upcoming; scheduled_start=2026-11-14T15:00:00+01:00; channel=@basketliga; official_schedule_tv=YouTube; now=2026-11-13T12:00:00Z.",
+      "expected_output": "Decision=SCHEDULED; reason=approved @basketliga channel, official fixture is marked YouTube (selected free game), and the upcoming broadcast starts 2026-11-14T15:00:00+01:00, strictly after now; checks: liveOnly=PASS, futureDatetime=PASS, officialSource=PASS, freeAccess=PASS",
+      "assertions": [
+        "liveOnly expected PASS",
+        "futureDatetime expected PASS",
+        "officialSource expected PASS",
+        "freeAccess expected PASS"
+      ],
+      "files": [
+        "config/sources.json",
+        "references/approved-sources.md",
+        "references/youtube-live-search.md",
+        "references/validation-workflow.md"
+      ]
+    },
+    {
+      "id": 57,
+      "prompt": "An ended PGE Basket Liga broadcast from the official @basketliga channel must not be promoted as a live stream, even if its title still says LIVE. Input: url=https://www.youtube.com/@basketliga/live; title=PGE Basket Liga LIVE: Toruń vs Trefl Sopot; live_broadcast_content=live; is_live_content=true; is_live_now=false; actual_end=2026-11-12T20:02:00Z; now=2026-11-13T12:00:00Z.",
+      "expected_output": "Decision=REJECT; reason=broadcast already ended (2026-11-12T20:02:00+00:00) — archived VOD, not a live stream; checks: liveOnly=FAIL",
+      "assertions": [
+        "liveOnly expected FAIL"
+      ],
+      "files": [
+        "scripts/youtube_live.py",
+        "references/youtube-live-search.md"
+      ]
     }
   ]
 }

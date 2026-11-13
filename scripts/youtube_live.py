@@ -119,6 +119,7 @@ DEFAULT_ALLOWED_HANDLES = (
     "tampa2films",
     "enbleague",
     "legabasket",
+    "basketliga",
 )
 
 
