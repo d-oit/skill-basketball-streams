@@ -1,0 +1,13 @@
+{
+  "$comment": "Free listing pages fetched directly (no search index between us and the links). Each entry is a page whose server-rendered markup links watchable livestreams: scripts/run_daily.py's DirectListBackend fetches it with stdlib urllib and keeps only links with a live/basketball signal in the URL or anchor text. Add a page here (and a probe in tests/fixtures/ if it is load-bearing) rather than hard-coding a URL into the backend. Verified fetchable 2026-11-13: mdr.de/sport/livestreams (75 KB, 59 livestream mentions, /video/livestreams links) and sportschau.de/basketball (931 KB, livestream links) via plain GET with the runtime user agent.",
+  "lists": [
+    {
+      "name": "mdr-livestreams",
+      "url": "https://www.mdr.de/sport/livestreams"
+    },
+    {
+      "name": "sportschau-basketball",
+      "url": "https://www.sportschau.de/basketball"
+    }
+  ]
+}

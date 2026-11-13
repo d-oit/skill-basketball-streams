@@ -715,6 +715,18 @@
             "references/magenta-tv.md",
             "scripts/run_daily.py"
       ]
-}
+},
+    {
+      "id": 53,
+      "prompt": "A BBL fixture (ALBA Berlin vs Bayern Muenchen, 2026-11-14T19:00:00+01:00, game_key BBL|ALBA Berlin|Bayern Muenchen|2026-11-14T18:00Z) has no ledger row: every Phase 0 row came from generic queries and none covers this pairing. What does the query-learning loop propose?",
+      "expected_output": "Decision=SUGGEST; reason=fixture BBL|ALBA Berlin|Bayern Muenchen|2026-11-14T18:00Z is uncovered by the ledger, so queries.py proposes the pairing it states (ALBA Berlin Bayern Muenchen basketball livestream kostenlos) as tomorrow's search list, advisory-only and never auto-applied; checks: fixtureQuery=PASS",
+      "assertions": [
+        "fixtureQuery expected PASS"
+      ],
+      "files": [
+        "references/self-learning.md",
+        "scripts/queries.py"
+      ]
+    }
   ]
 }

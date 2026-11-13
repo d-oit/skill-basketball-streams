@@ -28,10 +28,15 @@ discovery; see `references/youtube-live-search.md`.
 
 The implemented search ladder is `run_daily.py`'s `LADDER`, and it is the truth:
 
-    ("exa-mcp", "exa-mcp-keyless", "tinyfish", "youtube-tab", "render-arena")
+    ("exa-mcp", "exa-mcp-keyless", "tinyfish", "direct-list", "youtube-tab", "render-arena")
 
-i.e. paid Exa → keyless Exa → TinyFish → keyless YouTube channel tabs+RSS →
-headless render. The two bot-blocked rungs are additionally pre-read for the
+i.e. paid Exa → keyless Exa → TinyFish → keyless direct listing pages →
+keyless YouTube channel tabs+RSS → headless render. `direct-list` fetches the
+free listing pages in `config/direct-lists.json` (MDR livestreams, sportschau
+basketball) with stdlib urllib and keeps only stream-leaning links — no index
+between us and the broadcaster's own listing. Every row carries its `query`, so
+`source_learning.py score` can report per-query hit rates, not just per-backend
+ones. The two bot-blocked rungs are additionally pre-read for the
 agent: `run_daily.py --evidence-out` records the YouTube videos (with
 watch-page starts) and the rendered arena into `.tmp/phase0-evidence.json`,
 attached to the agent prompt, because the agent runtime (webfetch only) reads
@@ -51,6 +56,23 @@ ladder step a reader cannot run is worse than an admitted omission.
 
 If the agent runtime already exposes `webSearch` + `openUrl`, use those first and
 treat the backends above as the fallback rungs for dynamic/blocked pages.
+
+### Fixture-driven queries and YouTube expansion (recall beyond the index)
+
+Generic queries ask the index what it ranks; fixtures name games that exist.
+`scripts/queries.py` merges per-fixture queries (`ALBA Berlin Bayern live
+kostenlos`) into the run (`run_daily.py --fixtures fixtures.jsonl`, capped so a
+60-game window cannot burn a free tier), and the telemetry job runs a second
+ladder pass with them after the fixture fetch — same ledger, appended.
+`--suggest` inverts the join for self-improvement: fixtures no ledger row covers
+become tomorrow's query list.
+
+YouTube coverage is not limited to the approved handles either. After the
+ladder, `run_daily.py` resolves every `@handle`/`/channel/` URL the rows merely
+mentioned (`youtube_tab.discover_handles_from_urls`, at most 8 new channels,
+IDs + RSS titles only) and appends the videos as `youtube-expand` rows. They
+are leads, not sources: calendar use still requires Check 3 and
+`approve_source.py` on a live write.
 
 ### The keyless Exa MCP rung (Phase 0's zero-secret default)
 

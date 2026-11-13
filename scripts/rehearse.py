@@ -582,6 +582,15 @@ def build_checks(*, timeout: int = 60) -> list[Check]:
             probe=_probe_search("tinyfish"),
         ),
         Check(
+            name="search:direct-list",
+            # Keyless like `search:youtube-tab`: no credential to be
+            # missing, so `env` stays empty and `assess` probes it directly.
+            # NOT structural: it fetches the configured listing pages.
+            env=(),
+            what="Phase 0's keyless direct-list rung (broadcaster listing pages)",
+            probe=_probe_search("direct-list"),
+        ),
+        Check(
             name="search:youtube-tab",
             # Keyless like `search:exa-mcp-keyless`: no credential to be
             # missing, so `env` stays empty and `assess` probes it directly.

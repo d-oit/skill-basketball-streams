@@ -273,6 +273,131 @@ def discover(
     return {"handle": cleaned, "channel_id": resolved, "videos": videos}
 
 
+HANDLE_URL_RE = re.compile(
+    r"youtube\.com/@([A-Za-z0-9_.-]+)", re.IGNORECASE
+)
+CHANNEL_URL_RE = re.compile(r"youtube\.com/channel/(UC[\w-]{22})", re.IGNORECASE)
+
+
+def handles_from_urls(urls: list[str]) -> list[dict]:
+    """Channel identities hidden in arbitrary result URLs: `@handle` paths
+    and `/channel/UC...` links.
+
+    A bare `watch?v=` URL names a video, not its channel, so it yields
+    nothing here — resolving it would cost a 1.3 MB watch fetch per URL with
+    no guarantee the channel is basketball. Those URLs still reach the ledger
+    as leads; this only claims what the URL itself states.
+    """
+    found: list[dict] = []
+    seen: set[str] = set()
+    for url in urls or []:
+        text = str(url or "")
+        for handle in HANDLE_URL_RE.findall(text):
+            key = f"@{handle.strip().lower()}"
+            if key not in seen:
+                seen.add(key)
+                found.append({"handle": handle.strip().lower()})
+        for channel_id in CHANNEL_URL_RE.findall(text):
+            key = channel_id
+            if key not in seen:
+                seen.add(key)
+                found.append({"channel_id": channel_id})
+    return found
+
+
+def discover_handles_from_urls(
+    urls: list[str],
+    *,
+    known_handles: list[str] | None = None,
+    known_ids: list[str] | None = None,
+    fetch=None,
+    max_watch: int = 0,
+    max_new: int = 8,
+) -> list[dict]:
+    """Full tab+RSS discovery for channels search results merely mention.
+
+    The approved-handle rung covers 7 channels; any other basketball channel
+    (a club, a regional broadcaster, a league that rebranded) appears in
+    search results only as a URL. This turns those URLs into the same video
+    leads — bounded (`max_new` channels, `max_watch=0` posture like Phase 0)
+    and degraded-never-fatal, because a discovery pass must not red a run.
+    Approval still decides calendar use: these rows are leads until
+    `approve_source.py` (live write) or a human promotes the host.
+    """
+    fetch = fetch_text if fetch is None else fetch
+    known_h = {str(h or '').strip().lstrip('@').lower()
+               for h in (known_handles or [])}
+    known_c = {str(c or '').strip() for c in (known_ids or [])}
+    found: list[dict] = []
+    for identity in handles_from_urls(urls):
+        if len(found) >= max(0, max_new):
+            break
+        handle = (identity.get("handle") or "").strip().lower()
+        channel_id = (identity.get("channel_id") or "").strip()
+        if handle and handle in known_h:
+            continue
+        if channel_id and channel_id in known_c:
+            continue
+        try:
+            if handle:
+                result = discover(handle, fetch=fetch, max_watch=max_watch)
+            else:
+                result = discover_by_id(channel_id, fetch=fetch,
+                                        max_watch=max_watch)
+        except (urllib.error.URLError, OSError, ValueError):
+            continue
+        if result["videos"]:
+            found.append(result)
+    return found
+
+
+def discover_by_id(
+    channel_id: str,
+    *,
+    fetch=None,
+    max_watch: int = 0,
+) -> dict:
+    """RSS (+ watch enrichment) for a `/channel/UC...` URL with no handle.
+
+    The `/streams` tab URL needs a handle, which such a URL does not state,
+    so only the RSS feed (keyed by channel ID) is read. A failed RSS read is
+    an empty result, not an error — discovery degrades, never fails.
+    """
+    fetch = fetch_text if fetch is None else fetch
+    resolved = (channel_id or "").strip()
+    videos: list[dict] = []
+    if resolved:
+        try:
+            entries = rss_entries(fetch(RSS_URL.format(channel_id=resolved)))
+        except (urllib.error.URLError, OSError, ValueError):
+            entries = []
+        for entry in entries:
+            videos.append(
+                {
+                    "url": WATCH_URL.format(video_id=entry["video_id"]),
+                    "video_id": entry["video_id"],
+                    "title": entry["title"],
+                    "published": entry["published"],
+                    "scheduled_start": None,
+                    "is_live_now": False,
+                }
+            )
+        enriched = 0
+        for video in videos:
+            if enriched >= max(0, max_watch):
+                break
+            try:
+                info = watch_info(fetch(video["url"]))
+            except (urllib.error.URLError, OSError, ValueError):
+                continue
+            enriched += 1
+            if info["title"]:
+                video["title"] = info["title"]
+            video["scheduled_start"] = info["scheduled_start"]
+            video["is_live_now"] = info["is_live_now"]
+    return {"handle": "", "channel_id": resolved, "videos": videos}
+
+
 def discover_handles(
     handles: list[str] | None = None,
     *,

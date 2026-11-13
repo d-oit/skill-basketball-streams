@@ -87,7 +87,9 @@ quarantined:
 
 Promotion is automatic, and it is gated on evidence rather than on a reviewer.
 The `approve-sources` job in `runtime-daily.yml` runs `scripts/approve_source.py`
-after a **live** run, on the candidates that run exported. The script re-checks
+after a **live** run, on the candidates that run exported — including the
+`youtube-expand` rows, which is how a channel the ladder merely mentioned
+becomes an approved `@handle`. The script re-checks
 each one and adds a host or `@handle` to `config/sources.json` only when all of
 these hold:
 
@@ -101,6 +103,25 @@ these hold:
 The approved entry is labelled `runtime_approved` with its date and evidence, so
 a later PR can review or remove it. A domain that was discovered but not
 verified on a live write stays quarantined and is rejected at Check 3.
+
+### Query learning (the recall loop search cannot close itself)
+
+`score` reports which backends earn their keep, but a backend that answers is
+not a query that asks. `scripts/queries.py --suggest` joins the fixture ground
+truth against the ledger and proposes queries for the fixtures no row covers —
+the games that existed and nobody asked about. The `self-improve.yml` workflow
+runs it advisory-only after every run with fixtures: suggestions are printed to
+the log for tomorrow's search list, never auto-applied, because a query that
+was never run has no hit rate yet and auto-applying it would let the loop
+spend quota on its own guesses.
+
+Two caps keep the loop honest. `--cap` bounds fixture-derived queries per run
+(default 12), so a 60-game window cannot burn a free tier; per-query hit rates
+(the ledger's `query` field, recorded by `run_daily.py`) are the evidence a
+suggestion graduates on — a query that repeatedly surfaces nothing is dropped
+from the base list by a human, not re-suggested forever. A suggestion that names
+the uncovered fixture's pairing is graded `fixtureQuery=PASS`; anything that
+invents a pairing the fixture does not state is a guess, not a suggestion.
 
 ## 4. Link revalidation
 
