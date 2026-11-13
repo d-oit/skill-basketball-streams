@@ -484,6 +484,13 @@ def test_commitlint_rejects_an_unknown_type() -> None:
     assert proc.returncode == 1
 
 
+def test_commitlint_rejects_a_comma_separated_scope() -> None:
+    """The scope charset is `[a-z0-9._-]`: a `fix(a,b)` subject died on a real
+    commit, so pin the rejection rather than re-learning it."""
+    proc = _run_commitlint("fix(planner,fixtures): retry transient faults\n")
+    assert proc.returncode == 1, "check-commitlint.sh accepted a comma-separated scope"
+
+
 def test_commitlint_rejects_an_over_long_subject() -> None:
     proc = _run_commitlint("chore: " + "x" * 80 + "\n")
     assert proc.returncode == 1, "check-commitlint.sh accepted a >72 char subject"
