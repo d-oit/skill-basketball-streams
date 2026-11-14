@@ -1,6 +1,6 @@
 {
   "$comment": "Machine-readable mirror of references/approved-sources.md. Consumed by scripts/source_learning.py (approved_domains) so newly discovered domains and YouTube channel identities can be quarantined instead of auto-trusted. Keep in sync with the reference doc.",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "sources": [
     {
       "tier": 1,
@@ -236,10 +236,12 @@
         "youtube.com/@basketballbundesliga",
         "youtube.com/@EuroLeague",
         "youtube.com/@BasketballCL",
-        "youtube.com/user/TheDBBTV"
+        "youtube.com/user/TheDBBTV",
+        "youtube.com/@EastAsiaSuperLeague",
+        "youtube.com/@EuroLeagueWomen"
       ],
       "free_access": "selected",
-      "notes": "Only publicly accessible broadcasts qualify; check each stream is not members-only or paywalled. Live-only, future-only. See references/youtube-live-search.md."
+      "notes": "Only publicly accessible broadcasts qualify; check each stream is not members-only or paywalled. Live-only, future-only. See references/youtube-live-search.md. Added 2026-11-14: EASL (@EastAsiaSuperLeague) streams globally on YouTube except Japan, Mongolia, Philippines, Hong Kong SAR, Indonesia, Australia and New Zealand; check each game/territory. EuroLeague Women (@EuroLeagueWomen) offers live and on-demand games except territory-blackout fixtures; check FIBA's current where-to-watch page and the individual game page. Channel approval does not override geo-blocks or prove a specific stream is free."
     },
     {
       "tier": 6,
@@ -310,7 +312,7 @@
       ],
       "social": [],
       "free_access": "selected",
-      "notes": "Free access is decided PER GAME, never per platform. DAZN offers selected basketball free to view without a subscription (for example Basketball Champions League games via Courtside 1891, which DAZN describes as 'Watch the BCL for free', and selected Super League Basketball games). A dazn.com page is a directLink ONLY when the page itself states that this game is free to watch without a subscription, the page plays the game without login-gated paid content, and the game is basketball. Any DAZN game that needs a paid subscription, a free-trial-only signup or a paid tier is REJECTED, as is any game with no explicit free marker, even if the same competition is free elsewhere. Verified 2026-10-20 against dazn.com help and BCL pages."
+      "notes": "Free access is decided PER GAME, never per platform. DAZN offers selected basketball free to view without a subscription (for example Basketball Champions League games via Courtside 1891, which DAZN describes as 'Watch the BCL for free', and selected Super League Basketball games). A dazn.com page is a directLink ONLY when the page itself states that this game is free to watch without a subscription, the page plays the game without login-gated paid content, and the game is basketball. Any DAZN game that needs a paid subscription, a free-trial-only signup or a paid tier is REJECTED, as is any game with no explicit free marker, even if the same competition is free elsewhere. Verified 2026-10-20 against dazn.com help and BCL pages. 2026/27 addition: Super League Basketball (men's Championship, Cup and Play-Offs) states every game is live and on demand free-to-view worldwide. Still require the exact DAZN event page to identify the game and verify it is playable free in Germany; do not generalize this entitlement to other DAZN basketball competitions."
     }
   ],
   "excluded": [
