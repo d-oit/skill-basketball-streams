@@ -14,7 +14,11 @@
     "Basketball Champions League live",
     "PGE Basket Liga live",
     "ORLEN Basket Liga live",
-    "Polska Liga Koszykówki transmisja na żywo"
+    "Polska Liga Koszykówki transmisja na żywo",
+    "East Asia Super League EASL live",
+    "EuroLeague Women live",
+    "FIBA Europe Cup live",
+    "Liga Sudamericana de Baloncesto live"
   ],
   "channels": [
     {
@@ -48,6 +52,10 @@
     {
       "handle": "basketliga",
       "channel_id": "UCT3PGkIHb_jd6Nr8dmQGUMQ"
+    },
+    {
+      "handle": "EuroLeagueWomen",
+      "channel_id": "UChsN13M_uLLQQ8lFewoXxzA"
     }
   ]
 }
