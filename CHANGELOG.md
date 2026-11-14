@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+- Add official East Asia Super League and EuroLeague Women YouTube channels with territory-aware validation.
+- Expand DAZN free-to-view policy for 2026/27 men's Super League Basketball; require exact-event playback verification in Germany.
+- Add targeted EASL, EuroLeague Women, FIBA Europe Cup and Liga Sudamericana discovery queries and regression evals 58–60.
+
 All notable changes to `skill-basketball-streams` will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
