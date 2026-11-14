@@ -702,20 +702,20 @@
         "scripts/youtube_live.py"
       ]
     },
-{
+    {
       "id": 52,
       "prompt": "Phase-0 evidence pre-read lead (same run, recorded_at=2026-11-12T07:47:00+00:00). phase0-evidence.json names url=https://www.magenta.tv/tv/live-daenemark-deutschland/03316f8f with title Danmark - Basketball Frauen EM-Qualifikation; magenta_arena.markers KOSTENLOS=11. Readable sources confirm the game: Dänemark - Deutschland, 2026-11-14T15:00:00+01:00, basketball-bund.de: Alle Spiele live und kostenlos bei MagentaSport und MagentaTV. The agent's own webfetch of the URL returns the 858-byte SPA shell.",
       "expected_output": "Decision=VERIFIED; reason=Checks 1-5 PASS on readable sources (free via basketball-bund.de announcement under the Telekom-DBB deal; game in window 2026-11-14T15:00:00+01:00); Checks 6/7 PASS on the same-run recorded evidence cited verbatim (URL plus KOSTENLOS markers plus recorded_at) in validationNotes; the webfetch shell is the known block, not a failed check; checks: freeAccess=PASS, recordedEvidence=PASS, noRefetchPenalty=PASS",
       "assertions": [
-            "freeAccess expected PASS",
-            "recordedEvidence expected PASS",
-            "noRefetchPenalty expected PASS"
+        "freeAccess expected PASS",
+        "recordedEvidence expected PASS",
+        "noRefetchPenalty expected PASS"
       ],
       "files": [
-            "references/magenta-tv.md",
-            "scripts/run_daily.py"
+        "references/magenta-tv.md",
+        "scripts/run_daily.py"
       ]
-},
+    },
     {
       "id": 53,
       "prompt": "A BBL fixture (ALBA Berlin vs Bayern Muenchen, 2026-11-14T19:00:00+01:00, game_key BBL|ALBA Berlin|Bayern Muenchen|2026-11-14T18:00Z) has no ledger row: every Phase 0 row came from generic queries and none covers this pairing. What does the query-learning loop propose?",
@@ -779,6 +779,52 @@
       "files": [
         "scripts/youtube_live.py",
         "references/youtube-live-search.md"
+      ]
+    },
+    {
+      "id": 58,
+      "prompt": "An upcoming EASL game is streamed on the official @EastAsiaSuperLeague YouTube channel. The official 2026/27 where-to-watch page says YouTube is available globally except Japan, Mongolia, Philippines, Hong Kong SAR, Indonesia, Australia and New Zealand. The viewer is in Germany, the game page links to this public upcoming broadcast, and no local rights blackout is listed. What is the decision?",
+      "expected_output": "Decision=SCHEDULED only after the individual stream is confirmed public and upcoming; Germany is outside the published YouTube exclusion territories, but channel approval alone is insufficient; checks: territory=PASS, officialSource=PASS, liveOnly=PASS, freeAccess=PASS",
+      "assertions": [
+        "territory must be checked against current EASL where-to-watch exclusions",
+        "official game page and actual upcoming broadcast must both be verified",
+        "do not infer free access from channel approval alone"
+      ],
+      "files": [
+        "config/sources.json",
+        "config/youtube-live-queries.json",
+        "references/approved-sources.md",
+        "references/youtube-live-search.md"
+      ]
+    },
+    {
+      "id": 59,
+      "prompt": "An upcoming EuroLeague Women game is listed on the official @EuroLeagueWomen channel, but FIBA's 2026/27 where-to-watch page marks this specific fixture as geo-blocked in Germany and names a local rights holder. What is the decision?",
+      "expected_output": "Decision=REJECT for Germany; the official channel is approved but the specific game is geo-blocked in the viewer's territory; checks: territory=FAIL",
+      "assertions": [
+        "per-game geo-block status overrides channel approval",
+        "reject the geo-blocked YouTube stream for Germany",
+        "do not fall back to a VOD or highlights"
+      ],
+      "files": [
+        "config/sources.json",
+        "references/approved-sources.md",
+        "references/validation-workflow.md"
+      ]
+    },
+    {
+      "id": 60,
+      "prompt": "A Super League Basketball men's Championship fixture in 2026/27 has an official DAZN event page. The DAZN/SLB announcement says every Championship, Cup and Play-Off game is free live and on demand worldwide. The exact event page is marked free-to-view and plays without a paid subscription in Germany. What is the decision?",
+      "expected_output": "Decision=ACCEPT; the specific 2026/27 SLB men's fixture is explicitly free-to-view on DAZN and independently playable in Germany; this does not make other DAZN basketball events free; checks: freeAccess=PASS, territory=PASS, officialSource=PASS",
+      "assertions": [
+        "only SLB men's Championship/Cup/Play-Off fixtures covered by the 2026/27 announcement qualify",
+        "exact DAZN event must be free and playable in Germany",
+        "do not generalize the SLB entitlement to all DAZN basketball"
+      ],
+      "files": [
+        "config/sources.json",
+        "references/approved-sources.md",
+        "references/validation-workflow.md"
       ]
     }
   ]
