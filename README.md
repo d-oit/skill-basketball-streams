@@ -99,7 +99,7 @@ live-stream-runtime-spec.md           Spec: daily runtime, evals, self-improveme
   ├── corpus-refresh.yml              Weekly: re-record the evidence corpus; ONE issue per verdict flip, never per byte change
   └── codeql.yml                      CodeQL analysis
 evals/
-  └── evals.json                      57 standard-schema eval cases (driving the rubric)
+  └── evals.json                      60 standard-schema eval cases (driving the rubric)
 scripts/
   ├── validate.py                     Self-contained validator (stdlib only): four checks plus smoke-test regression guard.
   ├── runtime_eval.py                 Runtime skill-evaluator: structural + canned-stub passes, plus --transcripts for real captured runs.
