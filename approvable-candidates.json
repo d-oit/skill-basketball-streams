@@ -3,33 +3,6 @@
     {
       "league": "FIBA Women's EuroBasket 2027 Qualifiers",
       "teams": [
-        "D\u00e4nemark",
-        "Deutschland"
-      ],
-      "start": "2026-11-14T15:00:00+01:00",
-      "state": "VERIFIED",
-      "summary": "FIBA Women's EuroBasket 2027 Qualifiers: D\u00e4nemark vs Deutschland",
-      "game_key": "FIBA Women's EuroBasket 2027 Qualifiers|Deutschland|D\u00e4nemark|2026-11-14T14:00Z",
-      "url": "https://www.magenta.tv/tv/live-daenemark-deutschland/03316f8f",
-      "backend": "",
-      "evidence": {
-        "live_confirmed": true,
-        "free_confirmed": true
-      },
-      "direct_links": [
-        {
-          "source": "",
-          "url": "https://www.magenta.tv/tv/live-daenemark-deutschland/03316f8f"
-        }
-      ],
-      "source_reference": "https://www.basketball-bund.de/em-quali-dbb-damen-mit-voller-konzentration-in-daenemark/",
-      "access": "Free",
-      "validated_at": "2026-11-13T16:43:57Z",
-      "validation_notes": "Free: basketball-bund.de (2026-11-13) says the game is shown from 14:50 on MagentaSport/MagentaTV kostenlos; tip-off Sat 14.11.2026 15:00 CET. Live: phase0-evidence.json recorded_at 2026-11-13T16:44:00.594516+00:00, patchright render of magenta.tv/sport inside the 'KOSTENLOS & OHNE LOGIN' block (markers KOSTENLOS=11, OHNE LOGIN=10) lists this game with per-game link /tv/live-daenemark-deutschland/03316f8f, 'D\u00e4nemark - Deutschland, Morgen: 13:50 - 17:00' (UTC = 14:50-18:00 CET)."
-    },
-    {
-      "league": "FIBA Women's EuroBasket 2027 Qualifiers",
-      "teams": [
         "Portugal",
         "Deutschland"
       ],
@@ -49,10 +22,10 @@
           "url": "https://www.magenta.tv/tv/live-portugal-deutschland/0331db2a"
         }
       ],
-      "source_reference": "https://www.basketball-bund.de/em-quali-startschuss-fuer-die-dbb-damen/",
-      "access": "Free",
-      "validated_at": "2026-11-13T16:43:57Z",
-      "validation_notes": "Free: basketball-bund.de lists 'Di. 17. November 2026, 20.00 Uhr: Portugal - Deutschland' and 'Alle Spiele live und kostenlos bei MagentaSport und MagentaTV'. Live: phase0-evidence.json recorded_at 2026-11-13T16:44:00.594516+00:00, patchright render of magenta.tv/sport inside the 'KOSTENLOS & OHNE LOGIN' block (KOSTENLOS=11, OHNE LOGIN=10) lists 'Portugal - Deutschland, Di. 17.11.: 18:50 - 22:00' (UTC = 19:50-23:00 CET) with link /tv/live-portugal-deutschland/0331db2a."
+      "source_reference": "https://www.magenta.tv/sport",
+      "access": "Kostenlos",
+      "validated_at": "2026-11-14T15:18:33Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-14T15:18:35.959317+00:00) lists this game under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT' with a per-game player URL; basketball-bund.de announces it free on MagentaSport/MagentaTV at 20:00 CET (the 18:50 Magenta block is the pre-show)."
     },
     {
       "league": "EuroLeague",
@@ -76,10 +49,10 @@
           "url": "https://www.magenta.tv/tv/live-besiktas-istanbul-real-madrid/0331db2b"
         }
       ],
-      "source_reference": "https://www.realmadrid.com/en-US/news/basket/first-team/latest-news/el-calendario-del-real-madrid-para-la-euroliga-2026-27-29-07-2026",
-      "access": "Free",
-      "validated_at": "2026-11-13T16:43:57Z",
-      "validation_notes": "Free/live: phase0-evidence.json recorded_at 2026-11-13T16:44:00.594516+00:00, patchright render of magenta.tv/sport inside the 'KOSTENLOS & OHNE LOGIN' block (KOSTENLOS=11, OHNE LOGIN=10) lists 'Besiktas Istanbul - Real Madrid, Mi. 18.11.: 16:45 - 20:00' (UTC = 17:45-21:00 CET) with link /tv/live-besiktas-istanbul-real-madrid/0331db2b. Official Real Madrid calendar: G.12, Wed 18 Nov, Besiktas-Real Madrid 6:00 pm (CET) = GMT 17:00."
+      "source_reference": "https://www.magenta.tv/sport",
+      "access": "Kostenlos",
+      "validated_at": "2026-11-14T15:18:33Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-14T15:18:35.959317+00:00) lists this EuroLeague game in the free 'KOSTENLOS & OHNE LOGIN' block with a per-game player URL; tip-off 18:00 CET per Real Madrid's official schedule and Besiktas (20:00 Istanbul)."
     },
     {
       "league": "EuroLeague",
@@ -103,10 +76,91 @@
           "url": "https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c"
         }
       ],
-      "source_reference": "https://www.realmadrid.com/en-US/news/basket/first-team/latest-news/el-calendario-del-real-madrid-para-la-euroliga-2026-27-29-07-2026",
+      "source_reference": "https://www.magenta.tv/sport",
+      "access": "Kostenlos",
+      "validated_at": "2026-11-14T15:18:33Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-14T15:18:35.959317+00:00) lists this EuroLeague game in the free 'KOSTENLOS & OHNE LOGIN' block with a per-game player URL; tip-off 20:15 CET per Real Madrid's official schedule and Olympiacos (21:15 Athens)."
+    },
+    {
+      "league": "LBA Serie A",
+      "teams": [
+        "BC Roma",
+        "Tezenis Verona"
+      ],
+      "start": "2026-11-14T20:30:00+01:00",
+      "state": "VERIFIED",
+      "summary": "LBA Serie A: BC Roma vs Tezenis Verona",
+      "game_key": "LBA Serie A|BC Roma|Tezenis Verona|2026-11-14T19:30Z",
+      "url": "https://www.youtube.com/watch?v=PYj9ABg-DYY",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.youtube.com/watch?v=PYj9ABg-DYY"
+        }
+      ],
+      "source_reference": "https://www.youtube.com/@legabasket",
       "access": "Free",
-      "validated_at": "2026-11-13T16:43:57Z",
-      "validation_notes": "Free/live: phase0-evidence.json recorded_at 2026-11-13T16:44:00.594516+00:00, patchright render of magenta.tv/sport inside the 'KOSTENLOS & OHNE LOGIN' block (KOSTENLOS=11, OHNE LOGIN=10) lists 'Olympiakos Pir\u00e4us - Real Madrid, Fr. 20.11.: 19:00 - 21:40' (UTC = 20:00-22:40 CET) with link /tv/live-olympiakos-piraeus-real-madrid/0331db2c. Official Real Madrid calendar: G.13, Fri 20 Nov, Olympiacos-Real Madrid 8:15 pm (CET) = GMT 19:15."
+      "validated_at": "2026-11-14T15:18:33Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-14T15:18:35.959317+00:00) lists this as a scheduled live broadcast on the official @legabasket channel, scheduled_start 2026-11-14T19:30:00+00:00 (=20:30 CET); legabasket.it preview confirms 20.30."
+    },
+    {
+      "league": "LBA Serie A",
+      "teams": [
+        "Napoli Basketball",
+        "Pallacanestro Trieste"
+      ],
+      "start": "2026-11-15T17:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "LBA Serie A: Napoli Basketball vs Pallacanestro Trieste",
+      "game_key": "LBA Serie A|Napoli Basketball|Pallacanestro Trieste|2026-11-15T16:00Z",
+      "url": "https://www.youtube.com/watch?v=8KW_bO72dwA",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.youtube.com/watch?v=8KW_bO72dwA"
+        }
+      ],
+      "source_reference": "https://www.youtube.com/@legabasket",
+      "access": "Free",
+      "validated_at": "2026-11-14T15:18:33Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-14T15:18:35.959317+00:00) lists this as a scheduled live broadcast on the official @legabasket channel, scheduled_start 2026-11-15T16:00:00+00:00 (=17:00 CET); GameDay 8 on legabasket.it."
+    },
+    {
+      "league": "LBA Serie A",
+      "teams": [
+        "Dolomiti Energia Trentino",
+        "Virtus Costa Bologna"
+      ],
+      "start": "2026-11-15T19:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "LBA Serie A: Dolomiti Energia Trentino vs Virtus Costa Bologna",
+      "game_key": "LBA Serie A|Dolomiti Energia Trentino|Virtus Costa Bologna|2026-11-15T18:00Z",
+      "url": "https://www.youtube.com/watch?v=azLDQdNzmrc",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.youtube.com/watch?v=azLDQdNzmrc"
+        }
+      ],
+      "source_reference": "https://www.youtube.com/@legabasket",
+      "access": "Free",
+      "validated_at": "2026-11-14T15:18:33Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-14T15:18:35.959317+00:00) lists this as a scheduled live broadcast on the official @legabasket channel, scheduled_start 2026-11-15T18:00:00+00:00 (=19:00 CET); GameDay 8 on legabasket.it."
     }
   ]
 }

@@ -1,9 +1,9 @@
 {
   "audit": {
-    "inconclusive": 27,
+    "inconclusive": 30,
     "judged": 69,
     "precision": 1.0,
-    "rows": 96,
+    "rows": 99,
     "verified": 69,
     "wrong": 0
   },
@@ -150,9 +150,9 @@
     ]
   },
   "recall": {
-    "captured": 2,
+    "captured": 5,
     "eligible": 2066,
-    "missed": 2064,
+    "missed": 2061,
     "missed_keys": [
       "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
       "easyCredit BBL|Rostock Seawolves|Science City Jena|2026-11-21T15:00Z",
@@ -1367,7 +1367,6 @@
       "https://www.youtube.com/watch?v=7xMd31qaqds",
       "https://www.youtube.com/watch?v=80VAsCqwW90",
       "https://www.youtube.com/watch?v=8208-NetkYI",
-      "https://www.youtube.com/watch?v=8KW_bO72dwA",
       "https://www.youtube.com/watch?v=8MC0ubxZI-E",
       "https://www.youtube.com/watch?v=8O0mrS_Ujd8",
       "https://www.youtube.com/watch?v=8W_JUfOUDvY",
@@ -1627,7 +1626,6 @@
       "https://www.youtube.com/watch?v=PBopMg2TGAk",
       "https://www.youtube.com/watch?v=PDTjcSK8Pdc",
       "https://www.youtube.com/watch?v=PXlEYkn5Aso",
-      "https://www.youtube.com/watch?v=PYj9ABg-DYY",
       "https://www.youtube.com/watch?v=PhiWEWUtnIQ",
       "https://www.youtube.com/watch?v=Q-IRFAdmRSc",
       "https://www.youtube.com/watch?v=Q1Sy62d091A",
@@ -1802,7 +1800,6 @@
       "https://www.youtube.com/watch?v=ajCcf3kitAs",
       "https://www.youtube.com/watch?v=alekqvbCb3A",
       "https://www.youtube.com/watch?v=ao333sHnnZw",
-      "https://www.youtube.com/watch?v=azLDQdNzmrc",
       "https://www.youtube.com/watch?v=b-YKXwDluOY",
       "https://www.youtube.com/watch?v=b1Kj7PCovv0",
       "https://www.youtube.com/watch?v=b6kvj0Giq8c",
@@ -2219,10 +2216,10 @@
       "https://youtube.com/watch?v=yTai91_OsMw",
       "https://youtube.com/watch?v=yi7USox4xB8"
     ],
-    "recall": 0.001,
-    "rows": 29862,
+    "recall": 0.002,
+    "rows": 29868,
     "unique_games": 2973,
-    "unverifiable": 2064,
+    "unverifiable": 2061,
     "unverifiable_keys": [
       "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
       "easyCredit BBL|Rostock Seawolves|Science City Jena|2026-11-21T15:00Z",
@@ -3437,7 +3434,6 @@
       "https://www.youtube.com/watch?v=7xMd31qaqds",
       "https://www.youtube.com/watch?v=80VAsCqwW90",
       "https://www.youtube.com/watch?v=8208-NetkYI",
-      "https://www.youtube.com/watch?v=8KW_bO72dwA",
       "https://www.youtube.com/watch?v=8MC0ubxZI-E",
       "https://www.youtube.com/watch?v=8O0mrS_Ujd8",
       "https://www.youtube.com/watch?v=8W_JUfOUDvY",
@@ -3697,7 +3693,6 @@
       "https://www.youtube.com/watch?v=PBopMg2TGAk",
       "https://www.youtube.com/watch?v=PDTjcSK8Pdc",
       "https://www.youtube.com/watch?v=PXlEYkn5Aso",
-      "https://www.youtube.com/watch?v=PYj9ABg-DYY",
       "https://www.youtube.com/watch?v=PhiWEWUtnIQ",
       "https://www.youtube.com/watch?v=Q-IRFAdmRSc",
       "https://www.youtube.com/watch?v=Q1Sy62d091A",
@@ -3872,7 +3867,6 @@
       "https://www.youtube.com/watch?v=ajCcf3kitAs",
       "https://www.youtube.com/watch?v=alekqvbCb3A",
       "https://www.youtube.com/watch?v=ao333sHnnZw",
-      "https://www.youtube.com/watch?v=azLDQdNzmrc",
       "https://www.youtube.com/watch?v=b-YKXwDluOY",
       "https://www.youtube.com/watch?v=b1Kj7PCovv0",
       "https://www.youtube.com/watch?v=b6kvj0Giq8c",
@@ -4290,47 +4284,13 @@
       "https://youtube.com/watch?v=yi7USox4xB8"
     ]
   },
-  "run_id": "2026-11-14T15:17Z",
+  "run_id": "",
   "source": {
-    "audit_rows": 96,
-    "candidates_rows": 29862,
+    "audit_rows": 99,
+    "candidates_rows": 29868,
     "fixtures_rows": 133
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 359,
-      "missed": 359,
-      "recall": 0.0,
-      "rows": 517,
-      "run_id": "2026-11-13T06:50Z",
-      "unique_games": 498
-    },
-    {
-      "audit": {
-        "inconclusive": 2,
-        "judged": 0,
-        "precision": null,
-        "rows": 2,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 7,
-      "run_id": "2026-11-13T07:05Z",
-      "unique_games": 7
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -4534,7 +4494,41 @@
       "rows": 75,
       "run_id": "2026-11-14T15:16Z",
       "unique_games": 75
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 6,
+      "run_id": "2026-11-14T15:23Z",
+      "unique_games": 6
+    },
+    {
+      "audit": {
+        "inconclusive": 3,
+        "judged": 0,
+        "precision": null,
+        "rows": 3,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-11-14T15:24Z",
+      "unique_games": 0
     }
   ],
-  "ts": "2026-11-14T15:17:30.443082+00:00"
+  "ts": "2026-11-14T15:24:30.078900+00:00"
 }
