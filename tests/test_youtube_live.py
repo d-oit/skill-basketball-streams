@@ -515,6 +515,7 @@ class TestCli:
             "enbleague",
             "legabasket",
             "basketliga",
+            "euroleaguewomen",
         }
         assert next(row for row in channels if row["handle"] == "basketliga")["channel_id"] == "UCT3PGkIHb_jd6Nr8dmQGUMQ"
         for row in channels:
