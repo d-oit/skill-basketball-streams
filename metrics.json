@@ -1,9 +1,9 @@
 {
   "audit": {
-    "inconclusive": 30,
+    "inconclusive": 31,
     "judged": 69,
     "precision": 1.0,
-    "rows": 99,
+    "rows": 100,
     "verified": 69,
     "wrong": 0
   },
@@ -155,6 +155,7 @@
     "missed": 2183,
     "missed_keys": [
       "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
+      "EuroLeague|Real Madrid|Zalgiris Kaunas|2026-11-25T19:45Z",
       "easyCredit BBL|Rostock Seawolves|Science City Jena|2026-11-21T15:00Z",
       "http://courtside1891.com",
       "http://live.basketball-bundesliga.de/home",
@@ -926,7 +927,6 @@
       "https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c",
       "https://www.magenta.tv/tv/live-penny-del-konferenz/03316f66",
       "https://www.magenta.tv/tv/live-premier-padel-dubai-p1-2026-finale/03332ba1",
-      "https://www.magenta.tv/tv/live-real-madrid-zalgiris-kaunas/03349c75",
       "https://www.magenta.tv/tv/live-sky-sport-news-der-mittag/03319170",
       "https://www.magenta.tv/tv/live-sky-sport-news-der-mittag/0331d221",
       "https://www.magenta.tv/tv/live-sky-sport-news-der-nachmittag/0332e2a4",
@@ -2339,11 +2339,12 @@
       "https://youtube.com/watch?v=zNU44AAcyOc"
     ],
     "recall": 0.002,
-    "rows": 30749,
-    "unique_games": 3129,
+    "rows": 30757,
+    "unique_games": 3131,
     "unverifiable": 2183,
     "unverifiable_keys": [
       "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
+      "EuroLeague|Real Madrid|Zalgiris Kaunas|2026-11-25T19:45Z",
       "easyCredit BBL|Rostock Seawolves|Science City Jena|2026-11-21T15:00Z",
       "http://courtside1891.com",
       "http://live.basketball-bundesliga.de/home",
@@ -3115,7 +3116,6 @@
       "https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c",
       "https://www.magenta.tv/tv/live-penny-del-konferenz/03316f66",
       "https://www.magenta.tv/tv/live-premier-padel-dubai-p1-2026-finale/03332ba1",
-      "https://www.magenta.tv/tv/live-real-madrid-zalgiris-kaunas/03349c75",
       "https://www.magenta.tv/tv/live-sky-sport-news-der-mittag/03319170",
       "https://www.magenta.tv/tv/live-sky-sport-news-der-mittag/0331d221",
       "https://www.magenta.tv/tv/live-sky-sport-news-der-nachmittag/0332e2a4",
@@ -4528,30 +4528,13 @@
       "https://youtube.com/watch?v=zNU44AAcyOc"
     ]
   },
-  "run_id": "2026-11-15T15:48Z",
+  "run_id": "",
   "source": {
-    "audit_rows": 99,
-    "candidates_rows": 30749,
+    "audit_rows": 100,
+    "candidates_rows": 30757,
     "fixtures_rows": 133
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 2,
-        "judged": 0,
-        "precision": null,
-        "rows": 2,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-11-13T07:52Z",
-      "unique_games": 0
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -4772,7 +4755,24 @@
       "rows": 35,
       "run_id": "2026-11-15T15:47Z",
       "unique_games": 35
+    },
+    {
+      "audit": {
+        "inconclusive": 1,
+        "judged": 0,
+        "precision": null,
+        "rows": 1,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 8,
+      "run_id": "2026-11-15T16:04Z",
+      "unique_games": 8
     }
   ],
-  "ts": "2026-11-15T15:48:09.825115+00:00"
+  "ts": "2026-11-15T16:04:38.069560+00:00"
 }

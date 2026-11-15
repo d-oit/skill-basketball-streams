@@ -1,6 +1,60 @@
 {
   "candidates": [
     {
+      "league": "easyCredit BBL",
+      "teams": [
+        "NINERS Chemnitz",
+        "Basketball L\u00f6wen Braunschweig"
+      ],
+      "start": "2026-11-15T18:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "easyCredit BBL: NINERS Chemnitz vs Basketball L\u00f6wen Braunschweig",
+      "game_key": "easyCredit BBL|Basketball L\u00f6wen Braunschweig|NINERS Chemnitz|2026-11-15T17:00Z",
+      "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4"
+        }
+      ],
+      "source_reference": "https://www.dyn.sport/deinsender/dyn-sport-mix/",
+      "access": "Free",
+      "validated_at": "2026-11-15T15:49:11Z",
+      "validation_notes": "dyn.sport/deinsender/dyn-sport-mix/ fetched 2026-11-15 lists 'So. 15.11.2026, 18:00 Uhr - easyCredit BBL NINERS Chemnitz - Basketball L\u00f6wen Braunschweig' under 'Basketball bei Dyn Sport Mix ... Live bei Dyn und bei allen Dyn Sport Mix Partnern'. Dyn Sport Mix is the free channel carried on Pluto TV (https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4)."
+    },
+    {
+      "league": "LBA Serie A",
+      "teams": [
+        "Dolomiti Energia Trentino",
+        "Virtus Costa Bologna"
+      ],
+      "start": "2026-11-15T19:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "LBA Serie A: Dolomiti Energia Trentino vs Virtus Costa Bologna",
+      "game_key": "LBA Serie A|Dolomiti Energia Trentino|Virtus Costa Bologna|2026-11-15T18:00Z",
+      "url": "https://www.youtube.com/watch?v=azLDQdNzmrc",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.youtube.com/watch?v=azLDQdNzmrc"
+        }
+      ],
+      "source_reference": "https://www.legabasket.it/game/25417/dolomiti-energia-trentino-virtus-costa-bologna",
+      "access": "Free",
+      "validated_at": "2026-11-15T15:49:11Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-15T15:49:14Z) records @legabasket video azLDQdNzmrc 'LIVE | Dolomiti Energia Trentino vs Virtus Costa Bologna | Serie A SisalClub 2026/27 | GameDay 8' with scheduled_start 2026-11-15T18:00:00Z (19:00 CET); legabasket.it game page confirms 15/11/2026 ore 19:00. @legabasket is the approved free official league channel."
+    },
+    {
       "league": "FIBA Women's EuroBasket 2027 Qualifiers",
       "teams": [
         "Portugal",
@@ -23,9 +77,9 @@
         }
       ],
       "source_reference": "https://www.magenta.tv/sport",
-      "access": "Kostenlos",
-      "validated_at": "2026-11-14T15:18:33Z",
-      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-14T15:18:35.959317+00:00) lists this game under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT' with a per-game player URL; basketball-bund.de announces it free on MagentaSport/MagentaTV at 20:00 CET (the 18:50 Magenta block is the pre-show)."
+      "access": "Free",
+      "validated_at": "2026-11-15T15:49:11Z",
+      "validation_notes": "phase0-evidence.json magenta_arena render (recorded_at 2026-11-15T15:49:14Z, KOSTENLOS x11 / OHNE LOGIN x10) lists 'FIBA Basketball Frauen EM-Qualifikation 2027 - LIVE: Portugal - Deutschland, Di. 17.11.: 18:50 - 22:00' under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT'; basketball-bund.de and MagentaSport confirm the game is kostenlos, tip-off 20:00 CET."
     },
     {
       "league": "EuroLeague",
@@ -50,9 +104,9 @@
         }
       ],
       "source_reference": "https://www.magenta.tv/sport",
-      "access": "Kostenlos",
-      "validated_at": "2026-11-14T15:18:33Z",
-      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-14T15:18:35.959317+00:00) lists this EuroLeague game in the free 'KOSTENLOS & OHNE LOGIN' block with a per-game player URL; tip-off 18:00 CET per Real Madrid's official schedule and Besiktas (20:00 Istanbul)."
+      "access": "Free",
+      "validated_at": "2026-11-15T15:49:11Z",
+      "validation_notes": "phase0-evidence.json magenta_arena render (recorded_at 2026-11-15T15:49:14Z, KOSTENLOS x11 / OHNE LOGIN x10) lists 'Euroleague - LIVE: Besiktas Istanbul - Real Madrid, Mi. 18.11.: 16:45 - 20:00' under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT'; realmadrid.com confirms tip-off 18:00 CET on 18 Nov."
     },
     {
       "league": "EuroLeague",
@@ -77,21 +131,21 @@
         }
       ],
       "source_reference": "https://www.magenta.tv/sport",
-      "access": "Kostenlos",
-      "validated_at": "2026-11-14T15:18:33Z",
-      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-14T15:18:35.959317+00:00) lists this EuroLeague game in the free 'KOSTENLOS & OHNE LOGIN' block with a per-game player URL; tip-off 20:15 CET per Real Madrid's official schedule and Olympiacos (21:15 Athens)."
+      "access": "Free",
+      "validated_at": "2026-11-15T15:49:11Z",
+      "validation_notes": "phase0-evidence.json magenta_arena render (recorded_at 2026-11-15T15:49:14Z, KOSTENLOS x11 / OHNE LOGIN x10) lists 'Euroleague - LIVE: Olympiakos Pir\u00e4us - Real Madrid, Fr. 20.11.: 19:00 - 21:40' under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT'; realmadrid.com confirms tip-off 20:15 CET on 20 Nov."
     },
     {
-      "league": "LBA Serie A",
+      "league": "easyCredit BBL",
       "teams": [
-        "BC Roma",
-        "Tezenis Verona"
+        "Science City Jena",
+        "ROSTOCK SEAWOLVES"
       ],
-      "start": "2026-11-14T20:30:00+01:00",
+      "start": "2026-11-21T16:00:00+01:00",
       "state": "VERIFIED",
-      "summary": "LBA Serie A: BC Roma vs Tezenis Verona",
-      "game_key": "LBA Serie A|BC Roma|Tezenis Verona|2026-11-14T19:30Z",
-      "url": "https://www.youtube.com/watch?v=PYj9ABg-DYY",
+      "summary": "easyCredit BBL: Science City Jena vs ROSTOCK SEAWOLVES",
+      "game_key": "easyCredit BBL|ROSTOCK SEAWOLVES|Science City Jena|2026-11-21T15:00Z",
+      "url": "https://www.ardmediathek.de/video/sportschau/bbl-science-city-jena-gegen-rostock-seawolves/das-erste/Y3JpZDovL3Nwb3J0c2NoYXUuZGUvZWNkOGVkYjItYzliNy00Y2E1LWIwYWEtMzVhZTZmNDA5YTYy",
       "backend": "",
       "evidence": {
         "live_confirmed": true,
@@ -100,25 +154,25 @@
       "direct_links": [
         {
           "source": "",
-          "url": "https://www.youtube.com/watch?v=PYj9ABg-DYY"
+          "url": "https://www.ardmediathek.de/video/sportschau/bbl-science-city-jena-gegen-rostock-seawolves/das-erste/Y3JpZDovL3Nwb3J0c2NoYXUuZGUvZWNkOGVkYjItYzliNy00Y2E1LWIwYWEtMzVhZTZmNDA5YTYy"
         }
       ],
-      "source_reference": "https://www.youtube.com/@legabasket",
+      "source_reference": "https://www.ardmediathek.de/video/sportschau/bbl-science-city-jena-gegen-rostock-seawolves/das-erste/Y3JpZDovL3Nwb3J0c2NoYXUuZGUvZWNkOGVkYjItYzliNy00Y2E1LWIwYWEtMzVhZTZmNDA5YTYy",
       "access": "Free",
-      "validated_at": "2026-11-14T15:18:33Z",
-      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-14T15:18:35.959317+00:00) lists this as a scheduled live broadcast on the official @legabasket channel, scheduled_start 2026-11-14T19:30:00+00:00 (=20:30 CET); legabasket.it preview confirms 20.30."
+      "validated_at": "2026-11-15T15:49:11Z",
+      "validation_notes": "webfetch of the ARD Mediathek page on 2026-11-15 returned 'Livestream - BBL - Science City Jena gegen Rostock Seawolves, 21.11.2026 16:00-18:00, Das Erste, Das Spiel im Livestream des MDR'; free public broadcaster."
     },
     {
-      "league": "LBA Serie A",
+      "league": "easyCredit BBL",
       "teams": [
-        "Napoli Basketball",
-        "Pallacanestro Trieste"
+        "ALBA BERLIN",
+        "FC Bayern M\u00fcnchen"
       ],
-      "start": "2026-11-15T17:00:00+01:00",
+      "start": "2026-11-22T18:00:00+01:00",
       "state": "VERIFIED",
-      "summary": "LBA Serie A: Napoli Basketball vs Pallacanestro Trieste",
-      "game_key": "LBA Serie A|Napoli Basketball|Pallacanestro Trieste|2026-11-15T16:00Z",
-      "url": "https://www.youtube.com/watch?v=8KW_bO72dwA",
+      "summary": "easyCredit BBL: ALBA BERLIN vs FC Bayern M\u00fcnchen",
+      "game_key": "easyCredit BBL|ALBA BERLIN|FC Bayern M\u00fcnchen|2026-11-22T17:00Z",
+      "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
       "backend": "",
       "evidence": {
         "live_confirmed": true,
@@ -127,25 +181,25 @@
       "direct_links": [
         {
           "source": "",
-          "url": "https://www.youtube.com/watch?v=8KW_bO72dwA"
+          "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4"
         }
       ],
-      "source_reference": "https://www.youtube.com/@legabasket",
+      "source_reference": "https://www.dyn.sport/deinsender/dyn-sport-mix/",
       "access": "Free",
-      "validated_at": "2026-11-14T15:18:33Z",
-      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-14T15:18:35.959317+00:00) lists this as a scheduled live broadcast on the official @legabasket channel, scheduled_start 2026-11-15T16:00:00+00:00 (=17:00 CET); GameDay 8 on legabasket.it."
+      "validated_at": "2026-11-15T15:49:11Z",
+      "validation_notes": "dyn.sport/deinsender/dyn-sport-mix/ fetched 2026-11-15 lists 'So. 22.11.2026 - easyCredit BBL ALBA BERLIN - FC Bayern M\u00fcnchen Basketball' under 'Basketball bei Dyn Sport Mix ... Live bei Dyn und bei allen Dyn Sport Mix Partnern'. easycredit-bbl.de, the Uber Arena and Dyn's event page confirm tip-off 18:00 CET (the free list's 16:30 is stale). Dyn Sport Mix is free on Pluto TV."
     },
     {
-      "league": "LBA Serie A",
+      "league": "EuroLeague",
       "teams": [
-        "Dolomiti Energia Trentino",
-        "Virtus Costa Bologna"
+        "Real Madrid",
+        "Zalgiris Kaunas"
       ],
-      "start": "2026-11-15T19:00:00+01:00",
+      "start": "2026-11-25T20:45:00+01:00",
       "state": "VERIFIED",
-      "summary": "LBA Serie A: Dolomiti Energia Trentino vs Virtus Costa Bologna",
-      "game_key": "LBA Serie A|Dolomiti Energia Trentino|Virtus Costa Bologna|2026-11-15T18:00Z",
-      "url": "https://www.youtube.com/watch?v=azLDQdNzmrc",
+      "summary": "EuroLeague: Real Madrid vs Zalgiris Kaunas",
+      "game_key": "EuroLeague|Real Madrid|Zalgiris Kaunas|2026-11-25T19:45Z",
+      "url": "https://www.magenta.tv/tv/live-real-madrid-zalgiris-kaunas/03349c75",
       "backend": "",
       "evidence": {
         "live_confirmed": true,
@@ -154,13 +208,13 @@
       "direct_links": [
         {
           "source": "",
-          "url": "https://www.youtube.com/watch?v=azLDQdNzmrc"
+          "url": "https://www.magenta.tv/tv/live-real-madrid-zalgiris-kaunas/03349c75"
         }
       ],
-      "source_reference": "https://www.youtube.com/@legabasket",
+      "source_reference": "https://www.magenta.tv/sport",
       "access": "Free",
-      "validated_at": "2026-11-14T15:18:33Z",
-      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-14T15:18:35.959317+00:00) lists this as a scheduled live broadcast on the official @legabasket channel, scheduled_start 2026-11-15T18:00:00+00:00 (=19:00 CET); GameDay 8 on legabasket.it."
+      "validated_at": "2026-11-15T15:49:11Z",
+      "validation_notes": "phase0-evidence.json magenta_arena render (recorded_at 2026-11-15T15:49:14Z, KOSTENLOS x11 / OHNE LOGIN x10) lists 'Euroleague - LIVE: Real Madrid - Zalgiris Kaunas, Mi. 25.11.: 19:30 - 22:10' under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT'; realmadrid.com confirms tip-off 20:45 CET on 25 Nov."
     }
   ]
 }
