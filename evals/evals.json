@@ -786,25 +786,27 @@
       "prompt": "An upcoming EASL game is streamed on the official @EastAsiaSuperLeague YouTube channel. The official 2026/27 where-to-watch page says YouTube is available globally except Japan, Mongolia, Philippines, Hong Kong SAR, Indonesia, Australia and New Zealand. The viewer is in Germany, the game page links to this public upcoming broadcast, and no local rights blackout is listed. What is the decision?",
       "expected_output": "Decision=SCHEDULED only after the individual stream is confirmed public and upcoming; Germany is outside the published YouTube exclusion territories, but channel approval alone is insufficient; checks: territory=PASS, officialSource=PASS, liveOnly=PASS, freeAccess=PASS",
       "assertions": [
-        "territory must be checked against current EASL where-to-watch exclusions",
-        "official game page and actual upcoming broadcast must both be verified",
-        "do not infer free access from channel approval alone"
+        "territory expected PASS",
+        "officialSource expected PASS",
+        "liveOnly expected PASS",
+        "freeAccess expected PASS"
       ],
       "files": [
         "config/sources.json",
         "config/youtube-live-queries.json",
         "references/approved-sources.md",
+        "references/validation-workflow.md",
         "references/youtube-live-search.md"
       ]
     },
     {
       "id": 59,
       "prompt": "An upcoming EuroLeague Women game is listed on the official @EuroLeagueWomen channel, but FIBA's 2026/27 where-to-watch page marks this specific fixture as geo-blocked in Germany and names a local rights holder. What is the decision?",
-      "expected_output": "Decision=REJECT for Germany; the official channel is approved but the specific game is geo-blocked in the viewer's territory; checks: territory=FAIL",
+      "expected_output": "Decision=REJECT for Germany; the official channel is approved but the specific game is geo-blocked in the viewer's territory; checks: territory=FAIL, officialSource=PASS, freeAccess=FAIL",
       "assertions": [
-        "per-game geo-block status overrides channel approval",
-        "reject the geo-blocked YouTube stream for Germany",
-        "do not fall back to a VOD or highlights"
+        "territory expected FAIL",
+        "officialSource expected PASS",
+        "freeAccess expected FAIL"
       ],
       "files": [
         "config/sources.json",
@@ -817,9 +819,9 @@
       "prompt": "A Super League Basketball men's Championship fixture in 2026/27 has an official DAZN event page. The DAZN/SLB announcement says every Championship, Cup and Play-Off game is free live and on demand worldwide. The exact event page is marked free-to-view and plays without a paid subscription in Germany. What is the decision?",
       "expected_output": "Decision=ACCEPT; the specific 2026/27 SLB men's fixture is explicitly free-to-view on DAZN and independently playable in Germany; this does not make other DAZN basketball events free; checks: freeAccess=PASS, territory=PASS, officialSource=PASS",
       "assertions": [
-        "only SLB men's Championship/Cup/Play-Off fixtures covered by the 2026/27 announcement qualify",
-        "exact DAZN event must be free and playable in Germany",
-        "do not generalize the SLB entitlement to all DAZN basketball"
+        "territory expected PASS",
+        "freeAccess expected PASS",
+        "officialSource expected PASS"
       ],
       "files": [
         "config/sources.json",

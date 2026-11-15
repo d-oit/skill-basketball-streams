@@ -120,6 +120,8 @@ DEFAULT_ALLOWED_HANDLES = (
     "enbleague",
     "legabasket",
     "basketliga",
+    "eastasiasuperleague",
+    "euroleaguewomen",
 )
 
 
