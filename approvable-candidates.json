@@ -1,60 +1,6 @@
 {
   "candidates": [
     {
-      "league": "easyCredit BBL",
-      "teams": [
-        "NINERS Chemnitz",
-        "Basketball L\u00f6wen Braunschweig"
-      ],
-      "start": "2026-11-15T18:00:00+01:00",
-      "state": "VERIFIED",
-      "summary": "easyCredit BBL: NINERS Chemnitz vs Basketball L\u00f6wen Braunschweig",
-      "game_key": "easyCredit BBL|Basketball L\u00f6wen Braunschweig|NINERS Chemnitz|2026-11-15T17:00Z",
-      "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
-      "backend": "",
-      "evidence": {
-        "live_confirmed": true,
-        "free_confirmed": true
-      },
-      "direct_links": [
-        {
-          "source": "",
-          "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4"
-        }
-      ],
-      "source_reference": "https://www.dyn.sport/deinsender/dyn-sport-mix/",
-      "access": "Free",
-      "validated_at": "2026-11-15T15:49:11Z",
-      "validation_notes": "dyn.sport/deinsender/dyn-sport-mix/ fetched 2026-11-15 lists 'So. 15.11.2026, 18:00 Uhr - easyCredit BBL NINERS Chemnitz - Basketball L\u00f6wen Braunschweig' under 'Basketball bei Dyn Sport Mix ... Live bei Dyn und bei allen Dyn Sport Mix Partnern'. Dyn Sport Mix is the free channel carried on Pluto TV (https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4)."
-    },
-    {
-      "league": "LBA Serie A",
-      "teams": [
-        "Dolomiti Energia Trentino",
-        "Virtus Costa Bologna"
-      ],
-      "start": "2026-11-15T19:00:00+01:00",
-      "state": "VERIFIED",
-      "summary": "LBA Serie A: Dolomiti Energia Trentino vs Virtus Costa Bologna",
-      "game_key": "LBA Serie A|Dolomiti Energia Trentino|Virtus Costa Bologna|2026-11-15T18:00Z",
-      "url": "https://www.youtube.com/watch?v=azLDQdNzmrc",
-      "backend": "",
-      "evidence": {
-        "live_confirmed": true,
-        "free_confirmed": true
-      },
-      "direct_links": [
-        {
-          "source": "",
-          "url": "https://www.youtube.com/watch?v=azLDQdNzmrc"
-        }
-      ],
-      "source_reference": "https://www.legabasket.it/game/25417/dolomiti-energia-trentino-virtus-costa-bologna",
-      "access": "Free",
-      "validated_at": "2026-11-15T15:49:11Z",
-      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-15T15:49:14Z) records @legabasket video azLDQdNzmrc 'LIVE | Dolomiti Energia Trentino vs Virtus Costa Bologna | Serie A SisalClub 2026/27 | GameDay 8' with scheduled_start 2026-11-15T18:00:00Z (19:00 CET); legabasket.it game page confirms 15/11/2026 ore 19:00. @legabasket is the approved free official league channel."
-    },
-    {
       "league": "FIBA Women's EuroBasket 2027 Qualifiers",
       "teams": [
         "Portugal",
@@ -76,10 +22,10 @@
           "url": "https://www.magenta.tv/tv/live-portugal-deutschland/0331db2a"
         }
       ],
-      "source_reference": "https://www.magenta.tv/sport",
+      "source_reference": "https://www.basketball-bund.de/em-quali-startschuss-fuer-die-dbb-damen",
       "access": "Free",
-      "validated_at": "2026-11-15T15:49:11Z",
-      "validation_notes": "phase0-evidence.json magenta_arena render (recorded_at 2026-11-15T15:49:14Z, KOSTENLOS x11 / OHNE LOGIN x10) lists 'FIBA Basketball Frauen EM-Qualifikation 2027 - LIVE: Portugal - Deutschland, Di. 17.11.: 18:50 - 22:00' under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT'; basketball-bund.de and MagentaSport confirm the game is kostenlos, tip-off 20:00 CET."
+      "validated_at": "2026-11-16T18:50:52Z",
+      "validation_notes": "Checks 1-5: basketball-bund.de announces Portugal - Deutschland on Di. 17.11.2026, 20.00 Uhr (Odivelas) and states 'Alle Spiele live und kostenlos bei MagentaSport und MagentaTV'; ran.joyn confirms 17 Nov, 20 Uhr, free on Joyn. phase0-evidence.json magenta_arena (rendered_at 2026-11-16T18:50:55.340103+00:00) lists 'FIBA Basketball Frauen EM-Qualifikation 2027 - LIVE: Portugal - Deutschland, Morgen: 18:50 - 22:00' with per-game link live-portugal-deutschland under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT' (KOSTENLOS x11, OHNE LOGIN x10). Check 6/7 proof: that same-run arena render is the recorded evidence for this exact URL; 18:50 is the pre-game broadcast window, tip-off 20:00 per DBB."
     },
     {
       "league": "EuroLeague",
@@ -103,21 +49,21 @@
           "url": "https://www.magenta.tv/tv/live-besiktas-istanbul-real-madrid/0331db2b"
         }
       ],
-      "source_reference": "https://www.magenta.tv/sport",
+      "source_reference": "https://www.euroleaguebasketball.net/en/euroleague/game-center/2026-27/besiktas-istanbul-real-madrid/E2026/120",
       "access": "Free",
-      "validated_at": "2026-11-15T15:49:11Z",
-      "validation_notes": "phase0-evidence.json magenta_arena render (recorded_at 2026-11-15T15:49:14Z, KOSTENLOS x11 / OHNE LOGIN x10) lists 'Euroleague - LIVE: Besiktas Istanbul - Real Madrid, Mi. 18.11.: 16:45 - 20:00' under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT'; realmadrid.com confirms tip-off 18:00 CET on 18 Nov."
+      "validated_at": "2026-11-16T18:50:52Z",
+      "validation_notes": "Checks 1-5: EuroLeague official game center dates Besiktas Istanbul - Real Madrid 2026-11-18 at 17:00 GMT (18:00 CET); EuroLeague printable regular-season calendar lists the same Round 12 fixture. phase0-evidence.json magenta_arena (rendered_at 2026-11-16T18:50:55.340103+00:00) lists 'Euroleague - LIVE: Besiktas Istanbul - Real Madrid, Mi. 18.11.: 16:45 - 20:00' with per-game link live-besiktas-istanbul-real-madrid under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT' (KOSTENLOS x11, OHNE LOGIN x10). Check 6/7 proof: that same-run arena render is the recorded evidence; 16:45 is the pre-game window, tip 18:00 CET."
     },
     {
       "league": "EuroLeague",
       "teams": [
-        "Olympiakos Pir\u00e4us",
+        "Olympiacos Piraeus",
         "Real Madrid"
       ],
       "start": "2026-11-20T20:15:00+01:00",
       "state": "VERIFIED",
-      "summary": "EuroLeague: Olympiakos Pir\u00e4us vs Real Madrid",
-      "game_key": "EuroLeague|Olympiakos Pir\u00e4us|Real Madrid|2026-11-20T19:15Z",
+      "summary": "EuroLeague: Olympiacos Piraeus vs Real Madrid",
+      "game_key": "EuroLeague|Olympiacos Piraeus|Real Madrid|2026-11-20T19:15Z",
       "url": "https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c",
       "backend": "",
       "evidence": {
@@ -130,64 +76,10 @@
           "url": "https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c"
         }
       ],
-      "source_reference": "https://www.magenta.tv/sport",
+      "source_reference": "https://www.realmadrid.com/en-US/news/basket/first-team/latest-news/el-calendario-del-real-madrid-para-la-euroliga-2026-27-29-07-2026",
       "access": "Free",
-      "validated_at": "2026-11-15T15:49:11Z",
-      "validation_notes": "phase0-evidence.json magenta_arena render (recorded_at 2026-11-15T15:49:14Z, KOSTENLOS x11 / OHNE LOGIN x10) lists 'Euroleague - LIVE: Olympiakos Pir\u00e4us - Real Madrid, Fr. 20.11.: 19:00 - 21:40' under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT'; realmadrid.com confirms tip-off 20:15 CET on 20 Nov."
-    },
-    {
-      "league": "easyCredit BBL",
-      "teams": [
-        "Science City Jena",
-        "ROSTOCK SEAWOLVES"
-      ],
-      "start": "2026-11-21T16:00:00+01:00",
-      "state": "VERIFIED",
-      "summary": "easyCredit BBL: Science City Jena vs ROSTOCK SEAWOLVES",
-      "game_key": "easyCredit BBL|ROSTOCK SEAWOLVES|Science City Jena|2026-11-21T15:00Z",
-      "url": "https://www.ardmediathek.de/video/sportschau/bbl-science-city-jena-gegen-rostock-seawolves/das-erste/Y3JpZDovL3Nwb3J0c2NoYXUuZGUvZWNkOGVkYjItYzliNy00Y2E1LWIwYWEtMzVhZTZmNDA5YTYy",
-      "backend": "",
-      "evidence": {
-        "live_confirmed": true,
-        "free_confirmed": true
-      },
-      "direct_links": [
-        {
-          "source": "",
-          "url": "https://www.ardmediathek.de/video/sportschau/bbl-science-city-jena-gegen-rostock-seawolves/das-erste/Y3JpZDovL3Nwb3J0c2NoYXUuZGUvZWNkOGVkYjItYzliNy00Y2E1LWIwYWEtMzVhZTZmNDA5YTYy"
-        }
-      ],
-      "source_reference": "https://www.ardmediathek.de/video/sportschau/bbl-science-city-jena-gegen-rostock-seawolves/das-erste/Y3JpZDovL3Nwb3J0c2NoYXUuZGUvZWNkOGVkYjItYzliNy00Y2E1LWIwYWEtMzVhZTZmNDA5YTYy",
-      "access": "Free",
-      "validated_at": "2026-11-15T15:49:11Z",
-      "validation_notes": "webfetch of the ARD Mediathek page on 2026-11-15 returned 'Livestream - BBL - Science City Jena gegen Rostock Seawolves, 21.11.2026 16:00-18:00, Das Erste, Das Spiel im Livestream des MDR'; free public broadcaster."
-    },
-    {
-      "league": "easyCredit BBL",
-      "teams": [
-        "ALBA BERLIN",
-        "FC Bayern M\u00fcnchen"
-      ],
-      "start": "2026-11-22T18:00:00+01:00",
-      "state": "VERIFIED",
-      "summary": "easyCredit BBL: ALBA BERLIN vs FC Bayern M\u00fcnchen",
-      "game_key": "easyCredit BBL|ALBA BERLIN|FC Bayern M\u00fcnchen|2026-11-22T17:00Z",
-      "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4",
-      "backend": "",
-      "evidence": {
-        "live_confirmed": true,
-        "free_confirmed": true
-      },
-      "direct_links": [
-        {
-          "source": "",
-          "url": "https://pluto.tv/gsa/live-tv/6866525c8a412a0e95c438b4"
-        }
-      ],
-      "source_reference": "https://www.dyn.sport/deinsender/dyn-sport-mix/",
-      "access": "Free",
-      "validated_at": "2026-11-15T15:49:11Z",
-      "validation_notes": "dyn.sport/deinsender/dyn-sport-mix/ fetched 2026-11-15 lists 'So. 22.11.2026 - easyCredit BBL ALBA BERLIN - FC Bayern M\u00fcnchen Basketball' under 'Basketball bei Dyn Sport Mix ... Live bei Dyn und bei allen Dyn Sport Mix Partnern'. easycredit-bbl.de, the Uber Arena and Dyn's event page confirm tip-off 18:00 CET (the free list's 16:30 is stale). Dyn Sport Mix is free on Pluto TV."
+      "validated_at": "2026-11-16T18:50:52Z",
+      "validation_notes": "Checks 1-5: Real Madrid's official 2026/27 EuroLeague schedule lists G.13 'November 20, 8:15 pm Olympiacos-Real Madrid' (20:15 CET) and EuroLeague TV's schedule lists Olympiacos Piraeus - Real Madrid at 19:15 GMT (20:15 CET). phase0-evidence.json magenta_arena (rendered_at 2026-11-16T18:50:55.340103+00:00) lists 'Euroleague - LIVE: Olympiakos Piraus - Real Madrid, Fr. 20.11.: 19:00 - 21:40' with per-game link live-olympiakos-piraeus-real-madrid under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT' (KOSTENLOS x11, OHNE LOGIN x10). Check 6/7 proof: that same-run arena render is the recorded evidence; 19:00 is the pre-game window, tip 20:15 CET."
     },
     {
       "league": "EuroLeague",
@@ -211,10 +103,10 @@
           "url": "https://www.magenta.tv/tv/live-real-madrid-zalgiris-kaunas/03349c75"
         }
       ],
-      "source_reference": "https://www.magenta.tv/sport",
+      "source_reference": "https://www.realmadrid.com/en-US/news/basket/first-team/latest-news/el-calendario-del-real-madrid-para-la-euroliga-2026-27-29-07-2026",
       "access": "Free",
-      "validated_at": "2026-11-15T15:49:11Z",
-      "validation_notes": "phase0-evidence.json magenta_arena render (recorded_at 2026-11-15T15:49:14Z, KOSTENLOS x11 / OHNE LOGIN x10) lists 'Euroleague - LIVE: Real Madrid - Zalgiris Kaunas, Mi. 25.11.: 19:30 - 22:10' under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT'; realmadrid.com confirms tip-off 20:45 CET on 25 Nov."
+      "validated_at": "2026-11-16T18:50:52Z",
+      "validation_notes": "Checks 1-5: Real Madrid's official 2026/27 EuroLeague schedule lists G.14 'November 25, 8:45 pm Real Madrid-Zalgiris Kaunas' (20:45 CET) and EuroLeague TV's schedule lists Real Madrid - Zalgiris Kaunas at 19:45 GMT (20:45 CET). phase0-evidence.json magenta_arena (rendered_at 2026-11-16T18:50:55.340103+00:00) lists 'Euroleague - LIVE: Real Madrid - Zalgiris Kaunas, Mi. 25.11.: 19:30 - 22:10' with per-game link live-real-madrid-zalgiris-kaunas under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT' (KOSTENLOS x11, OHNE LOGIN x10). Check 6/7 proof: that same-run arena render is the recorded evidence; 19:30 is the pre-game window, tip 20:45 CET."
     }
   ]
 }

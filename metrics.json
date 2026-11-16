@@ -1,9 +1,9 @@
 {
   "audit": {
-    "inconclusive": 31,
+    "inconclusive": 33,
     "judged": 69,
     "precision": 1.0,
-    "rows": 100,
+    "rows": 102,
     "verified": 69,
     "wrong": 0
   },
@@ -150,12 +150,11 @@
     ]
   },
   "recall": {
-    "captured": 5,
+    "captured": 6,
     "eligible": 2492,
-    "missed": 2487,
+    "missed": 2486,
     "missed_keys": [
       "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
-      "EuroLeague|Real Madrid|Zalgiris Kaunas|2026-11-25T19:45Z",
       "easyCredit BBL|Rostock Seawolves|Science City Jena|2026-11-21T15:00Z",
       "http://courtside1891.com",
       "http://live.basketball-bundesliga.de/home",
@@ -2643,12 +2642,11 @@
       "https://youtube.com/watch?v=zNU44AAcyOc"
     ],
     "recall": 0.002,
-    "rows": 31960,
+    "rows": 31964,
     "unique_games": 3554,
-    "unverifiable": 2487,
+    "unverifiable": 2486,
     "unverifiable_keys": [
       "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
-      "EuroLeague|Real Madrid|Zalgiris Kaunas|2026-11-25T19:45Z",
       "easyCredit BBL|Rostock Seawolves|Science City Jena|2026-11-21T15:00Z",
       "http://courtside1891.com",
       "http://live.basketball-bundesliga.de/home",
@@ -5136,47 +5134,13 @@
       "https://youtube.com/watch?v=zNU44AAcyOc"
     ]
   },
-  "run_id": "2026-11-16T18:49Z",
+  "run_id": "",
   "source": {
-    "audit_rows": 100,
-    "candidates_rows": 31960,
+    "audit_rows": 102,
+    "candidates_rows": 31964,
     "fixtures_rows": 133
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 2,
-        "judged": 0,
-        "precision": null,
-        "rows": 2,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-11-13T08:44Z",
-      "unique_games": 0
-    },
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 624,
-      "missed": 624,
-      "recall": 0.0,
-      "rows": 777,
-      "run_id": "2026-11-13T16:39Z",
-      "unique_games": 760
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -5380,7 +5344,41 @@
       "rows": 36,
       "run_id": "2026-11-16T18:48Z",
       "unique_games": 36
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 4,
+      "run_id": "2026-11-16T18:56Z",
+      "unique_games": 4
+    },
+    {
+      "audit": {
+        "inconclusive": 2,
+        "judged": 0,
+        "precision": null,
+        "rows": 2,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-11-16T18:57Z",
+      "unique_games": 0
     }
   ],
-  "ts": "2026-11-16T18:49:39.223622+00:00"
+  "ts": "2026-11-16T18:57:02.517153+00:00"
 }
