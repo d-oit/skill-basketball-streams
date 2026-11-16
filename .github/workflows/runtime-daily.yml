@@ -1108,14 +1108,28 @@ jobs:
           # verdicts to those ids, so this file is the audit's evidence — and it
           # is what `calendar_io.py` writes BEFORE its own exit-1 path, so a
           # partially failed apply is still recordable rather than lost.
+          # `--existing` is the write-time second net behind the planner: a
+          # `create` row already on the calendar is demoted to `skip` before
+          # any HTTP, so a plan made from a stale snapshot can never duplicate
+          # a public event. The snapshot is the `list` output above, which
+          # covers the same window the planner saw.
+          EXTRA=""
+          if test -f .tmp/existing.json; then
+            EXTRA="--existing .tmp/existing.json"
+          else
+            echo "::warning::no .tmp/existing.json snapshot, so the apply-time duplicate guard is off this run"
+          fi
           if [ "$MODE" = "false" ]; then
-            python3 scripts/calendar_io.py apply --plan .tmp/plan.json \
+            # shellcheck disable=SC2086: $EXTRA is an optional flag list, intentionally split
+            python3 scripts/calendar_io.py apply --plan .tmp/plan.json $EXTRA \
               --out .tmp/applied.json
-            python3 scripts/calendar_io.py apply --plan .tmp/plan.json --live \
+            # shellcheck disable=SC2086: $EXTRA is an optional flag list, intentionally split
+            python3 scripts/calendar_io.py apply --plan .tmp/plan.json --live $EXTRA \
               --out .tmp/applied.json
           else
             echo "::notice::dry-run — planning only, no calendar writes."
-            python3 scripts/calendar_io.py apply --plan .tmp/plan.json \
+            # shellcheck disable=SC2086: $EXTRA is an optional flag list, intentionally split
+            python3 scripts/calendar_io.py apply --plan .tmp/plan.json $EXTRA \
               --out .tmp/applied.json
           fi
 

@@ -102,6 +102,30 @@ jobs:
       - name: Run youtube_live (URL builders)
         run: python3 scripts/youtube_live.py --print-urls "EuroLeague live"
 
+      # All search surfaces, offline: the configured YouTube Live-filter set
+      # must build (queries + per-channel RSS/streams URLs), and every
+      # direct-list page must be https on an approved source domain. A free
+      # game no surface asks for can never reach the calendar, so coverage is
+      # asserted here rather than on a scheduled run with credentials.
+      - name: Run search coverage (configured queries + free listing pages)
+        run: |
+          mkdir -p .tmp
+          python3 scripts/youtube_live.py \
+            --queries-file config/youtube-live-queries.json \
+            --out .tmp/youtube-live-searches.json
+          python3 - <<'PY'
+          import json, sys
+          sys.path.insert(0, "scripts")
+          payload = json.load(open(".tmp/youtube-live-searches.json"))
+          assert len(payload["searches"]) >= 20, payload
+          assert len(payload["channels"]) >= 7, payload
+          from run_daily import load_direct_lists
+          lists = load_direct_lists()
+          assert len(lists) >= 7, lists
+          assert all(row["url"].startswith("https://") for row in lists)
+          print(f"OK: search coverage: {len(payload['searches'])} live searches, {len(payload['channels'])} channels, {len(lists)} listing pages")
+          PY
+
       - name: Run source_learning (dry-run discovery)
         run: python3 scripts/source_learning.py candidates --root . --dry-run
 
@@ -212,9 +236,68 @@ jobs:
             --candidates .tmp/candidates.json \
             --now 2026-09-15T08:30:00Z --window-days 10 \
             --json > .tmp/plan.json
+          # `--existing` is the apply-time second net: a `create` row already
+          # stored is demoted to `skip` before any HTTP, in dry-run and live.
           python3 scripts/calendar_io.py apply \
             --plan .tmp/plan.json --calendar-id ci@example.com \
+            --existing tests/fixtures/upsert_existing.json \
             --out .tmp/applied.json
+
+      # Valid search -> valid entry, and never the same event twice. The skill's
+      # search output (.tmp/candidates.json, extracted above) must be fully
+      # accounted for in the plan (one row per candidate, each with a reason),
+      # the dry-run apply must use every planned create/update, and re-planning
+      # the same candidates against the just-planned events must create nothing.
+      - name: Verify every search is used and no duplicate is created
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          candidates = json.load(open(".tmp/candidates.json")).get("candidates", [])
+          plan_doc = json.load(open(".tmp/plan.json"))
+          plan = plan_doc.get("plan", [])
+          applied = json.load(open(".tmp/applied.json"))
+          assert len(plan) == len(candidates), (
+              f"every search must reach the plan: {len(candidates)} candidates vs {len(plan)} plan rows"
+          )
+          for row in plan:
+              assert row.get("reason"), f"plan row without reason: {row.get('game_key')}"
+          planned = sum(1 for r in plan if r["action"] in ("create", "update"))
+          used = sum(1 for a in applied.get("actions", []) if a["action"] in ("create", "update"))
+          assert used == planned, f"dry-run must use every planned write: {used} vs {planned}"
+          # Apply-time guard proof: the same plan applied against the snapshot
+          # it was planned from must not record a `create` for a stored game.
+          import subprocess
+          guarded = subprocess.run(
+              ["python3", "scripts/calendar_io.py", "apply",
+               "--plan", ".tmp/plan.json", "--calendar-id", "ci@example.com",
+               "--existing", "tests/fixtures/upsert_existing.json", "--json"],
+              capture_output=True, text=True,
+          )
+          assert guarded.returncode == 0, guarded.stderr
+          guarded_doc = json.loads(guarded.stdout)
+          stored_keys = {e.get("game_key") for e in existing}
+          guard_dupes = [a for a in guarded_doc.get("actions", [])
+                         if a.get("action") == "create" and a.get("game_key") in stored_keys]
+          assert not guard_dupes, f"apply-time guard let duplicates through: {guard_dupes}"
+          # Idempotency proof: created rows become stored events; a second plan
+          # over the same window must create none of the same games again.
+          sys.path.insert(0, "scripts")
+          from upsert_events import plan_upsert, parse_dt
+          existing = json.load(open("tests/fixtures/upsert_existing.json")).get("events", [])
+          stored = list(existing)
+          for i, row in enumerate([r for r in plan if r["action"] == "create"]):
+              stored.append({
+                  "event_id": f"ci-proof-{i}", "game_key": row.get("game_key", ""),
+                  "league": row.get("league", ""), "teams": row.get("teams", []),
+                  "start": row.get("start", ""), "state": row.get("state", "UNVERIFIED"),
+                  "summary": row.get("title", ""),
+              })
+          second = plan_upsert(stored, candidates, now=parse_dt("2026-09-15T08:30:00Z"), window_days=10)
+          dupes = [r for r in second if r["action"] == "create" and any(
+              s.get("game_key") == r.get("game_key") for s in stored)]
+          assert not dupes, f"duplicate creates: {[r.get('game_key') for r in dupes]}"
+          print(f"OK: {len(candidates)} searches used, {planned} writes, 0 duplicate creates")
+          PY
 
       # Phase 3's inputs, produced for real rather than trusted to exist. The
       # audit reads events.jsonl and evidence.json; nothing wrote them, so the

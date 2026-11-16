@@ -1,5 +1,5 @@
 {
-  "$comment": "Free listing pages fetched directly (no search index between us and the links). Each entry is a page whose server-rendered markup links watchable livestreams: scripts/run_daily.py's DirectListBackend fetches it with stdlib urllib and keeps only links with a live/basketball signal in the URL or anchor text. Add a page here (and a probe in tests/fixtures/ if it is load-bearing) rather than hard-coding a URL into the backend. Verified fetchable 2026-11-13: mdr.de/sport/livestreams (75 KB, 59 livestream mentions, /video/livestreams links) and sportschau.de/basketball (931 KB, livestream links) via plain GET with the runtime user agent.",
+  "$comment": "Free listing pages fetched directly (no search index between us and the links). Each entry is a page whose server-rendered markup links watchable livestreams: scripts/run_daily.py's DirectListBackend fetches it with stdlib urllib and keeps only links with a live/basketball signal in the URL or anchor text. Add a page here (and a probe in tests/fixtures/ if it is load-bearing) rather than hard-coding a URL into the backend. Verified fetchable 2026-11-13 and re-verified 2026-11-16 with the runtime user agent via plain GET: mdr.de/sport/livestreams (200, 7 stream links) and sportschau.de/basketball (200, ~13 stream links) plus dyn.sport/deinsender/dyn-sport-mix/ (200, 2 free-tier live links: Pluto TV live-tv and Prime Video livetv), ardmediathek.de/live (200, 20 live channel links), zdf.de/sport (200, 7 sport live links), rbb24.de/sport/livestreams.html (200, 5 livestream links) and br.de/nachrichten/sport (200, 8 live links incl. BR24Sport live). All hosts are approved sources (Tier 2/3/4); basketball relevance is decided per link by the 7-check pipeline, not by the listing.",
   "lists": [
     {
       "name": "mdr-livestreams",
@@ -8,6 +8,26 @@
     {
       "name": "sportschau-basketball",
       "url": "https://www.sportschau.de/basketball"
+    },
+    {
+      "name": "dyn-sport-mix-free",
+      "url": "https://dyn.sport/deinsender/dyn-sport-mix/"
+    },
+    {
+      "name": "ard-live",
+      "url": "https://www.ardmediathek.de/live"
+    },
+    {
+      "name": "zdf-sport",
+      "url": "https://www.zdf.de/sport"
+    },
+    {
+      "name": "rbb24-livestreams",
+      "url": "https://www.rbb24.de/sport/livestreams.html"
+    },
+    {
+      "name": "br-sport",
+      "url": "https://www.br.de/nachrichten/sport"
     }
   ]
 }

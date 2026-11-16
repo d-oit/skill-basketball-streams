@@ -30,6 +30,14 @@ For non-YouTube sources, use `webSearch` with `limit: 20`:
 - "Basketball Bundesliga live YouTube"
 - "EuroLeague live YouTube official"
 - "BBL live stream free Germany"
+- "BBL-Pokal Basketball live kostenlos"
+- "DBB Nationalmannschaft live stream kostenlos"
+- "Dyn Sport Mix Free Spiele Basketball live"
+- "Sporteurope NBBL JBBL live kostenlos"
+- "Basketball Champions League live free stream"
+- "ENBL European North Basketball League live"
+- "Lega Basket Serie A live stream"
+- "DAZN Basketball live kostenlos free"
 ```
 
 For YouTube, use only the prebuilt Live-filter URLs in

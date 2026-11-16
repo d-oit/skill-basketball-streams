@@ -838,6 +838,34 @@ def _apply_delete(
     )
 
 
+def _create_is_duplicate(row: dict, existing: list[dict]) -> bool:
+    """Second net behind the planner: is this `create` row already stored?
+
+    The planner (`upsert_events.plan_upsert`) is the primary dedupe, but a plan
+    produced from a stale or partial `existing` snapshot — or hand-built — must
+    still not duplicate a public event at write time. A match here demotes the
+    row to `skip` before any HTTP, in dry-run and live alike, so the decision
+    is visible in the counters rather than as a second event.
+
+    Reuses `upsert_events.events_match` (lazy import: that module imports this
+    one at top level, so a top-level import here would be circular) with a
+    `game_key` exact-match fallback if the import ever fails. A plan row
+    carries the planner's `league`/`teams`/`start`/`game_key` fields, which is
+    exactly the candidate shape `events_match` reads.
+    """
+    try:
+        from upsert_events import events_match  # lazy: avoids a circular import
+    except ImportError:
+        key = str(row.get("game_key") or "")
+        return bool(key) and any(
+            isinstance(item, dict) and str(item.get("game_key") or "") == key
+            for item in existing
+        )
+    return any(
+        isinstance(item, dict) and events_match(item, row) for item in existing
+    )
+
+
 def apply_plan(
     plan: list[dict],
     *,
@@ -849,12 +877,18 @@ def apply_plan(
     descriptions: dict | None = None,
     visibility: str = "",
     link_gate=None,
+    existing: list[dict] | None = None,
 ) -> dict:
     """Execute a planner's create/update rows. `skip` rows send nothing.
 
     With `live=False` this performs **no HTTP at all** — the safe behaviour is
     the default, and "did we write to a public calendar?" must be answerable by
     reading the command line rather than by trusting a code path.
+
+    When `existing` (the `calendar_io list` snapshot the planner saw) is
+    supplied, a `create` row already stored is demoted to `skip` before any
+    HTTP: the planner is the primary dedupe, this is the second net so a stale
+    plan can never duplicate an event it is about to create.
     """
     descriptions = descriptions or {}
     scope = scope or {}
@@ -893,6 +927,15 @@ def apply_plan(
                 {"game_key": str(row.get("game_key") or ""), "reason": "unknown action"}
             )
             continue
+
+        # Second net behind the planner: a `create` for a game already on the
+        # calendar sends nothing, in dry-run and live alike. Without `existing`
+        # this cannot fire, which is why the runtime always passes the `list`
+        # snapshot it planned against.
+        if action == ACTION_CREATE and existing:
+            if _create_is_duplicate(row, existing):
+                result["skipped"] += 1
+                continue
 
         # An explicit description wins; otherwise it is derived from the row.
         # Sending `""` was the old behaviour and it silently dropped the only
@@ -1095,6 +1138,12 @@ def main() -> None:
     parser.add_argument("--out")
     parser.add_argument("--plan")
     parser.add_argument(
+        "--existing",
+        help=("the `calendar_io list` snapshot the plan was made against "
+              "(JSON with an `events` list, or a bare list); a `create` row "
+              "already stored is demoted to `skip` before any HTTP"),
+    )
+    parser.add_argument(
         "--live",
         action="store_true",
         help="actually write. Without it, apply performs no HTTP at all",
@@ -1203,6 +1252,30 @@ def main() -> None:
         )
         sys.exit(2)
 
+    existing_events: list[dict] | None = None
+    if args.existing:
+        raw_existing = _load_json(Path(args.existing), "existing")
+        if isinstance(raw_existing, dict):
+            for key in ("events", "existing"):
+                if isinstance(raw_existing.get(key), list):
+                    existing_events = raw_existing[key]
+                    break
+            else:
+                print(
+                    "FAIL: calendar_io: --existing must hold an `events` list",
+                    file=sys.stderr,
+                )
+                sys.exit(2)
+        elif isinstance(raw_existing, list):
+            existing_events = raw_existing
+        else:
+            print(
+                "FAIL: calendar_io: --existing must be a list or "
+                '{"events": [...]}',
+                file=sys.stderr,
+            )
+            sys.exit(2)
+
     result = apply_plan(
         plan,
         api_key=api_key,
@@ -1212,6 +1285,7 @@ def main() -> None:
         live=args.live,
         visibility=args.visibility,
         link_gate=_rendered_gate if args.live else None,
+        existing=existing_events,
     )
 
     # The applied *result* is the record of what the calendar now holds — which

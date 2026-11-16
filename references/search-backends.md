@@ -32,8 +32,7 @@ The implemented search ladder is `run_daily.py`'s `LADDER`, and it is the truth:
 
 i.e. paid Exa → keyless Exa → TinyFish → keyless direct listing pages →
 keyless YouTube channel tabs+RSS → headless render. `direct-list` fetches the
-free listing pages in `config/direct-lists.json` (MDR livestreams, sportschau
-basketball) with stdlib urllib and keeps only stream-leaning links — no index
+free listing pages in `config/direct-lists.json` (MDR livestreams, sportschau basketball, Dyn Sport Mix free, ARD live, ZDF sport, RBB24 livestreams, BR sport) with stdlib urllib and keeps only stream-leaning links — no index
 between us and the broadcaster's own listing. Every row carries its `query`, so
 `source_learning.py score` can report per-query hit rates, not just per-backend
 ones. The two bot-blocked rungs are additionally pre-read for the

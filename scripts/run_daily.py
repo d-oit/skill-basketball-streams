@@ -86,6 +86,14 @@ DEFAULT_QUERIES = (
     "Dyn Sport Mix Basketball live",
     "ALBA Berlin live stream frei",
     "FC Bayern Basketball live kostenlos",
+    "DBB Nationalmannschaft live stream kostenlos",
+    "BBL-Pokal Basketball live kostenlos",
+    "Dyn Sport Mix Free Spiele Basketball live",
+    "Sporteurope NBBL JBBL live kostenlos",
+    "Basketball Champions League live free stream",
+    "ENBL European North Basketball League live",
+    "Lega Basket Serie A live stream",
+    "DAZN Basketball live kostenlos free",
 )
 
 LIVE_URL_HINTS = ("/live", "live-", "/watch?v=", "/tv/live")
