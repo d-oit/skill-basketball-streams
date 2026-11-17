@@ -90,7 +90,7 @@ BOUNDED_FILES = (
 )
 LEDGER_NAMES = ("candidates", "fetch-attempts", "rung-attempts", "events")
 # The keys `source_learning.mode_record` emits only when they carry a value.
-OPTIONAL_KEYS = ("game_key", "backend", "rung", "llm", "state", "color_id", "event_id")
+OPTIONAL_KEYS = ("game_key", "backend", "rung", "llm", "state", "color_id", "event_id", "query_id", "query_family", "experiment")
 # A fetch attempt with one of these statuses is an issue found during the run.
 FETCH_OUTCOMES = {"blocked": "blocked", "not_found": "reject"}
 # `rung_health.FAILURE_STATES` — a rung in one of these is dying, and `parked`
@@ -172,6 +172,11 @@ def _candidate_specs(rows: list[dict], fallback_now: str) -> list[dict]:
                 "backend": str(row.get("backend") or ""),
                 "game_key": str(row.get("game_key") or ""),
                 "state": str(row.get("state") or ""),
+                # Query-experiment identity (issue #98): carried through
+                # when the candidate row has it, dropped otherwise.
+                "query_id": str(row.get("query_id") or ""),
+                "query_family": str(row.get("query_family") or ""),
+                "experiment": bool(row.get("experiment", False)),
             }
         )
     return specs

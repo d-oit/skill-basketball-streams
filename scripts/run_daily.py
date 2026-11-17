@@ -1070,6 +1070,16 @@ def main() -> None:
         "--fixture-cap", type=int, default=12,
         help="max fixture-derived queries merged into the run (default: 12)",
     )
+    parser.add_argument(
+        "--experiments",
+        help="query-experiments JSONL (scripts/query_experiments.py persist output): "
+             "a capped canary runs after the baseline/fixture pass with the same "
+             "backend order and tags rows with query_id (issue #98)",
+    )
+    parser.add_argument(
+        "--canary-cap", type=int, default=6,
+        help="max prior-run experiment queries in the canary pass (default: 6)",
+    )
     parser.add_argument("--backend", action="append", default=[],
                         help="restrict to a backend (repeatable)")
     parser.add_argument("--limit", type=int, default=20)
@@ -1245,6 +1255,50 @@ def main() -> None:
     rows, contributed, attempted = collect_candidates(
         queries, backends=backends, limit=args.limit, run_id=run_id, ts=ts
     )
+    # Issue #98 canary: capped prior-run experiment queries run AFTER the
+    # baseline/fixture pass with the same backend order. A canary row only
+    # ever adds candidates; it cannot create calendar events. Rows are tagged
+    # with their stable query_id so scoring can credit the wording.
+    if args.experiments:
+        try:
+            from query_experiments import normalize_query as _normalize_query  # noqa: E402
+            from query_experiments import select_canary as _select_canary  # noqa: E402
+        except ImportError:
+            from scripts.query_experiments import normalize_query as _normalize_query  # type: ignore[no-redef]
+            from scripts.query_experiments import select_canary as _select_canary  # type: ignore[no-redef]
+        try:
+            experiment_rows = [
+                json.loads(line) for line in Path(args.experiments).read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+            experiment_rows = [r for r in experiment_rows if isinstance(r, dict)]
+        except OSError as exc:
+            print(f"FAIL: run_daily: {args.experiments}: {exc}", file=sys.stderr)
+            sys.exit(2)
+        canary = _select_canary(experiment_rows, queries, [], cap=max(0, args.canary_cap))
+        if canary:
+            by_query = {_normalize_query(str(r.get("query") or "")).casefold(): r for r in canary}
+            canary_queries = [str(r.get("query") or "") for r in canary if str(r.get("query") or "").strip()]
+            canary_rows, canary_contrib, _ = collect_candidates(
+                canary_queries, backends=backends, limit=args.limit, run_id=run_id, ts=ts
+            )
+            for row in canary_rows:
+                meta = by_query.get(_normalize_query(row.get("query") or "").casefold())
+                if meta:
+                    row["query_id"] = str(meta.get("query_id") or "")
+                    row["query_family"] = str(meta.get("query_family") or "")
+                    row["experiment"] = True
+            rows.extend(canary_rows)
+            for name in canary_contrib:
+                if name not in contributed:
+                    contributed.append(name)
+            print(
+                f"OK: run_daily: canary: {len(canary_queries)} experiment querie(s), "
+                f"{len(canary_rows)} candidate(s)",
+                file=sys.stderr,
+            )
+        else:
+            print("OK: run_daily: canary: no eligible experiment queries", file=sys.stderr)
     expanded = expand_youtube_leads(rows, run_id=run_id, ts=ts, fetch=None)
     if expanded:
         rows.extend(expanded)

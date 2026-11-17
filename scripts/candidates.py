@@ -98,6 +98,11 @@ def normalise_row(raw: dict, *, ts: str | None = None, run_id: str = "") -> dict
         "url": url,
         "backend": str(raw.get("backend") or ""),
         "query": str(raw.get("query") or ""),
+        # Query-experiment identity (issue #98): passthrough only, so rows
+        # written before this change keep their exact shape.
+        "query_id": str(raw.get("query_id") or ""),
+        "query_family": str(raw.get("query_family") or ""),
+        "experiment": bool(raw.get("experiment", False)),
         "game_key": game_key,
         "live_signal": bool(raw.get("live_signal", False)),
         "disposition": disposition,
