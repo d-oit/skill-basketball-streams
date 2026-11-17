@@ -254,6 +254,15 @@ jobs:
             git worktree add --orphan -b telemetry .tmp/telemetry
           fi
           mkdir -p .tmp/telemetry
+          # Issue #98 canary input: prior-run experiments for tomorrow's
+          # canary pass. Copied out of the worktree (never read in place)
+          # so the telemetry commit below cannot race it.
+          if [ -f .tmp/telemetry/query-experiments.jsonl ]; then
+            cp .tmp/telemetry/query-experiments.jsonl .tmp/prior-experiments.jsonl
+            echo "Prior experiments: $(wc -l < .tmp/prior-experiments.jsonl) row(s)"
+          else
+            echo "::notice::no prior query experiments yet — baseline only this run"
+          fi
 
       # Tolerant of a *content* outcome, not a configuration one: the preflight
       # above has already redded on a missing key, so a failure here means the
@@ -313,12 +322,20 @@ jobs:
           FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
         run: |
           if [ -f .tmp/telemetry/fixtures.jsonl ]; then
+            # Issue #98 canary input: prior-run experiments from the telemetry
+            # branch. Absent on first runs — the guard makes that a question,
+            # not a claim (workflow-refs treats `[ -f ]` as no assertion).
+            EXPERIMENTS=""
+            if [ -f .tmp/prior-experiments.jsonl ]; then
+              EXPERIMENTS="--experiments .tmp/prior-experiments.jsonl --canary-cap 6"
+            fi
             python3 scripts/run_daily.py \
               --dest .tmp/telemetry \
               --run-id "$(date -u +%Y-%m-%dT%H:%MZ)" \
               --fixtures .tmp/telemetry/fixtures.jsonl \
               --backend exa-mcp --backend exa-mcp-keyless \
               --backend tinyfish \
+              $EXPERIMENTS \
               --json \
               || echo "::warning::fixture-driven pass surfaced nothing new (reachable backends, empty answers) — the base pass stands"
           else
@@ -386,6 +403,33 @@ jobs:
               --dest .tmp/telemetry --out .tmp/telemetry/source-candidates.json
           else
             echo "::notice::No run-log rows yet, so there is nothing to score or quarantine this run."
+          fi
+
+      # Issue #98 persist: today's missed fixtures become tomorrow's bounded
+      # canary. Advisory and tolerated: suggestions are evidence, never a
+      # red run. Bounded: the experiments file keeps only the newest 500
+      # rows so the telemetry branch stays append-only and small.
+      - name: Persist missed-fixture query experiments
+        if: always()
+        run: |
+          if [ -f .tmp/telemetry/fixtures.jsonl ] && [ -f .tmp/telemetry/candidates.jsonl ]; then
+            if python3 scripts/queries.py --suggest --fixtures .tmp/telemetry/fixtures.jsonl --ledger .tmp/telemetry/candidates.jsonl --json > .tmp/query-suggestions.json; then
+              python3 scripts/query_experiments.py persist \
+                --suggestions .tmp/query-suggestions.json \
+                --fixtures .tmp/telemetry/fixtures.jsonl \
+                --run-id "$(date -u +%Y-%m-%dT%H:%MZ)" \
+                --out .tmp/new-experiments.jsonl
+              if [ -f .tmp/telemetry/query-experiments.jsonl ]; then
+                cat .tmp/telemetry/query-experiments.jsonl >> .tmp/new-experiments.jsonl
+              fi
+              python3 -c "from pathlib import Path; p=Path('.tmp/new-experiments.jsonl'); rows=[l for l in p.read_text().splitlines() if l.strip()]; p.write_text('\n'.join(rows[-500:])+('\n' if rows else ''))"
+              mv .tmp/new-experiments.jsonl .tmp/telemetry/query-experiments.jsonl
+              echo "Persisted experiments: $(wc -l < .tmp/telemetry/query-experiments.jsonl) row(s)"
+            else
+              echo "::notice::every fixture is covered — no new query experiments this run"
+            fi
+          else
+            echo "::notice::no fixtures or ledger, so no query experiments this run"
           fi
 
       - name: Commit telemetry (one commit per run, never per row)

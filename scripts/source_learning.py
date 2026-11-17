@@ -181,6 +181,10 @@ def mode_record(args) -> int:
         ("state", getattr(args, "state", None)),
         ("color_id", getattr(args, "color_id", None)),
         ("event_id", getattr(args, "event_id", None)),
+        # Query-experiment identity (issue #98): only emitted when supplied.
+        ("query_id", getattr(args, "query_id", None)),
+        ("query_family", getattr(args, "query_family", None)),
+        ("experiment", getattr(args, "experiment", None)),
     ):
         if value:
             entry[key] = value
@@ -392,6 +396,9 @@ def main() -> None:
     )
     record.add_argument("--game-key", dest="game_key")
     record.add_argument("--backend")
+    record.add_argument("--query-id", dest="query_id")
+    record.add_argument("--query-family", dest="query_family")
+    record.add_argument("--experiment")
     record.add_argument("--rung")
     record.add_argument("--llm")
     record.add_argument("--state")

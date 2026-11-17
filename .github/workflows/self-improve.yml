@@ -139,6 +139,26 @@ jobs:
             echo "::notice::no fixtures or ledger to learn queries from this run"
           fi
 
+      # Issue #98 scoring: per-query outcomes from the telemetry run-log,
+      # advisory proposals only. Never reds, never writes sources or
+      # calendar state — promotion stays a human/PR decision.
+      - name: Score query experiments and propose promotions (advisory)
+        if: always()
+        run: |
+          if git show origin/telemetry:query-experiments.jsonl > .tmp/experiments.jsonl 2>/dev/null && git show origin/telemetry:run-log.jsonl > .tmp/run-log.jsonl 2>/dev/null; then
+            python3 scripts/query_experiments.py score --outcomes .tmp/run-log.jsonl --out .tmp/query-scores.json \
+              || echo "::notice::no query outcomes to score this run"
+            if [ -f .tmp/query-scores.json ]; then
+              python3 scripts/query_experiments.py propose --experiments .tmp/experiments.jsonl --outcomes .tmp/run-log.jsonl --baseline-recall 0 --out .tmp/query-proposals.json \
+                || echo "::notice::no promotion proposals this run"
+              if [ -f .tmp/query-proposals.json ]; then
+                python3 -c "import json;d=json.load(open('.tmp/query-proposals.json'));print('Query proposals (advisory):',len(d['proposals']))"
+              fi
+            fi
+          else
+            echo "::notice::no experiments or run-log on telemetry yet — nothing to score"
+          fi
+
       # The branch is created and pushed BEFORE the gate runs. A red result is
       # therefore preserved as evidence on the branch rather than thrown away.
       - name: Create the self-improvement branch
