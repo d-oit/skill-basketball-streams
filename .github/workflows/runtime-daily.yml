@@ -432,6 +432,52 @@ jobs:
             echo "::notice::no fixtures or ledger, so no query experiments this run"
           fi
 
+      # Issue #99 experiment: opt-in resolver discovery over uncovered
+      # fixtures only. Default OFF behind ENABLE_RESOLVER_DISCOVERY; when
+      # off this is a notice, never a run. When on, leads append as
+      # unverifiable candidates only — never calendar writes, never source
+      # approvals. Degrades safely when do-wdr is absent.
+      - name: Resolver discovery over uncovered fixtures (opt-in)
+        if: always()
+        env:
+          RESOLVER_ENABLED: ${{ vars.ENABLE_RESOLVER_DISCOVERY == 'true' && 'true' || '' }}
+        run: |
+          if [ "${RESOLVER_ENABLED}" != "true" ]; then
+            echo "::notice::resolver discovery is off (ENABLE_RESOLVER_DISCOVERY != true) — ladder results stand"
+          elif [ -f .tmp/telemetry/fixtures.jsonl ] && [ -f .tmp/telemetry/candidates.jsonl ]; then
+            python3 scripts/resolver_discovery.py \
+              --fixtures .tmp/telemetry/fixtures.jsonl \
+              --ledger .tmp/telemetry/candidates.jsonl \
+              --out .tmp/resolver-leads.json \
+              --max-queries 8 --max-seconds 120 \
+              --run-id "$(date -u +%Y-%m-%dT%H:%MZ)" \
+              || echo "::notice::resolver discovery found nothing new or degraded — ladder results stand"
+            if [ -f .tmp/resolver-leads.json ]; then
+              python3 - <<'PY'
+          import json, sys
+          sys.path.insert(0, "scripts")
+          from candidates import normalise_row
+          payload = json.load(open(".tmp/resolver-leads.json"))
+          rows = []
+          for lead in payload.get("leads", []):
+              try:
+                  rows.append(normalise_row({"url": lead["url"], "backend": "resolver",
+                      "query": lead.get("query", ""), "live_signal": False,
+                      "disposition": "unverifiable", "run_id": lead.get("run_id", ""),
+                      "ts": lead.get("ts") or None}))
+              except ValueError:
+                  continue
+          if rows:
+              with open(".tmp/telemetry/candidates.jsonl", "a", encoding="utf-8") as handle:
+                  for row in rows:
+                      handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+              print(f"OK: resolver_discovery: appended {len(rows)} lead(s) as unverifiable candidates")
+          PY
+            fi
+          else
+            echo "::notice::no fixtures or ledger, so no resolver discovery this run"
+          fi
+
       - name: Commit telemetry (one commit per run, never per row)
         run: |
           # Same retention policy as rung-health: compact before staging so the
