@@ -275,6 +275,7 @@ jobs:
           )
           assert guarded.returncode == 0, guarded.stderr
           guarded_doc = json.loads(guarded.stdout)
+          existing = json.load(open("tests/fixtures/upsert_existing.json")).get("events", [])
           stored_keys = {e.get("game_key") for e in existing}
           guard_dupes = [a for a in guarded_doc.get("actions", [])
                          if a.get("action") == "create" and a.get("game_key") in stored_keys]
@@ -283,7 +284,6 @@ jobs:
           # over the same window must create none of the same games again.
           sys.path.insert(0, "scripts")
           from upsert_events import plan_upsert, parse_dt
-          existing = json.load(open("tests/fixtures/upsert_existing.json")).get("events", [])
           stored = list(existing)
           for i, row in enumerate([r for r in plan if r["action"] == "create"]):
               stored.append({
