@@ -27,7 +27,7 @@ agents and CI must pass.
 | Decision | Choice |
 |---|---|
 | Adoption depth | **Executed** — config, sensors, invariants, contract, hooks and CI. |
-| Binary acquisition | **Pinned prebuilt installer**, `--version v0.2.0`, checksum-verified into `$HOME/.local/bin`. |
+| Binary acquisition | **Pinned prebuilt installer**, `--version v0.4.7`, checksum-verified into `$HOME/.local/bin`. |
 | Grading authority | **The four product graders stay** (withdrawn from "`do-harness eval` only" — `eval` never sees the root skill). `do-harness eval` runs *in addition*, for the tooling skills. |
 
 ## Relationship to the runtime that now exists
@@ -78,7 +78,7 @@ described in `references/self-learning.md`.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/d-o-hub/do-harness/main/scripts/install.sh \
-  | sh -s -- --version v0.2.0
+  | sh -s -- --version v0.4.7
 export PATH="$HOME/.local/bin:$PATH"
 do-harness --version
 ```
@@ -86,7 +86,7 @@ do-harness --version
 The installer verifies the artifact against the release `checksums.txt` before
 installing. Those checksums share the release origin, so they detect corruption
 and truncated downloads — **not** a compromised origin. Record the pin in CI as
-a literal `v0.2.0`; do not track `latest`.
+a literal `v0.4.7`; do not track `latest`.
 
 **Which repository is upstream.** `d-o-hub/do-harness`. There is no
 `d-o-it/do-harness` — that URL returns 404, so an instruction naming it cannot
@@ -354,7 +354,7 @@ or harness regression cannot red the existing Python 3.9/3.12 matrix.
 ```yaml
 - run: |
     curl -fsSL https://raw.githubusercontent.com/d-o-hub/do-harness/main/scripts/install.sh \
-      | sh -s -- --version v0.2.0
+      | sh -s -- --version v0.4.7
     echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 - run: do-harness doctor
 - run: do-harness verify --set verification --format json --strict --evidence .do-harness/evidence.json
