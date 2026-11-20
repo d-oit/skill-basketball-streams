@@ -1,123 +1,15 @@
 {
   "candidates": [
     {
-      "league": "PGE Basket Liga",
-      "teams": [
-        "G\u00f3rnik Zamek Ksi\u0105\u017c Wa\u0142brzych",
-        "Euvic GTK Gliwice"
-      ],
-      "start": "2026-11-20T18:00:00+01:00",
-      "state": "VERIFIED",
-      "summary": "PGE Basket Liga: G\u00f3rnik Zamek Ksi\u0105\u017c Wa\u0142brzych vs Euvic GTK Gliwice",
-      "game_key": "PGE Basket Liga|Euvic GTK Gliwice|G\u00f3rnik Zamek Ksi\u0105\u017c Wa\u0142brzych|2026-11-20T17:00Z",
-      "url": "https://www.youtube.com/watch?v=536Yy3vylH0",
-      "backend": "",
-      "evidence": {
-        "live_confirmed": true,
-        "free_confirmed": true
-      },
-      "direct_links": [
-        {
-          "source": "",
-          "url": "https://www.youtube.com/watch?v=536Yy3vylH0"
-        }
-      ],
-      "source_reference": "https://plk.pl/aktualnosci/27673/typy-bukmacherskie-na-8-kolejke-az-1636-zl-do-wygrania-na-kupon",
-      "access": "Free",
-      "validated_at": "2026-11-18T17:36:09Z",
-      "validation_notes": "Check 1: plk.pl round-8 schedule states 'G\u00f3rnik Zamek Ksi\u0105\u017c Wa\u0142brzych \u2013 Euvic GTK Gliwice (20.11.2026, 18:00) \u2013 Transmisja: YouTube', under the league's published free-YouTube policy. Checks 2/6/7: phase0-evidence.json (recorded_at 2026-11-18T17:36:11.232657+00:00) records the official @basketliga video 'OBEJRZYJ NA \u017bYWO \ud83d\udd25 G\u00f3rnik Zamek Ksi\u0105\u017c Wa\u0142brzych - Euvic GTK Gliwice | 20.11.2026 / 18:00' with scheduled_start 2026-11-20T17:00:00+00:00 and is_live_now false."
-    },
-    {
-      "league": "PGE Basket Liga",
-      "teams": [
-        "PGE Start Lublin",
-        "Arriva Lotto Twarde Pierniki Toru\u0144"
-      ],
-      "start": "2026-11-21T12:30:00+01:00",
-      "state": "VERIFIED",
-      "summary": "PGE Basket Liga: PGE Start Lublin vs Arriva Lotto Twarde Pierniki Toru\u0144",
-      "game_key": "PGE Basket Liga|Arriva Lotto Twarde Pierniki Toru\u0144|PGE Start Lublin|2026-11-21T11:30Z",
-      "url": "https://www.youtube.com/watch?v=IMQn2NofSi8",
-      "backend": "",
-      "evidence": {
-        "live_confirmed": true,
-        "free_confirmed": true
-      },
-      "direct_links": [
-        {
-          "source": "",
-          "url": "https://www.youtube.com/watch?v=IMQn2NofSi8"
-        }
-      ],
-      "source_reference": "https://plk.pl/aktualnosci/27673/typy-bukmacherskie-na-8-kolejke-az-1636-zl-do-wygrania-na-kupon",
-      "access": "Free",
-      "validated_at": "2026-11-18T17:36:09Z",
-      "validation_notes": "Check 1: plk.pl round-8 schedule states 'PGE Start Lublin \u2013 Arriva Lotto Twarde Pierniki Toru\u0144 (21.11.2026, 12:30) \u2013 Transmisja: YouTube'. Checks 2/6/7: phase0-evidence.json (recorded_at 2026-11-18T17:36:11.232657+00:00) records the official @basketliga video 'OBEJRZYJ NA \u017bYWO \ud83d\udd25 PGE Start Lublin - Arriva Lotto Twarde Pierniki Toru\u0144 | 21.11.2026 / 12:30' with scheduled_start 2026-11-21T11:30:00+00:00 and is_live_now false."
-    },
-    {
-      "league": "PGE Basket Liga",
-      "teams": [
-        "WKS \u015al\u0105sk Wroc\u0142aw",
-        "Energa Trefl Sopot"
-      ],
-      "start": "2026-11-22T15:00:00+01:00",
-      "state": "VERIFIED",
-      "summary": "PGE Basket Liga: WKS \u015al\u0105sk Wroc\u0142aw vs Energa Trefl Sopot",
-      "game_key": "PGE Basket Liga|Energa Trefl Sopot|WKS \u015al\u0105sk Wroc\u0142aw|2026-11-22T14:00Z",
-      "url": "https://www.youtube.com/watch?v=OzV7jT1o5T0",
-      "backend": "",
-      "evidence": {
-        "live_confirmed": true,
-        "free_confirmed": true
-      },
-      "direct_links": [
-        {
-          "source": "",
-          "url": "https://www.youtube.com/watch?v=OzV7jT1o5T0"
-        }
-      ],
-      "source_reference": "https://plk.pl/aktualnosci/27673/typy-bukmacherskie-na-8-kolejke-az-1636-zl-do-wygrania-na-kupon",
-      "access": "Free",
-      "validated_at": "2026-11-18T17:36:09Z",
-      "validation_notes": "Check 1: plk.pl round-8 schedule states 'WKS \u015al\u0105sk Wroc\u0142aw \u2013 Energa Trefl Sopot (22.11.2026, 15:00) \u2013 Transmisja: YouTube'. Checks 2/6/7: phase0-evidence.json (recorded_at 2026-11-18T17:36:11.232657+00:00) records the official @basketliga video 'OBEJRZYJ NA \u017bYWO \ud83d\udd25 WKS \u015al\u0105sk Wroc\u0142aw - Energa Trefl Sopot | 22.11.2026 / 15:00' with scheduled_start 2026-11-22T14:00:00+00:00 and is_live_now false."
-    },
-    {
-      "league": "PGE Basket Liga",
-      "teams": [
-        "MKS D\u0105browa G\u00f3rnicza",
-        "Legia Warszawa"
-      ],
-      "start": "2026-11-22T19:30:00+01:00",
-      "state": "VERIFIED",
-      "summary": "PGE Basket Liga: MKS D\u0105browa G\u00f3rnicza vs Legia Warszawa",
-      "game_key": "PGE Basket Liga|Legia Warszawa|MKS D\u0105browa G\u00f3rnicza|2026-11-22T18:30Z",
-      "url": "https://www.youtube.com/watch?v=DIkSGWYzH8s",
-      "backend": "",
-      "evidence": {
-        "live_confirmed": true,
-        "free_confirmed": true
-      },
-      "direct_links": [
-        {
-          "source": "",
-          "url": "https://www.youtube.com/watch?v=DIkSGWYzH8s"
-        }
-      ],
-      "source_reference": "https://plk.pl/aktualnosci/27673/typy-bukmacherskie-na-8-kolejke-az-1636-zl-do-wygrania-na-kupon",
-      "access": "Free",
-      "validated_at": "2026-11-18T17:36:09Z",
-      "validation_notes": "Check 1: plk.pl round-8 schedule states 'MKS D\u0105browa G\u00f3rnicza \u2013 Legia Warszawa (22.11.2026, 19:30) \u2013 Transmisja: YouTube'. Checks 2/6/7: phase0-evidence.json (recorded_at 2026-11-18T17:36:11.232657+00:00) records the official @basketliga video 'OBEJRZYJ NA \u017bYWO \ud83d\udd25 MKS D\u0105browa G\u00f3rnicza - Legia Warszawa | 22.11.2026 / 19:30' with scheduled_start 2026-11-22T18:30:00+00:00 and is_live_now false."
-    },
-    {
       "league": "EuroLeague",
       "teams": [
         "Olympiakos Pir\u00e4us",
         "Real Madrid"
       ],
-      "start": "2026-11-20T19:15:00+01:00",
+      "start": "2026-11-20T20:00:00+01:00",
       "state": "VERIFIED",
       "summary": "EuroLeague: Olympiakos Pir\u00e4us vs Real Madrid",
-      "game_key": "EuroLeague|Olympiakos Pir\u00e4us|Real Madrid|2026-11-20T18:15Z",
+      "game_key": "EuroLeague|Olympiakos Pir\u00e4us|Real Madrid|2026-11-20T19:00Z",
       "url": "https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c",
       "backend": "",
       "evidence": {
@@ -130,10 +22,10 @@
           "url": "https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c"
         }
       ],
-      "source_reference": "https://www.euroleaguebasketball.net/en/euroleague/game-center/2026-27/olympiacos-piraeus-vs-real-madrid/E2026/130/",
-      "access": "Free (kostenlos & ohne Login)",
-      "validated_at": "2026-11-18T17:36:09Z",
-      "validation_notes": "Checks 1/6/7: phase0-evidence.json (recorded_at 2026-11-18T17:36:11.232657+00:00) rendered magenta.tv/sport with markers KOSTENLOS=11 / OHNE LOGIN=10 and lists 'Sport 18 - myTeamTV, Euroleague - LIVE: Olympiakos Pir\u00e4us - Real Madrid, Fr. 20.11.: 19:00 - 21:40' with per-game link https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT'. Checks 2/4/5: EuroLeague game center confirms Olympiacos Piraeus vs Real Madrid, 2026-11-20 19:15 CET, Round 13."
+      "source_reference": "https://www.magenta.tv/sport",
+      "access": "Free",
+      "validated_at": "2026-11-20T17:11:46Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-20T17:11:49Z) patchright render of https://www.magenta.tv/sport shows 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT' (KOSTENLOS x11, OHNE LOGIN x10) with entry 'KID00765-TelekomBasketball4, Euroleague - LIVE: Olympiakos Pir\u00e4us - Real Madrid, 19:00 - 21:40' and per-game link https://www.magenta.tv/tv/live-olympiakos-piraeus-real-madrid/0331db2c; promo tile states 'Heute ab 20:00 Uhr kostenlos und ohne Login'. Free access and live stream confirmed by the same-run render."
     },
     {
       "league": "EuroLeague",
@@ -141,10 +33,10 @@
         "Real Madrid",
         "Zalgiris Kaunas"
       ],
-      "start": "2026-11-25T19:45:00+01:00",
+      "start": "2026-11-25T20:30:00+01:00",
       "state": "VERIFIED",
       "summary": "EuroLeague: Real Madrid vs Zalgiris Kaunas",
-      "game_key": "EuroLeague|Real Madrid|Zalgiris Kaunas|2026-11-25T18:45Z",
+      "game_key": "EuroLeague|Real Madrid|Zalgiris Kaunas|2026-11-25T19:30Z",
       "url": "https://www.magenta.tv/tv/live-real-madrid-zalgiris-kaunas/03349c75",
       "backend": "",
       "evidence": {
@@ -157,21 +49,21 @@
           "url": "https://www.magenta.tv/tv/live-real-madrid-zalgiris-kaunas/03349c75"
         }
       ],
-      "source_reference": "https://www.euroleaguebasketball.net/en/euroleague/game-center/2026-27/real-madrid-zalgiris-kaunas/E2026/139/",
-      "access": "Free (kostenlos & ohne Login)",
-      "validated_at": "2026-11-18T17:36:09Z",
-      "validation_notes": "Checks 1/6/7: phase0-evidence.json (recorded_at 2026-11-18T17:36:11.232657+00:00) rendered magenta.tv/sport with markers KOSTENLOS=11 / OHNE LOGIN=10 and lists 'Sport 18 - myTeamTV, Euroleague - LIVE: Real Madrid - Zalgiris Kaunas, Mi. 25.11.: 19:30 - 22:10' with per-game link https://www.magenta.tv/tv/live-real-madrid-zalgiris-kaunas/03349c75 under 'KOSTENLOS & OHNE LOGIN: LIVE-EVENTS VON MAGENTA SPORT'. Checks 2/4/5: EuroLeague game center confirms Real Madrid vs Zalgiris Kaunas, 2026-11-25 19:45 CET, Round 14."
+      "source_reference": "https://www.magenta.tv/sport",
+      "access": "Free",
+      "validated_at": "2026-11-20T17:11:46Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-20T17:11:49Z) patchright render of https://www.magenta.tv/sport lists 'Euroleague - LIVE: Real Madrid - Zalgiris Kaunas, Mi. 25.11.: 19:30 - 22:10' in the 'KOSTENLOS & OHNE LOGIN' block and records the per-game link https://www.magenta.tv/tv/live-real-madrid-zalgiris-kaunas/03349c75. Free access and live stream confirmed by the same-run render."
     },
     {
-      "league": "FIBA World Cup Qualifiers",
+      "league": "FIBA World Cup Qualification",
       "teams": [
         "Lettland",
         "Deutschland"
       ],
-      "start": "2026-11-27T18:30:00+01:00",
+      "start": "2026-11-27T18:15:00+01:00",
       "state": "VERIFIED",
-      "summary": "FIBA World Cup Qualifiers: Lettland vs Deutschland",
-      "game_key": "FIBA World Cup Qualifiers|Deutschland|Lettland|2026-11-27T17:30Z",
+      "summary": "FIBA World Cup Qualification: Lettland vs Deutschland",
+      "game_key": "FIBA World Cup Qualification|Deutschland|Lettland|2026-11-27T17:15Z",
       "url": "https://www.magenta.tv/tv/live-lettland-deutschland/03349c76",
       "backend": "",
       "evidence": {
@@ -184,10 +76,253 @@
           "url": "https://www.magenta.tv/tv/live-lettland-deutschland/03349c76"
         }
       ],
-      "source_reference": "https://www.basketball-bund.de/mumbru-nominiert-wm-quali-kader-fuenftes-fenster/",
-      "access": "Free (kostenlos & ohne Login)",
-      "validated_at": "2026-11-18T17:36:09Z",
-      "validation_notes": "Checks 1/6/7: phase0-evidence.json (recorded_at 2026-11-18T17:36:11.232657+00:00) rendered magenta.tv/sport with markers KOSTENLOS=11 / OHNE LOGIN=10 and lists 'Sport 18 - myTeamTV, 2027 FIBA Basketball World Cup Qualification - LIVE: Lettland - Deutschland, Fr. 27.11.: 17:15 - 21:00' with per-game link https://www.magenta.tv/tv/live-lettland-deutschland/03349c76. Check 1 corroborated by basketball-bund.de: 'World Cup Qualifier: Lettland \u2013 Deutschland, 27. November 2026, ab 18.15 Uhr kostenlos bei MagentaSport und MagentaTV'. Check 5: tip 18:30 CET confirmed by DBB and Sportschau."
+      "source_reference": "https://www.magenta.tv/sport",
+      "access": "Free",
+      "validated_at": "2026-11-20T17:11:46Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-20T17:11:49Z) patchright render of https://www.magenta.tv/sport lists 'KID00765-TelekomBasketball4, 2027 FIBA Basketball World Cup Qualification - LIVE: Lettland - Deutschland, Fr. 27.11.: 17:15 - 21:00' in the 'KOSTENLOS & OHNE LOGIN' block with per-game link https://www.magenta.tv/tv/live-lettland-deutschland/03349c76. DBB national-team game, free under the Telekom-DBB deal. Free access and live stream confirmed by the same-run render."
+    },
+    {
+      "league": "FIBA World Cup Qualification",
+      "teams": [
+        "Spanien",
+        "Griechenland"
+      ],
+      "start": "2026-11-29T17:50:00+01:00",
+      "state": "VERIFIED",
+      "summary": "FIBA World Cup Qualification: Spanien vs Griechenland",
+      "game_key": "FIBA World Cup Qualification|Griechenland|Spanien|2026-11-29T16:50Z",
+      "url": "https://www.magenta.tv/tv/live-spanien-griechenland/03349c77",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.magenta.tv/tv/live-spanien-griechenland/03349c77"
+        }
+      ],
+      "source_reference": "https://www.magenta.tv/sport",
+      "access": "Free",
+      "validated_at": "2026-11-20T17:11:46Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-20T17:11:49Z) patchright render of https://www.magenta.tv/sport lists 'KID00765-TelekomBasketball4, LIVE: Spanien - Griechenland, So. 29.11.: 16:50 - 19:45' in the 'KOSTENLOS & OHNE LOGIN' block with per-game link https://www.magenta.tv/tv/live-spanien-griechenland/03349c77; FIBA World Cup qualifier basketball. Free access and live stream confirmed by the same-run render."
+    },
+    {
+      "league": "FIBA World Cup Qualification",
+      "teams": [
+        "Deutschland",
+        "Polen"
+      ],
+      "start": "2026-11-30T19:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "FIBA World Cup Qualification: Deutschland vs Polen",
+      "game_key": "FIBA World Cup Qualification|Deutschland|Polen|2026-11-30T18:00Z",
+      "url": "https://www.magenta.tv/tv/live-deutschland-polen/03349c78",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.magenta.tv/tv/live-deutschland-polen/03349c78"
+        }
+      ],
+      "source_reference": "https://www.magenta.tv/sport",
+      "access": "Free",
+      "validated_at": "2026-11-20T17:11:46Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-20T17:11:49Z) patchright render of https://www.magenta.tv/sport lists 'KID00765-TelekomBasketball4, 2027 FIBA Basketball World Cup Qualification - LIVE: Deutschland - Polen, Mo. 30.11.: 18:00 - 21:00' in the 'KOSTENLOS & OHNE LOGIN' block with per-game link https://www.magenta.tv/tv/live-deutschland-polen/03349c78. DBB national-team game, free under the Telekom-DBB deal. Free access and live stream confirmed by the same-run render."
+    },
+    {
+      "league": "Lega Basket Serie A",
+      "teams": [
+        "Derthona Basket",
+        "Olimpia Milano"
+      ],
+      "start": "2026-11-22T15:30:00+01:00",
+      "state": "VERIFIED",
+      "summary": "Lega Basket Serie A: Derthona Basket vs Olimpia Milano",
+      "game_key": "Lega Basket Serie A|Derthona Basket|Olimpia Milano|2026-11-22T14:30Z",
+      "url": "https://www.youtube.com/watch?v=6WIlBMa73uQ",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.youtube.com/watch?v=6WIlBMa73uQ"
+        }
+      ],
+      "source_reference": "https://www.youtube.com/@legabasket/streams",
+      "access": "Free",
+      "validated_at": "2026-11-20T17:11:46Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-20T17:11:49Z) watch-page enrichment for https://www.youtube.com/watch?v=6WIlBMa73uQ, title '\ud83d\udd34 LIVE | Derthona Basket - Olimpia Milano | 9\u00aa Giornata SerieA SisalClub 26/27', records scheduled_start 2026-11-22T14:30:00+00:00 and is_live_now false. @legabasket is the approved official LBA channel, which streams full Serie A games live free."
+    },
+    {
+      "league": "EuroLeague Women",
+      "teams": [
+        "Emlak Konut",
+        "Tango Bourges Basket"
+      ],
+      "start": "2026-11-25T17:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "EuroLeague Women: Emlak Konut vs Tango Bourges Basket",
+      "game_key": "EuroLeague Women|Emlak Konut|Tango Bourges Basket|2026-11-25T16:00Z",
+      "url": "https://www.youtube.com/watch?v=jTVngUPR_30",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.youtube.com/watch?v=jTVngUPR_30"
+        }
+      ],
+      "source_reference": "https://www.youtube.com/@EuroLeagueWomen/streams",
+      "access": "Free",
+      "validated_at": "2026-11-20T17:11:46Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-20T17:11:49Z) watch-page enrichment for https://www.youtube.com/watch?v=jTVngUPR_30, title 'LIVE - Emlak Konut v Tango Bourges Basket | EuroLeague Women 2026-27 | Regular Season', records scheduled_start 2026-11-25T16:00:00+00:00 and is_live_now false. FIBA 'Where to watch: EuroLeague Women' (2026-10-12) confirms all games free on the official EuroLeague Women YouTube channel outside geo-blocked territories and lists no German rights holder."
+    },
+    {
+      "league": "EuroLeague Women",
+      "teams": [
+        "Fenerbahce Tarfin",
+        "CS Rapid Bucuresti"
+      ],
+      "start": "2026-11-25T18:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "EuroLeague Women: Fenerbahce Tarfin vs CS Rapid Bucuresti",
+      "game_key": "EuroLeague Women|CS Rapid Bucuresti|Fenerbahce Tarfin|2026-11-25T17:00Z",
+      "url": "https://www.youtube.com/watch?v=I9dic0LUDr4",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.youtube.com/watch?v=I9dic0LUDr4"
+        }
+      ],
+      "source_reference": "https://www.youtube.com/@EuroLeagueWomen/streams",
+      "access": "Free",
+      "validated_at": "2026-11-20T17:11:46Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-20T17:11:49Z) watch-page enrichment for https://www.youtube.com/watch?v=I9dic0LUDr4, title 'LIVE - Fenerbahce Tarfin v CS Rapid Bucuresti | EuroLeague Women 2026-27 | Regular Season', records scheduled_start 2026-11-25T17:00:00+00:00 and is_live_now false. FIBA 'Where to watch: EuroLeague Women' (2026-10-12) confirms all games free on the official EuroLeague Women YouTube channel outside geo-blocked territories and lists no German rights holder."
+    },
+    {
+      "league": "EuroLeague Women",
+      "teams": [
+        "Galatasaray Cagdas Faktoring",
+        "Kangoeroes Basket Mechelen"
+      ],
+      "start": "2026-11-25T18:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "EuroLeague Women: Galatasaray Cagdas Faktoring vs Kangoeroes Basket Mechelen",
+      "game_key": "EuroLeague Women|Galatasaray Cagdas Faktoring|Kangoeroes Basket Mechelen|2026-11-25T17:00Z",
+      "url": "https://www.youtube.com/watch?v=WbIJl5l_1YQ",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.youtube.com/watch?v=WbIJl5l_1YQ"
+        }
+      ],
+      "source_reference": "https://www.youtube.com/@EuroLeagueWomen/streams",
+      "access": "Free",
+      "validated_at": "2026-11-20T17:11:46Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-20T17:11:49Z) watch-page enrichment for https://www.youtube.com/watch?v=WbIJl5l_1YQ, title 'LIVE - Galatasaray Cagdas Faktoring v Kangoeroes Basket Mechelen | EuroLeague Women 2026-27', records scheduled_start 2026-11-25T17:00:00+00:00 and is_live_now false. FIBA 'Where to watch: EuroLeague Women' (2026-10-12) confirms all games free on the official EuroLeague Women YouTube channel outside geo-blocked territories and lists no German rights holder."
+    },
+    {
+      "league": "EuroLeague Women",
+      "teams": [
+        "KKZ Crvena Zvezda",
+        "Beretta Famila Schio"
+      ],
+      "start": "2026-11-25T18:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "EuroLeague Women: KKZ Crvena Zvezda vs Beretta Famila Schio",
+      "game_key": "EuroLeague Women|Beretta Famila Schio|KKZ Crvena Zvezda|2026-11-25T17:00Z",
+      "url": "https://www.youtube.com/watch?v=7XIcy0aywsQ",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.youtube.com/watch?v=7XIcy0aywsQ"
+        }
+      ],
+      "source_reference": "https://www.youtube.com/@EuroLeagueWomen/streams",
+      "access": "Free",
+      "validated_at": "2026-11-20T17:11:46Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-20T17:11:49Z) watch-page enrichment for https://www.youtube.com/watch?v=7XIcy0aywsQ, title 'LIVE - KKZ Crvena Zvezda v Beretta Famila Schio | EuroLeague Women 2026-27 | Regular Season', records scheduled_start 2026-11-25T17:00:00+00:00 and is_live_now false. FIBA 'Where to watch: EuroLeague Women' (2026-10-12) confirms all games free on the official EuroLeague Women YouTube channel outside geo-blocked territories and lists no German rights holder."
+    },
+    {
+      "league": "EuroLeague Women",
+      "teams": [
+        "ZVVZ USK Praha",
+        "Lotto AZS UMCS Lublin"
+      ],
+      "start": "2026-11-25T19:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "EuroLeague Women: ZVVZ USK Praha vs Lotto AZS UMCS Lublin",
+      "game_key": "EuroLeague Women|Lotto AZS UMCS Lublin|ZVVZ USK Praha|2026-11-25T18:00Z",
+      "url": "https://www.youtube.com/watch?v=89_pTM2R4fw",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.youtube.com/watch?v=89_pTM2R4fw"
+        }
+      ],
+      "source_reference": "https://www.youtube.com/@EuroLeagueWomen/streams",
+      "access": "Free",
+      "validated_at": "2026-11-20T17:11:46Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-20T17:11:49Z) watch-page enrichment for https://www.youtube.com/watch?v=89_pTM2R4fw, title 'LIVE - ZVVZ USK Praha v Lotto AZS UMCS Lublin | EuroLeague Women 2026-27 | Regular Season', records scheduled_start 2026-11-25T18:00:00+00:00 and is_live_now false. FIBA 'Where to watch: EuroLeague Women' (2026-10-12) confirms all games free on the official EuroLeague Women YouTube channel outside geo-blocked territories and lists no German rights holder."
+    },
+    {
+      "league": "EuroLeague Women",
+      "teams": [
+        "Flammes Carolo Basket",
+        "Valencia Basket Club"
+      ],
+      "start": "2026-11-25T19:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "EuroLeague Women: Flammes Carolo Basket vs Valencia Basket Club",
+      "game_key": "EuroLeague Women|Flammes Carolo Basket|Valencia Basket Club|2026-11-25T18:00Z",
+      "url": "https://www.youtube.com/watch?v=RqCOjgV6UIk",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.youtube.com/watch?v=RqCOjgV6UIk"
+        }
+      ],
+      "source_reference": "https://www.youtube.com/@EuroLeagueWomen/streams",
+      "access": "Free",
+      "validated_at": "2026-11-20T17:11:46Z",
+      "validation_notes": "phase0-evidence.json (recorded_at 2026-11-20T17:11:49Z) watch-page enrichment for https://www.youtube.com/watch?v=RqCOjgV6UIk, title 'LIVE - Flammes Carolo Basket v Valencia Basket Club | EuroLeague Women 2026-27 | Regular Season', records scheduled_start 2026-11-25T18:00:00+00:00 and is_live_now false. FIBA 'Where to watch: EuroLeague Women' (2026-10-12) confirms all games free on the official EuroLeague Women YouTube channel outside geo-blocked territories and lists no German rights holder."
     }
   ]
 }

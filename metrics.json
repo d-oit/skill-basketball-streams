@@ -1,9 +1,9 @@
 {
   "audit": {
-    "inconclusive": 47,
+    "inconclusive": 55,
     "judged": 69,
     "precision": 1.0,
-    "rows": 116,
+    "rows": 124,
     "verified": 69,
     "wrong": 0
   },
@@ -151,12 +151,13 @@
     ]
   },
   "recall": {
-    "captured": 9,
+    "captured": 16,
     "eligible": 3008,
-    "missed": 2999,
+    "missed": 2992,
     "missed_keys": [
+      "EuroLeague Women|Emlak Konut|Tango Bourges Basket|2026-11-25T16:00Z",
       "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
-      "FIBA World Cup Qualifiers|Deutschland|Lettland|2026-11-27T17:30Z",
+      "FIBA World Cup Qualification|Deutschland|Polen|2026-11-30T18:00Z",
       "easyCredit BBL|ROSTOCK SEAWOLVES|Science City Jena|2026-11-21T15:00Z",
       "easyCredit BBL|Rostock Seawolves|Science City Jena|2026-11-21T15:00Z",
       "http://courtside1891.com",
@@ -1110,7 +1111,6 @@
       "https://www.magenta.tv/tv/live-daenemark-deutschland/03316f88",
       "https://www.magenta.tv/tv/live-deutschland-finnland-iihf-eishockey-wm-der-frauen-2026/03361430",
       "https://www.magenta.tv/tv/live-deutschland-finnland-iihf-eishockey-wm-der-frauen-2026/03361431",
-      "https://www.magenta.tv/tv/live-deutschland-polen/03349c78",
       "https://www.magenta.tv/tv/live-deutschland-schweden/03359e4a",
       "https://www.magenta.tv/tv/live-deutschland-schweden/03359e72",
       "https://www.magenta.tv/tv/live-dp-world-tour-championship-tag-1-teil-1/0334b707",
@@ -1133,6 +1133,7 @@
       "https://www.magenta.tv/tv/live-kickers-offenbach-vfr-mannheim/03375179",
       "https://www.magenta.tv/tv/live-kickers-offenbach-vfr-mannheim/0337518e",
       "https://www.magenta.tv/tv/live-krefeld-pinguine-straubing-tigers/0331db23",
+      "https://www.magenta.tv/tv/live-lettland-deutschland/03349c76",
       "https://www.magenta.tv/tv/live-lpga-cme-group-tour-championship-1-tag-in-naples-fl-usa/0333f085",
       "https://www.magenta.tv/tv/live-maccabi-rapyd-tel-aviv-dubai-basketball/0331dad9",
       "https://www.magenta.tv/tv/live-nhl-carolina-hurricanes-seattle-kraken-nhl-global-games-in-helsinki-fin/0331e42b",
@@ -1176,7 +1177,6 @@
       "https://www.magenta.tv/tv/live-sky-sport-news-top-news/03334915",
       "https://www.magenta.tv/tv/live-sky-sport-news-top-news/03345f1d",
       "https://www.magenta.tv/tv/live-skyliners-frankfurt-maxima-rom/0330432e",
-      "https://www.magenta.tv/tv/live-spanien-griechenland/03349c77",
       "https://www.magenta.tv/tv/live-sv-werder-bremen-1-fc-union-berlin/03316f9f",
       "https://www.magenta.tv/tv/live-telekom-starkick-2026/0333e833",
       "https://www.magenta.tv/tv/live-telekom-starkick-2026/0333e83e",
@@ -1747,7 +1747,6 @@
       "https://www.youtube.com/watch?v=6SHn-B6cGnY",
       "https://www.youtube.com/watch?v=6U3fPp_3Ros",
       "https://www.youtube.com/watch?v=6Vy5uR_QWUo",
-      "https://www.youtube.com/watch?v=6WIlBMa73uQ",
       "https://www.youtube.com/watch?v=6_us3AAD0pE",
       "https://www.youtube.com/watch?v=6fkDlEOcTVk",
       "https://www.youtube.com/watch?v=6lwB-uKVCXY",
@@ -1758,7 +1757,6 @@
       "https://www.youtube.com/watch?v=7BpttDqqnWk",
       "https://www.youtube.com/watch?v=7Kkegzlhwpk",
       "https://www.youtube.com/watch?v=7NIkLuZoPsI",
-      "https://www.youtube.com/watch?v=7XIcy0aywsQ",
       "https://www.youtube.com/watch?v=7Zadpi0hrTM",
       "https://www.youtube.com/watch?v=7c9A6V59rxA",
       "https://www.youtube.com/watch?v=7eM3g9gPwS0",
@@ -1769,7 +1767,6 @@
       "https://www.youtube.com/watch?v=80VAsCqwW90",
       "https://www.youtube.com/watch?v=8208-NetkYI",
       "https://www.youtube.com/watch?v=87OH7YDkmsw",
-      "https://www.youtube.com/watch?v=89_pTM2R4fw",
       "https://www.youtube.com/watch?v=89zkYHEIxg0",
       "https://www.youtube.com/watch?v=8LBm2HDw5wM",
       "https://www.youtube.com/watch?v=8MC0ubxZI-E",
@@ -2003,7 +2000,6 @@
       "https://www.youtube.com/watch?v=I0Osgb_rnSI",
       "https://www.youtube.com/watch?v=I3lVKz7TWoE",
       "https://www.youtube.com/watch?v=I7kdf6bfK1c",
-      "https://www.youtube.com/watch?v=I9dic0LUDr4",
       "https://www.youtube.com/watch?v=IABhHgE1RSk",
       "https://www.youtube.com/watch?v=IDcnhC5ZeZo",
       "https://www.youtube.com/watch?v=IMFUPfBtSM8",
@@ -2251,7 +2247,6 @@
       "https://www.youtube.com/watch?v=RfgLrHW61Cw",
       "https://www.youtube.com/watch?v=RfsCUB-qaMM",
       "https://www.youtube.com/watch?v=RmGeGxPIMDA",
-      "https://www.youtube.com/watch?v=RqCOjgV6UIk",
       "https://www.youtube.com/watch?v=RrV-SYvVg8A",
       "https://www.youtube.com/watch?v=RyRsbFUsH-c",
       "https://www.youtube.com/watch?v=Rz9YbFuOwhc",
@@ -2344,7 +2339,6 @@
       "https://www.youtube.com/watch?v=WIa0EKJdYxo",
       "https://www.youtube.com/watch?v=WTUkRg8mjwY",
       "https://www.youtube.com/watch?v=WUPQleriInw",
-      "https://www.youtube.com/watch?v=WbIJl5l_1YQ",
       "https://www.youtube.com/watch?v=WbW9ja1irKs",
       "https://www.youtube.com/watch?v=WfxN-p4i9wg",
       "https://www.youtube.com/watch?v=WkDNtBR1Q7s",
@@ -2692,7 +2686,6 @@
       "https://www.youtube.com/watch?v=jKgAvQ4onyE",
       "https://www.youtube.com/watch?v=jL3mu85bJjs",
       "https://www.youtube.com/watch?v=jM7JDSWdbHo",
-      "https://www.youtube.com/watch?v=jTVngUPR_30",
       "https://www.youtube.com/watch?v=jVyRUqrWIVg",
       "https://www.youtube.com/watch?v=jXEXtui1I4A",
       "https://www.youtube.com/watch?v=jXF5w5F1cBQ",
@@ -3155,13 +3148,14 @@
       "https://youtube.com/watch?v=yi7USox4xB8",
       "https://youtube.com/watch?v=zNU44AAcyOc"
     ],
-    "recall": 0.003,
-    "rows": 37878,
-    "unique_games": 4385,
-    "unverifiable": 2999,
+    "recall": 0.005,
+    "rows": 37890,
+    "unique_games": 4388,
+    "unverifiable": 2992,
     "unverifiable_keys": [
+      "EuroLeague Women|Emlak Konut|Tango Bourges Basket|2026-11-25T16:00Z",
       "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
-      "FIBA World Cup Qualifiers|Deutschland|Lettland|2026-11-27T17:30Z",
+      "FIBA World Cup Qualification|Deutschland|Polen|2026-11-30T18:00Z",
       "easyCredit BBL|ROSTOCK SEAWOLVES|Science City Jena|2026-11-21T15:00Z",
       "easyCredit BBL|Rostock Seawolves|Science City Jena|2026-11-21T15:00Z",
       "http://courtside1891.com",
@@ -4115,7 +4109,6 @@
       "https://www.magenta.tv/tv/live-daenemark-deutschland/03316f88",
       "https://www.magenta.tv/tv/live-deutschland-finnland-iihf-eishockey-wm-der-frauen-2026/03361430",
       "https://www.magenta.tv/tv/live-deutschland-finnland-iihf-eishockey-wm-der-frauen-2026/03361431",
-      "https://www.magenta.tv/tv/live-deutschland-polen/03349c78",
       "https://www.magenta.tv/tv/live-deutschland-schweden/03359e4a",
       "https://www.magenta.tv/tv/live-deutschland-schweden/03359e72",
       "https://www.magenta.tv/tv/live-dp-world-tour-championship-tag-1-teil-1/0334b707",
@@ -4138,6 +4131,7 @@
       "https://www.magenta.tv/tv/live-kickers-offenbach-vfr-mannheim/03375179",
       "https://www.magenta.tv/tv/live-kickers-offenbach-vfr-mannheim/0337518e",
       "https://www.magenta.tv/tv/live-krefeld-pinguine-straubing-tigers/0331db23",
+      "https://www.magenta.tv/tv/live-lettland-deutschland/03349c76",
       "https://www.magenta.tv/tv/live-lpga-cme-group-tour-championship-1-tag-in-naples-fl-usa/0333f085",
       "https://www.magenta.tv/tv/live-maccabi-rapyd-tel-aviv-dubai-basketball/0331dad9",
       "https://www.magenta.tv/tv/live-nhl-carolina-hurricanes-seattle-kraken-nhl-global-games-in-helsinki-fin/0331e42b",
@@ -4181,7 +4175,6 @@
       "https://www.magenta.tv/tv/live-sky-sport-news-top-news/03334915",
       "https://www.magenta.tv/tv/live-sky-sport-news-top-news/03345f1d",
       "https://www.magenta.tv/tv/live-skyliners-frankfurt-maxima-rom/0330432e",
-      "https://www.magenta.tv/tv/live-spanien-griechenland/03349c77",
       "https://www.magenta.tv/tv/live-sv-werder-bremen-1-fc-union-berlin/03316f9f",
       "https://www.magenta.tv/tv/live-telekom-starkick-2026/0333e833",
       "https://www.magenta.tv/tv/live-telekom-starkick-2026/0333e83e",
@@ -4752,7 +4745,6 @@
       "https://www.youtube.com/watch?v=6SHn-B6cGnY",
       "https://www.youtube.com/watch?v=6U3fPp_3Ros",
       "https://www.youtube.com/watch?v=6Vy5uR_QWUo",
-      "https://www.youtube.com/watch?v=6WIlBMa73uQ",
       "https://www.youtube.com/watch?v=6_us3AAD0pE",
       "https://www.youtube.com/watch?v=6fkDlEOcTVk",
       "https://www.youtube.com/watch?v=6lwB-uKVCXY",
@@ -4763,7 +4755,6 @@
       "https://www.youtube.com/watch?v=7BpttDqqnWk",
       "https://www.youtube.com/watch?v=7Kkegzlhwpk",
       "https://www.youtube.com/watch?v=7NIkLuZoPsI",
-      "https://www.youtube.com/watch?v=7XIcy0aywsQ",
       "https://www.youtube.com/watch?v=7Zadpi0hrTM",
       "https://www.youtube.com/watch?v=7c9A6V59rxA",
       "https://www.youtube.com/watch?v=7eM3g9gPwS0",
@@ -4774,7 +4765,6 @@
       "https://www.youtube.com/watch?v=80VAsCqwW90",
       "https://www.youtube.com/watch?v=8208-NetkYI",
       "https://www.youtube.com/watch?v=87OH7YDkmsw",
-      "https://www.youtube.com/watch?v=89_pTM2R4fw",
       "https://www.youtube.com/watch?v=89zkYHEIxg0",
       "https://www.youtube.com/watch?v=8LBm2HDw5wM",
       "https://www.youtube.com/watch?v=8MC0ubxZI-E",
@@ -5008,7 +4998,6 @@
       "https://www.youtube.com/watch?v=I0Osgb_rnSI",
       "https://www.youtube.com/watch?v=I3lVKz7TWoE",
       "https://www.youtube.com/watch?v=I7kdf6bfK1c",
-      "https://www.youtube.com/watch?v=I9dic0LUDr4",
       "https://www.youtube.com/watch?v=IABhHgE1RSk",
       "https://www.youtube.com/watch?v=IDcnhC5ZeZo",
       "https://www.youtube.com/watch?v=IMFUPfBtSM8",
@@ -5256,7 +5245,6 @@
       "https://www.youtube.com/watch?v=RfgLrHW61Cw",
       "https://www.youtube.com/watch?v=RfsCUB-qaMM",
       "https://www.youtube.com/watch?v=RmGeGxPIMDA",
-      "https://www.youtube.com/watch?v=RqCOjgV6UIk",
       "https://www.youtube.com/watch?v=RrV-SYvVg8A",
       "https://www.youtube.com/watch?v=RyRsbFUsH-c",
       "https://www.youtube.com/watch?v=Rz9YbFuOwhc",
@@ -5349,7 +5337,6 @@
       "https://www.youtube.com/watch?v=WIa0EKJdYxo",
       "https://www.youtube.com/watch?v=WTUkRg8mjwY",
       "https://www.youtube.com/watch?v=WUPQleriInw",
-      "https://www.youtube.com/watch?v=WbIJl5l_1YQ",
       "https://www.youtube.com/watch?v=WbW9ja1irKs",
       "https://www.youtube.com/watch?v=WfxN-p4i9wg",
       "https://www.youtube.com/watch?v=WkDNtBR1Q7s",
@@ -5697,7 +5684,6 @@
       "https://www.youtube.com/watch?v=jKgAvQ4onyE",
       "https://www.youtube.com/watch?v=jL3mu85bJjs",
       "https://www.youtube.com/watch?v=jM7JDSWdbHo",
-      "https://www.youtube.com/watch?v=jTVngUPR_30",
       "https://www.youtube.com/watch?v=jVyRUqrWIVg",
       "https://www.youtube.com/watch?v=jXEXtui1I4A",
       "https://www.youtube.com/watch?v=jXF5w5F1cBQ",
@@ -6161,47 +6147,13 @@
       "https://youtube.com/watch?v=zNU44AAcyOc"
     ]
   },
-  "run_id": "2026-11-20T17:10Z",
+  "run_id": "",
   "source": {
-    "audit_rows": 116,
-    "candidates_rows": 37878,
+    "audit_rows": 124,
+    "candidates_rows": 37890,
     "fixtures_rows": 134
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 5,
-      "missed": 5,
-      "recall": 0.0,
-      "rows": 17,
-      "run_id": "2026-11-17T06:35Z",
-      "unique_games": 17
-    },
-    {
-      "audit": {
-        "inconclusive": 2,
-        "judged": 0,
-        "precision": null,
-        "rows": 2,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-11-17T06:45Z",
-      "unique_games": 0
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -6405,7 +6357,41 @@
       "rows": 41,
       "run_id": "2026-11-20T17:09Z",
       "unique_games": 38
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 12,
+      "run_id": "2026-11-20T17:17Z",
+      "unique_games": 12
+    },
+    {
+      "audit": {
+        "inconclusive": 8,
+        "judged": 0,
+        "precision": null,
+        "rows": 8,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-11-20T17:18Z",
+      "unique_games": 0
     }
   ],
-  "ts": "2026-11-20T17:10:25.514585+00:00"
+  "ts": "2026-11-20T17:18:18.314040+00:00"
 }
