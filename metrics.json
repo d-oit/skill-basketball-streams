@@ -1,9 +1,9 @@
 {
   "audit": {
-    "inconclusive": 55,
+    "inconclusive": 57,
     "judged": 69,
     "precision": 1.0,
-    "rows": 124,
+    "rows": 126,
     "verified": 69,
     "wrong": 0
   },
@@ -151,9 +151,9 @@
     ]
   },
   "recall": {
-    "captured": 16,
+    "captured": 18,
     "eligible": 3136,
-    "missed": 3120,
+    "missed": 3118,
     "missed_keys": [
       "EuroLeague Women|Emlak Konut|Tango Bourges Basket|2026-11-25T16:00Z",
       "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
@@ -1977,7 +1977,6 @@
       "https://www.youtube.com/watch?v=DrK15_c7WGI",
       "https://www.youtube.com/watch?v=DsNzf-_2G-Y",
       "https://www.youtube.com/watch?v=Ds_y5m8WLac",
-      "https://www.youtube.com/watch?v=DvYsbk-xrz0",
       "https://www.youtube.com/watch?v=Dx1C5yey6oM",
       "https://www.youtube.com/watch?v=Dyq4CApVcZo",
       "https://www.youtube.com/watch?v=DzJQF6JAxyk",
@@ -2298,7 +2297,6 @@
       "https://www.youtube.com/watch?v=QMuyQtps85c",
       "https://www.youtube.com/watch?v=QNhg55jnexo",
       "https://www.youtube.com/watch?v=QOkKT8BsIv0",
-      "https://www.youtube.com/watch?v=QPrB6O7KAAM",
       "https://www.youtube.com/watch?v=QTZGkUybyVQ",
       "https://www.youtube.com/watch?v=QTngA3J9LJo",
       "https://www.youtube.com/watch?v=QXekogXKTdQ",
@@ -3276,10 +3274,10 @@
       "https://youtube.com/watch?v=yi7USox4xB8",
       "https://youtube.com/watch?v=zNU44AAcyOc"
     ],
-    "recall": 0.005,
-    "rows": 39016,
-    "unique_games": 4631,
-    "unverifiable": 3120,
+    "recall": 0.006,
+    "rows": 39026,
+    "unique_games": 4632,
+    "unverifiable": 3118,
     "unverifiable_keys": [
       "EuroLeague Women|Emlak Konut|Tango Bourges Basket|2026-11-25T16:00Z",
       "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
@@ -5103,7 +5101,6 @@
       "https://www.youtube.com/watch?v=DrK15_c7WGI",
       "https://www.youtube.com/watch?v=DsNzf-_2G-Y",
       "https://www.youtube.com/watch?v=Ds_y5m8WLac",
-      "https://www.youtube.com/watch?v=DvYsbk-xrz0",
       "https://www.youtube.com/watch?v=Dx1C5yey6oM",
       "https://www.youtube.com/watch?v=Dyq4CApVcZo",
       "https://www.youtube.com/watch?v=DzJQF6JAxyk",
@@ -5424,7 +5421,6 @@
       "https://www.youtube.com/watch?v=QMuyQtps85c",
       "https://www.youtube.com/watch?v=QNhg55jnexo",
       "https://www.youtube.com/watch?v=QOkKT8BsIv0",
-      "https://www.youtube.com/watch?v=QPrB6O7KAAM",
       "https://www.youtube.com/watch?v=QTZGkUybyVQ",
       "https://www.youtube.com/watch?v=QTngA3J9LJo",
       "https://www.youtube.com/watch?v=QXekogXKTdQ",
@@ -6403,30 +6399,13 @@
       "https://youtube.com/watch?v=zNU44AAcyOc"
     ]
   },
-  "run_id": "2026-11-21T16:23Z",
+  "run_id": "",
   "source": {
-    "audit_rows": 124,
-    "candidates_rows": 39016,
+    "audit_rows": 126,
+    "candidates_rows": 39026,
     "fixtures_rows": 134
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 2,
-        "judged": 0,
-        "precision": null,
-        "rows": 2,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 0,
-      "run_id": "2026-11-17T17:58Z",
-      "unique_games": 0
-    },
     {
       "audit": {
         "inconclusive": 0,
@@ -6647,7 +6626,24 @@
       "rows": 61,
       "run_id": "2026-11-21T16:22Z",
       "unique_games": 59
+    },
+    {
+      "audit": {
+        "inconclusive": 2,
+        "judged": 0,
+        "precision": null,
+        "rows": 2,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 10,
+      "run_id": "2026-11-21T16:37Z",
+      "unique_games": 10
     }
   ],
-  "ts": "2026-11-21T16:23:17.811064+00:00"
+  "ts": "2026-11-21T16:37:37.283027+00:00"
 }
