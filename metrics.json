@@ -1,9 +1,9 @@
 {
   "audit": {
-    "inconclusive": 58,
+    "inconclusive": 61,
     "judged": 70,
     "precision": 1.0,
-    "rows": 128,
+    "rows": 131,
     "verified": 70,
     "wrong": 0
   },
@@ -152,13 +152,12 @@
     ]
   },
   "recall": {
-    "captured": 18,
+    "captured": 17,
     "eligible": 3337,
-    "missed": 3319,
+    "missed": 3320,
     "missed_keys": [
       "EuroLeague Women|Emlak Konut|Tango Bourges Basket|2026-11-25T16:00Z",
       "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
-      "FIBA World Cup Qualification|Deutschland|Polen|2026-11-30T18:00Z",
       "easyCredit BBL|ROSTOCK SEAWOLVES|Science City Jena|2026-11-21T15:00Z",
       "easyCredit BBL|Rostock Seawolves|Science City Jena|2026-11-21T15:00Z",
       "http://courtside1891.com",
@@ -1209,6 +1208,7 @@
       "https://www.magenta.tv/tv/live-daenemark-deutschland/03316f88",
       "https://www.magenta.tv/tv/live-deutschland-finnland-iihf-eishockey-wm-der-frauen-2026/03361430",
       "https://www.magenta.tv/tv/live-deutschland-finnland-iihf-eishockey-wm-der-frauen-2026/03361431",
+      "https://www.magenta.tv/tv/live-deutschland-polen/03349c78",
       "https://www.magenta.tv/tv/live-deutschland-schweden/03359e4a",
       "https://www.magenta.tv/tv/live-deutschland-schweden/03359e72",
       "https://www.magenta.tv/tv/live-dp-world-tour-championship-tag-1-teil-1/0334b707",
@@ -1291,6 +1291,7 @@
       "https://www.magenta.tv/tv/live-sky-sport-news-top-news/03334915",
       "https://www.magenta.tv/tv/live-sky-sport-news-top-news/03345f1d",
       "https://www.magenta.tv/tv/live-skyliners-frankfurt-maxima-rom/0330432e",
+      "https://www.magenta.tv/tv/live-spanien-griechenland/03349c77",
       "https://www.magenta.tv/tv/live-sv-werder-bremen-1-fc-union-berlin/03316f9f",
       "https://www.magenta.tv/tv/live-telekom-starkick-2026/0333e833",
       "https://www.magenta.tv/tv/live-telekom-starkick-2026/0333e83e",
@@ -3477,13 +3478,12 @@
       "https://youtube.com/watch?v=zNU44AAcyOc"
     ],
     "recall": 0.005,
-    "rows": 41242,
-    "unique_games": 4925,
-    "unverifiable": 3319,
+    "rows": 41251,
+    "unique_games": 4930,
+    "unverifiable": 3320,
     "unverifiable_keys": [
       "EuroLeague Women|Emlak Konut|Tango Bourges Basket|2026-11-25T16:00Z",
       "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
-      "FIBA World Cup Qualification|Deutschland|Polen|2026-11-30T18:00Z",
       "easyCredit BBL|ROSTOCK SEAWOLVES|Science City Jena|2026-11-21T15:00Z",
       "easyCredit BBL|Rostock Seawolves|Science City Jena|2026-11-21T15:00Z",
       "http://courtside1891.com",
@@ -4534,6 +4534,7 @@
       "https://www.magenta.tv/tv/live-daenemark-deutschland/03316f88",
       "https://www.magenta.tv/tv/live-deutschland-finnland-iihf-eishockey-wm-der-frauen-2026/03361430",
       "https://www.magenta.tv/tv/live-deutschland-finnland-iihf-eishockey-wm-der-frauen-2026/03361431",
+      "https://www.magenta.tv/tv/live-deutschland-polen/03349c78",
       "https://www.magenta.tv/tv/live-deutschland-schweden/03359e4a",
       "https://www.magenta.tv/tv/live-deutschland-schweden/03359e72",
       "https://www.magenta.tv/tv/live-dp-world-tour-championship-tag-1-teil-1/0334b707",
@@ -4616,6 +4617,7 @@
       "https://www.magenta.tv/tv/live-sky-sport-news-top-news/03334915",
       "https://www.magenta.tv/tv/live-sky-sport-news-top-news/03345f1d",
       "https://www.magenta.tv/tv/live-skyliners-frankfurt-maxima-rom/0330432e",
+      "https://www.magenta.tv/tv/live-spanien-griechenland/03349c77",
       "https://www.magenta.tv/tv/live-sv-werder-bremen-1-fc-union-berlin/03316f9f",
       "https://www.magenta.tv/tv/live-telekom-starkick-2026/0333e833",
       "https://www.magenta.tv/tv/live-telekom-starkick-2026/0333e83e",
@@ -6802,30 +6804,13 @@
       "https://youtube.com/watch?v=zNU44AAcyOc"
     ]
   },
-  "run_id": "2026-11-23T20:36Z",
+  "run_id": "",
   "source": {
-    "audit_rows": 128,
-    "candidates_rows": 41242,
+    "audit_rows": 131,
+    "candidates_rows": 41251,
     "fixtures_rows": 135
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 17,
-      "missed": 17,
-      "recall": 0.0,
-      "rows": 45,
-      "run_id": "2026-11-19T17:35Z",
-      "unique_games": 44
-    },
     {
       "audit": {
         "inconclusive": 5,
@@ -7046,7 +7031,24 @@
       "rows": 23,
       "run_id": "2026-11-23T20:35Z",
       "unique_games": 23
+    },
+    {
+      "audit": {
+        "inconclusive": 3,
+        "judged": 0,
+        "precision": null,
+        "rows": 3,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 9,
+      "run_id": "2026-11-23T20:46Z",
+      "unique_games": 9
     }
   ],
-  "ts": "2026-11-23T20:36:20.044790+00:00"
+  "ts": "2026-11-23T20:46:58.353326+00:00"
 }
