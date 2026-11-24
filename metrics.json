@@ -1,9 +1,9 @@
 {
   "audit": {
-    "inconclusive": 61,
+    "inconclusive": 62,
     "judged": 70,
     "precision": 1.0,
-    "rows": 131,
+    "rows": 132,
     "verified": 70,
     "wrong": 0
   },
@@ -152,9 +152,9 @@
     ]
   },
   "recall": {
-    "captured": 17,
+    "captured": 18,
     "eligible": 3398,
-    "missed": 3381,
+    "missed": 3380,
     "missed_keys": [
       "EuroLeague Women|Emlak Konut|Tango Bourges Basket|2026-11-25T16:00Z",
       "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
@@ -1195,7 +1195,6 @@
       "https://www.magenta.tv/tv/live-austin-championship-tag-1-teil-1/0334b71d",
       "https://www.magenta.tv/tv/live-austin-championship-tag-2-teil-1/0334b720",
       "https://www.magenta.tv/tv/live-balkan-botevgrad-ratiopharm-ulm/0331dae3",
-      "https://www.magenta.tv/tv/live-besiktas-istanbul-panathinaikos-aktor-athen/0337037f",
       "https://www.magenta.tv/tv/live-besiktas-istanbul-paris-basketball/03349a2b",
       "https://www.magenta.tv/tv/live-besiktas-istanbul-real-madrid/0331db22",
       "https://www.magenta.tv/tv/live-bl-alle-spiele-alle-tore-die-vodafone-highlight-show-10-spieltag-samstag/033435ec",
@@ -3539,9 +3538,9 @@
       "https://youtube.com/watch?v=zNU44AAcyOc"
     ],
     "recall": 0.005,
-    "rows": 42375,
+    "rows": 42385,
     "unique_games": 5021,
-    "unverifiable": 3381,
+    "unverifiable": 3380,
     "unverifiable_keys": [
       "EuroLeague Women|Emlak Konut|Tango Bourges Basket|2026-11-25T16:00Z",
       "EuroLeague|Besiktas Istanbul|Real Madrid|2026-11-18T17:00Z",
@@ -4582,7 +4581,6 @@
       "https://www.magenta.tv/tv/live-austin-championship-tag-1-teil-1/0334b71d",
       "https://www.magenta.tv/tv/live-austin-championship-tag-2-teil-1/0334b720",
       "https://www.magenta.tv/tv/live-balkan-botevgrad-ratiopharm-ulm/0331dae3",
-      "https://www.magenta.tv/tv/live-besiktas-istanbul-panathinaikos-aktor-athen/0337037f",
       "https://www.magenta.tv/tv/live-besiktas-istanbul-paris-basketball/03349a2b",
       "https://www.magenta.tv/tv/live-besiktas-istanbul-real-madrid/0331db22",
       "https://www.magenta.tv/tv/live-bl-alle-spiele-alle-tore-die-vodafone-highlight-show-10-spieltag-samstag/033435ec",
@@ -6926,47 +6924,13 @@
       "https://youtube.com/watch?v=zNU44AAcyOc"
     ]
   },
-  "run_id": "2026-11-24T19:42Z",
+  "run_id": "",
   "source": {
-    "audit_rows": 131,
-    "candidates_rows": 42375,
+    "audit_rows": 132,
+    "candidates_rows": 42385,
     "fixtures_rows": 135
   },
   "trend": [
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 21,
-      "missed": 21,
-      "recall": 0.0,
-      "rows": 41,
-      "run_id": "2026-11-20T17:09Z",
-      "unique_games": 38
-    },
-    {
-      "audit": {
-        "inconclusive": 0,
-        "judged": 0,
-        "precision": null,
-        "rows": 0,
-        "verified": 0,
-        "wrong": 0
-      },
-      "captured": 0,
-      "eligible": 0,
-      "missed": 0,
-      "recall": null,
-      "rows": 12,
-      "run_id": "2026-11-20T17:17Z",
-      "unique_games": 12
-    },
     {
       "audit": {
         "inconclusive": 8,
@@ -7170,7 +7134,41 @@
       "rows": 15,
       "run_id": "2026-11-24T19:41Z",
       "unique_games": 14
+    },
+    {
+      "audit": {
+        "inconclusive": 0,
+        "judged": 0,
+        "precision": null,
+        "rows": 0,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 10,
+      "run_id": "2026-11-24T19:48Z",
+      "unique_games": 10
+    },
+    {
+      "audit": {
+        "inconclusive": 1,
+        "judged": 0,
+        "precision": null,
+        "rows": 1,
+        "verified": 0,
+        "wrong": 0
+      },
+      "captured": 0,
+      "eligible": 0,
+      "missed": 0,
+      "recall": null,
+      "rows": 0,
+      "run_id": "2026-11-24T19:49Z",
+      "unique_games": 0
     }
   ],
-  "ts": "2026-11-24T19:42:21.839287+00:00"
+  "ts": "2026-11-24T19:49:06.551672+00:00"
 }
