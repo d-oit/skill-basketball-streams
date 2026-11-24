@@ -275,6 +275,41 @@ class TestFetchWithLadder:
         assert attempts == [] and result.ok is False
 
 
+class TestFirecrawlV2:
+    """Pin the Firecrawl REST contract so the retired v1 endpoint cannot return."""
+
+    def test_scrape_uses_v2_endpoint_and_preserves_render_options(self, monkeypatch):
+        monkeypatch.setenv("FIRECRAWL_API_KEY", "test-firecrawl-key")
+        seen = {}
+
+        def fake(endpoint, payload, headers, timeout):
+            seen.update(endpoint=endpoint, payload=payload, headers=headers, timeout=timeout)
+            return 200, {
+                "data": {
+                    "markdown": "# Example\nRendered markdown",
+                    "html": "<html>rendered</html>",
+                }
+            }
+
+        monkeypatch.setattr(render_ladder_module, "_http_post_json", fake)
+        result = render_ladder_module.FirecrawlRung().fetch(
+            "https://example.com/rendered", timeout=7
+        )
+
+        assert seen["endpoint"] == "https://api.firecrawl.dev/v2/scrape"
+        assert seen["headers"]["Authorization"] == "Bearer test-firecrawl-key"
+        assert seen["payload"] == {
+            "url": "https://example.com/rendered",
+            "formats": ["markdown", "html"],
+            "waitFor": 6000,
+            "onlyMainContent": False,
+        }
+        assert seen["timeout"] == 7
+        assert result.ok is True
+        assert result.text == "# Example\nRendered markdown"
+        assert result.html == "<html>rendered</html>"
+
+
 class TestStreamEvidence:
     """The gate is a conjunction of a media marker and a live-state marker.
 
