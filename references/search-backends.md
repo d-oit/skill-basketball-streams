@@ -133,7 +133,7 @@ curl "https://api.search.tinyfish.ai?query=Basketball+Champions+League+live+free
 Firecrawl scrape (rendering `magenta.tv`):
 
 ```bash
-curl -X POST https://api.firecrawl.dev/v1/scrape \
+curl -X POST https://api.firecrawl.dev/v2/scrape \
   -H "Authorization: Bearer $FIRECRAWL_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"url":"https://www.magenta.tv/tv/live-basketball-euroleague-88213",
