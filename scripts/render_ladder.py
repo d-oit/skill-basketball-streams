@@ -429,7 +429,7 @@ class HostedRung(Rung):
 class FirecrawlRung(HostedRung):
     name = "firecrawl"
     env_var = "FIRECRAWL_API_KEY"
-    endpoint = "https://api.firecrawl.dev/v1/scrape"
+    endpoint = "https://api.firecrawl.dev/v2/scrape"
 
     def _request(self, url: str, key: str, timeout: float) -> tuple[int | None, dict]:
         status, payload = _http_post_json(
