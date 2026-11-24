@@ -113,7 +113,7 @@ one line per rung with the reason each was unusable, then whether the page names
 | # | Backend | How | Cost |
 |---|---------|-----|------|
 | 0 | **plain stdlib GET** (`urllib`) | `render_ladder.py --probe`; last on this host because it cannot render the SPA | free, no key |
-| 1 | **Firecrawl scrape** | `POST https://api.firecrawl.dev/v1/scrape` with `{"url": ..., "formats": ["markdown", "html"], "waitFor": 6000, "onlyMainContent": false}` | 1 credit (~1,000/month free, no card) |
+| 1 | **Firecrawl scrape** | `POST https://api.firecrawl.dev/v2/scrape` with `{"url": ..., "formats": ["markdown", "html"], "waitFor": 6000, "onlyMainContent": false}` | 1 credit (~1,000/month free, no card) |
 | 2 | **TinyFish Fetch** | `POST https://api.fetch.tinyfish.ai` with `{"urls": [url]}` | Fetch is free (30 req/min) |
 | 3 | **Exa `search_and_contents`** | semantic search for the game slug, returns page text | free-tier credits |
 | 4 | **Tavily `extract`** | `POST https://api.tavily.com/extract` with the URL | 1,000 credits/month free |
