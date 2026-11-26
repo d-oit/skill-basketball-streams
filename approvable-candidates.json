@@ -1,3 +1,112 @@
 {
-  "candidates": []
+  "candidates": [
+    {
+      "league": "FIBA World Cup 2027 European Qualifiers",
+      "teams": [
+        "Latvia",
+        "Germany"
+      ],
+      "start": "2026-11-27T18:30:00+01:00",
+      "state": "VERIFIED",
+      "summary": "FIBA World Cup 2027 European Qualifiers: Latvia vs Germany",
+      "game_key": "FIBA World Cup 2027 European Qualifiers|Germany|Latvia|2026-11-27T17:30Z",
+      "url": "https://www.magenta.tv/tv/live-lettland-deutschland/03349c76",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.magenta.tv/tv/live-lettland-deutschland/03349c76"
+        }
+      ],
+      "source_reference": "https://www.basketball-bund.de/team/a-herren/",
+      "access": "Free",
+      "validated_at": "2026-11-26T18:38:38Z",
+      "validation_notes": "Phase0 evidence (recorded_at 2026-11-26T18:38:40.700462+00:00) magenta_arena render lists under 'KOSTENLOS & OHNE LOGIN' (KOSTENLOS x11, OHNE LOGIN x10): 'KID00765-TelekomBasketball4, 2027 FIBA Basketball World Cup Qualification - LIVE: Lettland - Deutschland, Morgen: 17:15 - 21:00' with per-game link /tv/live-lettland-deutschland/03349c76. DBB confirms Fri 27 Nov 2026 18:30 CET, 'ab 18.15 Uhr kostenlos bei MagentaSport und MagentaTV'."
+    },
+    {
+      "league": "FIBA World Cup 2027 European Qualifiers",
+      "teams": [
+        "Spain",
+        "Greece"
+      ],
+      "start": "2026-11-29T18:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "FIBA World Cup 2027 European Qualifiers: Spain vs Greece",
+      "game_key": "FIBA World Cup 2027 European Qualifiers|Greece|Spain|2026-11-29T17:00Z",
+      "url": "https://www.magenta.tv/tv/live-spanien-griechenland/03349c77",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.magenta.tv/tv/live-spanien-griechenland/03349c77"
+        }
+      ],
+      "source_reference": "https://www.magenta.tv/sport",
+      "access": "Free",
+      "validated_at": "2026-11-26T18:38:38Z",
+      "validation_notes": "Phase0 evidence (recorded_at 2026-11-26T18:38:40.700462+00:00) magenta_arena free block lists 'Spanien - Griechenland, So. 29.11.: 16:50 - 19:45' with LIVE marker in KOSTENLOS & OHNE LOGIN. calovo/FIBA schedule confirm Sun 29 Nov 2026 18:00 CET, FIBA World Cup 2027 European Qualifiers."
+    },
+    {
+      "league": "FIBA World Cup 2027 European Qualifiers",
+      "teams": [
+        "Germany",
+        "Poland"
+      ],
+      "start": "2026-11-30T19:30:00+01:00",
+      "state": "VERIFIED",
+      "summary": "FIBA World Cup 2027 European Qualifiers: Germany vs Poland",
+      "game_key": "FIBA World Cup 2027 European Qualifiers|Germany|Poland|2026-11-30T18:30Z",
+      "url": "https://www.magenta.tv/tv/live-deutschland-polen/03349c78",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.magenta.tv/tv/live-deutschland-polen/03349c78"
+        }
+      ],
+      "source_reference": "https://www.basketball-bund.de/team/a-herren/",
+      "access": "Free",
+      "validated_at": "2026-11-26T18:38:38Z",
+      "validation_notes": "Phase0 evidence (recorded_at 2026-11-26T18:38:40.700462+00:00) magenta_arena free block lists 'Deutschland - Polen, Mo. 30.11.: 18:00 - 21:00'. DBB confirms Mon 30 Nov 2026 19:30 CET, free 'bei MagentaSport und MagentaTV'."
+    },
+    {
+      "league": "EuroLeague",
+      "teams": [
+        "Besiktas Istanbul",
+        "Panathinaikos AKTOR Athen"
+      ],
+      "start": "2026-12-04T18:00:00+01:00",
+      "state": "VERIFIED",
+      "summary": "EuroLeague: Besiktas Istanbul vs Panathinaikos AKTOR Athen",
+      "game_key": "EuroLeague|Besiktas Istanbul|Panathinaikos AKTOR Athen|2026-12-04T17:00Z",
+      "url": "https://www.magenta.tv/tv/live-besiktas-istanbul-panathinaikos-aktor-athen/0337037f",
+      "backend": "",
+      "evidence": {
+        "live_confirmed": true,
+        "free_confirmed": true
+      },
+      "direct_links": [
+        {
+          "source": "",
+          "url": "https://www.magenta.tv/tv/live-besiktas-istanbul-panathinaikos-aktor-athen/0337037f"
+        }
+      ],
+      "source_reference": "https://www.euroleaguebasketball.net/en/euroleague/game-center/2026-27/besiktas-fuzul-istanbul-panathinaikos-aktor-athens/E2026/146",
+      "access": "Free",
+      "validated_at": "2026-11-26T18:38:38Z",
+      "validation_notes": "Phase0 evidence (recorded_at 2026-11-26T18:38:40.700462+00:00) magenta_arena free block lists 'Besiktas Istanbul - Panathinaikos AKTOR Athen, Fr. 04.12.: 16:45 - 19:30'. EuroLeague calendar confirms Fri 4 Dec 2026 20:00 local (Istanbul) = 18:00 CET."
+    }
+  ]
 }
