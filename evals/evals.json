@@ -828,6 +828,34 @@
         "references/approved-sources.md",
         "references/validation-workflow.md"
       ]
+    },
+    {
+      "id": 61,
+      "prompt": "A EuroLeague regular-season game is streamed on the official euroleague.tv site. The page offers only day, monthly and annual passes, and playback requires a purchase; no free marker appears anywhere on the page. What is the decision?",
+      "expected_output": "Decision=REJECT; euroleague.tv is a paid subscription platform on the excluded list (day/monthly/annual passes only, no free stream), and appearing on the official EuroLeague site does not make a paid stream free; checks: freeAccess=FAIL, officialSource=PASS",
+      "assertions": [
+        "freeAccess expected FAIL",
+        "officialSource expected PASS"
+      ],
+      "files": [
+        "config/sources.json",
+        "references/approved-sources.md",
+        "references/validation-workflow.md"
+      ]
+    },
+    {
+      "id": 62,
+      "prompt": "A FIBA Women's EuroBasket 2027 qualifier is streamed on fibatv.com. The live page answers 'You must be a subscriber to access this content' and offers paid passes, while fiba.basketball carries only the schedule. What is the decision?",
+      "expected_output": "Decision=REJECT; fibatv.com is FIBA's paid subscription platform on the excluded list, and the free schedule on fiba.basketball is sourceReference evidence rather than a free stream; checks: freeAccess=FAIL, officialSource=PASS",
+      "assertions": [
+        "freeAccess expected FAIL",
+        "officialSource expected PASS"
+      ],
+      "files": [
+        "config/sources.json",
+        "references/approved-sources.md",
+        "references/validation-workflow.md"
+      ]
     }
   ]
 }
