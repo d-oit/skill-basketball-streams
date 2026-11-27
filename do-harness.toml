@@ -304,6 +304,25 @@ when-changed = [
   "tests/fixtures/tier_resolution/**",
 ]
 
+[[sensors]]
+name = "host-audit"
+# Eight of the eighteen Tier 5 rows named hosts that could never have served a
+# stream: six names did not resolve at all, one was a supporters' club behind a
+# failing handshake, and one failed the handshake while redirecting to its real
+# site. Nothing caught them because nothing compared the approved list to the
+# network, and `retired-sources` can only police a host once someone has noticed
+# it is dead. This is that comparison, split like every other recorded corpus:
+# `record` needs the network and is run by a human into
+# `config/host-audit.json`; this check is offline and fails when an approved host
+# has no measurement or was measured with no DNS answer at all. A 403 or a read
+# timeout is tolerated and recorded as such -- shaping is not evidence.
+argv = ["python3", "scripts/host_audit.py", "check", "--root", "."]
+when-changed = [
+  "scripts/host_audit.py",
+  "config/host-audit.json",
+  "config/sources.json",
+]
+
 [signal-sets]
 feedback = ["skill-contract", "validate-smoke"]
 verification = [
@@ -329,6 +348,7 @@ verification = [
   "eval-synthesis",
   "tier-resolution",
   "product-contract",
+  "host-audit",
 ]
 release = [
   "skill-contract",
@@ -355,4 +375,5 @@ release = [
   "version-sync",
   "tier-resolution",
   "product-contract",
+  "host-audit",
 ]

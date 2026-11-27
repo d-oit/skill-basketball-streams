@@ -125,6 +125,7 @@ retired sensor may still be explained.
 | `feed-corpus` | the recorded iCalendar bytes are unchanged **and** still readable |
 | `invariants-shape` | `plans/invariants.json` is a bare JSON array |
 | `product-contract` | this document's sections and eval-case count agree with the repository, it names only declared sensors, the task board matches the export, and every method/invariant reference resolves |
+| `host-audit` | every approved host has a committed measurement, and no host measured with no DNS answer is still approved (`config/host-audit.json`, recorded by `scripts/host_audit.py record`) |
 
 ## How to tell a change is safe
 

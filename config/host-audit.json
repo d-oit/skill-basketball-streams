@@ -1,0 +1,637 @@
+{
+  "$comment": "Measured on the date below by `python3 scripts/host_audit.py record`, one row per host `config/sources.json` approves. `dns: []` means the name does not exist; `status: null` means the host exists but answered no request (blocked, timed out or failed the handshake), which is traffic shaping or site configuration, not evidence about a broadcast. `python3 scripts/host_audit.py check` is the offline gate: it fails when an approved host is unrecorded or recorded dead. Do not hand-edit a row to silence it.",
+  "version": "1.0.0",
+  "measured_on": "2026-11-27",
+  "probe": "TLS + DNS, bare then www, browser User-Agent; see scripts/host_audit.py",
+  "hosts": {
+    "2basketballbundesliga.de": {
+      "dns": [
+        "144.76.32.124"
+      ],
+      "tls_ok": true,
+      "status": 403,
+      "final": "https://2basketballbundesliga.de/",
+      "error": "HTTP 403"
+    },
+    "aba-liga.com": {
+      "dns": [
+        "212.44.118.21"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.aba-liga.com/",
+      "title": "Home : ABA League",
+      "via": "www.aba-liga.com"
+    },
+    "acb.com": {
+      "dns": [
+        "143.204.181.14",
+        "143.204.181.46",
+        "143.204.181.9",
+        "143.204.181.90"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://acb.com/es/liga",
+      "title": "Liga Endesa | acb.com"
+    },
+    "albaberlin.de": {
+      "dns": [
+        "185.243.132.244"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.albaberlin.de/",
+      "title": "Startseite&nbsp;- ALBA BERLIN Basketballteam"
+    },
+    "api.basketball-bundesliga.de": {
+      "dns": [
+        "144.76.124.60",
+        "144.76.143.250",
+        "178.63.30.117"
+      ],
+      "tls_ok": true,
+      "status": 401,
+      "final": "https://api.basketball-bundesliga.de/",
+      "error": "HTTP 401"
+    },
+    "ard.de": {
+      "dns": [
+        "34.120.237.106"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.ard.de:443/",
+      "title": "ARD.de – TV, Radio, Streams, News, Sport und alles zur ARD | ard.de"
+    },
+    "ardmediathek.de": {
+      "dns": [
+        "34.120.237.106"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.ardmediathek.de:443/",
+      "title": "ARD Mediathek: Filme, Serien und Dokus online anschauen"
+    },
+    "bamberg.basketball": {
+      "dns": [
+        "46.224.40.50"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://bamberg.basketball/",
+      "title": "Bamberg Baskets – Bamberg ist Basketball"
+    },
+    "basketball-braunschweig.de": {
+      "dns": [
+        "2001:8d8:100f:f000::200",
+        "217.160.0.207"
+      ],
+      "tls_ok": false,
+      "status": null,
+      "final": null,
+      "error": "URLError: <urlopen error [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:1000)>"
+    },
+    "basketball-bund.de": {
+      "dns": [
+        "104.26.8.70",
+        "104.26.9.70",
+        "172.67.71.144",
+        "2606:4700:20::681a:846",
+        "2606:4700:20::681a:946",
+        "2606:4700:20::ac43:4790"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.basketball-bund.de/",
+      "title": "Startseite - DBB"
+    },
+    "basketball.at": {
+      "dns": [
+        "64.190.63.222"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://basketball.at/",
+      "title": "basketball.at&nbsp;-&nbsp;Diese Website steht zum Verkauf!&nbsp;-&nbsp;Informationen zum Thema basketball."
+    },
+    "baskets-jena.de": {
+      "dns": [
+        "176.52.247.46",
+        "2a03:2a00:1200:0:1::3982"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.baskets-jena.de/",
+      "title": "Startseite - Science City Jena"
+    },
+    "bnxtleague.com": {
+      "dns": [
+        "185.51.66.22"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://bnxtleague.com/",
+      "title": "BNXT League"
+    },
+    "br.de": {
+      "dns": [
+        "194.187.162.188"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.br.de/index.html",
+      "title": "Bayerischer Rundfunk: Nachrichten von BR24, Highlights aus der BR Mediathek, Live Radio hören und BR.de-Specials - die S"
+    },
+    "br24.de": {
+      "dns": [
+        "194.187.162.174"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.br.de/nachrichten/",
+      "title": "BR24 - Nachrichten, Fakten und Hintergrund | BR24"
+    },
+    "bsl.org.tr": {
+      "dns": [
+        "104.247.81.99"
+      ],
+      "tls_ok": false,
+      "status": null,
+      "final": null,
+      "error": "URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)>"
+    },
+    "championsleague.basketball": {
+      "dns": [
+        "4.180.173.196"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.championsleague.basketball/en",
+      "title": "Basketball Champions League Powered by Ameresco SUNEL Official Website | FIBA Basketball"
+    },
+    "chemnitz99.de": {
+      "dns": [
+        "77.220.240.7"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.chemnitz99.de/",
+      "title": "Offizielle Webseite &#x1F3C0; NINERS Chemnitz in der easycredit Basketball Bundesliga"
+    },
+    "dazn.com": {
+      "dns": [
+        "18.172.112.112",
+        "18.172.112.113",
+        "18.172.112.49",
+        "18.172.112.79",
+        "2600:9000:2761:4200:5:6660:98c0:93a1",
+        "2600:9000:2761:6600:5:6660:98c0:93a1",
+        "2600:9000:2761:7000:5:6660:98c0:93a1",
+        "2600:9000:2761:8400:5:6660:98c0:93a1",
+        "2600:9000:2761:ac00:5:6660:98c0:93a1",
+        "2600:9000:2761:cc00:5:6660:98c0:93a1",
+        "2600:9000:2761:d200:5:6660:98c0:93a1",
+        "2600:9000:2761:e000:5:6660:98c0:93a1"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.dazn.com/",
+      "title": ""
+    },
+    "dyn.sport": {
+      "dns": [
+        "2600:9000:275b:1600:1:dcc3:5bc0:93a1",
+        "2600:9000:275b:1e00:1:dcc3:5bc0:93a1",
+        "2600:9000:275b:6800:1:dcc3:5bc0:93a1",
+        "2600:9000:275b:7400:1:dcc3:5bc0:93a1",
+        "2600:9000:275b:9e00:1:dcc3:5bc0:93a1",
+        "2600:9000:275b:c000:1:dcc3:5bc0:93a1",
+        "2600:9000:275b:de00:1:dcc3:5bc0:93a1",
+        "2600:9000:275b:fe00:1:dcc3:5bc0:93a1",
+        "3.160.150.10",
+        "3.160.150.102",
+        "3.160.150.119",
+        "3.160.150.96"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.dyn.sport/",
+      "title": "Dyn - Handball, Basketball, Tischtennis, Volleyball live streamen und auf Abruf"
+    },
+    "easycredit-bbl.de": {
+      "dns": [
+        "162.55.15.50",
+        "162.55.231.108",
+        "162.55.231.109"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://easycredit-bbl.de/",
+      "title": "easyCredit BBL - Die offizielle Seite"
+    },
+    "esake.gr": {
+      "dns": [
+        "62.1.38.42",
+        "62.1.45.202"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.esake.gr/",
+      "title": "Ε.Σ.Α.Κ.Ε. - Ε.Σ.Α.Κ.Ε."
+    },
+    "eurocupbasketball.com": {
+      "dns": [
+        "76.76.21.21"
+      ],
+      "tls_ok": true,
+      "status": 429,
+      "final": "https://eurocupbasketball.com/",
+      "error": "HTTP 429"
+    },
+    "euroleaguebasketball.net": {
+      "dns": [
+        "104.21.88.170",
+        "172.67.151.110",
+        "2606:4700:3031::ac43:976e",
+        "2606:4700:3034::6815:58aa"
+      ],
+      "tls_ok": true,
+      "status": 429,
+      "final": "https://www.euroleaguebasketball.net/",
+      "error": "HTTP 429"
+    },
+    "ewe-baskets.de": {
+      "dns": [
+        "91.211.43.42"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://ewe-baskets.de/",
+      "title": "EWE Baskets Oldenburg - Startseite"
+    },
+    "facebook.com": {
+      "dns": [
+        "157.240.0.35",
+        "2a03:2880:f37a:1:face:b00c:0:25de"
+      ],
+      "tls_ok": true,
+      "status": 400,
+      "final": "https://www.facebook.com/",
+      "error": "HTTP 400"
+    },
+    "fcbayern.com": {
+      "dns": [
+        "23.67.133.188",
+        "2a02:26f0:480:1282::1770",
+        "2a02:26f0:480:129a::1770"
+      ],
+      "tls_ok": false,
+      "status": null,
+      "final": null,
+      "error": "TimeoutError: The read operation timed out"
+    },
+    "fiba.basketball": {
+      "dns": [
+        "4.180.173.196"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.fiba.basketball/en",
+      "title": "The Home of FIBA Basketball - News, Stats, Games, Results, Calendar &amp; Events | FIBA Basketball"
+    },
+    "fiba.com": {
+      "dns": [
+        "4.180.173.196"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.fiba.basketball/en",
+      "title": "The Home of FIBA Basketball - News, Stats, Games, Results, Calendar &amp; Events | FIBA Basketball"
+    },
+    "gladiators-trier.de": {
+      "dns": [
+        "81.88.34.116"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://vetconceptgladiators.de/",
+      "title": "VET-CONCEPT Gladiators Trier"
+    },
+    "hamburgtowers.de": {
+      "dns": [
+        "2a00:1169:103:6a00::",
+        "92.205.53.202"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.hamburgtowers.de/",
+      "title": "Startseite | Veolia Towers Hamburg"
+    },
+    "joyn.de": {
+      "dns": [
+        "76.76.21.21"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.joyn.de/",
+      "title": "Joyn - Serien, Filme, Sport &amp; Live TV jederzeit streamen"
+    },
+    "legabasket.it": {
+      "dns": [
+        "76.76.21.21"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.legabasket.it/",
+      "title": "Lega Basket Serie A: Campionato nazionale pallacanestro | LBA"
+    },
+    "lnb.fr": {
+      "dns": [
+        "13.37.209.149",
+        "51.45.53.253"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://lnb.fr/fr",
+      "title": "LNB – Betclic Élite, Élite 2, résultats et actualités"
+    },
+    "magenta.tv": {
+      "dns": [
+        "80.158.66.24"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.magenta.tv/",
+      "title": ""
+    },
+    "magentasport.de": {
+      "dns": [
+        "80.158.66.24"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.magentasport.de/",
+      "title": "Live Sport Stream HD | Die ganze Welt des Sports erleben | MagentaSport"
+    },
+    "mdr.de": {
+      "dns": [
+        "193.22.36.128"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.mdr.de/",
+      "title": "mdr.de – Radio, Fernsehen, Nachrichten für Mitteldeutschland | mdr.de"
+    },
+    "mlp-academics.de": {
+      "dns": [
+        "2a04:c940:0:7::171",
+        "81.89.193.171"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.mlp-academics.de/",
+      "title": "MLP Academics Heidelberg"
+    },
+    "plk.pl": {
+      "dns": [
+        "91.134.34.25"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://plk.pl/",
+      "title": "Polska Liga Koszykówki"
+    },
+    "pluto.tv": {
+      "dns": [
+        "151.101.1.91",
+        "151.101.129.91",
+        "151.101.193.91",
+        "151.101.65.91",
+        "2a04:4e42:200::347",
+        "2a04:4e42:400::347",
+        "2a04:4e42:600::347",
+        "2a04:4e42::347"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://pluto.tv/gsa/",
+      "title": "Pluto TV: Kostenlos Filme, Serien &amp; Live-TV online ansehen"
+    },
+    "rasta-vechta.de": {
+      "dns": [
+        "198.202.211.1"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.rasta-vechta.de/",
+      "title": "Erlebe Positive Vibrations | RASTA Vechta"
+    },
+    "ratiopharm-ulm.de": {
+      "dns": [
+        "23.88.15.120"
+      ],
+      "tls_ok": false,
+      "status": null,
+      "final": null,
+      "error": "URLError: <urlopen error timed out>"
+    },
+    "rbb-online.de": {
+      "dns": [
+        "192.108.72.56"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.rbb24.de/",
+      "title": "rbb24 - Nachrichten aus Berlin und Brandenburg"
+    },
+    "rbb24.de": {
+      "dns": [
+        "192.108.72.56"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.rbb24.de/",
+      "title": "rbb24 - Nachrichten aus Berlin und Brandenburg"
+    },
+    "regionalliga-suedost.de": {
+      "dns": [
+        "2a01:238:43c5:2f00:28cb:d3ab:bb89:b8d7",
+        "85.214.243.120"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://regionalliga-suedost.de/",
+      "title": "RLSO – Basketball Regionalliga Südost e.V."
+    },
+    "riesen-ludwigsburg.de": {
+      "dns": [
+        "85.13.149.235"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://riesen-ludwigsburg.de/",
+      "title": "RIESEN Ludwigsburg | Barock Pirates Ludwigsburg e.V."
+    },
+    "rln-basketball.de": {
+      "dns": [
+        "2a01:238:20a:202:1082::",
+        "81.169.145.82"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://rln-basketball.de/",
+      "title": "News - Basketball Regionalliga Nord"
+    },
+    "seawolves.de": {
+      "dns": [
+        "85.13.166.213"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.seawolves.de/",
+      "title": "Startseite - seawolves.de"
+    },
+    "skygermany.de": {
+      "dns": [
+        "3.33.139.32"
+      ],
+      "tls_ok": false,
+      "status": null,
+      "final": null,
+      "error": "URLError: <urlopen error timed out>"
+    },
+    "sporteurope.tv": {
+      "dns": [
+        "104.18.6.123",
+        "104.18.7.123",
+        "2606:4700::6812:67b",
+        "2606:4700::6812:77b"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://sporteurope.tv/",
+      "title": ""
+    },
+    "sportschau.de": {
+      "dns": [
+        "2600:1901:0:ec9::",
+        "34.149.139.111"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.sportschau.de/",
+      "title": "Sportschau - Sport-News, Live-Ticker, Videos, Ergebnisse und Tabellen | sportschau.de"
+    },
+    "swiss.basketball": {
+      "dns": [
+        "195.15.246.9"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://swiss.basketball/",
+      "title": "Home | Swiss Basketball"
+    },
+    "syntainics-mbc.de": {
+      "dns": [
+        "178.105.47.216",
+        "2a01:4f8:1c1e:faa1::2"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://syntainics-mbc.de/",
+      "title": "Startseite - MBC"
+    },
+    "telekom-baskets-bonn.de": {
+      "dns": [
+        "185.166.21.250"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.telekom-baskets-bonn.de/",
+      "title": "Telekom Baskets Bonn - Telekom Baskets Bonn"
+    },
+    "toyota-dbbl.de": {
+      "dns": [
+        "213.133.104.41",
+        "2a01:4f8:d0a:25c8::2"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://toyota-dbbl.de/",
+      "title": "Damen Basketball Bundesligen DBBL | Damen Basketball Bundesliga"
+    },
+    "vtb-league.com": {
+      "dns": [
+        "161.104.53.6"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://vtb-league.com/",
+      "title": "Единая Лига ВТБ | VTB United League - Официальный сайт"
+    },
+    "wuerzburg-baskets.de": {
+      "dns": [
+        "2a00:cb0:2:2::131",
+        "82.212.215.131"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.wuerzburg-baskets.de/",
+      "title": "Fitness First Würzburg Baskets - Pure Emotion"
+    },
+    "x.com": {
+      "dns": [
+        "172.66.0.227"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://x.com/",
+      "title": "X. Alles, was gerade los ist / X"
+    },
+    "youtube.com": {
+      "dns": [
+        "142.251.110.136",
+        "142.251.110.190",
+        "142.251.110.91",
+        "142.251.110.93",
+        "2a00:1450:4001:c1f::5b",
+        "2a00:1450:4001:c1f::5d",
+        "2a00:1450:4001:c1f::88",
+        "2a00:1450:4001:c1f::be"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.youtube.com/",
+      "title": "YouTube"
+    },
+    "zattoo.com": {
+      "dns": [
+        "91.123.100.227",
+        "91.123.100.228"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://zattoo.com/de",
+      "title": "Einfach fernsehen: Live TV mit über 250 TV-Sender | Zattoo"
+    },
+    "zdf.de": {
+      "dns": [
+        "91.197.29.78"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.zdf.de/",
+      "title": "ZDF Streaming-Portal: Filme, Serien und Dokus online anschauen"
+    },
+    "zdfmediathek.de": {
+      "dns": [
+        "91.197.29.49"
+      ],
+      "tls_ok": true,
+      "status": 200,
+      "final": "https://www.zdf.de/",
+      "title": "ZDF Streaming-Portal: Filme, Serien und Dokus online anschauen"
+    }
+  }
+}
