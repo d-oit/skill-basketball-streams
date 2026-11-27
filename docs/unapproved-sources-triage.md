@@ -360,11 +360,19 @@ The rest of the audit's failures are **not** documentation defects and were left
 
 The lesson is the one this repository keeps relearning: a domain in a document reads as a fact. Eight of eighteen Tier 5 rows had never been fetched, and nothing compared the document to the network.
 
-## NBL1: no approval
+## NBL1: no approval (territory unchecked)
 
-`nbl1.com.au` says "Subscribe for FREE to NBL+ to watch every NBL1 game LIVE" and "Watch Live & Free Via NBL1.com.au And NBL1 App" — a genuine per-competition free claim, the only one of the 31. It is **not approved**: the pages that would state territory (`/nbl1-plus`, `/faq`) return 404 and the watch page is rendered client-side, so there is no evidence that the streams play from Germany. Australian domestic rights are territorial, and `sportplus.tv` is the precedent for checking before approving.
+`nbl1.com.au` is the only one of the 31 club/league hosts with a genuine free claim, and it now has a dated source rather than a front-page slogan: the league's own "How to watch NBL1" article (11 March 2026) says "Sign up to NBL+ to watch every regular season and finals game live and free at NBL1.com.au or download the free NBL1 App", and `/watch` repeats "Watch Every Game, Live & Free." NBL+ itself is free (its FAQ: "How much does NBL+ cost? NBL+ is FREE!").
+
+It is still **not approved**, because nothing states where it plays. Two pages that looked likely to say so do not exist (`/nbl1-plus`, `/faq` return 404) and the watch page is client-rendered. What the NBL does publish is an international distribution list — and it covers the **NBL**, not NBL1: `nbl.com.au/how-to-watch` routes Germany to **EuroLeague TV**, which this repository excludes as paid. That is evidence about a different competition and cannot be stretched to cover NBL1. Until a territory statement exists, `nbl1.com.au` is a free-stream candidate that cannot be shown to be viewable from Germany.
 
 ## The 57 hosts that still did not answer
 
 DNS separates them: **7 names no longer exist** (`freestreams-live1.watch`, `matchora.to`, `nblaus.nbl.com.au`, `pereira.com.de`, `support.playback.tv`, `hom-sistaxon-int.ibama.gov.br`, `servicosonline.fazenda.gov.br`) and **50 resolve but refuse the connection** (Cloudflare-fronted sites, `eurosport.*`, `nba.com`, `basketball-reference.com`, the EuroLeague admin host). Only the first group is dead by measurement; a refusal is not evidence about a broadcast, so nothing in the second group was retired. Four of the seven were classified into `config/non-source-domains.json`; the three whose category is unclear (`matchora.to`, `freestreams-live1.watch`, `nblaus.nbl.com.au`) are named here rather than guessed at.
+
+## Fetch targets and the host snapshot (2026-11-27)
+
+**The three live fetch targets were probed** the same way as the club hosts, since a dead fixture URL is the BBL defect in its original form: `api.basketball-bundesliga.de/calendar/ical/all-games` answered 200 with 91,649 bytes, `championsleague.basketball/en/games` answered 200, and `euroleaguebasketball.net` answered **429** — a datacenter IP being rate-limited, on a host that resolves and whose pages are already recorded in `tests/fixtures/pages/`. No fetch target is dead, and nothing was changed.
+
+**The audit is now a committed snapshot.** `config/host-audit.json` records one measurement per approved host (DNS answers, TLS outcome, HTTP status, final URL, page title), written by `python3 scripts/host_audit.py record` on 2026-11-27: 62 hosts, 57 answered a request, 5 answered none, 0 without a DNS answer. `scripts/host_audit.py check` is the offline half and runs as the `host-audit` sensor: it fails when an approved host has no measurement, when a host recorded with `dns: []` is still approved, or when the snapshot is empty — so a new source cannot be added without saying what it answered, and the eight-dead-rows state cannot recur silently. A 403 or a read timeout is recorded and tolerated, because shaping is not evidence about a broadcast.
 
