@@ -225,6 +225,33 @@
       ]
     },
     {
+      "tier": 5,
+      "name": "BBL club official sites (Tier 5)",
+      "type": "club",
+      "domains": [
+        "albaberlin.de",
+        "bamberg-baskets.de",
+        "basketball-braunschweig.de",
+        "ewe-baskets.de",
+        "fcbayern.com",
+        "wuerzburg-baskets.de",
+        "mhpriesen.de",
+        "academics-basketball.de",
+        "niners-chemnitz.de",
+        "rasta-vechta.de",
+        "ratiopharm-ulm.de",
+        "rostock-seawolves.de",
+        "sciencecitybasketball.de",
+        "skygermany.de",
+        "mitteldeutscherbbc.de",
+        "telekom-baskets.de",
+        "towers-hamburg.de",
+        "gladiators-trier.de"
+      ],
+      "free_access": "selected",
+      "notes": "Official club websites of the 18 BBL clubs, mirrored from references/approved-sources.md's Tier 5 table. The doc has claimed this tier since it was written while this registry carried none of it, so every run scored albaberlin.de (2,165 attempts) and fcbayern.com (2,040) as unapproved. A club site announces its own broadcasts and may host the live stream, so it can be a directLink when the page itself plays the game free; free access is decided PER GAME and a club announcement is not proof of one. Two hosts are not basketball-only: fcbayern.com carries the whole club (a page there is basketball evidence only when it is about basketball) and skygermany.de is the SKYLINERS site. This entry asserts doc/registry agreement, not a live HTTP result; scripts/link_inventory.py + scripts/link_check.py are the probing half. Mirrored 2026-11-27."
+    },
+    {
       "tier": 6,
       "name": "Official YouTube channels",
       "type": "youtube",

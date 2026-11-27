@@ -6,6 +6,7 @@ subprocess against a tmp_path workspace, so nothing touches the real logs/.
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -70,6 +71,54 @@ class TestApprovedDomains:
         assert "magentasport.de" in domains
         assert "sporteurope.tv" in domains
         assert "youtube.com/@fiba" in domains
+
+
+TIER5_DOC = REPO_ROOT / "references" / "approved-sources.md"
+
+
+def _documented_tier5_domains() -> list[str]:
+    """The backticked club domains in the reference doc's Tier 5 table.
+
+    The table is the human contract and `config/sources.json` is its
+    machine-readable mirror, and nothing compared the two until the telemetry
+    report showed `albaberlin.de` and `fcbayern.com` scored as **unapproved** on
+    4,000+ attempts: the doc has claimed Tier 5 since it was written, the
+    registry carried none of it. Parsing the table rather than restating the
+    list here means the test fails when either side moves without the other.
+    """
+    text = TIER5_DOC.read_text(encoding="utf-8")
+    section = text.split("### Tier 5:", 1)[1].split("\n### ", 1)[0]
+    return re.findall(r"`([a-z0-9][a-z0-9.-]*\.[a-z]{2,})`", section)
+
+
+def _registry_tiers() -> dict[str, int]:
+    tiers: dict[str, int] = {}
+    for entry in load_sources(REPO_ROOT).get("sources", []):
+        for domain in [entry.get("domain"), *(entry.get("domains") or [])]:
+            if domain:
+                tiers[str(domain).lower()] = entry.get("tier")
+    return tiers
+
+
+class TestTier5ClubsAreMirrored:
+    def test_the_documented_club_table_parses_and_is_not_empty(self):
+        documented = _documented_tier5_domains()
+        # Without this a regex that stops matching would make the parity test
+        # below pass on two empty lists.
+        assert documented, "the Tier 5 table parsed to nothing"
+        assert "albaberlin.de" in documented
+
+    def test_every_documented_club_domain_is_approved_at_tier_5(self):
+        tiers = _registry_tiers()
+        missing = [domain for domain in _documented_tier5_domains() if tiers.get(domain) != 5]
+        assert missing == [], f"documented Tier 5 clubs absent from config/sources.json: {missing}"
+
+    def test_no_tier_5_host_is_invented_in_the_registry(self):
+        documented = set(_documented_tier5_domains())
+        invented = sorted(
+            host for host, tier in _registry_tiers().items() if tier == 5 and host not in documented
+        )
+        assert invented == [], f"tier 5 hosts the reference doc does not list: {invented}"
 
 
 class TestDiscoverCandidates:
