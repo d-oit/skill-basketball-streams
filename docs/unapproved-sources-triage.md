@@ -338,3 +338,33 @@ Each of the 31 official hosts was fetched, its live/stream links followed, and t
 ## Retried unreachable hosts
 
 66 hosts did not answer the first probe. Retrying with a browser User-Agent, the `www.` variant and plain HTTP recovered **9**: `deia.eus`, `eldia.es`, `firmenpresse.de`, `hrr.mlit.go.jp`, `laprovincia.es`, `penya.com`, `sdbing.net`, `sport.es`, `tbs.co.jp`. The rest either block datacenter addresses or are gone; neither is evidence against a game, so none was retired.
+
+## Tier 5 host audit (2026-11-27)
+
+The Bonn correction (`telekom-baskets.de` failing TLS hostname verification) looked like one bad row. It was not. The same check run over every approved host found **eight more Tier 5 domains that could never have produced a stream**:
+
+| Club | Documented host | What it did | Corrected to |
+|---|---|---|---|
+| Bamberg Baskets | bamberg-baskets.de | TLS handshake fails; HTTP serves a **supporters' club** ("Stammtisch Bamberg Baskets") | `bamberg.basketball` |
+| RIESEN Ludwigsburg | mhpriesen.de | does not resolve | `riesen-ludwigsburg.de` |
+| MLP Academics Heidelberg | academics-basketball.de | does not resolve | `mlp-academics.de` |
+| NINERS Chemnitz | niners-chemnitz.de | does not resolve | `chemnitz99.de` |
+| ROSTOCK SEAWOLVES | rostock-seawolves.de | TLS handshake fails; HTTP redirects elsewhere | `seawolves.de` |
+| Science City Jena | sciencecitybasketball.de | does not resolve | `baskets-jena.de` |
+| SYNTAINICS MBC | mitteldeutscherbbc.de | does not resolve; the name was misspelled (Mitteldeutscher **BC**) | `syntainics-mbc.de` |
+| Veolia Towers Hamburg | towers-hamburg.de | does not resolve; that is the display name, not the domain | `hamburgtowers.de` |
+
+Each replacement was accepted only because its own page title names the club; Chemnitz rests on two independent sources (the site itself and the EuroCup team page). All nine retired hosts, Bonn included, are now in `config/retired-sources.json` with `replaced_by`, so `retired-sources` fails if any is ever declared a source again.
+
+The rest of the audit's failures are **not** documentation defects and were left alone: four Tier 1 hosts answer 401/403/429 to a datacenter IP (bot protection), and `fcbayern.com`, `ratiopharm-ulm.de` and `skygermany.de` resolve but time out on a read. `aba-liga.com` presents a certificate for the `www` host only, which the registry's parent-domain approval already covers.
+
+The lesson is the one this repository keeps relearning: a domain in a document reads as a fact. Eight of eighteen Tier 5 rows had never been fetched, and nothing compared the document to the network.
+
+## NBL1: no approval
+
+`nbl1.com.au` says "Subscribe for FREE to NBL+ to watch every NBL1 game LIVE" and "Watch Live & Free Via NBL1.com.au And NBL1 App" — a genuine per-competition free claim, the only one of the 31. It is **not approved**: the pages that would state territory (`/nbl1-plus`, `/faq`) return 404 and the watch page is rendered client-side, so there is no evidence that the streams play from Germany. Australian domestic rights are territorial, and `sportplus.tv` is the precedent for checking before approving.
+
+## The 57 hosts that still did not answer
+
+DNS separates them: **7 names no longer exist** (`freestreams-live1.watch`, `matchora.to`, `nblaus.nbl.com.au`, `pereira.com.de`, `support.playback.tv`, `hom-sistaxon-int.ibama.gov.br`, `servicosonline.fazenda.gov.br`) and **50 resolve but refuse the connection** (Cloudflare-fronted sites, `eurosport.*`, `nba.com`, `basketball-reference.com`, the EuroLeague admin host). Only the first group is dead by measurement; a refusal is not evidence about a broadcast, so nothing in the second group was retired. Four of the seven were classified into `config/non-source-domains.json`; the three whose category is unclear (`matchora.to`, `freestreams-live1.watch`, `nblaus.nbl.com.au`) are named here rather than guessed at.
+
