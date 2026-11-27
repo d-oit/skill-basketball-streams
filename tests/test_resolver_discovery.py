@@ -6,6 +6,7 @@ quarantine preserved, safe degradation, no calendar writes.
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -23,6 +24,7 @@ from resolver_discovery import (  # noqa: E402
     build_strategies,
     discover,
     is_enabled,
+    runner_status,
     uncovered_fixtures,
 )
 
@@ -141,8 +143,17 @@ class TestCli:
         assert result.returncode == 1
         assert "disabled" in result.stderr
 
-    def test_enabled_no_benefit_is_a_recorded_answer(self, tmp_path, monkeypatch):
+    def test_enabled_without_a_usable_runner_is_a_usage_error(self, tmp_path, monkeypatch):
+        """A missing backend must not read as "the index had nothing new".
+
+        The old path ran every query, got nothing, wrote `leads: []` and exited
+        1 — the same verdict as a genuine empty result. With no runner on PATH
+        the run now stops before searching and says why.
+        """
         monkeypatch.setenv("RESOLVER_ENABLED", "true")
+        bindir = tmp_path / "bin"
+        bindir.mkdir()
+        monkeypatch.setenv("PATH", str(bindir))
         fixtures = tmp_path / "f.jsonl"
         fixtures.write_text("\n".join(json.dumps(f) for f in FIXTURES) + "\n", encoding="utf-8")
         ledger = tmp_path / "c.jsonl"
@@ -151,10 +162,40 @@ class TestCli:
         result = subprocess.run(
             [sys.executable, str(SCRIPT), "--fixtures", str(fixtures), "--ledger", str(ledger),
              "--out", str(out)],
-            capture_output=True, text=True,
+            capture_output=True, text=True, env={**os.environ, "PATH": str(bindir),
+                                                 "PYTHONPATH": ""},
         )
-        # No resolver backend in this environment: degraded, recorded, exit 1.
-        assert result.returncode == 1
-        payload = json.loads(out.read_text(encoding="utf-8"))
-        assert payload["leads"] == []
-        assert payload["stats"]["queries"] > 0
+        assert result.returncode == 2
+        assert "no usable runner" in result.stderr
+        assert "do-wdr" in result.stderr
+        assert not out.exists()
+
+
+class TestRunnerProbe:
+    """Presence is not validity: a shim that cannot start is not a runner."""
+
+    def test_a_broken_shim_is_not_a_runner(self, tmp_path, monkeypatch):
+        bindir = tmp_path / "bin"
+        bindir.mkdir()
+        shim = bindir / "do-wdr"
+        shim.write_text("#!/bin/sh\nexit 3\n", encoding="utf-8")
+        shim.chmod(0o755)
+        monkeypatch.setenv("PATH", str(bindir))
+        usable, detail = runner_status()
+        assert usable is False
+        assert "exits 3" in detail
+
+    def test_a_responding_shim_is_a_runner(self, tmp_path, monkeypatch):
+        bindir = tmp_path / "bin"
+        bindir.mkdir()
+        shim = bindir / "do-wdr"
+        shim.write_text("#!/bin/sh\necho 0.1.0\n", encoding="utf-8")
+        shim.chmod(0o755)
+        monkeypatch.setenv("PATH", str(bindir))
+        assert runner_status()[0] is True
+
+    def test_no_runner_names_both_transports(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("PATH", str(tmp_path / "empty"))
+        usable, detail = runner_status()
+        assert usable is False
+        assert "do-wdr" in detail and "do_web_doc_resolver" in detail
