@@ -72,6 +72,29 @@ def test_refuses_excluded_evidence_only_and_retired(repo):
         assert mod.approve(repo, [_candidate(f"https://{dead}/x")], dry_run=False) == []
 
 
+def test_refuses_a_host_the_excluded_list_names(repo):
+    """`excluded` is enforced through `domains`; the human `name` never matched."""
+    before = (repo / "config" / "sources.json").read_bytes()
+    added = mod.approve(
+        repo,
+        [
+            _candidate("https://euroleague.tv/watch/1"),
+            _candidate("https://secure.fibatv.com/live/1"),
+            _candidate("https://www.euroleague.tv/watch/2"),
+        ],
+        dry_run=False,
+    )
+    assert added == []
+    assert (repo / "config" / "sources.json").read_bytes() == before
+
+
+def test_excluded_domains_are_read_from_the_registry(repo):
+    hosts, _, excluded = mod._known(_sources(repo))
+    assert {"euroleague.tv", "fibatv.com", "secure.fibatv.com"} <= excluded
+    assert "sky sport" not in excluded  # a name, not a host: nothing to match
+    assert "dazn.com" not in excluded  # approved per game, never platform-wide
+
+
 def test_youtube_is_approved_by_handle_never_by_host(repo):
     added = mod.approve(repo, [_candidate("https://www.youtube.com/@hoopsfree/live")], dry_run=False)
     assert added == ["@hoopsfree"]

@@ -195,4 +195,6 @@ The tier system prioritizes sources based on:
 | ProA on Sporteurope.TV (2026/27) | Paid — official season passes and pay-per-view are required. NBBL/JBBL remain free; ProB is excluded from this calendar as not free of charge. |
 | Pirate/aggregator sites | Unofficial |
 | Third-party stream sites | Unofficial |
+| EuroLeague TV (`euroleague.tv`) | Paid subscription (day/monthly/annual passes); every EuroLeague and BKT EuroCup stream there sits behind one. Free EuroLeague games stay on MagentaSport (one per round) and the approved YouTube channels. Verified 2026-11-27 against `euroleague.tv/signup`. |
+| FIBA TV (`fibatv.com`, `secure.fibatv.com`) | Paid subscription/VOD; live and replay pages answer "You must be a subscriber". FIBA's free schedule and announcement evidence stays on `fiba.basketball`. Verified 2026-11-27 against `fibatv.com/live`. |
 | Social media accounts as stream sources | Validation only — never a `directLink` |

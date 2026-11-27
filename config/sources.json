@@ -362,6 +362,21 @@
     {
       "name": "Pirate/aggregator sites",
       "reason": "unofficial"
+    },
+    {
+      "name": "EuroLeague TV",
+      "domains": [
+        "euroleague.tv"
+      ],
+      "reason": "paid subscription (day/monthly/annual passes); every EuroLeague and EuroCup stream here is behind one — verified 2026-11-27 against euroleague.tv/signup"
+    },
+    {
+      "name": "FIBA TV",
+      "domains": [
+        "fibatv.com",
+        "secure.fibatv.com"
+      ],
+      "reason": "paid subscription/VOD; live and replay pages answer 'You must be a subscriber' — verified 2026-11-27 against fibatv.com/live"
     }
   ]
 }
