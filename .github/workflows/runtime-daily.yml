@@ -436,7 +436,9 @@ jobs:
       # fixtures only. Default OFF behind ENABLE_RESOLVER_DISCOVERY; when
       # off this is a notice, never a run. When on, leads append as
       # unverifiable candidates only — never calendar writes, never source
-      # approvals. Degrades safely when do-wdr is absent.
+      # approvals. A missing or non-starting `do-wdr` exits 2 and the notice
+      # names the status, because "found nothing" and "the runner is broken"
+      # must not read the same in the log.
       - name: Resolver discovery over uncovered fixtures (opt-in)
         if: always()
         env:
@@ -451,7 +453,7 @@ jobs:
               --out .tmp/resolver-leads.json \
               --max-queries 8 --max-seconds 120 \
               --run-id "$(date -u +%Y-%m-%dT%H:%MZ)" \
-              || echo "::notice::resolver discovery found nothing new or degraded — ladder results stand"
+              || echo "::notice::resolver discovery exited $? — no usable do-wdr runner, or nothing new; ladder results stand"
             if [ -f .tmp/resolver-leads.json ]; then
               python3 - <<'PY'
           import json, sys

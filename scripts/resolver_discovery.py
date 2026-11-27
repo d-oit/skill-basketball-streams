@@ -8,10 +8,22 @@ only for uncovered fixtures (or events whose source diversity is thin),
 behind an explicit flag, with per-run query/latency caps — and everything it
 finds stays a *lead* until this repository's own seven checks pass.
 
+Status (decided 2026-11-27): kept, opt-in, and blocked upstream. `do-wdr` has
+no published release — `d-o-hub/do-web-doc-resolver` is 404 on GitHub and PyPI —
+and the installed shim dies with `ModuleNotFoundError: No module named
+'scripts'`, so enabling this cannot produce a lead today. It is deliberately
+**not** retired: while `ENABLE_RESOLVER_DISCOVERY` is unset it costs nothing,
+and the rung now exits 2 naming the runner instead of recording an empty
+result. Revival condition: `do-wdr --version` exits 0 **and** a run over a
+fixture returns leads. If no working release exists at the next
+source-discovery change, retire the rung (script, tests, workflow step) rather
+than keep a documented path nothing can execute.
+
 Safety and budget boundaries (enforced, not documented):
 
-* Default OFF. `enabled()` is true only when `RESOLVER_ENABLED=true` (or
-  `--enable`) AND a runner is available. No flag, no run.
+* Default OFF, and a runner is required. `is_enabled()` is true only when
+  `RESOLVER_ENABLED=true` (or `--enable`), and `runner_status()` must report a
+  runner that actually starts. No flag, no run; no working runner, no run.
 * The discovery rung may append candidates and evidence only. It never
   creates, updates, or relabels calendar events, and never writes
   `config/sources.json` — quarantine (`approve_source.py`) stays human/PR.
@@ -44,7 +56,7 @@ Usage:
 Exit codes:
     0  PASS — at least one lead recorded
     1  FAIL — disabled, nothing uncovered, or nothing found (all advisory)
-    2  USAGE — bad arguments or unreadable input
+    2  USAGE — bad arguments, unreadable input, or no usable runner
 """
 from __future__ import annotations
 
@@ -83,14 +95,40 @@ def is_enabled(explicit: bool = False) -> bool:
     return os.environ.get("RESOLVER_ENABLED", "").strip().lower() == "true"
 
 
-def runner_available() -> bool:
-    if shutil.which("do-wdr"):
-        return True
+def runner_status() -> tuple[bool, str]:
+    """`(usable, detail)` — presence is not validity.
+
+    A shim on PATH that cannot start is not a runner. This machine shipped
+    `do-wdr` as a wrapper around `from scripts.cli import main`, which raises
+    `ModuleNotFoundError` before printing anything; the old `shutil.which` check
+    answered "available", every query then exited non-zero, and this module
+    reported `no new leads` for a search that never ran. The runner is probed,
+    not assumed, and the failure names what was tried.
+    """
+    cli = shutil.which("do-wdr")
+    if cli:
+        try:
+            proc = subprocess.run(
+                [cli, "--version"], capture_output=True, text=True, timeout=10
+            )
+        except (OSError, subprocess.SubprocessError) as exc:
+            return False, f"{cli} could not be started ({exc})"
+        if proc.returncode == 0:
+            return True, f"{cli} responds"
+        lines = (proc.stderr or proc.stdout or "").strip().splitlines()
+        return False, (
+            f"{cli} is on PATH but exits {proc.returncode}"
+            + (f": {lines[0].strip()}" if lines else ": no output")
+        )
     try:
         __import__("do_web_doc_resolver")
-        return True
     except ImportError:
-        return False
+        return False, "do-wdr is not on PATH and do_web_doc_resolver is not importable"
+    return True, "do_web_doc_resolver is importable"
+
+
+def runner_available() -> bool:
+    return runner_status()[0]
 
 
 def build_strategies(fixture: dict) -> list[dict]:
@@ -264,6 +302,19 @@ def main() -> None:
     if not is_enabled(explicit=args.enable):
         print("FAIL: resolver_discovery: disabled (pass --enable or RESOLVER_ENABLED=true)", file=sys.stderr)
         sys.exit(1)
+    # Enabled is not the same as runnable. Without this check the rung ran every
+    # query into a missing backend, wrote `{"leads": []}` and exited 1 — an
+    # outcome indistinguishable from "the index had nothing new".
+    usable, detail = runner_status()
+    if not usable:
+        print(
+            "FAIL: resolver_discovery: enabled, but no usable runner — "
+            f"{detail}. This experiment searches *through* do-wdr; a run without "
+            "it would report 'no new leads' for a search that never happened. "
+            "Leave ENABLE_RESOLVER_DISCOVERY off until the runner starts.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
     try:
         fixtures = _read_jsonl(Path(args.fixtures))
     except OSError as exc:
