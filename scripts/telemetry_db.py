@@ -18,6 +18,13 @@ from the committed JSONL and reports from that:
   default 10). Below the floor the sample is too small to be a claim, so no
   suggestion is made rather than one being guessed.
 
+A row's `source` is normally a host, but not every row is a source observation:
+render rungs (`tinyfish`), libraries (`urllib`) and the league labels older event
+rows were charged to also reach the log. Those are reported as
+`plumbing_sources` rather than `unapproved_sources`: the right reaction to an
+unapproved *source* is a `candidates` review, and there is nothing to approve in
+a rung's name.
+
 The `tier` column is resolved, not trusted. Every row the runtime writes today
 carries `tier: 0` — `record_run_outcomes.derive_specs` hardcodes it, and the
 committed log's 142k rows all say so — so a report that read the log's own
@@ -153,6 +160,19 @@ def normalise_source(source: str) -> str:
     alias from reading as a dead source.
     """
     return str(source or "").strip().lower().removeprefix("www.")
+
+
+def is_source_identity(source: str) -> bool:
+    """Whether this name is something `approve_source` could ever add.
+
+    A host (`ndr.de`), a YouTube identity (`youtube.com/@handle`) or a bare
+    handle (`@handle`) is a source. `tinyfish` (a render rung), `urllib` (a
+    library) and `NBBL` (a league label older event rows were charged to) are
+    not, and listing them under *unapproved sources* invites a review with
+    nothing to approve.
+    """
+    name = normalise_source(source)
+    return name.startswith("@") or ("." in name and " " not in name)
 
 
 def resolve_tier(row: dict, tiers: dict[str, int]) -> tuple[int | None, str | None]:
@@ -333,7 +353,16 @@ def report(db_path: Path, *, min_attempts: int = DEFAULT_MIN_ATTEMPTS) -> dict:
         "sources": sources,
         "tier_changes": changes,
         "unapproved_sources": sorted(
-            stats["source"] for stats in sources if stats["tier"] is None
+            stats["source"]
+            for stats in sources
+            if stats["tier"] is None and is_source_identity(stats["source"])
+        ),
+        # Kept in the report rather than dropped: the row is real evidence about
+        # the run, it is just not a source anyone could approve.
+        "plumbing_sources": sorted(
+            stats["source"]
+            for stats in sources
+            if stats["tier"] is None and not is_source_identity(stats["source"])
         ),
         "advisory": "tier moves are proposals; config/sources.json is written only by a reviewed PR",
     }
