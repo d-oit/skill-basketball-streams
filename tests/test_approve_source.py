@@ -161,6 +161,7 @@ def test_refuses_a_host_the_excluded_list_names(repo):
             _candidate("https://euroleague.tv/watch/1"),
             _candidate("https://secure.fibatv.com/live/1"),
             _candidate("https://www.euroleague.tv/watch/2"),
+            _candidate("https://fubo.tv/sports/basketball"),
         ],
         dry_run=False,
     )
@@ -170,9 +171,17 @@ def test_refuses_a_host_the_excluded_list_names(repo):
 
 def test_excluded_domains_are_read_from_the_registry(repo):
     hosts, _, excluded = mod._known(_sources(repo))
-    assert {"euroleague.tv", "fibatv.com", "secure.fibatv.com"} <= excluded
+    assert {
+        "euroleague.tv",
+        "fibatv.com",
+        "secure.fibatv.com",
+        "fubo.tv",
+        "flohoops.com",
+        "tv.youtube.com",
+    } <= excluded
     assert "sky sport" not in excluded  # a name, not a host: nothing to match
     assert "dazn.com" not in excluded  # approved per game, never platform-wide
+    assert "sportplus.tv" not in excluded  # checked free, not paid: a real candidate
 
 
 def test_youtube_is_approved_by_handle_never_by_host(repo):
