@@ -153,10 +153,70 @@ jobs:
                 || echo "::notice::no promotion proposals this run"
               if [ -f .tmp/query-proposals.json ]; then
                 python3 -c "import json;d=json.load(open('.tmp/query-proposals.json'));print('Query proposals (advisory):',len(d['proposals']))"
+                # An artefact on an ephemeral runner is read by nobody, so the
+                # proposals go where a human actually looks: the run summary.
+                python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          proposals = json.load(open(".tmp/query-proposals.json"))["proposals"]
+          print("")
+          print("### Query promotion proposals (advisory)")
+          print("")
+          if not proposals:
+              print("No query met the evidence floor this run.")
+          else:
+              print("| Query | Attempts | Verified | Precision |")
+              print("|---|---|---|---|")
+              for row in proposals:
+                  print(f"| {row['query']} | {row['attempts']} | {row['verified']} | {row['verified_precision']:.0%} |")
+          print("")
+          print("Adoption is a PR against `config/youtube-live-queries.json`; nothing here writes it.")
+          PY
               fi
             fi
           else
             echo "::notice::no experiments or run-log on telemetry yet — nothing to score"
+          fi
+
+      # The proposals above are advisory, and so are these: `telemetry_db.py`
+      # turns the committed run log into a queryable read model and names the
+      # tier reorderings the evidence supports (>= 10 attempts per source).
+      # A tier move is a PR a human opens; this step only makes the evidence
+      # visible in the summary instead of leaving it in a `.tmp` file the runner
+      # discards.
+      - name: Tier ordering report (advisory)
+        if: always()
+        run: |
+          if [ -f .tmp/run-log.jsonl ]; then
+            mkdir -p .tmp/ledgers
+            cp .tmp/run-log.jsonl .tmp/ledgers/run-log.jsonl
+            # `--sources` is load-bearing: every run-log row says `tier: 0`,
+            # so without the registry every source scores as unapproved and
+            # the report can never propose anything.
+            if python3 scripts/telemetry_db.py build --ledgers .tmp/ledgers --db .tmp/telemetry.db \
+                 --sources config/sources.json \
+                 && python3 scripts/telemetry_db.py report --db .tmp/telemetry.db --min-attempts 10 --json > .tmp/tier-report.json; then
+              python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          payload = json.load(open(".tmp/tier-report.json"))
+          changes = payload["tier_changes"]
+          print("")
+          print("### Tier ordering (advisory)")
+          print("")
+          print(f"{len(payload['sources'])} source(s) scored; {len(changes)} tier change(s) at or above {payload['min_attempts']} attempts; {len(payload['unapproved_sources'])} unapproved source(s) not reordered.")
+          print("")
+          if changes:
+              print("| Source | From | To | Attempts | Hit rate | Why |")
+              print("|---|---|---|---|---|---|")
+              for change in changes:
+                  print(f"| {change['source']} | {change['from']} | {change['to']} | {change['attempts']} | {change['hit_rate']:.0%} | {change['why']} |")
+              print("")
+          print("`config/sources.json` is not written by this report: a tier move is a PR.")
+          PY
+            else
+              echo "::notice::no scored run-log rows yet — tier ordering has no evidence to report"
+            fi
+          else
+            echo "::notice::no run-log on telemetry yet — tier ordering report skipped"
           fi
 
       # The branch is created and pushed BEFORE the gate runs. A red result is
@@ -394,6 +454,9 @@ jobs:
             echo "| Actionable misjudgements | ${{ steps.probe.outputs.actionable }} |"
             echo "| Branch | ${{ steps.branch.outputs.name || '—' }} |"
             echo "| Gate | ${{ steps.gate.outcome || 'not run' }} |"
+            echo ""
+            echo "Query-promotion and tier-ordering proposals above are advisory: a"
+            echo "human opens the PR that changes a query list or a source tier."
             echo ""
             echo "This workflow holds **no calendar credential** on purpose: the"
             echo "authority to edit the instructions and the authority to write the"

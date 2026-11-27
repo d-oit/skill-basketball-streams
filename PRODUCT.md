@@ -118,6 +118,7 @@ retired sensor may still be explained.
 | `audit-verdict` | the post-hoc audit returns `WRONG`/`VERIFIED`/`INCONCLUSIVE` from evidence |
 | `event-ledger` | the audit's inputs are written by a producer, not assumed |
 | `eval-synthesis` | a synthesised case fails before the fix and its needles resolve |
+| `tier-resolution` | the tier report resolves the `tier: 0` the runtime writes from `config/sources.json`, fires a promotion and a demotion on production-shaped rows, and refuses to reorder an unapproved domain or a `www.` alias |
 | `metrics` | the metric contract is checked against fixture inputs, offline |
 | `workflow-refs` | every repo path a workflow names exists |
 | `page-corpus` | the stream-evidence gate is judged against recorded real pages |
