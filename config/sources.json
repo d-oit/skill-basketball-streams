@@ -244,12 +244,12 @@
         "sciencecitybasketball.de",
         "skygermany.de",
         "mitteldeutscherbbc.de",
-        "telekom-baskets.de",
+        "telekom-baskets-bonn.de",
         "towers-hamburg.de",
         "gladiators-trier.de"
       ],
       "free_access": "selected",
-      "notes": "Official club websites of the 18 BBL clubs, mirrored from references/approved-sources.md's Tier 5 table. The doc has claimed this tier since it was written while this registry carried none of it, so every run scored albaberlin.de (2,165 attempts) and fcbayern.com (2,040) as unapproved. A club site announces its own broadcasts and may host the live stream, so it can be a directLink when the page itself plays the game free; free access is decided PER GAME and a club announcement is not proof of one. Two hosts are not basketball-only: fcbayern.com carries the whole club (a page there is basketball evidence only when it is about basketball) and skygermany.de is the SKYLINERS site. This entry asserts doc/registry agreement, not a live HTTP result; scripts/link_inventory.py + scripts/link_check.py are the probing half. Mirrored 2026-11-27."
+      "notes": "Official club websites of the 18 BBL clubs, mirrored from references/approved-sources.md's Tier 5 table. The doc has claimed this tier since it was written while this registry carried none of it, so every run scored albaberlin.de (2,165 attempts) and fcbayern.com (2,040) as unapproved. A club site announces its own broadcasts and may host the live stream, so it can be a directLink when the page itself plays the game free; free access is decided PER GAME and a club announcement is not proof of one. Two hosts are not basketball-only: fcbayern.com carries the whole club (a page there is basketball evidence only when it is about basketball) and skygermany.de is the SKYLINERS site. This entry asserts doc/registry agreement, not a live HTTP result; scripts/link_inventory.py + scripts/link_check.py are the probing half. Mirrored 2026-11-27. One host was corrected the same day: `telekom-baskets.de` answers with a certificate whose hostname does not match, so the Bonn club site is `telekom-baskets-bonn.de` over TLS."
     },
     {
       "tier": 6,
@@ -398,6 +398,48 @@
         "tv.youtube.com"
       ],
       "reason": "paid live-TV membership (main plan $82.99/mo); an approved YouTube stream is a channel handle on youtube.com, never this host — verified 2026-11-27 against tv.youtube.com/learn/explore-plans"
+    },
+    {
+      "name": "Foxtel",
+      "domains": [
+        "foxtel.com.au"
+      ],
+      "reason": "paid pay-TV and streaming bundles (from $83/mo) — verified 2026-11-27 against foxtel.com.au/shop.html"
+    },
+    {
+      "name": "Kayo Sports",
+      "domains": [
+        "kayosports.com.au"
+      ],
+      "reason": "paid subscription ($29.99 Standard / $45.99 Premium per month) — verified 2026-11-27 against kayosports.com.au help"
+    },
+    {
+      "name": "beIN SPORTS",
+      "domains": [
+        "beinsports.com"
+      ],
+      "reason": "paid CONNECT subscription (AU$16.99/mo or AU$169.99/yr); the free part of the site is highlights, not live games — verified 2026-11-27"
+    },
+    {
+      "name": "NFHS Network",
+      "domains": [
+        "nfhsnetwork.com"
+      ],
+      "reason": "paid subscription ($6.67–$8.33/mo) — verified 2026-11-27 against nfhsnetwork.com/subscribe"
+    },
+    {
+      "name": "BallerTV",
+      "domains": [
+        "ballertv.com"
+      ],
+      "reason": "paid subscription ($44.85 per quarter, Bronze) — verified 2026-11-27 against baller.tv support pricing"
+    },
+    {
+      "name": "Fanseat",
+      "domains": [
+        "fanseat.com"
+      ],
+      "reason": "paid subscription (€14.99/mo for all live streams) — verified 2026-11-27 against fanseat.com/subscribe"
     }
   ]
 }

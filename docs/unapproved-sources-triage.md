@@ -319,7 +319,22 @@ What the pages said: news 92, official basketball 60, broadcaster 51, stats 32, 
 - `probasket.asport.tv` — ProBasket | Nord-Ostschweizer Basketballverband
 - `courtside1891.basketball` — (no title)
 
-**Paid broadcasters and platforms the fetch found**, proposed for `excluded` once their pricing is checked the way `fubo.tv` was: `foxtel.com.au`, `kayosports.com.au`, `beinsports.com`, `nfhsnetwork.com`, `ballertv.com`, `fanseat.com`, `staige.tv`.
+**Paid broadcasters the fetch found, now excluded** after checking each provider's own pricing page: `foxtel.com.au` (bundles from $83/mo), `kayosports.com.au` ($29.99-$45.99/mo), `beinsports.com` (CONNECT AU$16.99/mo), `nfhsnetwork.com` ($6.67-$8.33/mo), `ballertv.com` ($44.85/quarter) and `fanseat.com` (EUR 14.99/mo). `staige.tv` was fetched and is **not** excluded: it carries free streams beside pay-per-view, so a per-game check is still the rule. `sportplus.tv` was excluded from the paid group for the same reason (its page says every stream is free).
 
 **Aggregators retired from the fetch**: `streameaste.cc`, `vipleague.ro`, `nbabox.co`, `buffsports.io`, `crackstream-au.net`, `liveleagues.me`, `oneball.live`, `mainsports.me`, `livetv-de2.com`, `stream2watch.me`, `canli-spor.com`, `tvsport24.fr`, `partidos-hoy.com`.
 
+## Club evidence check (2026-11-27)
+
+Each of the 31 official hosts was fetched, its live/stream links followed, and the resulting page read for free and paid wording. **No host was approved.** A word on a page is not the per-game free-access claim the source contract requires, and the check showed how easily one is faked:
+
+- **One real free claim:** `nbl1.com.au` - "Subscribe for FREE to NBL+ to watch every NBL1 game LIVE!" and "Watch Live & Free Via NBL1.com.au And NBL1 App". It still needs a Germany-availability check before it can be a source; Australia's domestic rights are territorial.
+- **Five sell their streams:** `cholet-basket.com`, `telekom-baskets-bonn.de`, `winnerleague.tv`, `basketballaustria.tv`, `probasket.asport.tv` mention a subscription or premium tier. A free game there would need its own marker.
+- **Twenty-five said nothing about access.** Silence is not evidence in either
+ direction.
+- **False positives the context check removed:** `bamberg.basketball` matched "free" only inside CSS class names (`swiper-free-mode`), `peristeribc.gr` inside a plugin name, and `tsvbreitenguessbach.de` on "kostenloses Profil" - a free account profile, not a free stream.
+
+- **Registry correction:** the Tier 5 table's Bonn host `telekom-baskets.de` fails TLS hostname verification. The live site is `telekom-baskets-bonn.de` (200, club page); both the doc and the registry now carry it.
+
+## Retried unreachable hosts
+
+66 hosts did not answer the first probe. Retrying with a browser User-Agent, the `www.` variant and plain HTTP recovered **9**: `deia.eus`, `eldia.es`, `firmenpresse.de`, `hrr.mlit.go.jp`, `laprovincia.es`, `penya.com`, `sdbing.net`, `sport.es`, `tbs.co.jp`. The rest either block datacenter addresses or are gone; neither is evidence against a game, so none was retired.
