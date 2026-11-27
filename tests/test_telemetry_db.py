@@ -236,6 +236,39 @@ class TestRegistryTier:
         assert payload["unapproved_sources"] == ["nowhere.example"]
         assert propose_tier_change(stats) is None
 
+    def test_a_plumbing_label_is_not_an_unapproved_source(self, tmp_path):
+        """`tinyfish` is a rung, `urllib` a library, `NBBL` a league label."""
+        rows = (
+            _rows("ndr.de", 0, {"blocked": 3})
+            + _rows("tinyfish", 0, {"error": 5})
+            + _rows("urllib", 0, {"error": 2})
+            + _rows("NBBL", 0, {"create": 2})
+        )
+        directory = _write_ledger(tmp_path / "ledgers", rows)
+        db = tmp_path / "telemetry.db"
+        build(directory, db, self._registry(tmp_path, {"ndr.de": 3}))
+        payload = report(db)
+        assert payload["unapproved_sources"] == []
+        # Sources are normalised on build, so a label is reported lowercased.
+        assert payload["plumbing_sources"] == ["nbbl", "tinyfish", "urllib"]
+        # Reported, just not as a source to approve: the rows are still evidence.
+        assert {entry["source"] for entry in payload["sources"]} == {
+            "ndr.de", "nbbl", "tinyfish", "urllib"
+        }
+
+    def test_an_unapproved_host_and_a_handle_are_still_reported(self, tmp_path):
+        """The classification must not hide the candidates a review exists for."""
+        rows = _rows("nowhere.example", 0, {"skip": 2}) + _rows(
+            "youtube.com/@newchannel", 0, {"skip": 2}
+        )
+        directory = _write_ledger(tmp_path / "ledgers", rows)
+        db = tmp_path / "telemetry.db"
+        build(directory, db, self._registry(tmp_path, {"ndr.de": 3}))
+        assert report(db)["unapproved_sources"] == [
+            "nowhere.example",
+            "youtube.com/@newchannel",
+        ]
+
     def test_a_www_alias_is_one_source_not_a_dead_one(self, tmp_path):
         # The real ledger holds 1,479 rows for the bare host and 405 blocked
         # rows for `www.`. Scored separately, the alias alone is 10/10 blocked
