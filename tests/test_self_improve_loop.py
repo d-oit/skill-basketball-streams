@@ -291,3 +291,35 @@ class TestTheWorkflowWiring:
             "--transcripts tests/fixtures/runtime_transcripts.json"
             not in self.WORKFLOW
         )
+
+    def test_advisory_proposals_reach_the_run_summary(self):
+        """A `.tmp` file on an ephemeral runner is read by nobody.
+
+        `query_experiments.py propose` wrote `.tmp/query-proposals.json` and the
+        step printed a count from it — enough to prove it ran, never enough for
+        anyone to act on. Both promotions and tier moves now land in the job
+        summary, which survives the run and is linked from the Actions page.
+        """
+        assert ".tmp/query-proposals.json" in self.WORKFLOW
+        assert "Query promotion proposals (advisory)" in self.WORKFLOW
+        assert "Tier ordering report (advisory)" in self.WORKFLOW
+        assert "scripts/telemetry_db.py report" in self.WORKFLOW
+        assert '>> "$GITHUB_STEP_SUMMARY"' in self.WORKFLOW
+
+    def test_the_tier_report_stays_advisory(self):
+        """It reads the registry to resolve a tier; it never writes one.
+
+        The read is load-bearing: every run-log row stores `tier: 0`, so a step
+        without `--sources` would score every source as unapproved and could
+        not propose a single move. The write is what the invariant forbids.
+        """
+        step = self.WORKFLOW.split("Tier ordering report (advisory)")[1]
+        body = step.split("- name:")[0]
+        assert "--sources config/sources.json" in body
+        for write_marker in (
+            "--out config/sources.json",
+            "> config/sources.json",
+            ">> config/sources.json",
+            "tee config/sources.json",
+        ):
+            assert write_marker not in body, f"the report must not write {write_marker}"

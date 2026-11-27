@@ -286,6 +286,24 @@ name = "product-contract"
 argv = ["python3", "scripts/check_product_contract.py", "--root", "."]
 when-changed = ["PRODUCT.md", "tasks.md", "plans/**", "do-harness.toml", "scripts/check_product_contract.py"]
 
+[[sensors]]
+name = "tier-resolution"
+# The tier report's first version read the run log's own `tier` field, which
+# every runtime row hardcodes to 0 (`record_run_outcomes.derive_specs`) -- so on
+# the real 142k-row ledger it could neither promote nor demote, while its unit
+# tests passed on a hand-supplied tier. This gate drives the emitted shape
+# through the approved registry and requires a promotion and a demotion to fire,
+# an unapproved domain to be refused, and a `www.` alias to fold into the bare
+# host (the real 405-blocked alias proposed demoting a site that was answering).
+# Build without `--sources` and it reds: that is the mutation it exists for.
+argv = ["python3", "scripts/check_tier_resolution.py", "--root", "."]
+when-changed = [
+  "scripts/telemetry_db.py",
+  "scripts/check_tier_resolution.py",
+  "config/sources.json",
+  "tests/fixtures/tier_resolution/**",
+]
+
 [signal-sets]
 feedback = ["skill-contract", "validate-smoke"]
 verification = [
@@ -309,6 +327,7 @@ verification = [
   "run-outcomes",
   "link-inventory",
   "eval-synthesis",
+  "tier-resolution",
   "product-contract",
 ]
 release = [
@@ -334,5 +353,6 @@ release = [
   "eval-synthesis",
   "link-gate",
   "version-sync",
+  "tier-resolution",
   "product-contract",
 ]
