@@ -2,6 +2,7 @@
 but only on evidence, and only by the narrow rules pinned here."""
 
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -38,6 +39,85 @@ def repo(tmp_path):
 
 def _sources(root):
     return json.loads((root / "config" / "sources.json").read_text(encoding="utf-8"))
+
+
+APPROVED_DOC = ROOT / "references" / "approved-sources.md"
+
+
+def _documented_exclusions() -> list[tuple[str, set[str]]]:
+    """`(Source cell, hosts named in that cell)` from the doc's excluded table.
+
+    Only the first cell is read: the Reason column may name an approved host
+    (`dazn.com` in the DAZN row) while explaining a policy, and treating that as
+    a declaration would demand an exclusion that would break per-game approval.
+    """
+    text = APPROVED_DOC.read_text(encoding="utf-8")
+    marker = "## Explicitly Excluded Sources"
+    if marker not in text:
+        return []
+    section = text.split(marker, 1)[1].split("\n## ", 1)[0]
+    rows: list[tuple[str, set[str]]] = []
+    for line in section.splitlines():
+        if not line.lstrip().startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if not cells or cells[0].lower() == "source":
+            continue
+        if set(cells[0]) <= set("-: "):  # the markdown separator row
+            continue
+        rows.append((cells[0], set(re.findall(r"`([^`]+)`", cells[0]))))
+    return rows
+
+
+class TestTheDocumentedExclusionsAreEnforced:
+    """A doc row is a policy; a registry `domains` entry is the enforced half."""
+
+    def test_every_registry_exclusion_is_in_the_doc_table(self):
+        cells = [cell for cell, _ in _documented_exclusions()]
+        for entry in _sources(ROOT)["excluded"]:
+            assert any(cell.startswith(entry["name"]) for cell in cells), (
+                f"{entry['name']} is excluded in config/sources.json but absent "
+                "from references/approved-sources.md's excluded table"
+            )
+
+    def test_the_hosts_the_doc_names_are_the_hosts_the_registry_refuses(self):
+        rows = _documented_exclusions()
+        for entry in _sources(ROOT)["excluded"]:
+            _cell, hosts = next(
+                (cell, named) for cell, named in rows if cell.startswith(entry["name"])
+            )
+            assert hosts == set(entry.get("domains") or []), (
+                f"{entry['name']}: doc names {sorted(hosts)}, registry refuses "
+                f"{sorted(entry.get('domains') or [])}"
+            )
+
+    def test_a_documented_host_is_not_left_unenforced(self):
+        """The trap: a doc row naming a host that no `excluded` entry refuses."""
+        names = [entry["name"] for entry in _sources(ROOT)["excluded"]]
+        for cell, hosts in _documented_exclusions():
+            if not hosts:
+                continue
+            assert any(cell.startswith(name) for name in names), (
+                f"{cell} documents excluded host(s) {sorted(hosts)} that "
+                "config/sources.json does not refuse"
+            )
+
+    def test_a_host_is_never_both_excluded_and_approved(self):
+        data = _sources(ROOT)
+        approved = {
+            domain.lower()
+            for source in data["sources"]
+            for domain in (source.get("domain"), *(source.get("domains") or []))
+            if isinstance(domain, str)
+        }
+        excluded = {
+            domain.lower()
+            for entry in data["excluded"]
+            for domain in (entry.get("domain"), *(entry.get("domains") or []))
+            if isinstance(domain, str)
+        }
+        assert excluded, "the excluded list lost every domain: nothing is enforced"
+        assert not (excluded & approved)
 
 
 def test_approves_verified_new_host(repo):
