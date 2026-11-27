@@ -85,6 +85,7 @@
         "open.spotify.com",
         "sporx.com",
         "spox.com",
+        "support.playback.tv",
         "twitch.tv"
       ]
     },
@@ -150,7 +151,16 @@
         "bvb.de",
         "cucinaalba.com",
         "dscvolley.de",
-        "ishd.de"
+        "ishd.de",
+        "pereira.com.de"
+      ]
+    },
+    {
+      "category": "Institutional / government portals",
+      "reason": "Public-sector portals a query reached because a game was mentioned on them. They publish nothing and, measured on 2026-11-27, two of them no longer resolve at all. 0 creates in the committed ledger.",
+      "domains": [
+        "hom-sistaxon-int.ibama.gov.br",
+        "servicosonline.fazenda.gov.br"
       ]
     }
   ]

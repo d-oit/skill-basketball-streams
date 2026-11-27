@@ -13,6 +13,105 @@
         "easycredit-bbl.de",
         "api.basketball-bundesliga.de"
       ]
+    },
+    {
+      "domain": "bamberg-baskets.de",
+      "retired_on": "2026-11-27",
+      "verified_on": "2026-11-27",
+      "failure": "wrong-owner",
+      "reason": "The Tier 5 table's Bamberg host since the tier was written. Every TLS handshake fails with SSLV3_ALERT_HANDSHAKE_FAILURE on the bare and www host; over plain HTTP it serves a page titled 'Stammtisch Bamberg Baskets', which is a supporters' club, not the club. The approved host is the club's own site.",
+      "evidence": "Bare and www probed over TLS and HTTP, 2026-11-27. `bamberg.basketball` answers 200 over TLS with the title 'Bamberg Baskets – Bamberg ist Basketball' and was in the same day's fetch pass.",
+      "replaced_by": [
+        "bamberg.basketball"
+      ]
+    },
+    {
+      "domain": "mhpriesen.de",
+      "retired_on": "2026-11-27",
+      "verified_on": "2026-11-27",
+      "failure": "nxdomain",
+      "reason": "The Tier 5 table's Ludwigsburg host. The name does not resolve at all, on the bare or the www host, so no request ever reached a server.",
+      "evidence": "getaddrinfo returns 'no address associated with hostname' for both names, 2026-11-27. `riesen-ludwigsburg.de` answers 200 with the title 'RIESEN Ludwigsburg | Barock Pirates Ludwigsburg e.V.'.",
+      "replaced_by": [
+        "riesen-ludwigsburg.de"
+      ]
+    },
+    {
+      "domain": "academics-basketball.de",
+      "retired_on": "2026-11-27",
+      "verified_on": "2026-11-27",
+      "failure": "nxdomain",
+      "reason": "The Tier 5 table's Heidelberg host. The name does not resolve, on the bare or the www host.",
+      "evidence": "getaddrinfo fails for both names, 2026-11-27. `mlp-academics.de` answers 200 with the title 'MLP Academics Heidelberg'.",
+      "replaced_by": [
+        "mlp-academics.de"
+      ]
+    },
+    {
+      "domain": "niners-chemnitz.de",
+      "retired_on": "2026-11-27",
+      "verified_on": "2026-11-27",
+      "failure": "nxdomain",
+      "reason": "The Tier 5 table's Chemnitz host. The name does not resolve, so the club's site was never fetched under it.",
+      "evidence": "getaddrinfo fails for both names, 2026-11-27. `chemnitz99.de` answers with the NINERS Chemnitz site and is also the 'official website' on the EuroCup team page, so the replacement rests on two independent sources.",
+      "replaced_by": [
+        "chemnitz99.de"
+      ]
+    },
+    {
+      "domain": "sciencecitybasketball.de",
+      "retired_on": "2026-11-27",
+      "verified_on": "2026-11-27",
+      "failure": "nxdomain",
+      "reason": "The Tier 5 table's Jena host. The name does not resolve, on the bare or the www host.",
+      "evidence": "getaddrinfo fails for both names, 2026-11-27. `baskets-jena.de` answers 200 with the title 'Startseite - Science City Jena'.",
+      "replaced_by": [
+        "baskets-jena.de"
+      ]
+    },
+    {
+      "domain": "mitteldeutscherbbc.de",
+      "retired_on": "2026-11-27",
+      "verified_on": "2026-11-27",
+      "failure": "nxdomain",
+      "reason": "The Tier 5 table's MBC host. It is a misspelling of the club's name (the club is Mitteldeutscher BC, not BBC) and the doubled letter does not resolve.",
+      "evidence": "getaddrinfo fails for both names, 2026-11-27. `mitteldeutscherbc.de` answers 200 and redirects to `syntainics-mbc.de`, whose title is 'Startseite - MBC'.",
+      "replaced_by": [
+        "syntainics-mbc.de"
+      ]
+    },
+    {
+      "domain": "towers-hamburg.de",
+      "retired_on": "2026-11-27",
+      "verified_on": "2026-11-27",
+      "failure": "nxdomain",
+      "reason": "The Tier 5 table's Hamburg host. The word order is the club's display name, not its domain, and the name does not resolve.",
+      "evidence": "getaddrinfo fails for both names, 2026-11-27. `hamburgtowers.de` answers 200 with the title 'Startseite | Veolia Towers Hamburg'.",
+      "replaced_by": [
+        "hamburgtowers.de"
+      ]
+    },
+    {
+      "domain": "rostock-seawolves.de",
+      "retired_on": "2026-11-27",
+      "verified_on": "2026-11-27",
+      "failure": "tls-sni",
+      "reason": "The Tier 5 table's Rostock host. Every TLS handshake fails with SSLV3_ALERT_HANDSHAKE_FAILURE on the bare and www host; a plain HTTP request redirects to the club's real host, so the string never served a page over TLS.",
+      "evidence": "Bare and www probed over TLS and HTTP, 2026-11-27. HTTP redirects to `https://www.seawolves.de/`, which answers 200 over TLS with the title 'Startseite - seawolves.de'.",
+      "replaced_by": [
+        "seawolves.de"
+      ]
+    },
+    {
+      "domain": "telekom-baskets.de",
+      "retired_on": "2026-11-27",
+      "verified_on": "2026-11-27",
+      "failure": "tls-hostname",
+      "reason": "The Tier 5 table's Bonn host. The server presents a certificate whose hostname does not match, so the approved host could never be fetched over TLS.",
+      "evidence": "TLS fails with a hostname-mismatch verification error on the bare and www host, 2026-11-27. `telekom-baskets-bonn.de` answers 200 and redirects to `https://www.telekom-baskets-bonn.de/`, the club site.",
+      "replaced_by": [
+        "telekom-baskets-bonn.de"
+      ]
     }
   ]
 }

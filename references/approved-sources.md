@@ -54,22 +54,22 @@ Official websites of BBL clubs that may host live streams.
 | Club | Domain | Notes |
 |------|--------|-------|
 | ALBA BERLIN | `albaberlin.de` | ✅ Tier 5 |
-| BMA365 Bamberg Baskets | `bamberg-baskets.de` | ✅ Tier 5 |
+| BMA365 Bamberg Baskets | `bamberg.basketball` | ✅ Tier 5 — corrected 2026-11-27: bamberg-baskets.de is a fan site ("Stammtisch Bamberg Baskets") and fails the TLS handshake, while `bamberg.basketball` serves the club ("Bamberg Baskets – Bamberg ist Basketball") |
 | Basketball Löwen Braunschweig | `basketball-braunschweig.de` | ✅ Tier 5 |
 | EWE Baskets Oldenburg | `ewe-baskets.de` | ✅ Tier 5 |
 | FC Bayern München Basketball | `fcbayern.com` | ✅ Tier 5 |
 | FIT/One Würzburg Baskets | `wuerzburg-baskets.de` | ✅ Tier 5 |
-| MHP RIESEN Ludwigsburg | `mhpriesen.de` | ✅ Tier 5 |
-| MLP Academics Heidelberg | `academics-basketball.de` | ✅ Tier 5 |
-| NINERS Chemnitz | `niners-chemnitz.de` | ✅ Tier 5 |
+| MHP RIESEN Ludwigsburg | `riesen-ludwigsburg.de` | ✅ Tier 5 — corrected 2026-11-27: mhpriesen.de does not resolve; `riesen-ludwigsburg.de` serves RIESEN Ludwigsburg |
+| MLP Academics Heidelberg | `mlp-academics.de` | ✅ Tier 5 — corrected 2026-11-27: academics-basketball.de does not resolve; `mlp-academics.de` serves MLP Academics Heidelberg |
+| NINERS Chemnitz | `chemnitz99.de` | ✅ Tier 5 — corrected 2026-11-27: niners-chemnitz.de does not resolve; `chemnitz99.de` is the club's site, also named as the official website on the EuroCup team page |
 | RASTA Vechta | `rasta-vechta.de` | ✅ Tier 5 |
 | ratiopharm ulm | `ratiopharm-ulm.de` | ✅ Tier 5 |
-| ROSTOCK SEAWOLVES | `rostock-seawolves.de` | ✅ Tier 5 |
-| Science City Jena | `sciencecitybasketball.de` | ✅ Tier 5 |
+| ROSTOCK SEAWOLVES | `seawolves.de` | ✅ Tier 5 — corrected 2026-11-27: rostock-seawolves.de fails the TLS handshake; `seawolves.de` serves the club |
+| Science City Jena | `baskets-jena.de` | ✅ Tier 5 — corrected 2026-11-27: sciencecitybasketball.de does not resolve; `baskets-jena.de` serves Science City Jena |
 | SKYLINERS | `skygermany.de` | ✅ Tier 5 |
-| SYNTAINICS MBC | `mitteldeutscherbbc.de` | ✅ Tier 5 |
+| SYNTAINICS MBC | `syntainics-mbc.de` | ✅ Tier 5 — corrected 2026-11-27: mitteldeutscherbbc.de does not resolve; mitteldeutscherbc.de redirects to `syntainics-mbc.de`, the club's current site |
 | Telekom Baskets Bonn | `telekom-baskets-bonn.de` | ✅ Tier 5 — domain corrected 2026-11-27: telekom-baskets.de answers with a certificate whose hostname does not match, while `telekom-baskets-bonn.de` serves the club site over TLS |
-| Veolia Towers Hamburg | `towers-hamburg.de` | ✅ Tier 5 |
+| Veolia Towers Hamburg | `hamburgtowers.de` | ✅ Tier 5 — corrected 2026-11-27: towers-hamburg.de does not resolve; `hamburgtowers.de` serves Veolia Towers Hamburg |
 | VET-CONCEPT Gladiators Trier | `gladiators-trier.de` | ✅ Tier 5 |
 
 ### Tier 6: Official YouTube Channels (Medium Confidence)
