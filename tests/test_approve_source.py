@@ -197,10 +197,17 @@ def test_excluded_domains_are_read_from_the_registry(repo):
         "fubo.tv",
         "flohoops.com",
         "tv.youtube.com",
+        "foxtel.com.au",
+        "kayosports.com.au",
+        "beinsports.com",
+        "nfhsnetwork.com",
+        "ballertv.com",
+        "fanseat.com",
     } <= excluded
     assert "sky sport" not in excluded  # a name, not a host: nothing to match
     assert "dazn.com" not in excluded  # approved per game, never platform-wide
     assert "sportplus.tv" not in excluded  # checked free, not paid: a real candidate
+    assert "staige.tv" not in excluded  # mixed free streams and pay-per-view
 
 
 def test_youtube_is_approved_by_handle_never_by_host(repo):

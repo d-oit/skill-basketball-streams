@@ -68,7 +68,7 @@ Official websites of BBL clubs that may host live streams.
 | Science City Jena | `sciencecitybasketball.de` | ✅ Tier 5 |
 | SKYLINERS | `skygermany.de` | ✅ Tier 5 |
 | SYNTAINICS MBC | `mitteldeutscherbbc.de` | ✅ Tier 5 |
-| Telekom Baskets Bonn | `telekom-baskets.de` | ✅ Tier 5 |
+| Telekom Baskets Bonn | `telekom-baskets-bonn.de` | ✅ Tier 5 — domain corrected 2026-11-27: telekom-baskets.de answers with a certificate whose hostname does not match, while `telekom-baskets-bonn.de` serves the club site over TLS |
 | Veolia Towers Hamburg | `towers-hamburg.de` | ✅ Tier 5 |
 | VET-CONCEPT Gladiators Trier | `gladiators-trier.de` | ✅ Tier 5 |
 
@@ -200,4 +200,10 @@ The tier system prioritizes sources based on:
 | Fubo TV (`fubo.tv`) | Paid subscription; every live-TV plan bills monthly (from $63.99/mo). Verified 2026-11-27 against `fubo.tv/welcome/plans`. |
 | FloHoops (`flohoops.com`) | Paid FloSports subscription; exclusive live basketball is subscriber-only. Verified 2026-11-27 against `flohoops.com/signup`. |
 | YouTube TV (`tv.youtube.com`) | Paid live-TV membership (main plan $82.99/mo). The approved YouTube source is a channel handle on `youtube.com`, never this host. Verified 2026-11-27 against `tv.youtube.com/learn/explore-plans`. |
+| Foxtel (`foxtel.com.au`) | Paid pay-TV and streaming bundles (from $83/mo). Verified 2026-11-27 against `foxtel.com.au/shop.html`. |
+| Kayo Sports (`kayosports.com.au`) | Paid subscription ($29.99 Standard / $45.99 Premium per month). Verified 2026-11-27 against the Kayo help page. |
+| beIN SPORTS (`beinsports.com`) | Paid CONNECT subscription (AU$16.99/mo or AU$169.99/yr); the free part of the site is highlights, not live games. Verified 2026-11-27. |
+| NFHS Network (`nfhsnetwork.com`) | Paid subscription ($6.67–$8.33/mo). Verified 2026-11-27 against `nfhsnetwork.com/subscribe`. |
+| BallerTV (`ballertv.com`) | Paid subscription ($44.85 per quarter, Bronze). Verified 2026-11-27 against the BallerTV pricing help page. |
+| Fanseat (`fanseat.com`) | Paid subscription (€14.99/mo for all live streams). Verified 2026-11-27 against `fanseat.com/subscribe`. |
 | Social media accounts as stream sources | Validation only — never a `directLink` |
