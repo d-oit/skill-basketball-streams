@@ -40,7 +40,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from source_learning import NON_SOURCE_DOMAINS  # noqa: E402
+from source_learning import is_non_source, load_non_source_domains  # noqa: E402
 
 SOURCES = "config/sources.json"
 RETIRED = "config/retired-sources.json"
@@ -158,6 +158,11 @@ def approve(root: Path, candidates: list[dict], *, dry_run: bool) -> list[str]:
     sources = json.loads(sources_path.read_text(encoding="utf-8"))
     hosts, handles, excluded = _known(sources)
     retired = _retired_hosts(root)
+    try:
+        non_source = load_non_source_domains(root)
+    except ValueError as exc:
+        print(f"FAIL: approve_source: {exc}", file=sys.stderr)
+        return []
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     new_entries: list[dict] = []
     added: list[str] = []
@@ -182,7 +187,7 @@ def approve(root: Path, candidates: list[dict], *, dry_run: bool) -> list[str]:
             handles.add(handle.lower())
             added.append(handle)
             continue
-        if host in EVIDENCE_ONLY or host in NON_SOURCE_DOMAINS or host in retired:
+        if host in EVIDENCE_ONLY or is_non_source(host, non_source) or host in retired:
             print(f"SKIP: approve_source: {host}: not promotable", file=sys.stderr)
             continue
         if host in excluded or host in hosts:

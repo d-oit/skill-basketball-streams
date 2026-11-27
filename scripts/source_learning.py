@@ -41,6 +41,7 @@ from urllib.parse import urlparse
 LOG_RELATIVE_PATH = "logs/run-log.jsonl"
 CANDIDATES_RELATIVE_PATH = "logs/source-candidates.json"
 SOURCES_RELATIVE_PATH = "config/sources.json"
+NON_SOURCE_RELATIVE_PATH = "config/non-source-domains.json"
 
 OUTCOMES = ("create", "skip", "reject", "blocked", "error")
 
@@ -129,6 +130,42 @@ def approved_domains(sources: dict) -> set[str]:
             if identity:
                 domains.add(identity)
     return domains
+
+
+def load_non_source_domains(root: Path) -> set[str]:
+    """Builtin plumbing plus the reviewed retirements in `config/`.
+
+    The growing list of reviewed non-sources lives in a config file, not here:
+    73 TV-guide, betting, news, stats and app-store hosts collected ~36,000
+    attempts and zero creates in the committed ledger, and a list that long is
+    unreviewable inside a module. A broken file is a usage error, never an empty
+    set — silently un-retiring every host would look exactly like a quiet week.
+    """
+    domains = set(NON_SOURCE_DOMAINS)
+    path = root / NON_SOURCE_RELATIVE_PATH
+    if not path.is_file():
+        return domains
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"{path}: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise ValueError(f"{path}: expected an object with a 'groups' list")
+    for group in payload.get("groups") or []:
+        if not isinstance(group, dict):
+            continue
+        for domain in group.get("domains") or []:
+            if isinstance(domain, str) and domain.strip():
+                domains.add(domain.strip().lower().removeprefix("www."))
+    return domains
+
+
+def is_non_source(domain: str, blocked: set[str]) -> bool:
+    """True for a blocked host and everything under it (`sports.justwatch.com`)."""
+    host = str(domain or "").strip().lower().removeprefix("www.")
+    return bool(host) and any(
+        host == entry or host.endswith("." + entry) for entry in blocked
+    )
 
 
 def read_log(log_path: Path) -> list[dict]:
@@ -311,9 +348,15 @@ def mode_score(args) -> int:
 
 
 def discover_candidates(
-    entries: list[dict], approved: set[str]
+    entries: list[dict], approved: set[str], non_source: set[str] | None = None
 ) -> list[dict]:
-    """Unapproved source domains and YouTube channels, kept quarantined."""
+    """Unapproved source domains and YouTube channels, kept quarantined.
+
+    `non_source` defaults to the builtin plumbing; the CLI passes
+    `load_non_source_domains(root)` so the reviewed retirements in `config/`
+    count too. A subdomain inherits its blocked parent.
+    """
+    blocked = NON_SOURCE_DOMAINS if non_source is None else non_source
     seen: dict[str, dict] = {}
     for entry in entries:
         url = str(entry.get("url") or "")
@@ -324,7 +367,7 @@ def discover_candidates(
                 continue
             identity = channel
         else:
-            if not domain or domain in approved or domain in NON_SOURCE_DOMAINS:
+            if not domain or domain in approved or is_non_source(domain, blocked):
                 continue
             if any(domain.endswith("." + ok) or domain == ok for ok in approved):
                 continue
@@ -357,7 +400,12 @@ def mode_candidates(args) -> int:
     )
     entries = read_log(log_path)
     approved = approved_domains(load_sources(root))
-    candidates = discover_candidates(entries, approved)
+    try:
+        non_source = load_non_source_domains(root)
+    except ValueError as exc:
+        print(f"FAIL: source_learning: {exc}", file=sys.stderr)
+        return 2
+    candidates = discover_candidates(entries, approved, non_source)
     if not candidates:
         print("OK: source_learning: no new source candidates found")
         return 0

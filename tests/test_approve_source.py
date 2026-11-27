@@ -34,6 +34,10 @@ def repo(tmp_path):
     (tmp_path / "config").mkdir()
     shutil.copy(ROOT / "config" / "sources.json", tmp_path / "config" / "sources.json")
     shutil.copy(ROOT / "config" / "retired-sources.json", tmp_path / "config" / "retired-sources.json")
+    shutil.copy(
+        ROOT / "config" / "non-source-domains.json",
+        tmp_path / "config" / "non-source-domains.json",
+    )
     return tmp_path
 
 
@@ -162,6 +166,21 @@ def test_refuses_a_host_the_excluded_list_names(repo):
             _candidate("https://secure.fibatv.com/live/1"),
             _candidate("https://www.euroleague.tv/watch/2"),
             _candidate("https://fubo.tv/sports/basketball"),
+        ],
+        dry_run=False,
+    )
+    assert added == []
+    assert (repo / "config" / "sources.json").read_bytes() == before
+
+
+def test_refuses_a_host_retired_as_a_non_source(repo):
+    """`config/non-source-domains.json` is the reviewable half of the refusal."""
+    before = (repo / "config" / "sources.json").read_bytes()
+    added = mod.approve(
+        repo,
+        [
+            _candidate("https://netzwelt.de/live/1"),
+            _candidate("https://tv.netzwelt.de/live/1"),
         ],
         dry_run=False,
     )

@@ -14,8 +14,10 @@ from pathlib import Path
 import pytest
 
 from scripts.source_learning import (
+    NON_SOURCE_DOMAINS,
     approved_domains,
     discover_candidates,
+    load_non_source_domains,
     load_sources,
     read_log,
     score_entries,
@@ -171,6 +173,49 @@ class TestDiscoverCandidates:
         found = discover_candidates(entries, set())
         assert found[0]["hits"] == 6
         assert len(found[0]["examples"]) == 3
+
+
+class TestNonSourceRetirements:
+    """The reviewed retirements in `config/` are enforced, not just documented."""
+
+    def test_the_config_is_merged_with_the_builtin_plumbing(self):
+        blocked = load_non_source_domains(REPO_ROOT)
+        assert {"netzwelt.de", "tipico.de", "spox.com", "flashscore.com"} <= blocked
+        assert "youtube.com" in blocked  # builtin plumbing, not the config
+
+    def test_a_retired_host_and_its_subdomain_are_never_proposed(self):
+        entries = [
+            _entry("", "skip", "https://netzwelt.de/live"),
+            _entry("", "skip", "https://tv.netzwelt.de/live"),
+            _entry("", "skip", "https://new-basketball.tv/live"),
+        ]
+        found = discover_candidates(entries, set(), load_non_source_domains(REPO_ROOT))
+        assert [item["domain"] for item in found] == ["new-basketball.tv"]
+
+    def test_no_configured_retirement_is_also_approved(self):
+        """A host cannot be both refused and allow-listed.
+
+        The builtin plumbing is checked apart: `youtube.com` is in it (a bare
+        YouTube URL is never a directLink) while the registry carries the same
+        host at tier 6 for its **handles**, and handle approval is the rule that
+        governs YouTube streams.
+        """
+        configured = load_non_source_domains(REPO_ROOT) - NON_SOURCE_DOMAINS
+        approved = approved_domains(load_sources(REPO_ROOT))
+        assert configured and not (configured & approved)
+
+    def test_every_configured_entry_is_a_hostname(self):
+        configured = load_non_source_domains(REPO_ROOT) - NON_SOURCE_DOMAINS
+        assert configured and all("." in name and " " not in name for name in configured)
+
+    def test_a_broken_config_is_a_usage_error(self, tmp_path):
+        """Silently un-retiring every host would look exactly like a quiet week."""
+        (tmp_path / "config").mkdir()
+        (tmp_path / "config" / "non-source-domains.json").write_text(
+            "{not json", encoding="utf-8"
+        )
+        with pytest.raises(ValueError):
+            load_non_source_domains(tmp_path)
 
 
 class TestReadLog:
