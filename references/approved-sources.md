@@ -197,4 +197,7 @@ The tier system prioritizes sources based on:
 | Third-party stream sites | Unofficial |
 | EuroLeague TV (`euroleague.tv`) | Paid subscription (day/monthly/annual passes); every EuroLeague and BKT EuroCup stream there sits behind one. Free EuroLeague games stay on MagentaSport (one per round) and the approved YouTube channels. Verified 2026-11-27 against `euroleague.tv/signup`. |
 | FIBA TV (`fibatv.com`, `secure.fibatv.com`) | Paid subscription/VOD; live and replay pages answer "You must be a subscriber". FIBA's free schedule and announcement evidence stays on `fiba.basketball`. Verified 2026-11-27 against `fibatv.com/live`. |
+| Fubo TV (`fubo.tv`) | Paid subscription; every live-TV plan bills monthly (from $63.99/mo). Verified 2026-11-27 against `fubo.tv/welcome/plans`. |
+| FloHoops (`flohoops.com`) | Paid FloSports subscription; exclusive live basketball is subscriber-only. Verified 2026-11-27 against `flohoops.com/signup`. |
+| YouTube TV (`tv.youtube.com`) | Paid live-TV membership (main plan $82.99/mo). The approved YouTube source is a channel handle on `youtube.com`, never this host. Verified 2026-11-27 against `tv.youtube.com/learn/explore-plans`. |
 | Social media accounts as stream sources | Validation only — never a `directLink` |

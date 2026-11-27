@@ -377,6 +377,27 @@
         "secure.fibatv.com"
       ],
       "reason": "paid subscription/VOD; live and replay pages answer 'You must be a subscriber' — verified 2026-11-27 against fibatv.com/live"
+    },
+    {
+      "name": "Fubo TV",
+      "domains": [
+        "fubo.tv"
+      ],
+      "reason": "paid subscription; every plan bills monthly (from $63.99/mo) — verified 2026-11-27 against fubo.tv/welcome/plans"
+    },
+    {
+      "name": "FloHoops",
+      "domains": [
+        "flohoops.com"
+      ],
+      "reason": "paid FloSports subscription; exclusive live basketball is subscriber-only — verified 2026-11-27 against flohoops.com/signup"
+    },
+    {
+      "name": "YouTube TV",
+      "domains": [
+        "tv.youtube.com"
+      ],
+      "reason": "paid live-TV membership (main plan $82.99/mo); an approved YouTube stream is a channel handle on youtube.com, never this host — verified 2026-11-27 against tv.youtube.com/learn/explore-plans"
     }
   ]
 }
