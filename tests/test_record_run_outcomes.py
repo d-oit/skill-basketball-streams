@@ -262,7 +262,7 @@ class TestRecordThroughTheRealWriter:
         # Every create names a scorable host, never a league label.
         assert [entry["source"] for entry in entries if entry["outcome"] == "create"] == [
             "magentasport.de",
-            "basketball-bundesliga.de",
+            "easycredit-bbl.de",
         ]
         assert any(entry.get("rung") == "tinyfish" for entry in entries)
         stats = source_learning.score_entries(entries)
