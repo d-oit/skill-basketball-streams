@@ -1,0 +1,157 @@
+{
+  "$comment": "Hosts reviewed and retired as non-sources: search/EPG/news/betting/stats/app-store pages that can never be a stream. Merged with the builtin plumbing in source_learning.NON_SOURCE_DOMAINS by load_non_source_domains(); a configured host and every subdomain are refused by discover_candidates and approve_source. Grouped, not flat, because the reason a host is retired is the reviewable part. Evidence: the 2026-11-27 committed run log has thousands of attempts and 0 creates across these hosts, and no entry is an approved host or inside one.",
+  "version": "1.0.0",
+  "groups": [
+    {
+      "category": "TV guide / EPG",
+      "reason": "Electronic programme guides and \"where to watch\" pages: they list broadcasts, they are never the broadcast. 0 creates in the committed ledger.",
+      "domains": [
+        "astra.de",
+        "basketballimtv.de",
+        "calovo.com",
+        "calovo.de",
+        "digitalfernsehen.de",
+        "dslweb.de",
+        "dyn-sport-live-auf-abruf.en.softonic.com",
+        "gestreamt.de",
+        "liveimtv.de",
+        "livesportsontv.com",
+        "netzwelt.de",
+        "sport-tv-guide.live",
+        "sports.justwatch.com",
+        "wowi.astra.de"
+      ]
+    },
+    {
+      "category": "betting / tips",
+      "reason": "Betting and tipster sites: never a stream, and their \"free\" claims are advertising. 0 creates in the committed ledger.",
+      "domains": [
+        "1xbet.com",
+        "freetips.com",
+        "legalbet.es",
+        "leon.bet",
+        "sportsgambler.com",
+        "tipico.de",
+        "wetten.com",
+        "wettfreunde.net"
+      ]
+    },
+    {
+      "category": "news / portal",
+      "reason": "News articles about games, not games. 0 creates in the committed ledger.",
+      "domains": [
+        "basketball-world.news",
+        "basketballsphere.com",
+        "bild.de",
+        "eurosport.de",
+        "freiepresse.de",
+        "hockeyweb.de",
+        "live-sport-online.com",
+        "liveticker.abendblatt.de",
+        "merkur.de",
+        "news.de",
+        "presseportal.de",
+        "rnd.de",
+        "ruhrnachrichten.de",
+        "sport.bild.de",
+        "sport.de",
+        "sport1.de",
+        "sportbild.bild.de",
+        "sportdaten.ikz-online.de",
+        "sportdaten.waz.de",
+        "sportdaten.wr.de",
+        "sportpresseportal.de",
+        "sports.yahoo.com",
+        "squawka.com",
+        "sueddeutsche.de",
+        "swp.de",
+        "swr.de",
+        "t-online.de",
+        "tagesschau.de",
+        "topfreizeit.de",
+        "welt.de",
+        "ws05.news.de"
+      ]
+    },
+    {
+      "category": "social / app store",
+      "reason": "Social platforms, app-store listings and video-conference tools: never a promotable stream source.",
+      "domains": [
+        "apps.apple.com",
+        "de.linkedin.com",
+        "forums.vmix.com",
+        "linkedin.com",
+        "m.twitch.tv",
+        "open.spotify.com",
+        "sporx.com",
+        "spox.com",
+        "twitch.tv"
+      ]
+    },
+    {
+      "category": "stats / results",
+      "reason": "Score and fixture sites: at most evidence for a fixture, never a directLink. 0 creates in the committed ledger.",
+      "domains": [
+        "basketball.realgm.com",
+        "eurobasket.com",
+        "flashscore.co.uk",
+        "flashscore.com",
+        "flashscoreusa.com",
+        "livescore.com",
+        "livescoreapi.com",
+        "livescorehunter.com",
+        "proballers.com",
+        "sofascore.com"
+      ]
+    },
+    {
+      "category": "piracy / aggregator",
+      "reason": "Unauthorised stream aggregators and \"free live stream\" sites: they redistribute other broadcasters' feeds, are never an official source, and a link there cannot be validated as free-and-legal. Verified by fetching each page 2026-11-27.",
+      "domains": [
+        "buffsports.io",
+        "canli-spor.com",
+        "crackstream-au.net",
+        "drakula.stream",
+        "freestreams-live1h.pk",
+        "freestreams-live1i.pk",
+        "live-sport-online.com",
+        "live-sport-tv.fr",
+        "liveleagues.me",
+        "liveru.eu",
+        "livetv-de2.com",
+        "livetv902.me",
+        "mainsports.me",
+        "mainstreams.io",
+        "nbabox.co",
+        "nbabox.im",
+        "oneball.live",
+        "partidos-hoy.com",
+        "screenify.fun",
+        "stream2watch.me",
+        "streameaste.cc",
+        "streameasti.ch",
+        "strikeout.im",
+        "tvizle.tr",
+        "tvsport24.fr",
+        "vipleague.ro",
+        "watch-live-stream.com"
+      ]
+    },
+    {
+      "category": "unrelated (name collision)",
+      "reason": "Sites that matched a query on a club name but are a different business (ALBA the coffee/cosmetics brand, a football or volleyball club). Fetched 2026-11-27: none carries basketball.",
+      "domains": [
+        "alba-coffee.com",
+        "albabotanica.com",
+        "albadsm.com",
+        "albafarmers.org",
+        "albaquincy.com",
+        "bfv.de",
+        "bvb.de",
+        "cucinaalba.com",
+        "dscvolley.de",
+        "ishd.de"
+      ]
+    }
+  ]
+}

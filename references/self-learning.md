@@ -72,7 +72,9 @@ attached in the fetch ladder rather than being dropped — see
 
 `candidates` extracts every domain or exact YouTube channel identity that
 produced a search hit but is absent from `config/sources.json`, and writes them
-quarantined:
+quarantined. Hosts reviewed as non-sources live in
+`config/non-source-domains.json` (TV guides, betting, news, stats, app stores)
+and are never proposed, nor is any subdomain of one:
 
 ```json
 {
