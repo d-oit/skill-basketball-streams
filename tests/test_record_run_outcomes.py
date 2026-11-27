@@ -158,16 +158,54 @@ class TestDerivation:
         }
         assert derive_specs(ledgers) == []
 
-    def test_a_written_event_is_a_create_row(self):
+    def test_a_written_event_is_a_create_row_for_its_stream_host(self):
         ledgers = {
             "events": [
-                {"ts": "t", "run_id": "r", "game_key": "BBL|a|b|c", "action": "create", "event_id": "evt-1", "state": "UNVERIFIED"}
+                {"ts": "t", "run_id": "r", "game_key": "BBL|a|b|c", "action": "create", "event_id": "evt-1", "state": "UNVERIFIED", "source": "www.basketball-bundesliga.de"}
             ]
         }
         specs = derive_specs(ledgers)
         assert specs[0]["outcome"] == "create"
-        assert specs[0]["source"] == "BBL"
+        assert specs[0]["source"] == "basketball-bundesliga.de"
         assert specs[0]["event_id"] == "evt-1"
+
+    def test_an_event_row_without_a_host_is_attributed_by_its_candidate(self):
+        """Ledger rows written before `source` existed can still be attributed."""
+        ledgers = {
+            "candidates": [
+                {"ts": "t", "run_id": "r", "url": "https://sporteurope.tv/game",
+                 "game_key": "NBBL|a|b|c", "disposition": "created"}
+            ],
+            "events": [
+                {"ts": "t", "run_id": "r", "game_key": "NBBL|a|b|c", "action": "create", "event_id": "e", "state": "UNVERIFIED"}
+            ],
+        }
+        assert [(s["source"], s["outcome"]) for s in derive_specs(ledgers)] == [
+            ("sporteurope.tv", "create")
+        ]
+
+    def test_a_league_label_is_never_scored_as_a_source(self):
+        """The real ledger carried `NBBL` / `easyCredit BBL` as sources with creates."""
+        ledgers = {
+            "events": [
+                {"ts": "t", "run_id": "r", "game_key": "easyCredit BBL|a|b|c", "action": "create", "event_id": "e", "state": "VERIFIED"}
+            ]
+        }
+        assert derive_specs(ledgers) == []
+
+    def test_a_calendar_write_is_not_counted_twice(self):
+        """The candidate row already recorded the create; the event is the same game."""
+        ledgers = {
+            "candidates": [
+                {"ts": "t", "run_id": "r", "url": "https://magentasport.de/live/1",
+                 "game_key": "BBL|a|b|c", "disposition": "created"}
+            ],
+            "events": [
+                {"ts": "t", "run_id": "r", "game_key": "BBL|a|b|c", "action": "update", "event_id": "e", "state": "VERIFIED", "source": "magentasport.de"}
+            ],
+        }
+        specs = derive_specs(ledgers)
+        assert [s["source"] for s in specs] == ["magentasport.de"]
 
 
 class TestEntryShape:
@@ -221,6 +259,11 @@ class TestRecordThroughTheRealWriter:
         entries = source_learning.read_log(log_path)
         assert len(entries) == 5
         assert any(entry["outcome"] == "blocked" for entry in entries)
+        # Every create names a scorable host, never a league label.
+        assert [entry["source"] for entry in entries if entry["outcome"] == "create"] == [
+            "magentasport.de",
+            "basketball-bundesliga.de",
+        ]
         assert any(entry.get("rung") == "tinyfish" for entry in entries)
         stats = source_learning.score_entries(entries)
         assert stats["euroleaguebasketball.net"]["attempts"] == 1

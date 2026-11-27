@@ -30,7 +30,7 @@ The inputs are the ledgers that already exist. No new data source is invented:
     fetch-attempts.jsonl  league fixture sources that were blocked/gone/5xx —
                           "an issue found during the run"
     rung-attempts.jsonl   render rungs that failed or are parked
-    events.jsonl          what reached the calendar
+    events.jsonl          what reached the calendar, charged to its stream host
 
 `record` derives one run-log row per input row and hands each to
 `source_learning.mode_record` — the real writer, imported, not a second
@@ -145,10 +145,6 @@ def _outcome_for_disposition(disposition: str) -> str:
     return "skip"
 
 
-def _league_of(game_key: str) -> str:
-    return game_key.split("|", 1)[0].strip() if game_key else ""
-
-
 def _candidate_specs(rows: list[dict], fallback_now: str) -> list[dict]:
     specs: list[dict] = []
     for row in rows:
@@ -236,7 +232,51 @@ def _rung_specs(rows: list[dict], fallback_now: str) -> list[dict]:
     return specs
 
 
-def _event_specs(rows: list[dict], fallback_now: str) -> list[dict]:
+def _stream_host(value: str) -> str:
+    """A recorded host, normalised; `""` when it is not a hostname.
+
+    The dot test is the enforcement of "a league is not a source": the real
+    ledger carries `NBBL`, `EuroLeague` and `easyCredit BBL` as sources because
+    this function used to take `game_key`'s league field. A label that lacks a
+    dot is refused however it arrives.
+    """
+    host = str(value or "").strip().lower()
+    if "://" in host:
+        host = source_learning._domain(host)
+    host = host.removeprefix("www.")
+    return host if "." in host else ""
+
+
+def _event_specs(
+    rows: list[dict], fallback_now: str, candidates: list[dict]
+) -> list[dict]:
+    """One row per calendar write, charged to the source that produced it.
+
+    `events.jsonl` names the league in its `game_key`, and a league is not a
+    source: the real ledger scored "NBBL", "easyCredit BBL", "EuroLeague" and
+    "FIBA Women's EuroBasket 2027 Qualifiers" as unapproved sources with
+    `creates`, and no tier can ever resolve for them. `event_ledger` now records
+    the stream link's host; a row written before that field existed is attributed
+    through the candidate ledger's `(run_id, game_key)`.
+
+    Two rows for one write are also one too many. A game the candidate ledger
+    already recorded as `created` is not written again: the calendar write is not
+    a second attempt by the source, and counting it as one doubled both
+    `attempts` and `creates` for that game.
+    """
+    attributed: dict[tuple[str, str], str] = {}
+    created: set[tuple[str, str]] = set()
+    for row in candidates:
+        game_key = str(row.get("game_key") or "")
+        if not game_key:
+            continue
+        identity = (str(row.get("run_id") or ""), game_key)
+        host = source_learning._domain(str(row.get("url") or ""))
+        if host:
+            attributed.setdefault(identity, host)
+        if str(row.get("disposition") or "") == "created":
+            created.add(identity)
+
     specs: list[dict] = []
     for row in rows:
         action = str(row.get("action") or "")
@@ -245,9 +285,16 @@ def _event_specs(rows: list[dict], fallback_now: str) -> list[dict]:
             # rule `event_ledger` follows, applied before the row reaches here.
             continue
         game_key = str(row.get("game_key") or "")
+        identity = (str(row.get("run_id") or ""), game_key)
+        host = _stream_host(str(row.get("source") or "")) or attributed.get(identity, "")
+        if not host or identity in created:
+            # Nothing names the site, or the site's create is already recorded.
+            # A league label in `game_key` is not a source, and inventing one
+            # would be the rule-reads-nothing defect this module exists to avoid.
+            continue
         specs.append(
             {
-                "source": _league_of(game_key) or "calendar",
+                "source": host,
                 "tier": 0,
                 "url": "",
                 "outcome": "create",
@@ -269,11 +316,12 @@ def derive_specs(ledgers: dict[str, list[dict]], *, now: str = "") -> list[dict]
     candidates (what search surfaced), fetch attempts (what broke), rungs (what
     is dying), events (what reached the calendar).
     """
+    candidates = ledgers.get("candidates", [])
     return (
-        _candidate_specs(ledgers.get("candidates", []), now)
+        _candidate_specs(candidates, now)
         + _fetch_specs(ledgers.get("fetch-attempts", []), now)
         + _rung_specs(ledgers.get("rung-attempts", []), now)
-        + _event_specs(ledgers.get("events", []), now)
+        + _event_specs(ledgers.get("events", []), now, candidates)
     )
 
 

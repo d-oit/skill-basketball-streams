@@ -10,7 +10,10 @@ allow-list. It is deliberately narrow:
   * the candidate must prove free access and a live broadcast (both booleans
     true), a validationTimestamp, an https directLink and an https sourceReference;
   * it never approves an excluded host, a plumbing/social host, an evidence-only
-    host, or a host `config/retired-sources.json` proves dead;
+    host, or a host `config/retired-sources.json` proves dead. An `excluded`
+    entry is enforced through its `domains` list: the five older entries carry a
+    human `name` only ("Sky Sport"), and comparing a host to that name never
+    matched anything;
   * a YouTube stream is approved by channel handle (`@handle`), never by the
     `youtube.com` host, which would approve every channel on YouTube;
   * it is idempotent: a host or handle already present is reported, not added.
@@ -66,7 +69,15 @@ def _retired_hosts(root: Path) -> set[str]:
 
 
 def _known(sources: dict) -> tuple[set[str], set[str], set[str]]:
-    """(approved hosts, approved handles, excluded names) already on file."""
+    """(approved hosts, approved handles, excluded hosts) already on file.
+
+    Excluded hosts come from an entry's `domains` (and `domain`), never its
+    `name`. The first version compared a fetched host to the human name —
+    "Sky Sport" — which could not match a hostname, so the list was decoration;
+    the comment in `references/approved-sources.md` is the policy, this is the
+    half a runtime can enforce. A platform-wide exclusion with no single host
+    legitimately carries no domain and stays a documented refusal.
+    """
     hosts: set[str] = set()
     handles: set[str] = set()
     for source in sources.get("sources", []):
@@ -75,7 +86,14 @@ def _known(sources: dict) -> tuple[set[str], set[str], set[str]]:
         for key in ("domains", "social"):
             hosts.update(str(v).lower() for v in source.get(key, []) if isinstance(v, str))
         handles.update(str(h).lower() for h in source.get("handles", []))
-    excluded = {str(e.get("name", "")).lower() for e in sources.get("excluded", [])}
+    excluded: set[str] = set()
+    for entry in sources.get("excluded", []):
+        if not isinstance(entry, dict):
+            continue
+        values = [entry.get("domain"), *(entry.get("domains") or [])]
+        for value in values:
+            if isinstance(value, str) and value.strip():
+                excluded.add(value.strip().lower().removeprefix("www."))
     return hosts, handles, excluded
 
 

@@ -167,6 +167,20 @@ class TestRowShape:
     def test_it_is_not_a_dry_run_row(self):
         assert ledger_row(_plan_row(), _action(), run_id="r")["dry_run"] is False
 
+    def test_the_stream_host_is_recorded_not_the_league(self):
+        """A run-log source must be scorable; `BBL` can never resolve a tier."""
+        plan = _plan_row(
+            direct_links=[
+                {"source": "magenta.tv", "url": "https://www.magentasport.de/live/1"}
+            ]
+        )
+        row = ledger_row(plan, _action(), run_id="r")
+        assert row["source"] == "magentasport.de"
+        assert row["source"] != "BBL"
+
+    def test_no_link_records_no_source(self):
+        assert ledger_row(_plan_row(), _action(), run_id="r")["source"] == ""
+
 
 class TestBuildRows:
     def test_a_dry_run_records_nothing_and_says_why(self):

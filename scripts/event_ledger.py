@@ -65,6 +65,7 @@ import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlparse
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -116,6 +117,27 @@ def load_applied(path: Path) -> dict:
     return payload
 
 
+def link_host(plan_row: dict) -> str:
+    """The stream host the event was built from, or `""` when no link is known.
+
+    `upsert_events._event_fields` carries the candidate's `direct_links` onto the
+    plan row, so the plan knows the site the stream came from. Recording it is
+    what lets the run log charge a calendar write to a source at all: the row
+    carried only the league (`game_key`'s first field), and `record_run_outcomes`
+    scored "NBBL" and "easyCredit BBL" as unapproved sources with `creates` —
+    labels that can never resolve a tier. A `www.` alias is folded, exactly as
+    `telemetry_db.normalise_source` folds it.
+    """
+    links = plan_row.get("direct_links")
+    for entry in links if isinstance(links, list) else []:
+        if not isinstance(entry, dict):
+            continue
+        host = (urlparse(str(entry.get("url") or "")).hostname or "").lower()
+        if host:
+            return host[4:] if host.startswith("www.") else host
+    return ""
+
+
 def ledger_row(
     plan_row: dict,
     action: dict,
@@ -145,6 +167,9 @@ def ledger_row(
         "run_id": run_id,
         "event_id": str(action.get("event_id") or ""),
         "game_key": str(plan_row.get("game_key") or action.get("game_key") or ""),
+        # The site the stream came from, never the league: a league label is not
+        # a source and cannot be scored as one.
+        "source": link_host(plan_row),
         "action": str(action.get("action") or ""),
         "state": state,
         # Unprefixed, so re-applying a prefix is idempotent and a reader sees the

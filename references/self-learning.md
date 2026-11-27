@@ -33,7 +33,8 @@ The CI caller is `scripts/record_run_outcomes.py`: it derives rows from ledgers
 that already exist — `candidates.jsonl` (search hits, including the backend),
 `fetch-attempts.jsonl` (a blocked/gone/5xx fixture source is "an issue during
 the run"), `rung-attempts.jsonl` (a failed or parked render rung) and
-`events.jsonl` (what reached the calendar) — and appends them through
+`events.jsonl` (what reached the calendar, charged to the stream link's host
+rather than the league, which is not a source) — and appends them through
 `source_learning.py`'s own `record`. Runtime-discovered source leads are added
 separately with `record-leads`; they include URLs surfaced by YouTube's Live
 filter and stay quarantined until manually approved. Before the writer existed,
