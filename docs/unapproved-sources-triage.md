@@ -276,3 +276,50 @@ Derived from `telemetry_db.py report` over the committed 142,290-row run log (`c
 - `pirly.tech` (75 attempts)
 - `schoenen-dunk.de` (75 attempts)
 - `hom-sistaxon-int.ibama.gov.br` (70 attempts)
+
+## Fetch pass (2026-11-27)
+
+Each of the 449 hosts the name-based pass could not settle was fetched once (HTTPS, 6 s timeout, `<title>` + meta description; the throwaway probe is not part of the product). **383 answered, 66 did not** — an unreachable host is a transport fact, never evidence that a game was not streamed, so nothing was retired for failing to answer.
+
+What the pages said: news 92, official basketball 60, broadcaster 51, stats 32, TV guide 22, betting 11, paid platform 4, other 111.
+
+**Retired on the fetch evidence** (now in `config/non-source-domains.json`, which `discover_candidates` and `approve_source` both refuse): 27 unauthorised aggregators and 10 name-collision businesses. The collision list is the useful one — `alba-coffee.com`, `albabotanica.com` and `albaquincy.com` matched the `alba` query and have nothing to do with ALBA Berlin.
+
+**Official basketball hosts that answered with a club/league page**, proposed for a documented Tier 5 addition. They are **not approved here**: each needs the free-access claim `references/approved-sources.md` requires, and a club stream is free only when the club says so.
+
+- `bamberg.basketball` — Bamberg Baskets – Bamberg ist Basketball
+- `basket.co.il` — מנהלת ליגת העל בכדורסל
+- `belarus.basketball` — Белорусская федерация баскетбола
+- `bilbaobasket.biz` — Bilbao Basket | Web Oficial
+- `bkpardubice.cz` — BK Pardubice, a.s.
+- `cholet-basket.com` — Site officiel du club de Cholet Basket
+- `eagles-basketball.de` — Home – Itzehoe Eagles Basketball - 2. Basketball Bundesliga
+- `frankfurt-skyliners.de` — Home - Frankfurt Skyliners
+- `igokea.rs` — Igokea m:tel &#8211; Republika Srpska
+- `jbbl-koeln.de` — JBBL Basketball Köln
+- `manchester.basketball` — Manchester Basketball | Super League Basketball Team
+- `msb.fr` — MSB.FR - Le Mans Sarthe Basket
+- `nbl.com.au` — National Basketball League | NBL Australia | Australia&#x27;s Basketba
+- `nbl1.com.au` — Home | NBL1 Australia
+- `pallacanestroreggiana.it` — Pallacanestro Reggiana
+- `peristeribc.gr` — PERISTERI BC
+- `sg-rheinstars-koeln.de` — RheinStars Köln - #1 Basketball in Köln
+- `telekom-baskets-bonn.de` — Telekom Baskets Bonn - Telekom Baskets Bonn
+- `ts-jahn-basketball.de` — TS Jahn München Basketball - #jahnfamily
+- `ttl-basketball-bamberg.de` — TTL Basketball Bamberg &#8211; Basketball in Bamberg seit 1988 – Leist
+- `ubc.ms` — Startseite - UBC Münster
+- `usc-eisvoegel.de` — Eisvögel USC Freiburg | USC Eisvögel
+- `winnerleague.tv` — -
+- `basketballaustria.tv` — -
+- `basketballireland.tv` — JoymoTV
+- `tv.ibasketball.co.il` — Israeli Basketball TV
+- `bba-46ers.de` — BBA GIESSEN 46ers | Basketball Akademie GIESSEN 46ers
+- `bcwiesbaden.de` — Basketball Club Wiesbaden &#8211; 1952 e.V.
+- `tsvbreitenguessbach.de` — TSV Breitengüßbach e.V. 1923
+- `probasket.asport.tv` — ProBasket | Nord-Ostschweizer Basketballverband
+- `courtside1891.basketball` — (no title)
+
+**Paid broadcasters and platforms the fetch found**, proposed for `excluded` once their pricing is checked the way `fubo.tv` was: `foxtel.com.au`, `kayosports.com.au`, `beinsports.com`, `nfhsnetwork.com`, `ballertv.com`, `fanseat.com`, `staige.tv`.
+
+**Aggregators retired from the fetch**: `streameaste.cc`, `vipleague.ro`, `nbabox.co`, `buffsports.io`, `crackstream-au.net`, `liveleagues.me`, `oneball.live`, `mainsports.me`, `livetv-de2.com`, `stream2watch.me`, `canli-spor.com`, `tvsport24.fr`, `partidos-hoy.com`.
+
