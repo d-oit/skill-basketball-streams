@@ -59,9 +59,10 @@ STREAMS_URL = "https://www.youtube.com/@{handle}/streams"
 RSS_URL = "https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}"
 WATCH_URL = "https://www.youtube.com/watch?v={video_id}"
 
-# Channel IDs resolved live 2026-11-11 from each `@handle` page (`browseId`).
-# A handle missing here is resolved the same way at runtime (one extra GET);
-# the map only saves that request for the handles this skill approves.
+# Channel IDs resolved live from each `@handle` page (`browseId`): the seven
+# below on 2026-11-11, the three approved later on 2026-11-26. A handle missing
+# here is resolved the same way at runtime (one extra GET); the map only saves
+# that request for the handles this skill approves.
 CHANNEL_IDS = {
     "fiba": "UCtInrnU3QbWqFGsdKT1GZtg",
     "basketballbundesliga": "UCg4YgrMEO4Y5hg9FJce6Jag",
@@ -70,6 +71,9 @@ CHANNEL_IDS = {
     "tampa2films": "UCDH9pTsSYS2zJDd_Rr9xbWg",
     "enbleague": "UC4nW9T_6d6e4DKa4A9_3Ouw",
     "legabasket": "UCKuhExlRMWgfcaD__HtN1yw",
+    "basketliga": "UCT3PGkIHb_jd6Nr8dmQGUMQ",
+    "euroleaguewomen": "UChsN13M_uLLQQ8lFewoXxzA",
+    "eastasiasuperleague": "UCE--r0UnH4KFVBtFVHN5jeA",
 }
 
 BROWSE_ID_RE = re.compile(r'"browseId":"(UC[\w-]{22})"')

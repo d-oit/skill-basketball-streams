@@ -65,6 +65,64 @@ class TestYouTubeQueries:
         assert all(f"sp={LIVE_SEARCH_SP}" in row["url"] for row in searches)
 
 
+def _approved_handles() -> set[str]:
+    """`@handle` identities in `config/sources.json`, lowercased.
+
+    Legacy `/user/<name>` URLs are skipped: they have no `@handle` to attach to
+    a channel tab, and `youtube_live.py` handles them separately.
+    """
+    payload = json.loads((REPO / "config" / "sources.json").read_text(encoding="utf-8"))
+    handles: set[str] = set()
+    for source in payload.get("sources", []):
+        for handle in source.get("handles", []):
+            if "/user/" in handle:
+                continue
+            name = handle.rstrip("/").rsplit("/", 1)[-1]
+            if name.startswith("@") and len(name) > 1:
+                handles.add(name[1:].lower())
+    return handles
+
+
+class TestAttachedChannelSurface:
+    """An approved channel the runtime is not handed is a channel no run reads.
+
+    `config/sources.json` is the *policy* list (`youtube_live.load_allowed_handles`
+    and Phase 0's `youtube-tab` rung both read it), but the agent's prebuilt
+    channel tabs come from `config/youtube-live-queries.json`. `@EastAsiaSuperLeague`
+    was approved and gated correctly and was still missing from the attached
+    list, so every gate passed while the channel was never fetched. These two
+    directions are the guard: policy cannot name a channel the surface omits,
+    and the surface cannot attach a channel policy has not approved.
+    """
+
+    def test_every_approved_handle_is_attached(self):
+        attached = {entry["handle"].lower() for entry in _youtube_config()["channels"]}
+        missing = sorted(_approved_handles() - attached)
+        assert not missing, (
+            "approved YouTube handles missing from config/youtube-live-queries.json "
+            f"channels: {missing} — the gate would pass and the channel never fetched"
+        )
+
+    def test_no_channel_is_attached_without_approval(self):
+        attached = {entry["handle"].lower() for entry in _youtube_config()["channels"]}
+        unapproved = sorted(attached - _approved_handles())
+        assert not unapproved, (
+            "config/youtube-live-queries.json attaches channels config/sources.json "
+            f"does not approve: {unapproved}"
+        )
+
+    def test_every_attached_channel_pins_a_channel_id(self):
+        import re
+
+        entries = _youtube_config()["channels"]
+        ids = [entry["channel_id"] for entry in entries]
+        assert len(set(ids)) == len(ids), "two channels share a channel_id"
+        for entry in entries:
+            assert re.fullmatch(r"UC[\w-]{22}", entry["channel_id"]), (
+                f"{entry['handle']}: channel_id {entry['channel_id']!r} is not a YouTube channel id"
+            )
+
+
 class TestPhase0Queries:
     def test_default_queries_cover_youth_regional_and_free_tiers(self):
         from scripts.run_daily import DEFAULT_QUERIES
