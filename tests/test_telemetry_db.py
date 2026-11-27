@@ -190,7 +190,9 @@ class TestRegistryTier:
     """
 
     @staticmethod
-    def _registry(tmp_path: Path, tiers: dict[str, int]) -> Path:
+    def _registry(
+        tmp_path: Path, tiers: dict[str, int], excluded: tuple[str, ...] = ()
+    ) -> Path:
         path = tmp_path / "sources.json"
         path.write_text(
             json.dumps(
@@ -198,7 +200,10 @@ class TestRegistryTier:
                     "sources": [
                         {"tier": tier, "domains": [domain], "name": domain}
                         for domain, tier in tiers.items()
-                    ]
+                    ],
+                    "excluded": [
+                        {"name": domain, "domains": [domain]} for domain in excluded
+                    ],
                 }
             ),
             encoding="utf-8",
@@ -222,6 +227,53 @@ class TestRegistryTier:
         build(directory, db, self._registry(tmp_path, {"ndr.de": 2}))
         stats = report(db)["sources"][0]
         assert (stats["tier"], stats["tier_source"]) == (4, "log")
+
+    def test_a_subdomain_resolves_from_its_approved_parent(self, tmp_path):
+        """Discovery treats `live.x` as approved; the report must agree."""
+        directory = _write_ledger(
+            tmp_path / "ledgers", _rows("about.fiba.basketball", 0, {"skip": 20})
+        )
+        db = tmp_path / "telemetry.db"
+        build(directory, db, self._registry(tmp_path, {"fiba.basketball": 1}))
+        payload = report(db)
+        stats = payload["sources"][0]
+        assert (stats["tier"], stats["tier_source"]) == (1, "registry")
+        assert payload["unapproved_sources"] == []
+
+    def test_an_excluded_host_never_inherits_its_approved_parent(self, tmp_path):
+        """`tv.youtube.com` is paid; `youtube.com` being tier 6 must not win."""
+        rows = _rows("tv.youtube.com", 0, {"skip": 20}) + _rows(
+            "youtube.com", 0, {"skip": 5}
+        )
+        directory = _write_ledger(tmp_path / "ledgers", rows)
+        db = tmp_path / "telemetry.db"
+        build(
+            directory,
+            db,
+            self._registry(tmp_path, {"youtube.com": 6}, excluded=("tv.youtube.com",)),
+        )
+        payload = report(db)
+        by_source = {entry["source"]: entry for entry in payload["sources"]}
+        assert (
+            by_source["tv.youtube.com"]["tier"],
+            by_source["tv.youtube.com"]["tier_source"],
+        ) == (None, "excluded")
+        assert by_source["youtube.com"]["tier"] == 6
+        assert payload["excluded_sources"] == ["tv.youtube.com"]
+        assert payload["unapproved_sources"] == []
+
+    def test_a_subdomain_of_an_excluded_host_is_excluded(self, tmp_path):
+        directory = _write_ledger(
+            tmp_path / "ledgers", _rows("secure.fibatv.com", 0, {"skip": 3})
+        )
+        db = tmp_path / "telemetry.db"
+        build(
+            directory,
+            db,
+            self._registry(tmp_path, {"fiba.basketball": 1}, excluded=("fibatv.com",)),
+        )
+        stats = report(db)["sources"][0]
+        assert (stats["tier"], stats["tier_source"]) == (None, "excluded")
 
     def test_an_unapproved_domain_is_reported_but_never_reordered(self, tmp_path):
         # Twelve creates would be a promotion if the source were approved. It is

@@ -36,6 +36,13 @@ registry, the only place a tier is actually maintained) and recorded as
 `tier: NULL` — it is *unapproved*, not tier 0 — and is never reordered, because
 its right reaction is a `candidates` review, not a tier move.
 
+A host is also resolved through its approved parent when it is a subdomain
+(`about.fiba.basketball` is the approved `fiba.basketball`), which is the same
+rule discovery applies; an `excluded` host wins over that fallback, so
+`tv.youtube.com` stays unapproved even though `youtube.com` is tier 6. Those two
+answers — approved and excluded — are reported apart (`tier_source`), never
+scored as tier 0.
+
 Sources are also folded to one identity per site (`www.` stripped, lowercased),
 the same rule the registry uses. The log records the host as fetched, so the
 real ledger carries 1,479 rows for `euroleaguebasketball.net` and 405 blocked
@@ -175,12 +182,47 @@ def is_source_identity(source: str) -> bool:
     return name.startswith("@") or ("." in name and " " not in name)
 
 
-def resolve_tier(row: dict, tiers: dict[str, int]) -> tuple[int | None, str | None]:
+def load_excluded(sources_path: Path) -> set[str]:
+    """Hosts `config/sources.json` refuses outright, from `excluded[].domains`.
+
+    `{}` when the file is absent; an unparseable registry raises, exactly as
+    `load_tiers` does — silently treating every exclusion as gone would let a
+    paid host resolve a tier.
+    """
+    try:
+        payload = json.loads(sources_path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return set()
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"{sources_path}: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise ValueError(f"{sources_path}: expected an object with a 'sources' list")
+    excluded: set[str] = set()
+    for entry in payload.get("excluded") or []:
+        if not isinstance(entry, dict):
+            continue
+        for value in (entry.get("domain"), *(entry.get("domains") or [])):
+            if isinstance(value, str) and value.strip():
+                excluded.add(normalise_source(value))
+    return excluded
+
+
+def _parents(source: str) -> list[str]:
+    """Parent suffixes of a host, most specific first (`a.b.c` -> `b.c`, `c`)."""
+    parts = source.split(".")
+    return [".".join(parts[index:]) for index in range(1, len(parts) - 1)]
+
+
+def resolve_tier(
+    row: dict, tiers: dict[str, int], excluded: set[str] | None = None
+) -> tuple[int | None, str | None]:
     """The tier a row is scored at, and where that number came from.
 
     A positive tier in the log is the observation itself and wins. The runtime
-    writes `0` for "not stated", so `0` falls through to the registry, and a
-    source absent from the registry resolves to `(None, None)`: unapproved.
+    writes `0` for "not stated", so `0` falls through to the registry. A host
+    the registry excludes is `(None, "excluded")` even when a parent is
+    approved (`tv.youtube.com` under `youtube.com`); a subdomain of an approved
+    host resolves from that parent; anything else is `(None, None)`: unapproved.
     """
     try:
         logged = int(row.get("tier"))
@@ -189,8 +231,16 @@ def resolve_tier(row: dict, tiers: dict[str, int]) -> tuple[int | None, str | No
     if logged > 0:
         return logged, "log"
     source = normalise_source(row.get("source"))
+    blocked = excluded or set()
+    if source in blocked:
+        return None, "excluded"
     if source in tiers:
         return tiers[source], "registry"
+    for parent in _parents(source):
+        if parent in blocked:
+            return None, "excluded"
+        if parent in tiers:
+            return tiers[parent], "registry"
     return None, None
 
 
@@ -224,6 +274,7 @@ def build(
     """
     rows = read_rows(directory)
     tiers = load_tiers(sources_path) if sources_path else {}
+    excluded = load_excluded(sources_path) if sources_path else set()
     db_path.parent.mkdir(parents=True, exist_ok=True)
     # Derived, so the old file is discarded rather than migrated: a stale row
     # that the ledger no longer carries must not survive a rebuild.
@@ -231,7 +282,10 @@ def build(
     with sqlite3.connect(db_path) as conn:
         conn.executescript(SCHEMA)
         resolved = [
-            (resolve_tier(row, tiers), {**row, "source": normalise_source(row.get("source"))})
+            (
+                resolve_tier(row, tiers, excluded),
+                {**row, "source": normalise_source(row.get("source"))},
+            )
             for row in rows
         ]
         # `tier` and `tier_source` replace the raw field, which is always 0 on
@@ -313,6 +367,7 @@ def report(db_path: Path, *, min_attempts: int = DEFAULT_MIN_ATTEMPTS) -> dict:
             """
             SELECT source,
                    MAX(tier) AS tier,
+                   MAX(tier_source) AS tier_source,
                    SUM(tier_source = 'log') AS logged_tiers,
                    COUNT(*) AS attempts,
                    SUM(outcome = 'create') AS creates,
@@ -334,9 +389,12 @@ def report(db_path: Path, *, min_attempts: int = DEFAULT_MIN_ATTEMPTS) -> dict:
         entry["attempts"] = int(entry["attempts"] or 0)
         tier = entry.pop("tier")
         entry["tier"] = None if tier is None else int(tier)
+        logged = int(entry.pop("logged_tiers") or 0)
+        stored = entry.pop("tier_source")
         entry["tier_source"] = (
-            "log" if int(entry.pop("logged_tiers") or 0)
-            else ("registry" if entry["tier"] is not None else "unapproved")
+            "log"
+            if logged
+            else (stored or ("registry" if entry["tier"] is not None else "unapproved"))
         )
         for key in ("creates", "skips", "rejects", "blocked", "errors"):
             entry[key] = int(entry[key] or 0)
@@ -355,7 +413,16 @@ def report(db_path: Path, *, min_attempts: int = DEFAULT_MIN_ATTEMPTS) -> dict:
         "unapproved_sources": sorted(
             stats["source"]
             for stats in sources
-            if stats["tier"] is None and is_source_identity(stats["source"])
+            if stats["tier"] is None
+            and stats["tier_source"] != "excluded"
+            and is_source_identity(stats["source"])
+        ),
+        # A refused host is not a candidate: `approve_source` would reject it, so
+        # offering it for review would be a question with a known answer.
+        "excluded_sources": sorted(
+            stats["source"]
+            for stats in sources
+            if stats["tier"] is None and stats["tier_source"] == "excluded"
         ),
         # Kept in the report rather than dropped: the row is real evidence about
         # the run, it is just not a source anyone could approve.
